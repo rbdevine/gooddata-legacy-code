@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Sun May 29 13:31:38 EDT 2016" guiVersion="3.4.4.P" id="1464546328917" licenseType="Commercial" modified="Fri Jun 17 23:33:12 EDT 2016" modifiedBy="scalvillo" name="Populate Metrics" revision="1.38" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Component" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" recordSize="-1" type="delimited">
+<Field eofAsDelimiter="false" name="Component_Name" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="Component_Weight_Sort" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="Component_Hyperlink" nullable="true" shift="0" size="0" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3">
+<Record fieldDelimiter="|" name="Data_Source" recordDelimiter="\n" type="delimited">
+<Field name="Data_Source_Name" type="string"/>
+<Field name="Data_Source_Sort" type="string"/>
+<Field name="Data_Source_Hyperlink" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Driver" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" recordSize="-1" type="delimited">
+<Field eofAsDelimiter="false" name="Driver_Name" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="Driver_Sort" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="Driver_Hyperlink" nullable="true" shift="0" size="0" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Metric" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Driver_Name" type="string"/>
+<Field name="Component_Name" type="string"/>
+<Field name="Metric_Id" type="string"/>
+<Field name="Metric_Name" type="string"/>
+<Field name="Metric_Description" type="string"/>
+<Field name="Data_Source" type="string"/>
+<Field name="Best_Practices" type="string"/>
+<Field name="Unit_of_Measurement" type="string"/>
+<Field name="Metric_Weight_Sort" type="string"/>
+<Field name="Metric_Weight" type="string"/>
+<Field name="Metric_Hyperlink" type="string"/>
+</Record>
+</Metadata>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/Component.txt" guiName="Component" guiX="6" guiY="203" id="COMPONENT" type="DATA_READER"/>
+<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/Data Source.txt" guiName="Data Source" guiX="6" guiY="335" id="DATA_SOURCE" type="DATA_READER"/>
+<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/Driver.txt" guiName="Driver" guiX="14" guiY="59" id="DRIVER" type="DATA_READER"/>
+<Node dataset="dataset.driver" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.driver&quot;,&quot;datasetTitle&quot;:&quot;Driver&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.driver.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;attr_driver_drivername&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driver.driverhyperlink&quot;,&quot;title&quot;:&quot;Driver Hyperlink&quot;,&quot;prettyId&quot;:&quot;driver_driverhyperlink&quot;,&quot;assignedMetadataField&quot;:&quot;Driver_Hyperlink&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;drivername&quot;,&quot;assignedMetadataField&quot;:&quot;Driver_Name&quot;,&quot;referenceKey&quot;:true}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driver.driversort&quot;,&quot;title&quot;:&quot;Driver Sort&quot;,&quot;prettyId&quot;:&quot;driver_driversort&quot;,&quot;assignedMetadataField&quot;:&quot;Driver_Sort&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[],&quot;dateFacts&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;datesWithFactConflict&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;entitiesWithoutValue&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="438" guiY="59" id="GD_DATASET_WRITER" mode="FULL_LOAD" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node dataset="dataset.component" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.component&quot;,&quot;datasetTitle&quot;:&quot;Component&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.comp.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;attr_comp_componentname&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.component.componenthyperlink&quot;,&quot;title&quot;:&quot;Component Hyperlink&quot;,&quot;prettyId&quot;:&quot;component_componenthyperlink&quot;,&quot;assignedMetadataField&quot;:&quot;Component_Hyperlink&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;componentname&quot;,&quot;assignedMetadataField&quot;:&quot;Component_Name&quot;,&quot;referenceKey&quot;:true}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.component.componentweight&quot;,&quot;title&quot;:&quot;Component Weight Sort&quot;,&quot;prettyId&quot;:&quot;component_componentweight&quot;,&quot;assignedMetadataField&quot;:&quot;Component_Weight_Sort&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[],&quot;dateFacts&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;datesWithFactConflict&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;entitiesWithoutValue&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="438" guiY="203" id="GD_DATASET_WRITER1" mode="FULL_LOAD" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node dataset="dataset.metric" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.metric&quot;,&quot;datasetTitle&quot;:&quot;Metric&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.metricdescription&quot;,&quot;title&quot;:&quot;Metric Description&quot;,&quot;prettyId&quot;:&quot;attr_metric_metricdescription&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricdescription&quot;,&quot;title&quot;:&quot;Metric Description&quot;,&quot;prettyId&quot;:&quot;metricdescription&quot;,&quot;assignedMetadataField&quot;:&quot;Metric_Description&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.metricid&quot;,&quot;title&quot;:&quot;Metric Id&quot;,&quot;prettyId&quot;:&quot;attr_metric_metricid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricid&quot;,&quot;title&quot;:&quot;Metric Id&quot;,&quot;prettyId&quot;:&quot;metricid&quot;,&quot;assignedMetadataField&quot;:&quot;Metric_Id&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.metricname&quot;,&quot;title&quot;:&quot;Metric Name&quot;,&quot;prettyId&quot;:&quot;attr_metric_metricname&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricname.metrichyperlink&quot;,&quot;title&quot;:&quot;Metric Hyperlink&quot;,&quot;prettyId&quot;:&quot;metricname_metrichyperlink&quot;,&quot;assignedMetadataField&quot;:&quot;Metric_Hyperlink&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricname&quot;,&quot;title&quot;:&quot;Metric Name&quot;,&quot;prettyId&quot;:&quot;metricname&quot;,&quot;assignedMetadataField&quot;:&quot;Metric_Name&quot;,&quot;referenceKey&quot;:true}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricname.metricweightsort&quot;,&quot;title&quot;:&quot;Metric Weight Sort&quot;,&quot;prettyId&quot;:&quot;metricname_metricweightsort&quot;,&quot;assignedMetadataField&quot;:&quot;Metric_Weight_Sort&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.qualityassurance&quot;,&quot;title&quot;:&quot;Best Practices&quot;,&quot;prettyId&quot;:&quot;attr_metric_qualityassurance&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.qualityassurance&quot;,&quot;title&quot;:&quot;Best Practices&quot;,&quot;prettyId&quot;:&quot;qualityassurance&quot;,&quot;assignedMetadataField&quot;:&quot;Best_Practices&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.unitofmeasurement&quot;,&quot;title&quot;:&quot;Unit of Measurement&quot;,&quot;prettyId&quot;:&quot;attr_metric_unitofmeasurement&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.unitofmeasurement&quot;,&quot;title&quot;:&quot;Unit of Measurement&quot;,&quot;prettyId&quot;:&quot;unitofmeasurement&quot;,&quot;assignedMetadataField&quot;:&quot;Unit_of_Measurement&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.comp.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;attr_comp_componentname&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.component.componenthyperlink&quot;,&quot;title&quot;:&quot;Component Hyperlink&quot;,&quot;prettyId&quot;:&quot;comp__component_componenthyperlink&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;comp__componentname&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.component.componentweight&quot;,&quot;title&quot;:&quot;Component Weight Sort&quot;,&quot;prettyId&quot;:&quot;comp__component_componentweight&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Component_Name&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;comp__componentname&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source Name&quot;,&quot;prettyId&quot;:&quot;attr_datasource_datasourcename&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename.datasourcehyperlink&quot;,&quot;title&quot;:&quot;Data Source Hyperlink&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename_datasourcehyperlink&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source Name&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename.datasourcesort&quot;,&quot;title&quot;:&quot;Data Source Sort&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename_datasourcesort&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Data_Source&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source Name&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.driver.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;attr_driver_drivername&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driver.driverhyperlink&quot;,&quot;title&quot;:&quot;Driver Hyperlink&quot;,&quot;prettyId&quot;:&quot;driver__driver_driverhyperlink&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;driver__drivername&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driver.driversort&quot;,&quot;title&quot;:&quot;Driver Sort&quot;,&quot;prettyId&quot;:&quot;driver__driver_driversort&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Driver_Name&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;driver__drivername&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}}}],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.metric.metricweight&quot;,&quot;title&quot;:&quot;Metric Weight&quot;,&quot;prettyId&quot;:&quot;metricweight&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;Metric_Weight&quot;}}],&quot;dateFacts&quot;:[],&quot;entitiesWithoutValue&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;datesWithFactConflict&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="438" guiY="443" id="GD_DATASET_WRITER2" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node dataset="dataset.datasource" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.datasource&quot;,&quot;datasetTitle&quot;:&quot;Data Source&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source Name&quot;,&quot;prettyId&quot;:&quot;attr_datasource_datasourcename&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename.datasourcehyperlink&quot;,&quot;title&quot;:&quot;Data Source Hyperlink&quot;,&quot;prettyId&quot;:&quot;datasourcename_datasourcehyperlink&quot;,&quot;assignedMetadataField&quot;:&quot;Data_Source_Hyperlink&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source Name&quot;,&quot;prettyId&quot;:&quot;datasourcename&quot;,&quot;assignedMetadataField&quot;:&quot;Data_Source_Name&quot;,&quot;referenceKey&quot;:true}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename.datasourcesort&quot;,&quot;title&quot;:&quot;Data Source Sort&quot;,&quot;prettyId&quot;:&quot;datasourcename_datasourcesort&quot;,&quot;assignedMetadataField&quot;:&quot;Data_Source_Sort&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[],&quot;dateFacts&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;datesWithFactConflict&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;entitiesWithoutValue&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="446" guiY="335" id="GD_DATASET_WRITER3" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/Metric.txt" guiName="Metric" guiX="6" guiY="443" id="METRIC" quotedStrings="false" trim="false" type="DATA_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="239" guiY="59" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Driver_Name = $in.0.Driver_Name;
+	$out.0.Driver_Sort = $in.0.Driver_Sort;
+	$out.0.Driver_Hyperlink = $in.0.Driver_Hyperlink;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="239" guiY="203" id="REFORMAT1" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Component_Name = $in.0.Component_Name;
+	$out.0.Component_Weight_Sort = $in.0.Component_Weight_Sort;
+	$out.0.Component_Hyperlink = $in.0.Component_Hyperlink;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="239" guiY="443" id="REFORMAT2" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Driver_Name = $in.0.Driver_Name;
+	$out.0.Component_Name = $in.0.Component_Name;
+	$out.0.Metric_Id = $in.0.Metric_Id;
+	$out.0.Metric_Name = $in.0.Metric_Name;
+	$out.0.Metric_Description = $in.0.Metric_Description;
+	$out.0.Data_Source = $in.0.Data_Source;
+	$out.0.Unit_of_Measurement = $in.0.Unit_of_Measurement;
+	$out.0.Best_Practices = $in.0.Best_Practices;
+	$out.0.Metric_Weight_Sort = $in.0.Metric_Weight_Sort;
+	$out.0.Metric_Weight = $in.0.Metric_Weight;
+	$out.0.Metric_Hyperlink = $in.0.Metric_Hyperlink;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="239" guiY="335" id="REFORMAT3" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Data_Source_Name = $in.0.Data_Source_Name;
+	$out.0.Data_Source_Sort = $in.0.Data_Source_Sort;
+	$out.0.Data_Source_Hyperlink = $in.0.Data_Source_Hyperlink;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="COMPONENT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="REFORMAT1:0"/>
+<Edge fromNode="DATA_SOURCE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="REFORMAT3:0"/>
+<Edge fromNode="DRIVER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="METRIC:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT2:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="GD_DATASET_WRITER:0"/>
+<Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="GD_DATASET_WRITER1:0"/>
+<Edge fromNode="REFORMAT2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="GD_DATASET_WRITER2:0"/>
+<Edge fromNode="REFORMAT3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge7" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="GD_DATASET_WRITER3:0"/>
+</Phase>
+</Graph>
