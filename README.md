@@ -26,16 +26,16 @@
 9.  In Downloads, select `dss-jdbc-driver-2.8.1.jar` file. Click Choose.
 10. Under 'Driver Settings', name: `GoodData ADS`. Close window.
 11. Click the 'green plus' icon (to the left of 'green plus, folder' icon). Click 'No Wizard'.
-12. Name the connection: `GoodData Dev`.
+12. Name the connection: `GoodData Dev`. Driver (JDBC): select `GoodData ADS`.
+13. Use Database URL: `jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e`.
+14. Database Userid: `ps-etl+justcapital_research@gooddata.com`.
+15. Database Password: `justcapital1!`. Click Connect.
 
 
 ## Downloading CloudConnect
 - - - -
-1.  
-2.  
-3.  
-4.  
-
+1.  Go to `https://developer.gooddata.com/cloudconnect/registration.php`.
+2.  Fill out form, choose MacOS 64bit version. Download and Install.
 
 
 ## For existing CloudConnect users
