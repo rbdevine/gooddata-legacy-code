@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 13 13:10:12 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.64" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="area_fips" type="string"/>
+<Field name="own_code" type="string"/>
+<Field name="INDUSTRY_CODE" type="string"/>
+<Field name="agglvl_code" type="string"/>
+<Field name="size_code" type="string"/>
+<Field name="year" type="string"/>
+<Field name="qtr" type="string"/>
+<Field name="disclosure_code" type="string"/>
+<Field name="area_title" type="string"/>
+<Field name="own_title" type="string"/>
+<Field name="industry_title" type="string"/>
+<Field name="agglvl_title" type="string"/>
+<Field name="size_title" type="string"/>
+<Field name="annual_avg_estabs_count" type="string"/>
+<Field name="annual_avg_emplvl" type="string"/>
+<Field name="total_annual_wages" type="string"/>
+<Field name="taxable_annual_wages" type="string"/>
+<Field name="annual_contributions" type="string"/>
+<Field name="annual_avg_wkly_wage" type="string"/>
+<Field name="avg_annual_pay" type="string"/>
+<Field name="lq_disclosure_code" type="string"/>
+<Field name="lq_annual_avg_estabs_count" type="string"/>
+<Field name="lq_annual_avg_emplvl" type="string"/>
+<Field name="lq_total_annual_wages" type="string"/>
+<Field name="lq_taxable_annual_wages" type="string"/>
+<Field name="lq_annual_contributions" type="string"/>
+<Field name="lq_annual_avg_wkly_wage" type="string"/>
+<Field name="lq_avg_annual_pay" type="string"/>
+<Field name="oty_disclosure_code" type="string"/>
+<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
+<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
+<Field name="oty_total_annual_wages_chg" type="string"/>
+<Field name="oty_total_annual_wages_pct_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
+<Field name="oty_annual_contributions_chg" type="string"/>
+<Field name="oty_annual_contributions_pct_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
+<Field name="oty_avg_annual_pay_chg" type="string"/>
+<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
+<Field name="CREATED_DATE" type="decimal"/>
+<Field name="UPDATED_DATE" type="decimal"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="QCEW_Record_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="area_fips" type="string"/>
+<Field name="own_code" type="string"/>
+<Field name="INDUSTRY_CODE" type="string"/>
+<Field name="agglvl_code" type="string"/>
+<Field name="size_code" type="string"/>
+<Field name="year" type="string"/>
+<Field name="qtr" type="string"/>
+<Field name="disclosure_code" type="string"/>
+<Field name="area_title" type="string"/>
+<Field name="own_title" type="string"/>
+<Field name="industry_title" type="string"/>
+<Field name="agglvl_title" type="string"/>
+<Field name="size_title" type="string"/>
+<Field name="annual_avg_estabs_count" type="string"/>
+<Field name="annual_avg_emplvl" type="string"/>
+<Field name="total_annual_wages" type="string"/>
+<Field name="taxable_annual_wages" type="string"/>
+<Field name="annual_contributions" type="string"/>
+<Field name="annual_avg_wkly_wage" type="string"/>
+<Field name="avg_annual_pay" type="string"/>
+<Field name="lq_disclosure_code" type="string"/>
+<Field name="lq_annual_avg_estabs_count" type="string"/>
+<Field name="lq_annual_avg_emplvl" type="string"/>
+<Field name="lq_total_annual_wages" type="string"/>
+<Field name="lq_taxable_annual_wages" type="string"/>
+<Field name="lq_annual_contributions" type="string"/>
+<Field name="lq_annual_avg_wkly_wage" type="string"/>
+<Field name="lq_avg_annual_pay" type="string"/>
+<Field name="oty_disclosure_code" type="string"/>
+<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
+<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
+<Field name="oty_total_annual_wages_chg" type="string"/>
+<Field name="oty_total_annual_wages_pct_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
+<Field name="oty_annual_contributions_chg" type="string"/>
+<Field name="oty_annual_contributions_pct_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
+<Field name="oty_avg_annual_pay_chg" type="string"/>
+<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW" enabled="enabled" guiName="Copy zip files to temp" guiX="46" guiY="43" id="COPY_ZIP_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/BLS/QCEW/" type="FILE_COPY_MOVE"/>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="DROP TABLE" guiX="25" guiY="255" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_COMPLETE_COUNTY;]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="CREATE TABLE" guiX="187" guiY="255" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_COMPLETE_COUNTY (
+    FIPS_ST_CD VARCHAR(30),
+    FIPS_CO_CD VARCHAR(30),
+    INDUSTRY_CD VARCHAR(30),
+    DATA_SUPPRESS_FL VARCHAR(30),
+    TOTAL_MM_EMP_NOISE_FL VARCHAR(30),
+    TOTAL_MM_EMP_NOISE VARCHAR(30),
+    TOTAL_Q1P_NOISE_FL VARCHAR(30),
+    TOTAL_Q1P_NOISE VARCHAR(30),
+	TOTAL_ANL_PAY_NOISE_FL VARCHAR(30),
+	TOTAL_ANL_PAY_NOISE VARCHAR(30),
+	TOTAL_NOE VARCHAR(30),
+    NOE_1_4 VARCHAR(30),
+    NOE_5_9 VARCHAR(30),
+    NOE_10_19 VARCHAR(30),
+    NOE_20_49 VARCHAR(30),
+    NOE_50_99 VARCHAR(30),
+    NOE_100_249 VARCHAR(30),
+    NOE_250_499 VARCHAR(30),
+    NOE_500_999 VARCHAR(30),
+    NOE_1000_OR_MORE VARCHAR(30),
+    NOE_1000_1499 VARCHAR(30),
+    NOE_1500_2499 VARCHAR(30),
+    NOE_2500_4999 VARCHAR(30),
+    NOE_5000_OR_MORE VARCHAR(30),
+	CENSUS_ST_CD VARCHAR(30),
+	CENSUS_CO_CD VARCHAR(30),
+    CREATED_DATE NUMERIC(8,0),
+    UPDATED_DATE NUMERIC(8,0),
+    CREATED_BY VARCHAR(255)
+);]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*County*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Parish*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Burough*.csv" guiName="Read County Files" guiX="46" guiY="124" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt" guiName="Write County File" guiX="291" guiY="124" id="WRITE_COUNTY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="READ_COUNTY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="WRITE_COUNTY_FILE:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${DATA_TMP_DIR}/BLS/QCEW" enabled="enabled" guiName="Delete all temp files" guiX="279" guiY="43" id="DELETE_ALL_TEMP_FILES" type="FILE_DELETE"/>
+<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW/" enabled="enabled" guiName="File Copy/Move (FILE_COPY_MOVE)" guiX="470" guiY="43" id="FILE_COPY_MOVE_FILE_COPY_MOVE" targetPath="Done/" type="FILE_COPY_MOVE"/>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="POPULATE TABLE" guiX="351" guiY="255" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY STG_COMPLETE_COUNTY (
+    FIPS_ST_CD,
+    FIPS_CO_CD,
+    INDUSTRY_CD,
+    DATA_SUPPRESS_FL,
+    TOTAL_MM_EMP_NOISE_FL,
+    TOTAL_MM_EMP_NOISE,
+    TOTAL_Q1P_NOISE_FL,
+    TOTAL_Q1P_NOISE,
+	TOTAL_ANL_PAY_NOISE_FL,
+	TOTAL_ANL_PAY_NOISE,
+	TOTAL_NOE,
+    NOE_1_4,
+    NOE_5_9,
+    NOE_10_19,
+    NOE_20_49,
+    NOE_50_99,
+    NOE_100_249,
+    NOE_250_499,
+    NOE_500_999,
+    NOE_1000_OR_MORE,
+    NOE_1000_1499,
+    NOE_1500_2499,
+    NOE_2500_4999,
+    NOE_5000_OR_MORE,
+	CENSUS_ST_CD,
+	CENSUS_CO_CD,
+    CREATED_DATE,
+    UPDATED_DATE,
+    CREATED_BY
+)
+FROM LOCAL '${DATA_TRANSFORM_DIR}/CompleteCountyFile.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/CompleteCountyErrors.txt'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+</Graph>
