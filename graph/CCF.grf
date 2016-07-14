@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jun 16 00:40:51 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.12" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="COMPLETE_COUNTY_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="FIPS_STATE_CODE" type="string"/>
+<Field name="FIPS_COUNTY_CODE" type="string"/>
+<Field name="INDUSTRY_CODE" type="string"/>
+<Field name="DATA_SUPRESSION_FL" type="string"/>
+<Field name="TOTAL_MM_EMP_NOISE_FL" type="string"/>
+<Field name="TOTAL_MM_EMP_NOISE" type="string"/>
+<Field name="TOTAL_Q1P_NOISE_FL" type="string"/>
+<Field name="TOTAL_Q1P_NOISE" type="string"/>
+<Field name="TOTAL_ANL_PAY_NOISE_FL" type="string"/>
+<Field name="TOTAL_ANL_PAY_NOISE" type="string"/>
+<Field name="TOTAL_NOE" type="string"/>
+<Field name="NOE_1_4" type="string"/>
+<Field name="NOE_5_9" type="string"/>
+<Field name="NOE_10_19" type="string"/>
+<Field name="NOE_20_49" type="string"/>
+<Field name="NOE_50_99" type="string"/>
+<Field name="NOE_100_249" type="string"/>
+<Field name="NOE_250_499" type="string"/>
+<Field name="NOE_500_999" type="string"/>
+<Field name="NOE_1000_OR_MORE" type="string"/>
+<Field name="NOE_1000_1499" type="string"/>
+<Field name="NOE_1500_2499" type="string"/>
+<Field name="NOE_2500_4999" type="string"/>
+<Field name="NOE_5000_OR_MORE" type="string"/>
+<Field name="CENSUS_ST_CD" type="string"/>
+<Field name="CENSUS_CO_CD" type="string"/>
+<Field name="CREATED_DATE" type="decimal"/>
+<Field name="UPDATED_DATE" type="decimal"/>
+<Field name="CREATED_BY" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="COMPLETE_COUNTY_FILE" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="FIPS_STATE_CODE" type="string"/>
+<Field name="FIPS_COUNTY_CODE" type="string"/>
+<Field name="INDUSTRY_CODE" type="string"/>
+<Field name="DATA_SUPRESSION_FL" type="string"/>
+<Field name="TOTAL_MM_EMP_NOISE_FL" type="string"/>
+<Field name="TOTAL_MM_EMP_NOISE" type="string"/>
+<Field name="TOTAL_Q1P_NOISE_FL" type="string"/>
+<Field name="TOTAL_Q1P_NOISE" type="string"/>
+<Field name="TOTAL_ANL_PAY_NOISE_FL" type="string"/>
+<Field name="TOTAL_ANL_PAY_NOISE" type="string"/>
+<Field name="TOTAL_NOE" type="string"/>
+<Field name="NOE_1_4" type="string"/>
+<Field name="NOE_5_9" type="string"/>
+<Field name="NOE_10_19" type="string"/>
+<Field name="NOE_20_49" type="string"/>
+<Field name="NOE_50_99" type="string"/>
+<Field name="NOE_100_249" type="string"/>
+<Field name="NOE_250_499" type="string"/>
+<Field name="NOE_500_999" type="string"/>
+<Field name="NOE_1000_OR_MORE" type="string"/>
+<Field name="NOE_1000_1499" type="string"/>
+<Field name="NOE_1500_2499" type="string"/>
+<Field name="NOE_2500_4999" type="string"/>
+<Field name="NOE_5000_OR_MORE" type="string"/>
+<Field name="CENSUS_ST_CD" type="string"/>
+<Field name="CENSUS_CO_CD" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="52" guiY="345" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_COMPLETE_COUNTY;]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/cbp14co.txt" guiName="READ SOURCE FILE" guiX="42" guiY="205" id="READ_SOURCE_FILE" type="DATA_READER"/>
+<Node enabled="enabled" guiName="TRANSFORM" guiX="243" guiY="205" id="TRANSFORM" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+string blankStr = "";
+string jcDateFormat = "yyyyMMdd";
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.FIPS_STATE_CODE = $in.0.FIPS_STATE_CODE;
+	$out.0.FIPS_COUNTY_CODE = $in.0.FIPS_COUNTY_CODE;
+	$out.0.INDUSTRY_CODE = $in.0.INDUSTRY_CODE;
+	$out.0.DATA_SUPRESSION_FL = $in.0.DATA_SUPRESSION_FL;
+	$out.0.TOTAL_MM_EMP_NOISE_FL = $in.0.TOTAL_MM_EMP_NOISE_FL;
+	$out.0.TOTAL_MM_EMP_NOISE = $in.0.TOTAL_MM_EMP_NOISE;
+	$out.0.TOTAL_Q1P_NOISE_FL = $in.0.TOTAL_Q1P_NOISE_FL;
+	$out.0.TOTAL_Q1P_NOISE = $in.0.TOTAL_Q1P_NOISE;
+	$out.0.TOTAL_ANL_PAY_NOISE_FL = $in.0.TOTAL_ANL_PAY_NOISE_FL;
+	$out.0.TOTAL_ANL_PAY_NOISE = $in.0.TOTAL_ANL_PAY_NOISE;
+	$out.0.TOTAL_NOE = $in.0.TOTAL_NOE;
+	$out.0.NOE_1_4 = $in.0.NOE_1_4;
+	$out.0.NOE_5_9 = $in.0.NOE_5_9;
+	$out.0.NOE_10_19 = $in.0.NOE_10_19;
+	$out.0.NOE_20_49 = $in.0.NOE_20_49;
+	$out.0.NOE_50_99 = $in.0.NOE_50_99;
+	$out.0.NOE_100_249 = $in.0.NOE_100_249;
+	$out.0.NOE_250_499 = $in.0.NOE_250_499;
+	$out.0.NOE_500_999 = $in.0.NOE_500_999;
+	$out.0.NOE_1000_OR_MORE = $in.0.NOE_1000_OR_MORE;
+	$out.0.NOE_1000_1499 = $in.0.NOE_1000_1499;
+	$out.0.NOE_1500_2499 = $in.0.NOE_1500_2499;
+	$out.0.NOE_2500_4999 = $in.0.NOE_2500_4999;
+	$out.0.NOE_5000_OR_MORE = $in.0.NOE_5000_OR_MORE;
+	$out.0.CENSUS_ST_CD = $in.0.CENSUS_ST_CD;
+	$out.0.CENSUS_CO_CD = $in.0.CENSUS_CO_CD;
+	$out.0.CREATED_DATE = str2decimal(date2str(today(), jcDateFormat));
+    $out.0.UPDATED_DATE = str2decimal(date2str(today(), jcDateFormat));
+    $out.0.CREATED_BY = "Complete County File.grf";
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/CompleteCountyFile.txt" guiName="WRITE INTERMEDIATE FILE" guiX="437" guiY="205" id="WRITE_INTERMEDIATE_FILE" type="DATA_WRITER"/>
+<Edge fromNode="READ_SOURCE_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="TRANSFORM:0"/>
+<Edge fromNode="TRANSFORM:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INTERMEDIATE_FILE:0"/>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="221" guiY="345" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_COMPLETE_COUNTY (
+    FIPS_ST_CD VARCHAR(30),
+    FIPS_CO_CD VARCHAR(30),
+    INDUSTRY_CD VARCHAR(30),
+    DATA_SUPPRESS_FL VARCHAR(30),
+    TOTAL_MM_EMP_NOISE_FL VARCHAR(30),
+    TOTAL_MM_EMP_NOISE VARCHAR(30),
+    TOTAL_Q1P_NOISE_FL VARCHAR(30),
+    TOTAL_Q1P_NOISE VARCHAR(30),
+	TOTAL_ANL_PAY_NOISE_FL VARCHAR(30),
+	TOTAL_ANL_PAY_NOISE VARCHAR(30),
+	TOTAL_NOE VARCHAR(30),
+    NOE_1_4 VARCHAR(30),
+    NOE_5_9 VARCHAR(30),
+    NOE_10_19 VARCHAR(30),
+    NOE_20_49 VARCHAR(30),
+    NOE_50_99 VARCHAR(30),
+    NOE_100_249 VARCHAR(30),
+    NOE_250_499 VARCHAR(30),
+    NOE_500_999 VARCHAR(30),
+    NOE_1000_OR_MORE VARCHAR(30),
+    NOE_1000_1499 VARCHAR(30),
+    NOE_1500_2499 VARCHAR(30),
+    NOE_2500_4999 VARCHAR(30),
+    NOE_5000_OR_MORE VARCHAR(30),
+	CENSUS_ST_CD VARCHAR(30),
+	CENSUS_CO_CD VARCHAR(30),
+    CREATED_DATE NUMERIC(8,0),
+    UPDATED_DATE NUMERIC(8,0),
+    CREATED_BY VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="381" guiY="345" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY STG_COMPLETE_COUNTY (
+    FIPS_ST_CD,
+    FIPS_CO_CD,
+    INDUSTRY_CD,
+    DATA_SUPPRESS_FL,
+    TOTAL_MM_EMP_NOISE_FL,
+    TOTAL_MM_EMP_NOISE,
+    TOTAL_Q1P_NOISE_FL,
+    TOTAL_Q1P_NOISE,
+	TOTAL_ANL_PAY_NOISE_FL,
+	TOTAL_ANL_PAY_NOISE,
+	TOTAL_NOE,
+    NOE_1_4,
+    NOE_5_9,
+    NOE_10_19,
+    NOE_20_49,
+    NOE_50_99,
+    NOE_100_249,
+    NOE_250_499,
+    NOE_500_999,
+    NOE_1000_OR_MORE,
+    NOE_1000_1499,
+    NOE_1500_2499,
+    NOE_2500_4999,
+    NOE_5000_OR_MORE,
+	CENSUS_ST_CD,
+	CENSUS_CO_CD,
+    CREATED_DATE,
+    UPDATED_DATE,
+    CREATED_BY
+)
+FROM LOCAL '${DATA_TRANSFORM_DIR}/CompleteCountyFile.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/CompleteCountyErrors.txt'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+</Graph>
