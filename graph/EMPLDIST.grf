@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 13 16:59:46 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.75" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 11:00:40 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.76" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -99,10 +99,10 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW" enabled="enabled" guiName="Copy zip files to temp" guiX="46" guiY="43" id="COPY_ZIP_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/BLS/QCEW/" type="FILE_COPY_MOVE"/>
+<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Copy zip files to temp" guiX="46" guiY="43" id="COPY_ZIP_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/DNB/EMPLDIST" type="FILE_COPY_MOVE"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*County*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Parish*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Burough*.csv" guiName="Read County Files" guiX="39" guiY="134" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
+<Node enabled="enabled" fileURL="#*oes*.csv" guiName="Read Industry Files" guiX="39" guiY="134" id="READ_INDUSTRY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
 <Node enabled="enabled" guiName="Reformat" guiX="239" guiY="146" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -174,118 +174,84 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt" guiName="Write County File" guiX="461" guiY="145" id="WRITE_COUNTY_FILE" type="DATA_WRITER"/>
-<Edge fromNode="READ_COUNTY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_COUNTY_FILE:0"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/DNB/EMPLDIST/EMPLDISTIndustryCombined.txt" guiName="Write Industry File" guiX="461" guiY="145" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="READ_INDUSTRY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="25" guiY="255" id="DROP_TABLE1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_QCEW;]]></attr>
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_EMPLDIST;]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="196" guiY="255" id="CREATE_TABLE1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_QCEW (
-    AREA_FIPS VARCHAR(30),
-	OWN_CODE VARCHAR(30),
-	INDUSTRY_CODE VARCHAR(30),
-	AGGLVL_CODE VARCHAR(30),
-	SIZE_CODE VARCHAR(30),
-	YEAR VARCHAR(30),
-	QTR VARCHAR(30),
-	DISCLOSURE_CODE VARCHAR(30),
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_EMPLDIST (
+	AREA VARCHAR(30),
 	AREA_TITLE VARCHAR(30),
-	OWN_TITLE VARCHAR(30),
-	INDUSTRY_TITLE VARCHAR(30),
-	AGGLVL_TITLE VARCHAR(30),
-	SIZE_TITLE VARCHAR(30),
-	ANNUAL_AVG_ESTABS_COUNT VARCHAR(30),
-	ANNUAL_AVG_EMPLVL VARCHAR(30),
-	TOTAL_ANNUAL_WAGES VARCHAR(30),
-	TAXABLE_ANNUAL_WAGES VARCHAR(30),
-	ANNUAL_CONTRIBUTIONS VARCHAR(30),
-	ANNUAL_AVG_WKLY_WAGE VARCHAR(30),
-	AVG_ANNUAL_PAY VARCHAR(30),
-	LQ_DISCLOSURE_CODE VARCHAR(30),
-	LQ_ANNUAL_AVG_ESTABS_COUNT VARCHAR(30),
-	LQ_ANNUAL_AVG_EMPLVL VARCHAR(30),
-	LQ_TOTAL_ANNUAL_WAGES VARCHAR(30),
-	LQ_TAXABLE_ANNUAL_WAGES VARCHAR(30),
-	LQ_ANNUAL_CONTRIBUTIONS VARCHAR(30),
-	LQ_ANNUAL_AVG_WKLY_WAGE VARCHAR(30),
-	LQ_AVG_ANNUAL_PAY VARCHAR(30),
-	OTY_DISCLOSURE_CODE VARCHAR(30),
-	OTY_ANNUAL_AVG_ESTABS_COUNT_CHG VARCHAR(30),
-	OTY_ANNUAL_AVG_ESTABS_COUNT_PCT_CHG VARCHAR(30),
-	OTY_ANNUAL_AVG_EMPLVL_CHG VARCHAR(30),
-	OTY_ANNUAL_AVG_EMPLVL_PCT_CHG VARCHAR(30),
-	OTY_TOTAL_ANNUAL_WAGES_CHG VARCHAR(30),
-	OTY_TOTAL_ANNUAL_WAGES_PCT_CHG VARCHAR(30),
-	OTY_TAXABLE_ANNUAL_WAGES_CHG VARCHAR(30),
-	OTY_TAXABLE_ANNUAL_WAGES_PCT_CHG VARCHAR(30),
-	OTY_ANNUAL_CONTRIBUTIONS_CHG VARCHAR(30),
-	OTY_ANNUAL_CONTRIBUTIONS_PCT_CHG VARCHAR(30),
-	OTY_ANNUAL_AVG_WKLY_WAGE_CHG VARCHAR(30),
-	OTY_ANNUAL_AVG_WKLY_WAGE_PCT_CHG VARCHAR(30),
-	OTY_AVG_ANNUAL_PAY_CHG VARCHAR(30),
-	OTY_AVG_ANNUAL_PAY_PCT_CHG VARCHAR(30)
+	NAICS VARCHAR(30),
+	NAICS_TITLE VARCHAR(30),
+	OCC CODE VARCHAR(30),
+	OCC TITLE VARCHAR(30),
+	GROUP VARCHAR(30),
+	I_GROUP VARCHAR(30),
+	TOT_EMP VARCHAR(30),
+	EMP_PRSE VARCHAR(30),
+	PCT_TOT VARCHAR(30),
+	H_MEAN VARCHAR(30),
+	A_MEAN VARCHAR(30),
+	MEAN_PRSE VARCHAR(30),
+	H_PCT10 VARCHAR(30),
+	H_PCT25 VARCHAR(30),
+	H_MEDIAN VARCHAR(30),
+	H_PCT75 VARCHAR(30),
+	H_PCT90 VARCHAR(30),
+	A_PCT10 VARCHAR(30),
+	A_PCT25 VARCHAR(30),
+	A_MEDIAN VARCHAR(30),
+	A_PCT75 VARCHAR(30),
+	A_PCT90 VARCHAR(30),
+	ANNUAL VARCHAR(30),
+	HOURLY VARCHAR(30)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="373" guiY="255" id="POPULATE_TABLE1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[COPY STG_QCEW (
-	AREA_FIPS,
-	OWN_CODE,
-	INDUSTRY_CODE,
-	AGGLVL_CODE,
-	SIZE_CODE,
-	YEAR,
-	QTR,
-	DISCLOSURE_CODE,
+<attr name="sqlQuery"><![CDATA[COPY STG_EMPLDIST (
+	AREA,
 	AREA_TITLE,
-	OWN_TITLE,
-	INDUSTRY_TITLE,
-	AGGLVL_TITLE,
-	SIZE_TITLE,
-	ANNUAL_AVG_ESTABS_COUNT,
-	ANNUAL_AVG_EMPLVL,
-	TOTAL_ANNUAL_WAGES,
-	TAXABLE_ANNUAL_WAGES,
-	ANNUAL_CONTRIBUTIONS,
-	ANNUAL_AVG_WKLY_WAGE,
-	AVG_ANNUAL_PAY,
-	LQ_DISCLOSURE_CODE,
-	LQ_ANNUAL_AVG_ESTABS_COUNT,
-	LQ_ANNUAL_AVG_EMPLVL,
-	LQ_TOTAL_ANNUAL_WAGES,
-	LQ_TAXABLE_ANNUAL_WAGES,
-	LQ_ANNUAL_CONTRIBUTIONS,
-	LQ_ANNUAL_AVG_WKLY_WAGE,
-	LQ_AVG_ANNUAL_PAY,
-	OTY_DISCLOSURE_CODE,
-	OTY_ANNUAL_AVG_ESTABS_COUNT_CHG,
-	OTY_ANNUAL_AVG_ESTABS_COUNT_PCT_CHG,
-	OTY_ANNUAL_AVG_EMPLVL_CHG,
-	OTY_ANNUAL_AVG_EMPLVL_PCT_CHG,
-	OTY_TOTAL_ANNUAL_WAGES_CHG,
-	OTY_TOTAL_ANNUAL_WAGES_PCT_CHG,
-	OTY_TAXABLE_ANNUAL_WAGES_CHG,
-	OTY_TAXABLE_ANNUAL_WAGES_PCT_CHG,
-	OTY_ANNUAL_CONTRIBUTIONS_CHG,
-	OTY_ANNUAL_CONTRIBUTIONS_PCT_CHG,
-	OTY_ANNUAL_AVG_WKLY_WAGE_CHG,
-	OTY_ANNUAL_AVG_WKLY_WAGE_PCT_CHG,
-	OTY_AVG_ANNUAL_PAY_CHG,
-	OTY_AVG_ANNUAL_PAY_PCT_CHG
+	NAICS,
+	NAICS_TITLE,
+	OCC CODE,
+	OCC TITLE,
+	GROUP,
+	I_GROUP,
+	TOT_EMP,
+	EMP_PRSE,
+	PCT_TOT,
+	H_MEAN,
+	A_MEAN,
+	MEAN_PRSE,
+	H_PCT10,
+	H_PCT25,
+	H_MEDIAN,
+	H_PCT75,
+	H_PCT90,
+	A_PCT10,
+	A_PCT25,
+	A_MEDIAN,
+	A_PCT75,
+	A_PCT90,
+	ANNUAL,
+	HOURLY
 )
-FROM LOCAL '${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt'
-EXCEPTIONS '${DATA_TMP_DIR}/BLS/QCEW/QCEWCountyCombinedErrors.txt'
+FROM LOCAL '${DATA_TRANSFORM_DIR}/DNB/EMPLDIST/EMPLDISTIndustryCombined.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/DNB/EMPLDIST/EMPLDISTIndustryCombinedErrors.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${DATA_TMP_DIR}/BLS/QCEW" enabled="enabled" guiName="Delete all temp files" guiX="279" guiY="43" id="DELETE_ALL_TEMP_FILES" type="FILE_DELETE"/>
-<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW/" enabled="enabled" guiName="File Copy/Move (FILE_COPY_MOVE)" guiX="470" guiY="43" id="FILE_COPY_MOVE_FILE_COPY_MOVE" targetPath="Done/" type="FILE_COPY_MOVE"/>
+<Node baseURL="${DATA_TMP_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Delete all temp files" guiX="279" guiY="43" id="DELETE_ALL_TEMP_FILES" type="FILE_DELETE"/>
+<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="File Copy/Move (FILE_COPY_MOVE)" guiX="470" guiY="43" id="FILE_COPY_MOVE_FILE_COPY_MOVE" targetPath="Done/" type="FILE_COPY_MOVE"/>
 </Phase>
 </Graph>
