@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 13 16:59:46 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.75" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 09:58:55 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.76" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -99,10 +99,10 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW" enabled="enabled" guiName="Copy zip files to temp" guiX="46" guiY="43" id="COPY_ZIP_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/BLS/QCEW/" type="FILE_COPY_MOVE"/>
+<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Copy zip files to temp" guiX="46" guiY="43" id="COPY_ZIP_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/DNB/EMPLDIST/" type="FILE_COPY_MOVE"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*County*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Parish*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Burough*.csv" guiName="Read County Files" guiX="39" guiY="134" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
+<Node enabled="enabled" fileURL="*oes*.csv" guiName="Read County Files" guiX="39" guiY="134" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
 <Node enabled="enabled" guiName="Reformat" guiX="239" guiY="146" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
