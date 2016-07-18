@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 15:48:11 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.83" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 17:12:38 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.97" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -31,7 +31,7 @@
 </Record>
 </Metadata>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="EMPLDIST_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="," name="EMPLDIST_File" previewAttachmentCharset="ISO-8859-1" quotedStrings="true" recordDelimiter="\n" type="delimited">
 <Field label="area" name="area" type="string"/>
 <Field label="area_title" name="area_title" type="string"/>
 <Field label="naics" name="naics" type="string"/>
@@ -160,9 +160,10 @@
 </Global>
 <Phase number="0">
 <Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Copy data csv files to temp" guiX="46" guiY="43" id="COPY_DATA_CSV_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/DNB/EMPLDIST/" type="FILE_COPY_MOVE"/>
+<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST/*.csv" guiName="CSV Reader" guiX="61" guiY="145" id="CSV_READER" type="DATA_READER"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="#*oes*.csv" guiName="Read Industry Files" guiX="46" guiY="145" id="READ_INDUSTRY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
 <Node enabled="enabled" guiName="Reformat" guiX="262" guiY="145" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -218,7 +219,6 @@ function integer transform() {
 ]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/DNB/EMPLDIST/EMPLDISTIndustryCombined.txt" guiName="Write Industry File" guiX="461" guiY="145" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
-<Edge fromNode="READ_INDUSTRY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
 </Phase>
 <Phase number="2">
@@ -233,9 +233,9 @@ function integer transform() {
 	AREA_TITLE VARCHAR(30),
 	NAICS VARCHAR(30),
 	NAICS_TITLE VARCHAR(30),
-	OCC CODE VARCHAR(30),
-	OCC TITLE VARCHAR(30),
-	GROUP VARCHAR(30),
+	OCC_CODE VARCHAR(30),
+	OCC_TITLE VARCHAR(30),
+	"GROUP" VARCHAR(30),
 	I_GROUP VARCHAR(30),
 	TOT_EMP VARCHAR(30),
 	EMP_PRSE VARCHAR(30),
@@ -265,9 +265,9 @@ function integer transform() {
 	AREA_TITLE,
 	NAICS,
 	NAICS_TITLE,
-	OCC CODE,
-	OCC TITLE,
-	GROUP,
+	OCC_CODE,
+	OCC_TITLE,
+	"GROUP",
 	I_GROUP,
 	TOT_EMP,
 	EMP_PRSE,
@@ -294,7 +294,7 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${DATA_TMP_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Delete all temp files" guiX="279" guiY="43" id="DELETE_ALL_TEMP_FILES" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TMP_DIR}/DNB/EMPLDIST/*.csv" enabled="enabled" guiName="Delete all temp files" guiX="279" guiY="43" id="DELETE_ALL_TEMP_FILES" type="FILE_DELETE"/>
 <Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="File Copy/Move (FILE_COPY_MOVE)" guiX="470" guiY="43" id="FILE_COPY_MOVE_FILE_COPY_MOVE" targetPath="Done/" type="FILE_COPY_MOVE"/>
 </Phase>
 </Graph>
