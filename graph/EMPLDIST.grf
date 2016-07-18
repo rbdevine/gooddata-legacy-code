@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 13 16:59:46 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.75" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="area_fips" type="string"/>
+<Field name="own_code" type="string"/>
+<Field name="INDUSTRY_CODE" type="string"/>
+<Field name="agglvl_code" type="string"/>
+<Field name="size_code" type="string"/>
+<Field name="year" type="string"/>
+<Field name="qtr" type="string"/>
+<Field name="disclosure_code" type="string"/>
+<Field name="area_title" type="string"/>
+<Field name="own_title" type="string"/>
+<Field name="industry_title" type="string"/>
+<Field name="agglvl_title" type="string"/>
+<Field name="size_title" type="string"/>
+<Field name="annual_avg_estabs_count" type="string"/>
+<Field name="annual_avg_emplvl" type="string"/>
+<Field name="total_annual_wages" type="string"/>
+<Field name="taxable_annual_wages" type="string"/>
+<Field name="annual_contributions" type="string"/>
+<Field name="annual_avg_wkly_wage" type="string"/>
+<Field name="avg_annual_pay" type="string"/>
+<Field name="lq_disclosure_code" type="string"/>
+<Field name="lq_annual_avg_estabs_count" type="string"/>
+<Field name="lq_annual_avg_emplvl" type="string"/>
+<Field name="lq_total_annual_wages" type="string"/>
+<Field name="lq_taxable_annual_wages" type="string"/>
+<Field name="lq_annual_contributions" type="string"/>
+<Field name="lq_annual_avg_wkly_wage" type="string"/>
+<Field name="lq_avg_annual_pay" type="string"/>
+<Field name="oty_disclosure_code" type="string"/>
+<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
+<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
+<Field name="oty_total_annual_wages_chg" type="string"/>
+<Field name="oty_total_annual_wages_pct_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
+<Field name="oty_annual_contributions_chg" type="string"/>
+<Field name="oty_annual_contributions_pct_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
+<Field name="oty_avg_annual_pay_chg" type="string"/>
+<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="QCEW_Record_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="area_fips" type="string"/>
+<Field name="own_code" type="string"/>
+<Field name="INDUSTRY_CODE" type="string"/>
+<Field name="agglvl_code" type="string"/>
+<Field name="size_code" type="string"/>
+<Field name="year" type="string"/>
+<Field name="qtr" type="string"/>
+<Field name="disclosure_code" type="string"/>
+<Field name="area_title" type="string"/>
+<Field name="own_title" type="string"/>
+<Field name="industry_title" type="string"/>
+<Field name="agglvl_title" type="string"/>
+<Field name="size_title" type="string"/>
+<Field name="annual_avg_estabs_count" type="string"/>
+<Field name="annual_avg_emplvl" type="string"/>
+<Field name="total_annual_wages" type="string"/>
+<Field name="taxable_annual_wages" type="string"/>
+<Field name="annual_contributions" type="string"/>
+<Field name="annual_avg_wkly_wage" type="string"/>
+<Field name="avg_annual_pay" type="string"/>
+<Field name="lq_disclosure_code" type="string"/>
+<Field name="lq_annual_avg_estabs_count" type="string"/>
+<Field name="lq_annual_avg_emplvl" type="string"/>
+<Field name="lq_total_annual_wages" type="string"/>
+<Field name="lq_taxable_annual_wages" type="string"/>
+<Field name="lq_annual_contributions" type="string"/>
+<Field name="lq_annual_avg_wkly_wage" type="string"/>
+<Field name="lq_avg_annual_pay" type="string"/>
+<Field name="oty_disclosure_code" type="string"/>
+<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
+<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
+<Field name="oty_total_annual_wages_chg" type="string"/>
+<Field name="oty_total_annual_wages_pct_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
+<Field name="oty_annual_contributions_chg" type="string"/>
+<Field name="oty_annual_contributions_pct_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
+<Field name="oty_avg_annual_pay_chg" type="string"/>
+<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW" enabled="enabled" guiName="Copy zip files to temp" guiX="46" guiY="43" id="COPY_ZIP_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/BLS/QCEW/" type="FILE_COPY_MOVE"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*County*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Parish*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Burough*.csv" guiName="Read County Files" guiX="39" guiY="134" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
+<Node enabled="enabled" guiName="Reformat" guiX="239" guiY="146" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.area_fips = $in.0.area_fips;
+	$out.0.own_code = $in.0.own_code;
+	$out.0.INDUSTRY_CODE = $in.0.INDUSTRY_CODE;
+	$out.0.agglvl_code = $in.0.agglvl_code;
+	$out.0.size_code = $in.0.size_code;
+	$out.0.year = $in.0.year;
+	$out.0.qtr = $in.0.qtr;
+	$out.0.disclosure_code = $in.0.disclosure_code;
+	$out.0.area_title = $in.0.area_title;
+	$out.0.own_title = $in.0.own_title;
+	$out.0.industry_title = $in.0.industry_title;
+	$out.0.agglvl_title = $in.0.agglvl_title;
+	$out.0.size_title = $in.0.size_title;
+	$out.0.annual_avg_estabs_count = $in.0.annual_avg_estabs_count;
+	$out.0.annual_avg_emplvl = $in.0.annual_avg_emplvl;
+	$out.0.total_annual_wages = $in.0.total_annual_wages;
+	$out.0.taxable_annual_wages = $in.0.taxable_annual_wages;
+	$out.0.annual_contributions = $in.0.annual_contributions;
+	$out.0.annual_avg_wkly_wage = $in.0.annual_avg_wkly_wage;
+	$out.0.avg_annual_pay = $in.0.avg_annual_pay;
+	$out.0.lq_disclosure_code = $in.0.lq_disclosure_code;
+	$out.0.lq_annual_avg_estabs_count = $in.0.lq_annual_avg_estabs_count;
+	$out.0.lq_annual_avg_emplvl = $in.0.lq_annual_avg_emplvl;
+	$out.0.lq_total_annual_wages = $in.0.lq_total_annual_wages;
+	$out.0.lq_taxable_annual_wages = $in.0.lq_taxable_annual_wages;
+	$out.0.lq_annual_contributions = $in.0.lq_annual_contributions;
+	$out.0.lq_annual_avg_wkly_wage = $in.0.lq_annual_avg_wkly_wage;
+	$out.0.lq_avg_annual_pay = $in.0.lq_avg_annual_pay;
+	$out.0.oty_disclosure_code = $in.0.oty_disclosure_code;
+	$out.0.oty_annual_avg_estabs_count_chg = $in.0.oty_annual_avg_estabs_count_chg;
+	$out.0.oty_annual_avg_estabs_count_pct_chg = $in.0.oty_annual_avg_estabs_count_pct_chg;
+	$out.0.oty_annual_avg_emplvl_chg = $in.0.oty_annual_avg_emplvl_chg;
+	$out.0.oty_annual_avg_emplvl_pct_chg = $in.0.oty_annual_avg_emplvl_pct_chg;
+	$out.0.oty_total_annual_wages_chg = $in.0.oty_total_annual_wages_chg;
+	$out.0.oty_total_annual_wages_pct_chg = $in.0.oty_total_annual_wages_pct_chg;
+	$out.0.oty_taxable_annual_wages_chg = $in.0.oty_taxable_annual_wages_chg;
+	$out.0.oty_taxable_annual_wages_pct_chg = $in.0.oty_taxable_annual_wages_pct_chg;
+	$out.0.oty_annual_contributions_chg = $in.0.oty_annual_contributions_chg;
+	$out.0.oty_annual_contributions_pct_chg = $in.0.oty_annual_contributions_pct_chg;
+	$out.0.oty_annual_avg_wkly_wage_chg = $in.0.oty_annual_avg_wkly_wage_chg;
+	$out.0.oty_annual_avg_wkly_wage_pct_chg = $in.0.oty_annual_avg_wkly_wage_pct_chg;
+	$out.0.oty_avg_annual_pay_chg = $in.0.oty_avg_annual_pay_chg;
+	$out.0.oty_avg_annual_pay_pct_chg = $in.0.oty_avg_annual_pay_pct_chg;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt" guiName="Write County File" guiX="461" guiY="145" id="WRITE_COUNTY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="READ_COUNTY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_COUNTY_FILE:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="25" guiY="255" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_QCEW;]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="196" guiY="255" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_QCEW (
+    AREA_FIPS VARCHAR(30),
+	OWN_CODE VARCHAR(30),
+	INDUSTRY_CODE VARCHAR(30),
+	AGGLVL_CODE VARCHAR(30),
+	SIZE_CODE VARCHAR(30),
+	YEAR VARCHAR(30),
+	QTR VARCHAR(30),
+	DISCLOSURE_CODE VARCHAR(30),
+	AREA_TITLE VARCHAR(30),
+	OWN_TITLE VARCHAR(30),
+	INDUSTRY_TITLE VARCHAR(30),
+	AGGLVL_TITLE VARCHAR(30),
+	SIZE_TITLE VARCHAR(30),
+	ANNUAL_AVG_ESTABS_COUNT VARCHAR(30),
+	ANNUAL_AVG_EMPLVL VARCHAR(30),
+	TOTAL_ANNUAL_WAGES VARCHAR(30),
+	TAXABLE_ANNUAL_WAGES VARCHAR(30),
+	ANNUAL_CONTRIBUTIONS VARCHAR(30),
+	ANNUAL_AVG_WKLY_WAGE VARCHAR(30),
+	AVG_ANNUAL_PAY VARCHAR(30),
+	LQ_DISCLOSURE_CODE VARCHAR(30),
+	LQ_ANNUAL_AVG_ESTABS_COUNT VARCHAR(30),
+	LQ_ANNUAL_AVG_EMPLVL VARCHAR(30),
+	LQ_TOTAL_ANNUAL_WAGES VARCHAR(30),
+	LQ_TAXABLE_ANNUAL_WAGES VARCHAR(30),
+	LQ_ANNUAL_CONTRIBUTIONS VARCHAR(30),
+	LQ_ANNUAL_AVG_WKLY_WAGE VARCHAR(30),
+	LQ_AVG_ANNUAL_PAY VARCHAR(30),
+	OTY_DISCLOSURE_CODE VARCHAR(30),
+	OTY_ANNUAL_AVG_ESTABS_COUNT_CHG VARCHAR(30),
+	OTY_ANNUAL_AVG_ESTABS_COUNT_PCT_CHG VARCHAR(30),
+	OTY_ANNUAL_AVG_EMPLVL_CHG VARCHAR(30),
+	OTY_ANNUAL_AVG_EMPLVL_PCT_CHG VARCHAR(30),
+	OTY_TOTAL_ANNUAL_WAGES_CHG VARCHAR(30),
+	OTY_TOTAL_ANNUAL_WAGES_PCT_CHG VARCHAR(30),
+	OTY_TAXABLE_ANNUAL_WAGES_CHG VARCHAR(30),
+	OTY_TAXABLE_ANNUAL_WAGES_PCT_CHG VARCHAR(30),
+	OTY_ANNUAL_CONTRIBUTIONS_CHG VARCHAR(30),
+	OTY_ANNUAL_CONTRIBUTIONS_PCT_CHG VARCHAR(30),
+	OTY_ANNUAL_AVG_WKLY_WAGE_CHG VARCHAR(30),
+	OTY_ANNUAL_AVG_WKLY_WAGE_PCT_CHG VARCHAR(30),
+	OTY_AVG_ANNUAL_PAY_CHG VARCHAR(30),
+	OTY_AVG_ANNUAL_PAY_PCT_CHG VARCHAR(30)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="373" guiY="255" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY STG_QCEW (
+	AREA_FIPS,
+	OWN_CODE,
+	INDUSTRY_CODE,
+	AGGLVL_CODE,
+	SIZE_CODE,
+	YEAR,
+	QTR,
+	DISCLOSURE_CODE,
+	AREA_TITLE,
+	OWN_TITLE,
+	INDUSTRY_TITLE,
+	AGGLVL_TITLE,
+	SIZE_TITLE,
+	ANNUAL_AVG_ESTABS_COUNT,
+	ANNUAL_AVG_EMPLVL,
+	TOTAL_ANNUAL_WAGES,
+	TAXABLE_ANNUAL_WAGES,
+	ANNUAL_CONTRIBUTIONS,
+	ANNUAL_AVG_WKLY_WAGE,
+	AVG_ANNUAL_PAY,
+	LQ_DISCLOSURE_CODE,
+	LQ_ANNUAL_AVG_ESTABS_COUNT,
+	LQ_ANNUAL_AVG_EMPLVL,
+	LQ_TOTAL_ANNUAL_WAGES,
+	LQ_TAXABLE_ANNUAL_WAGES,
+	LQ_ANNUAL_CONTRIBUTIONS,
+	LQ_ANNUAL_AVG_WKLY_WAGE,
+	LQ_AVG_ANNUAL_PAY,
+	OTY_DISCLOSURE_CODE,
+	OTY_ANNUAL_AVG_ESTABS_COUNT_CHG,
+	OTY_ANNUAL_AVG_ESTABS_COUNT_PCT_CHG,
+	OTY_ANNUAL_AVG_EMPLVL_CHG,
+	OTY_ANNUAL_AVG_EMPLVL_PCT_CHG,
+	OTY_TOTAL_ANNUAL_WAGES_CHG,
+	OTY_TOTAL_ANNUAL_WAGES_PCT_CHG,
+	OTY_TAXABLE_ANNUAL_WAGES_CHG,
+	OTY_TAXABLE_ANNUAL_WAGES_PCT_CHG,
+	OTY_ANNUAL_CONTRIBUTIONS_CHG,
+	OTY_ANNUAL_CONTRIBUTIONS_PCT_CHG,
+	OTY_ANNUAL_AVG_WKLY_WAGE_CHG,
+	OTY_ANNUAL_AVG_WKLY_WAGE_PCT_CHG,
+	OTY_AVG_ANNUAL_PAY_CHG,
+	OTY_AVG_ANNUAL_PAY_PCT_CHG
+)
+FROM LOCAL '${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/BLS/QCEW/QCEWCountyCombinedErrors.txt'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${DATA_TMP_DIR}/BLS/QCEW" enabled="enabled" guiName="Delete all temp files" guiX="279" guiY="43" id="DELETE_ALL_TEMP_FILES" type="FILE_DELETE"/>
+<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW/" enabled="enabled" guiName="File Copy/Move (FILE_COPY_MOVE)" guiX="470" guiY="43" id="FILE_COPY_MOVE_FILE_COPY_MOVE" targetPath="Done/" type="FILE_COPY_MOVE"/>
+</Phase>
+</Graph>
