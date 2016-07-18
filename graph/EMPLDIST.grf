@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 17:12:38 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.97" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 17:21:07 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.98" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -295,6 +295,6 @@ ABORT ON ERROR;]]></attr>
 </Phase>
 <Phase number="5">
 <Node baseURL="${DATA_TMP_DIR}/DNB/EMPLDIST/*.csv" enabled="enabled" guiName="Delete all temp files" guiX="279" guiY="43" id="DELETE_ALL_TEMP_FILES" type="FILE_DELETE"/>
-<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="File Copy/Move (FILE_COPY_MOVE)" guiX="470" guiY="43" id="FILE_COPY_MOVE_FILE_COPY_MOVE" targetPath="Done/" type="FILE_COPY_MOVE"/>
+<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="File Copy/Move" guiX="470" guiY="43" id="FILE_COPY_MOVE" targetPath="Done/" type="FILE_COPY_MOVE"/>
 </Phase>
 </Graph>
