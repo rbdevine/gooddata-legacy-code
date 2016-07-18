@@ -1,5 +1,65 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 11:16:59 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.78" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 15:48:11 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.83" showComponentDetails="true">
 <Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="area" name="area" type="string"/>
+<Field label="area_title" name="area_title" type="string"/>
+<Field label="naics" name="naics" type="string"/>
+<Field label="naics_title" name="naics_title" type="string"/>
+<Field label="occ code" name="occ_code" type="string"/>
+<Field label="occ title" name="occ_title" type="string"/>
+<Field label="group" name="group" type="string"/>
+<Field label="i_group" name="i_group" type="string"/>
+<Field label="tot_emp" name="tot_emp" type="string"/>
+<Field label="emp_prse" name="emp_prse" type="string"/>
+<Field label="pct_tot" name="pct_tot" type="string"/>
+<Field label="h_mean" name="h_mean" type="string"/>
+<Field label="a_mean" name="a_mean" type="string"/>
+<Field label="mean_prse" name="mean_prse" type="string"/>
+<Field label="h_pct10" name="h_pct10" type="string"/>
+<Field label="h_pct25" name="h_pct25" type="string"/>
+<Field label="h_median" name="h_median" type="string"/>
+<Field label="h_pct75" name="h_pct75" type="string"/>
+<Field label="h_pct90" name="h_pct90" type="string"/>
+<Field label="a_pct10" name="a_pct10" type="string"/>
+<Field label="a_pct25" name="a_pct25" type="string"/>
+<Field label="a_median" name="a_median" type="string"/>
+<Field label="a_pct75" name="a_pct75" type="string"/>
+<Field label="a_pct90" name="a_pct90" type="string"/>
+<Field label="annual" name="annual" type="string"/>
+<Field label="hourly" name="hourly" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="EMPLDIST_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="area" name="area" type="string"/>
+<Field label="area_title" name="area_title" type="string"/>
+<Field label="naics" name="naics" type="string"/>
+<Field label="naics_title" name="naics_title" type="string"/>
+<Field label="occ code" name="occ_code" type="string"/>
+<Field label="occ title" name="occ_title" type="string"/>
+<Field label="group" name="group" type="string"/>
+<Field label="i_group" name="i_group" type="string"/>
+<Field label="tot_emp" name="tot_emp" type="string"/>
+<Field label="emp_prse" name="emp_prse" type="string"/>
+<Field label="pct_tot" name="pct_tot" type="string"/>
+<Field label="h_mean" name="h_mean" type="string"/>
+<Field label="a_mean" name="a_mean" type="string"/>
+<Field label="mean_prse" name="mean_prse" type="string"/>
+<Field label="h_pct10" name="h_pct10" type="string"/>
+<Field label="h_pct25" name="h_pct25" type="string"/>
+<Field label="h_median" name="h_median" type="string"/>
+<Field label="h_pct75" name="h_pct75" type="string"/>
+<Field label="h_pct90" name="h_pct90" type="string"/>
+<Field label="a_pct10" name="a_pct10" type="string"/>
+<Field label="a_pct25" name="a_pct25" type="string"/>
+<Field label="a_median" name="a_median" type="string"/>
+<Field label="a_pct75" name="a_pct75" type="string"/>
+<Field label="a_pct90" name="a_pct90" type="string"/>
+<Field label="annual" name="annual" type="string"/>
+<Field label="hourly" name="hourly" type="string"/>
+</Record>
+</Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="area_fips" type="string"/>
@@ -99,58 +159,41 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Copy csv data files to temp" guiX="46" guiY="43" id="COPY_CSV_DATA_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/DNB/EMPLDIST" type="FILE_COPY_MOVE"/>
+<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Copy data csv files to temp" guiX="46" guiY="43" id="COPY_DATA_CSV_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/DNB/EMPLDIST/" type="FILE_COPY_MOVE"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="#*oes*.csv" guiName="Read Industry Files" guiX="39" guiY="134" id="READ_INDUSTRY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
-<Node enabled="enabled" guiName="Reformat" guiX="239" guiY="146" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" fileURL="#*oes*.csv" guiName="Read Industry Files" guiX="46" guiY="145" id="READ_INDUSTRY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
+<Node enabled="enabled" guiName="Reformat" guiX="262" guiY="145" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.area_fips = $in.0.area_fips;
-	$out.0.own_code = $in.0.own_code;
-	$out.0.INDUSTRY_CODE = $in.0.INDUSTRY_CODE;
-	$out.0.agglvl_code = $in.0.agglvl_code;
-	$out.0.size_code = $in.0.size_code;
-	$out.0.year = $in.0.year;
-	$out.0.qtr = $in.0.qtr;
-	$out.0.disclosure_code = $in.0.disclosure_code;
+	$out.0.area = $in.0.area;
 	$out.0.area_title = $in.0.area_title;
-	$out.0.own_title = $in.0.own_title;
-	$out.0.industry_title = $in.0.industry_title;
-	$out.0.agglvl_title = $in.0.agglvl_title;
-	$out.0.size_title = $in.0.size_title;
-	$out.0.annual_avg_estabs_count = $in.0.annual_avg_estabs_count;
-	$out.0.annual_avg_emplvl = $in.0.annual_avg_emplvl;
-	$out.0.total_annual_wages = $in.0.total_annual_wages;
-	$out.0.taxable_annual_wages = $in.0.taxable_annual_wages;
-	$out.0.annual_contributions = $in.0.annual_contributions;
-	$out.0.annual_avg_wkly_wage = $in.0.annual_avg_wkly_wage;
-	$out.0.avg_annual_pay = $in.0.avg_annual_pay;
-	$out.0.lq_disclosure_code = $in.0.lq_disclosure_code;
-	$out.0.lq_annual_avg_estabs_count = $in.0.lq_annual_avg_estabs_count;
-	$out.0.lq_annual_avg_emplvl = $in.0.lq_annual_avg_emplvl;
-	$out.0.lq_total_annual_wages = $in.0.lq_total_annual_wages;
-	$out.0.lq_taxable_annual_wages = $in.0.lq_taxable_annual_wages;
-	$out.0.lq_annual_contributions = $in.0.lq_annual_contributions;
-	$out.0.lq_annual_avg_wkly_wage = $in.0.lq_annual_avg_wkly_wage;
-	$out.0.lq_avg_annual_pay = $in.0.lq_avg_annual_pay;
-	$out.0.oty_disclosure_code = $in.0.oty_disclosure_code;
-	$out.0.oty_annual_avg_estabs_count_chg = $in.0.oty_annual_avg_estabs_count_chg;
-	$out.0.oty_annual_avg_estabs_count_pct_chg = $in.0.oty_annual_avg_estabs_count_pct_chg;
-	$out.0.oty_annual_avg_emplvl_chg = $in.0.oty_annual_avg_emplvl_chg;
-	$out.0.oty_annual_avg_emplvl_pct_chg = $in.0.oty_annual_avg_emplvl_pct_chg;
-	$out.0.oty_total_annual_wages_chg = $in.0.oty_total_annual_wages_chg;
-	$out.0.oty_total_annual_wages_pct_chg = $in.0.oty_total_annual_wages_pct_chg;
-	$out.0.oty_taxable_annual_wages_chg = $in.0.oty_taxable_annual_wages_chg;
-	$out.0.oty_taxable_annual_wages_pct_chg = $in.0.oty_taxable_annual_wages_pct_chg;
-	$out.0.oty_annual_contributions_chg = $in.0.oty_annual_contributions_chg;
-	$out.0.oty_annual_contributions_pct_chg = $in.0.oty_annual_contributions_pct_chg;
-	$out.0.oty_annual_avg_wkly_wage_chg = $in.0.oty_annual_avg_wkly_wage_chg;
-	$out.0.oty_annual_avg_wkly_wage_pct_chg = $in.0.oty_annual_avg_wkly_wage_pct_chg;
-	$out.0.oty_avg_annual_pay_chg = $in.0.oty_avg_annual_pay_chg;
-	$out.0.oty_avg_annual_pay_pct_chg = $in.0.oty_avg_annual_pay_pct_chg;
+	$out.0.naics = $in.0.naics;
+	$out.0.naics_title = $in.0.naics_title;
+	$out.0.occ_code = $in.0.occ_code;
+	$out.0.occ_title = $in.0.occ_title;
+	$out.0.group = $in.0.group;
+	$out.0.i_group = $in.0.i_group;
+	$out.0.tot_emp = $in.0.tot_emp;
+	$out.0.emp_prse = $in.0.emp_prse;
+	$out.0.pct_tot = $in.0.pct_tot;
+	$out.0.h_mean = $in.0.h_mean;
+	$out.0.a_mean = $in.0.a_mean;
+	$out.0.mean_prse = $in.0.mean_prse;
+	$out.0.h_pct10 = $in.0.h_pct10;
+	$out.0.h_pct25 = $in.0.h_pct25;
+	$out.0.h_median = $in.0.h_median;
+	$out.0.h_pct75 = $in.0.h_pct75;
+	$out.0.h_pct90 = $in.0.h_pct90;
+	$out.0.a_pct10 = $in.0.a_pct10;
+	$out.0.a_pct25 = $in.0.a_pct25;
+	$out.0.a_median = $in.0.a_median;
+	$out.0.a_pct75 = $in.0.a_pct75;
+	$out.0.a_pct90 = $in.0.a_pct90;
+	$out.0.annual = $in.0.annual;
+	$out.0.hourly = $in.0.hourly;
 
 	return ALL;
 }
@@ -175,8 +218,8 @@ function integer transform() {
 ]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/DNB/EMPLDIST/EMPLDISTIndustryCombined.txt" guiName="Write Industry File" guiX="461" guiY="145" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
-<Edge fromNode="READ_INDUSTRY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
+<Edge fromNode="READ_INDUSTRY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="25" guiY="255" id="DROP_TABLE1" type="DB_EXECUTE">
