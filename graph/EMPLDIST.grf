@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 11:00:40 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.76" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 11:14:07 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.77" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -99,7 +99,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Copy zip files to temp" guiX="46" guiY="43" id="COPY_ZIP_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/DNB/EMPLDIST" type="FILE_COPY_MOVE"/>
+<Node baseURL="${DATA_SOURCE_DIR}/DNB/EMPLDIST" enabled="enabled" guiName="Copy data csv files to temp" guiX="46" guiY="43" id="COPY_DATA_CSV_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/DNB/EMPLDIST" type="FILE_COPY_MOVE"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="#*oes*.csv" guiName="Read Industry Files" guiX="39" guiY="134" id="READ_INDUSTRY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
