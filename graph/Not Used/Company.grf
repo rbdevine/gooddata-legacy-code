@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="samarth" created="Tue Feb 02 17:16:26 IST 2016" guiVersion="3.4.4.P" id="1454440534838" licenseType="Commercial" modified="Thu Jun 16 00:01:54 EDT 2016" modifiedBy="scalvillo" name="securities-master" revision="1.35" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" label="securities-master-db" name="securities_master_db" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" recordSize="-1" type="delimited">
+<Field eofAsDelimiter="false" name="JUST_CO_ID" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="CO_LONG_NAME" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="CO_SHORT_NAME" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="EXCHANGE" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="TICKER" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="TICKER_TRIM" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="GLASSDOOR_EMP_ID" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="BLOOMBERG_ISIN" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="MSCI_ISSUERID" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="SUSTAIN_CO_ID" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="REPRISK_ID" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN1" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN2" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN3" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN4" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN5" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN6" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN7" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN8" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN9" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="COLUMN10" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" length="8" name="CREATED_DATE" nullable="true" scale="0" shift="0" size="0" type="decimal"/>
+<Field eofAsDelimiter="false" length="8" name="UPDATED_DATE" nullable="true" scale="0" shift="0" size="0" type="decimal"/>
+<Field eofAsDelimiter="false" name="CREATED_BY" nullable="true" shift="0" size="0" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachment="${DATA_SOURCE_DIR}/JUST_CAP_CO_SEC_MASTER.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="securities-master-flat-file" name="securities_master_flat_file" previewAttachment="${DATA_SOURCE_DIR}/JUST_CAP_CO_SEC_MASTER.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\r" skipSourceRows="1" type="delimited">
+<Field name="JUST_CO_ID" type="string"/>
+<Field name="CO_LONG_NAME" type="string"/>
+<Field name="CO_SHORT_NAME" type="string"/>
+<Field name="EXCHANGE" type="string"/>
+<Field name="TICKER" type="string"/>
+<Field name="TICKER_TRIM" type="string"/>
+<Field name="GLASSDOOR_EMP_ID" type="string"/>
+<Field name="BLOOMBERG_ISIN" type="string"/>
+<Field name="MSCI_ISSUERID" type="string"/>
+<Field name="SUSTAIN_CO_ID" type="string"/>
+<Field name="REPRISK_ID" type="string"/>
+<Field eofAsDelimiter="false" name="NOTES" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="securities-master-db-conn" password="fA7ErkPjKeD3PrYS" type="JDBC" user="ps-etl+justcapital@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="${SECURITY_MASTER_SOURCE_FILE}" guiName="securities-master-reader" guiX="30" guiY="74" id="SECURITIES_MASTER_READER" quoteCharacter="&quot;" quotedStrings="true" skipLeadingBlanks="true" skipTrailingBlanks="true" trim="true" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" guiName="securities-master-transformation" guiX="304" guiY="86" id="SECURITIES_MASTER_TRANSFORMATION" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+string blankStr = "";
+string jcDateFormat = "yyyyMMdd";
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.JUST_CO_ID = $in.0.JUST_CO_ID;
+	$out.0.CO_LONG_NAME = $in.0.CO_LONG_NAME;
+	$out.0.CO_SHORT_NAME = $in.0.CO_SHORT_NAME;
+	$out.0.EXCHANGE = $in.0.EXCHANGE;
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.TICKER_TRIM = $in.0.TICKER_TRIM;
+	$out.0.GLASSDOOR_EMP_ID = $in.0.GLASSDOOR_EMP_ID;
+	$out.0.BLOOMBERG_ISIN = $in.0.BLOOMBERG_ISIN;
+	$out.0.MSCI_ISSUERID = $in.0.MSCI_ISSUERID;
+	$out.0.SUSTAIN_CO_ID = $in.0.SUSTAIN_CO_ID;
+	$out.0.REPRISK_ID = $in.0.REPRISK_ID;
+	$out.0.COLUMN1 = blankStr;
+	$out.0.COLUMN2 = blankStr;
+    $out.0.COLUMN3 = blankStr;
+    $out.0.COLUMN4 = blankStr;
+    $out.0.COLUMN5 = blankStr;
+    $out.0.COLUMN6 = blankStr;
+    $out.0.COLUMN7 = blankStr;
+    $out.0.COLUMN8 = blankStr;
+    $out.0.COLUMN9 = blankStr;
+    $out.0.COLUMN10 = blankStr;
+    $out.0.CREATED_DATE = str2decimal(date2str(today(), jcDateFormat));
+    $out.0.UPDATED_DATE = str2decimal(date2str(today(), jcDateFormat));
+    $out.0.CREATED_BY = "securities-master.grf";
+
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${SECURITY_MASTER_FINAL_FILE}" guiName="securities-master-writer" guiX="622" guiY="74" id="SECURITIES_MASTER_WRITER" type="DATA_WRITER"/>
+<Edge fromNode="SECURITIES_MASTER_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="SECURITIES_MASTER_TRANSFORMATION:0"/>
+<Edge fromNode="SECURITIES_MASTER_TRANSFORMATION:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="SECURITIES_MASTER_WRITER:0"/>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="drop-securities-master" guiX="333" guiY="202" id="DROP_SECURITIES_MASTER" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS LKP_JUST_CO_SECTY_MASTER;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="create-securities-master" guiX="328" guiY="317" id="CREATE_SECURITIES_MASTER" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS LKP_JUST_CO_SECTY_MASTER (
+    JUST_CO_ID VARCHAR(15),
+    CO_LONG_NAME VARCHAR(255),
+    CO_SHORT_NAME VARCHAR(255),
+    EXCHANGE VARCHAR(255),
+    TICKER VARCHAR(255),
+    TICKER_TRIM VARCHAR(255),
+    GLASSDOOR_EMP_ID VARCHAR(255),
+    BLOOMBERG_ISIN VARCHAR(255),
+    MSCI_ISSUERID VARCHAR(255),
+    SUSTAIN_CO_ID VARCHAR(255),
+    REPRISK_ID VARCHAR(255),
+    COLUMN1 VARCHAR(255),
+    COLUMN2 VARCHAR(255),
+    COLUMN3 VARCHAR(255),
+    COLUMN4 VARCHAR(255),
+    COLUMN5 VARCHAR(255),
+    COLUMN6 VARCHAR(255),
+    COLUMN7 VARCHAR(255),
+    COLUMN8 VARCHAR(255),
+    COLUMN9 VARCHAR(255),
+    COLUMN10 VARCHAR(255),
+    CREATED_DATE NUMERIC(8,0),
+    UPDATED_DATE NUMERIC(8,0),
+    CREATED_BY VARCHAR(255)
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="copy-securities-master-data" guiX="318" guiY="425" id="COPY_SECURITIES_MASTER_DATA" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY LKP_JUST_CO_SECTY_MASTER (
+    JUST_CO_ID,
+    CO_LONG_NAME,
+    CO_SHORT_NAME,
+    EXCHANGE,
+    TICKER,
+    TICKER_TRIM,
+    GLASSDOOR_EMP_ID,
+    BLOOMBERG_ISIN,
+    MSCI_ISSUERID,
+    SUSTAIN_CO_ID,
+    REPRISK_ID,
+    COLUMN1,
+    COLUMN2,
+    COLUMN3,
+    COLUMN4,
+    COLUMN5,
+    COLUMN6,
+    COLUMN7,
+    COLUMN8,
+    COLUMN9,
+    COLUMN10,
+    CREATED_DATE,
+    UPDATED_DATE,
+    CREATED_BY
+)
+FROM LOCAL '${SECURITY_MASTER_FINAL_FILE}'
+EXCEPTIONS '${ETL_ERROR_LOG_FILE}'
+ABORT ON ERROR;
+]]></attr>
+</Node>
+</Phase>
+</Graph>
