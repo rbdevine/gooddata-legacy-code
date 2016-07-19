@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 22:16:18 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.98" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 22:21:13 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.101" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -288,6 +288,7 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
-<Node baseURL="${DATA_TMP_DIR}/*zip;${DATA_TRANSFORM_DIR}/QCEWCountyCombined.txt" enabled="enabled" guiName="Clean Up" guiX="196" guiY="370" id="CLEAN_UP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TMP_DIR}/*.zip" enabled="enabled" guiName="Clean tmp" guiX="-2" guiY="370" id="CLEAN_TMP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TRANSFORM_DIR}/QCEWCountyCombined.txt" enabled="enabled" guiName="Clean transform" guiX="391" guiY="370" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
 </Phase>
 </Graph>
