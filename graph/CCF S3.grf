@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jun 16 00:40:51 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.12" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 23:56:31 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.15" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="COMPLETE_COUNTY_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -68,11 +68,11 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="52" guiY="345" id="DROP_TABLE1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_COMPLETE_COUNTY;]]></attr>
-</Node>
-<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/cbp14co.txt" guiName="READ SOURCE FILE" guiX="42" guiY="205" id="READ_SOURCE_FILE" type="DATA_READER"/>
-<Node enabled="enabled" guiName="TRANSFORM" guiX="243" guiY="205" id="TRANSFORM" type="REFORMAT">
+<Node baseURL="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/uscb/cbp/cbp14co.txt" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="296" guiY="37" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/cbp14co.txt" guiName="READ SOURCE FILE" guiX="88" guiY="140" id="READ_SOURCE_FILE" type="DATA_READER"/>
+<Node enabled="enabled" guiName="TRANSFORM" guiX="289" guiY="140" id="TRANSFORM" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 string blankStr = "";
 string jcDateFormat = "yyyyMMdd";
@@ -131,12 +131,17 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/CompleteCountyFile.txt" guiName="WRITE INTERMEDIATE FILE" guiX="437" guiY="205" id="WRITE_INTERMEDIATE_FILE" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/CompleteCountyFile.txt" guiName="WRITE INTERMEDIATE FILE" guiX="463" guiY="140" id="WRITE_INTERMEDIATE_FILE" type="DATA_WRITER"/>
 <Edge fromNode="READ_SOURCE_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="TRANSFORM:0"/>
 <Edge fromNode="TRANSFORM:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INTERMEDIATE_FILE:0"/>
 </Phase>
-<Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="221" guiY="345" id="CREATE_TABLE" type="DB_EXECUTE">
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="98" guiY="280" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_COMPLETE_COUNTY;]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="289" guiY="280" id="CREATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_COMPLETE_COUNTY (
     FIPS_ST_CD VARCHAR(30),
     FIPS_CO_CD VARCHAR(30),
@@ -170,8 +175,8 @@ function integer transform() {
 );]]></attr>
 </Node>
 </Phase>
-<Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="381" guiY="345" id="POPULATE_TABLE" type="DB_EXECUTE">
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="490" guiY="280" id="POPULATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY STG_COMPLETE_COUNTY (
     FIPS_ST_CD,
     FIPS_CO_CD,
@@ -207,5 +212,9 @@ FROM LOCAL '${DATA_TRANSFORM_DIR}/CompleteCountyFile.txt'
 EXCEPTIONS '${DATA_TMP_DIR}/CompleteCountyErrors.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${DATA_TMP_DIR}/cbp14co.txt" enabled="enabled" guiName="Clean tmp" guiX="98" guiY="387" id="CLEAN_TMP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TRANSFORM_DIR}/CompleteCountyFile.txt" enabled="enabled" guiName="Clean transform" guiX="491" guiY="387" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
 </Phase>
 </Graph>
