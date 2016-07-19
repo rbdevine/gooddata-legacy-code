@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 20:18:02 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.78" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 21:26:10 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.84" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -97,18 +97,16 @@
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter12" name="S3ACCESSKEY" value="AKIAIJF44KUAT6SGEJWA"/>
 <Property id="GraphParameter13" name="S3BUCKETNAME" value="justdata"/>
-<Property id="GraphParameter11" name="S3SECRETKEY" value="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"/>
+<Property id="GraphParameter11" name="S3SECRETKEY" value="I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX"/>
 <Property fileURL="workspace.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
-<Phase number="0">
-<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW" enabled="enabled" guiName="Copy zip files to temp" guiX="46" guiY="43" id="COPY_ZIP_FILES_TO_TEMP" operation="COPY" overwriteExisting="true" targetPath="../../../tmp/BLS/QCEW/" type="FILE_COPY_MOVE"/>
-<Node destination="${DATA_DIR}" enabled="enabled" guiName="File Download" guiX="-17" guiY="147" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
-<Edge fromNode="FILE_DOWNLOAD:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (input)" outPort="Port 0 (out)" toNode="READ_COUNTY_FILES:0"/>
-</Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*County*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Parish*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Burough*.csv" guiName="Read County Files" guiX="163" guiY="135" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
-<Node enabled="enabled" guiName="Reformat" guiX="363" guiY="147" id="REFORMAT" type="REFORMAT">
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/bls/qcew/*.zip" destination="${DATA_TMP_DIR}/BLS/QCEW" enabled="enabled" guiName="Download Source" guiX="196" guiY="73" id="DOWNLOAD_SOURCE" makeDirs="true" overwriteExisting="true" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="2">
+<Node enabled="enabled" fileURL="zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*County*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Parish*.csv;zip:(${DATA_TMP_DIR}/BLS/QCEW/*.zip)#*Burough*.csv" guiName="Read County Files" guiX="-4" guiY="155" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
+<Node enabled="enabled" guiName="Reformat" guiX="196" guiY="158" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -179,16 +177,16 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt" guiName="Write County File" guiX="585" guiY="146" id="WRITE_COUNTY_FILE" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt" guiName="Write County File" guiX="412" guiY="155" id="WRITE_COUNTY_FILE" type="DATA_WRITER"/>
 <Edge fromNode="READ_COUNTY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_COUNTY_FILE:0"/>
 </Phase>
-<Phase number="2">
+<Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="25" guiY="255" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_QCEW;]]></attr>
 </Node>
 </Phase>
-<Phase number="3">
+<Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="196" guiY="255" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_QCEW (
     AREA_FIPS VARCHAR(30),
@@ -237,7 +235,7 @@ function integer transform() {
 );]]></attr>
 </Node>
 </Phase>
-<Phase number="4">
+<Phase number="5">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="373" guiY="255" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY STG_QCEW (
 	AREA_FIPS,
@@ -289,8 +287,7 @@ EXCEPTIONS '${DATA_TMP_DIR}/BLS/QCEW/QCEWCountyCombinedErrors.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
-<Node baseURL="${DATA_TMP_DIR}/BLS/QCEW" enabled="enabled" guiName="Delete all temp files" guiX="279" guiY="43" id="DELETE_ALL_TEMP_FILES" type="FILE_DELETE"/>
-<Node baseURL="${DATA_SOURCE_DIR}/BLS/QCEW/" enabled="enabled" guiName="File Copy/Move (FILE_COPY_MOVE)" guiX="470" guiY="43" id="FILE_COPY_MOVE_FILE_COPY_MOVE" targetPath="Done/" type="FILE_COPY_MOVE"/>
+<Phase number="6">
+<Node baseURL="${DATA_TMP_DIR}/BLS/QCEW;${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt" enabled="enabled" guiName="Clean Up" guiX="196" guiY="340" id="CLEAN_UP" type="FILE_DELETE"/>
 </Phase>
 </Graph>
