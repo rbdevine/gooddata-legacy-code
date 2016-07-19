@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 23:53:24 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.108" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 19 00:27:10 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.109" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -155,11 +155,13 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter11" name="S3BUCKETNAME" value="justdata"/>
+<Property id="GraphParameter12" name="S3SECRETKEY" value="I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX"/>
 <Property fileURL="workspace.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/dnb/empldist/*.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/dnb/empldist/*.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" type="DATA_READER"/>

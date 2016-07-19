@@ -1,19 +1,19 @@
-#(Please use slash '/' character as a path delimiter in all path specifications, e.g., C:/Users/username/workspace/project)
+##Project path
+#Tue Jul 19 00:19:04 EDT 2016
+PROJECT=.
 
-PROJECT= .
-DATA_DIR=${PROJECT}/data
-DATA_SOURCE_DIR=${PROJECT}/data/source
-DATA_TRANSFORM_DIR=${PROJECT}/data/transform
-DATA_GOODDATA_DIR=${PROJECT}/data/gooddata
+
+#Tue Jul 19 00:19:04 EDT 2016
 DATA_TMP_DIR=${PROJECT}/data/tmp
+DATA_SOURCE_DIR=${PROJECT}/data/source
+DATA_DIR=${PROJECT}/data
+S3ACCESSKEY=AKIAIJF44KUAT6SGEJWA
 GRAPH_DIR=${PROJECT}/graph
-META_DIR=${PROJECT}/meta
 TRANS_DIR=${PROJECT}/trans
 MODEL_DIR=${PROJECT}/model
-
-
-# GoodData working project
-# GDC_PROJECT_ID identifies the GoodData working project. Transformed data will be uploaded into the datasets of the GoodData working project.
-#   The data model information necessary for transformation definition is also obtained from this project.
-# You can find the ID of a project in the project context menu in Server Explorer.
-GDC_PROJECT_ID=
+S3BUCKETNAME=justdata
+GDC_PROJECT_ID=htowkqbaa70p86c1f6ho09y2lb66zwj7
+S3SECRETKEY=I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX
+DATA_GOODDATA_DIR=${PROJECT}/data/gooddata
+DATA_TRANSFORM_DIR=${PROJECT}/data/transform
+META_DIR=${PROJECT}/meta

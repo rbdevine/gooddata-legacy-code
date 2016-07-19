@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 23:56:31 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.15" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 19 00:24:21 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.16" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="COMPLETE_COUNTY_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -68,7 +68,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/uscb/cbp/cbp14co.txt" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="296" guiY="37" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/uscb/cbp/cbp14co.txt" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="296" guiY="37" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${DATA_TMP_DIR}/cbp14co.txt" guiName="READ SOURCE FILE" guiX="88" guiY="140" id="READ_SOURCE_FILE" type="DATA_READER"/>
