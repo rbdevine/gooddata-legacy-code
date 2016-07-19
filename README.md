@@ -75,7 +75,7 @@
     *   Click OK.
 5.  Click `Add Entry`
     *   Enter Key: `user.email`.
-    *   Enter Value: Enter Your Email Id.
+    *   Enter Value: Enter Your Email Address.
     *   Click OK.
 6.  Close Preferences Dialog Box.
 
