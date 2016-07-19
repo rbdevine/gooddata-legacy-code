@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 22:21:13 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.101" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 22:52:49 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.103" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -101,12 +101,12 @@
 <Property fileURL="workspace.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
-<Phase number="1">
-<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/bls/qcew/*.zip" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="Download Source" guiX="196" guiY="73" id="DOWNLOAD_SOURCE" makeDirs="true" overwriteExisting="true" type="FILE_DOWNLOAD"/>
+<Phase number="0">
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/bls/qcew/*.zip" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="Download Source" guiX="196" guiY="73" id="DOWNLOAD_SOURCE" makeDirs="true" overwriteExisting="true" type="FILE_DOWNLOAD"/>
 </Phase>
-<Phase number="2">
-<Node enabled="enabled" fileURL="zip:(${DATA_TMP_DIR}/*.zip)#*County*.csv;zip:(${DATA_TMP_DIR}/*.zip)#*Parish*.csv;zip:(${DATA_TMP_DIR}/*.zip)#*Burough*.csv" guiName="Read County Files" guiX="-4" guiY="167" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
-<Node enabled="enabled" guiName="Reformat" guiX="196" guiY="167" id="REFORMAT" type="REFORMAT">
+<Phase number="1">
+<Node enabled="disabled" fileURL="zip:(${DATA_TMP_DIR}/*.zip)#*County*.csv;zip:(${DATA_TMP_DIR}/*.zip)#*Parish*.csv;zip:(${DATA_TMP_DIR}/*.zip)#*Burough*.csv" guiName="Read County Files" guiX="-4" guiY="167" id="READ_COUNTY_FILES" quotedStrings="true" type="DATA_READER" verbose="false"/>
+<Node enabled="disabled" guiName="Reformat" guiX="196" guiY="167" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -177,17 +177,17 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/QCEWCountyCombined.txt" guiName="Write County File" guiX="391" guiY="167" id="WRITE_COUNTY_FILE" type="DATA_WRITER"/>
+<Node enabled="disabled" fileURL="${DATA_TRANSFORM_DIR}/QCEWCountyCombined.txt" guiName="Write County File" guiX="391" guiY="167" id="WRITE_COUNTY_FILE" type="DATA_WRITER"/>
 <Edge fromNode="READ_COUNTY_FILES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_COUNTY_FILE:0"/>
 </Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="-2" guiY="283" id="DROP_TABLE1" type="DB_EXECUTE">
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="DROP TABLE" guiX="-2" guiY="283" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_QCEW;]]></attr>
 </Node>
 </Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="196" guiY="283" id="CREATE_TABLE1" type="DB_EXECUTE">
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="CREATE TABLE" guiX="196" guiY="283" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_QCEW (
     AREA_FIPS VARCHAR(30),
 	OWN_CODE VARCHAR(30),
@@ -235,7 +235,7 @@ function integer transform() {
 );]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
+<Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="390" guiY="283" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY STG_QCEW (
 	AREA_FIPS,
@@ -282,13 +282,15 @@ function integer transform() {
 	OTY_AVG_ANNUAL_PAY_CHG,
 	OTY_AVG_ANNUAL_PAY_PCT_CHG
 )
-FROM LOCAL '${DATA_TRANSFORM_DIR}/BLS/QCEW/QCEWCountyCombined.txt'
-EXCEPTIONS '${DATA_TMP_DIR}/BLS/QCEW/QCEWCountyCombinedErrors.txt'
+FROM LOCAL '${DATA_TRANSFORM_DIR}/QCEWCountyCombined.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/QCEWCountyCombinedErrors.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
-<Phase number="6">
+<Phase number="5">
 <Node baseURL="${DATA_TMP_DIR}/*.zip" enabled="enabled" guiName="Clean tmp" guiX="-2" guiY="370" id="CLEAN_TMP" type="FILE_DELETE"/>
+</Phase>
+<Phase number="6">
 <Node baseURL="${DATA_TRANSFORM_DIR}/QCEWCountyCombined.txt" enabled="enabled" guiName="Clean transform" guiX="391" guiY="370" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
 </Phase>
 </Graph>

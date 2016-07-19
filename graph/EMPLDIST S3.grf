@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 22:38:11 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.102" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 18 22:44:30 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.105" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -159,11 +159,10 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" type="DATA_READER"/>
 <Node baseURL="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/dnb/empldist/*.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
-<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 </Phase>
 <Phase number="1">
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" type="DATA_READER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="286" guiY="118" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -219,6 +218,7 @@ function integer transform() {
 ]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/EMPLDISTIndustryCombined.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
 </Phase>
 <Phase number="2">
@@ -288,8 +288,8 @@ function integer transform() {
 	ANNUAL,
 	HOURLY
 )
-FROM LOCAL '${DATA_TRANSFORM_DIR}/DNB/EMPLDIST/EMPLDISTIndustryCombined.txt'
-EXCEPTIONS '${DATA_TMP_DIR}/DNB/EMPLDIST/EMPLDISTIndustryCombinedErrors.txt'
+FROM LOCAL '${DATA_TRANSFORM_DIR}/EMPLDISTIndustryCombined.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/EMPLDISTIndustryCombinedErrors.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
