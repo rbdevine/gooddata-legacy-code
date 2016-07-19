@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 19 12:23:56 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.123" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="I" name="Avention_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="Company_Name" name="Company_Name" type="string"/>
+<Field label="Avention_Contacts" name="Avention_Contacts" type="string"/>
+<Field label="Ownership_Type" name="Ownership_Type" type="string"/>
+<Field label="Entity_Type" name="Entity_Type" type="string"/>
+<Field label="City" name="City" type="string"/>
+<Field label="State_Or_Province" name="State_Or_Province" type="string"/>
+<Field label="Country" name="Country" type="string"/>
+<Field label="Employees" name="Employees" type="number"/>
+<Field format="excel:0.00E+00" label="Revenue_USD" name="Revenue_USD" type="number"/>
+<Field label="Avention_Industry" name="Avention_Industry" type="string"/>
+<Field label="Key_ID" name="Key_ID" type="string"/>
+<Field label="Source" name="Source" type="string"/>
+<Field label="Order" name="Order" type="long"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Avention_Record_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field format="" label="Company_Name" name="Company_Name" type="string"/>
+<Field format="" label="Avention_Contacts" name="Avention_Contacts" type="string"/>
+<Field format="" label="Ownership_Type" name="Ownership_Type" type="string"/>
+<Field format="" label="Entity_Type" name="Entity_Type" type="string"/>
+<Field format="" label="City" name="City" type="string"/>
+<Field format="" label="State_Or_Province" name="State_Or_Province" type="string"/>
+<Field format="" label="Country" name="Country" type="string"/>
+<Field format="" label="Employees" name="Employees" type="number"/>
+<Field format="excel:0.00E+00" label="Revenue_USD" name="Revenue_USD" type="number"/>
+<Field format="" label="Avention_Industry" name="Avention_Industry" type="string"/>
+<Field format="" label="Key_ID" name="Key_ID" type="string"/>
+<Field format="" label="Source" name="Source" type="string"/>
+<Field format="" label="Order" name="Order" type="long"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter2"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/avention/*.csv" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" quotedStrings="true" skipSourceRows="1" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" guiName="Reformat" guiX="286" guiY="130" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Company_Name = $in.0.Company_Name;
+	$out.0.Avention_Contacts = $in.0.Avention_Contacts;
+	$out.0.Ownership_Type = $in.0.Ownership_Type;
+	$out.0.Entity_Type = $in.0.Entity_Type;
+	$out.0.City = $in.0.City;
+	$out.0.State_Or_Province = $in.0.State_Or_Province;
+	$out.0.Country = $in.0.Country;
+	if (isNumber($in.0.Employees.toString()))
+	{  
+			$out.0.Employees = $in.0.Employees;
+	}
+	else
+	{
+			$out.0.Employees = null;
+	}
+	if (isNumber($in.0.Revenue_USD.toString()))
+	{
+		$out.0.Revenue_USD = $in.0.Revenue_USD;
+	}
+	else
+	{
+		$out.0.Revenue_USD = null;
+	}
+	$out.0.Avention_Industry = $in.0.Avention_Industry;
+	$out.0.Key_ID = $in.0.Key_ID;
+	$out.0.Source = $in.0.Source;
+	if (isNumber($in.0.Order.toString()))
+	{
+		$out.0.Order = $in.0.Order;
+	}
+	else
+	{
+		$out.0.Order = null;
+	}
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/AventionCombined.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="DROP TABLE" guiX="109" guiY="222" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_AVENTION;]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="CREATE TABLE" guiX="280" guiY="222" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_AVENTION (
+	COMPANY_NAME VARCHAR(255),
+AVENTION_CONTACTS VARCHAR(255),
+OWNERSHIP_TYPE VARCHAR(255),
+ENTITY_TYPE VARCHAR(255),
+CITY VARCHAR(255),
+STATE_OR_PROVINCE VARCHAR(255),
+COUNTRY VARCHAR(255),
+EMPLOYEES VARCHAR(255),
+REVENUE__USD_ VARCHAR(255),
+AVENTION_INDUSTRY VARCHAR(255),
+KEY_ID VARCHAR(255),
+SOURCE VARCHAR(255),
+ORDER VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="POPULATE TABLE" guiX="473" guiY="222" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY STG_AVENTION (
+	COMPANY_NAME,
+AVENTION_CONTACTS,
+OWNERSHIP_TYPE,
+ENTITY_TYPE,
+CITY,
+STATE_OR_PROVINCE,
+COUNTRY,
+EMPLOYEES,
+REVENUE__USD_,
+AVENTION_INDUSTRY,
+KEY_ID,
+SOURCE,
+ORDER
+	
+)
+FROM LOCAL '${DATA_TRANSFORM_DIR}/AventionCombined.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/AventionCombinedErrors.txt'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${DATA_TMP_DIR}/*.csv" enabled="disabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TRANSFORM_DIR}/EMPLDISTIndustryCombined.txt" enabled="disabled" guiName="Clean transform" guiX="474" guiY="302" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
+</Phase>
+</Graph>
