@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 19 15:39:41 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.161" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 19 15:48:51 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.164" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="I" name="Avention_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="Avention_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field label="Company_Name" name="Company_Name" type="string"/>
 <Field label="Avention_Contacts" name="Avention_Contacts" type="string"/>
 <Field label="Ownership_Type" name="Ownership_Type" type="string"/>
@@ -61,8 +61,8 @@
 <Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/avention/*.csv" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="disabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" quotedStrings="true" skipSourceRows="1" trim="true" type="DATA_READER" verbose="true"/>
-<Node enabled="disabled" guiName="Reformat" guiX="297" guiY="130" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" quotedStrings="true" skipSourceRows="1" trim="true" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" guiName="Reformat" guiX="297" guiY="130" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -103,7 +103,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="disabled" fileURL="${DATA_TRANSFORM_DIR}/AventionCombined.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/AventionCombined.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" quotedStrings="true" type="DATA_WRITER"/>
 <Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
 </Phase>
