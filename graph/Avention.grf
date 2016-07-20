@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 19 15:48:51 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.164" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 19 20:56:42 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.165" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Avention_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -36,7 +36,7 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="workspace.prm" id="GraphParameter0"/>
-<Note alignment="1" backgroundColorB="225" backgroundColorG="255" backgroundColorR="255" enabled="true" folded="false" height="418" id="Note0" textColorB="0" textColorG="0" textColorR="0" textFontSize="12" title="New note" titleColorB="0" titleColorG="0" titleColorR="0" titleFontSize="14" width="422" x="630" y="126">
+<Note alignment="1" backgroundColorB="225" backgroundColorG="255" backgroundColorR="255" enabled="true" folded="false" height="418" id="Note0" textColorB="0" textColorG="0" textColorR="0" textFontSize="12" title="New note" titleColorB="0" titleColorG="0" titleColorR="0" titleFontSize="14" width="422" x="592" y="39">
 <attr name="text"><![CDATA[Right now you must earch for regular expressions and replace with nothing ^.*Recently acquired.*\n 
 ^.*Pending acquisition.*\n
 ^.*Asset/product.*\n
