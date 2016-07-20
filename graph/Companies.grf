@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Wed Jul 20 10:12:44 EDT 2016" guiVersion="3.4.4.P" id="1469024072452" licenseType="Commercial" modified="Wed Jul 20 16:22:06 EDT 2016" modifiedBy="scalvillo" name="Companies" revision="1.1" showComponentDetails="true">
+<Global>
+<Connection clientId="${SFDC_CLIENT_ID}" consumerKey="${SFDC_CONSUMER_KEY}" consumerSecret="${SFDC_CONSUMER_SECRET}" credentialsType="${SFDC_CREDENTIALS_TYPE}" id="SFDC" loginHostname="${SFDC_LOGIN_HOSTNAME}" name="${SFDC_NAME}" password="${SFDC_PASSWORD}" passwordEncrypted="true" refreshToken="${SFDC_REFRESH_TOKEN}" token="${SFDC_TOKEN}" type="SFDC" username="${SFDC_USERNAME}"/>
+<Property id="GraphParameter14" name="SFDC_CLIENT_ID" value="gooddata/gooddata/"/>
+<Property id="GraphParameter15" name="SFDC_CONSUMER_KEY" value=""/>
+<Property id="GraphParameter23" name="SFDC_CONSUMER_SECRET" value=""/>
+<Property id="GraphParameter18" name="SFDC_CREDENTIALS_TYPE" value="basic"/>
+<Property id="GraphParameter22" name="SFDC_LOGIN_HOSTNAME" value="justcapital.my.salesforce.com"/>
+<Property id="GraphParameter16" name="SFDC_NAME" value="JUST SF"/>
+<Property id="GraphParameter19" name="SFDC_PASSWORD" value="if6ZTei6fnTNS8uu+wwMlw=="/>
+<Property id="GraphParameter20" name="SFDC_REFRESH_TOKEN" value=""/>
+<Property id="GraphParameter21" name="SFDC_TOKEN" value="9CQmSSD40rlwAezZRli82zTit"/>
+<Property id="GraphParameter17" name="SFDC_USERNAME" value="gooddata@justcapital.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" guiName="CSV Writer" guiX="460" guiY="257" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="DBExecute" guiX="163" guiY="359" id="DBEXECUTE" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="SF Reader" guiX="163" guiY="257" id="SF_READER" sfdcConnection="SFDC" type="SF_READER"/>
+<Edge fromNode="SF_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" outPort="Port 0 (output)" toNode="CSV_WRITER:0"/>
+</Phase>
+</Graph>
