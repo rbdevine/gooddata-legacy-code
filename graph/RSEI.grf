@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 20 16:19:12 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.125" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="area" name="area" type="string"/>
+<Field label="area_title" name="area_title" type="string"/>
+<Field label="naics" name="naics" type="string"/>
+<Field label="naics_title" name="naics_title" type="string"/>
+<Field label="occ code" name="occ_code" type="string"/>
+<Field label="occ title" name="occ_title" type="string"/>
+<Field label="group" name="group" type="string"/>
+<Field label="i_group" name="i_group" type="string"/>
+<Field label="tot_emp" name="tot_emp" type="string"/>
+<Field label="emp_prse" name="emp_prse" type="string"/>
+<Field label="pct_tot" name="pct_tot" type="string"/>
+<Field label="h_mean" name="h_mean" type="string"/>
+<Field label="a_mean" name="a_mean" type="string"/>
+<Field label="mean_prse" name="mean_prse" type="string"/>
+<Field label="h_pct10" name="h_pct10" type="string"/>
+<Field label="h_pct25" name="h_pct25" type="string"/>
+<Field label="h_median" name="h_median" type="string"/>
+<Field label="h_pct75" name="h_pct75" type="string"/>
+<Field label="h_pct90" name="h_pct90" type="string"/>
+<Field label="a_pct10" name="a_pct10" type="string"/>
+<Field label="a_pct25" name="a_pct25" type="string"/>
+<Field label="a_median" name="a_median" type="string"/>
+<Field label="a_pct75" name="a_pct75" type="string"/>
+<Field label="a_pct90" name="a_pct90" type="string"/>
+<Field label="annual" name="annual" type="string"/>
+<Field label="hourly" name="hourly" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="EMPLDIST_File" previewAttachmentCharset="ISO-8859-1" quotedStrings="true" recordDelimiter="\n" type="delimited">
+<Field label="area" name="area" type="string"/>
+<Field label="area_title" name="area_title" type="string"/>
+<Field label="naics" name="naics" type="string"/>
+<Field label="naics_title" name="naics_title" type="string"/>
+<Field label="occ code" name="occ_code" type="string"/>
+<Field label="occ title" name="occ_title" type="string"/>
+<Field label="group" name="group" type="string"/>
+<Field label="i_group" name="i_group" type="string"/>
+<Field label="tot_emp" name="tot_emp" type="string"/>
+<Field label="emp_prse" name="emp_prse" type="string"/>
+<Field label="pct_tot" name="pct_tot" type="string"/>
+<Field label="h_mean" name="h_mean" type="string"/>
+<Field label="a_mean" name="a_mean" type="string"/>
+<Field label="mean_prse" name="mean_prse" type="string"/>
+<Field label="h_pct10" name="h_pct10" type="string"/>
+<Field label="h_pct25" name="h_pct25" type="string"/>
+<Field label="h_median" name="h_median" type="string"/>
+<Field label="h_pct75" name="h_pct75" type="string"/>
+<Field label="h_pct90" name="h_pct90" type="string"/>
+<Field label="a_pct10" name="a_pct10" type="string"/>
+<Field label="a_pct25" name="a_pct25" type="string"/>
+<Field label="a_median" name="a_median" type="string"/>
+<Field label="a_pct75" name="a_pct75" type="string"/>
+<Field label="a_pct90" name="a_pct90" type="string"/>
+<Field label="annual" name="annual" type="string"/>
+<Field label="hourly" name="hourly" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="area_fips" type="string"/>
+<Field name="own_code" type="string"/>
+<Field name="INDUSTRY_CODE" type="string"/>
+<Field name="agglvl_code" type="string"/>
+<Field name="size_code" type="string"/>
+<Field name="year" type="string"/>
+<Field name="qtr" type="string"/>
+<Field name="disclosure_code" type="string"/>
+<Field name="area_title" type="string"/>
+<Field name="own_title" type="string"/>
+<Field name="industry_title" type="string"/>
+<Field name="agglvl_title" type="string"/>
+<Field name="size_title" type="string"/>
+<Field name="annual_avg_estabs_count" type="string"/>
+<Field name="annual_avg_emplvl" type="string"/>
+<Field name="total_annual_wages" type="string"/>
+<Field name="taxable_annual_wages" type="string"/>
+<Field name="annual_contributions" type="string"/>
+<Field name="annual_avg_wkly_wage" type="string"/>
+<Field name="avg_annual_pay" type="string"/>
+<Field name="lq_disclosure_code" type="string"/>
+<Field name="lq_annual_avg_estabs_count" type="string"/>
+<Field name="lq_annual_avg_emplvl" type="string"/>
+<Field name="lq_total_annual_wages" type="string"/>
+<Field name="lq_taxable_annual_wages" type="string"/>
+<Field name="lq_annual_contributions" type="string"/>
+<Field name="lq_annual_avg_wkly_wage" type="string"/>
+<Field name="lq_avg_annual_pay" type="string"/>
+<Field name="oty_disclosure_code" type="string"/>
+<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
+<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
+<Field name="oty_total_annual_wages_chg" type="string"/>
+<Field name="oty_total_annual_wages_pct_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
+<Field name="oty_annual_contributions_chg" type="string"/>
+<Field name="oty_annual_contributions_pct_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
+<Field name="oty_avg_annual_pay_chg" type="string"/>
+<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="QCEW_Record_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="area_fips" type="string"/>
+<Field name="own_code" type="string"/>
+<Field name="INDUSTRY_CODE" type="string"/>
+<Field name="agglvl_code" type="string"/>
+<Field name="size_code" type="string"/>
+<Field name="year" type="string"/>
+<Field name="qtr" type="string"/>
+<Field name="disclosure_code" type="string"/>
+<Field name="area_title" type="string"/>
+<Field name="own_title" type="string"/>
+<Field name="industry_title" type="string"/>
+<Field name="agglvl_title" type="string"/>
+<Field name="size_title" type="string"/>
+<Field name="annual_avg_estabs_count" type="string"/>
+<Field name="annual_avg_emplvl" type="string"/>
+<Field name="total_annual_wages" type="string"/>
+<Field name="taxable_annual_wages" type="string"/>
+<Field name="annual_contributions" type="string"/>
+<Field name="annual_avg_wkly_wage" type="string"/>
+<Field name="avg_annual_pay" type="string"/>
+<Field name="lq_disclosure_code" type="string"/>
+<Field name="lq_annual_avg_estabs_count" type="string"/>
+<Field name="lq_annual_avg_emplvl" type="string"/>
+<Field name="lq_total_annual_wages" type="string"/>
+<Field name="lq_taxable_annual_wages" type="string"/>
+<Field name="lq_annual_contributions" type="string"/>
+<Field name="lq_annual_avg_wkly_wage" type="string"/>
+<Field name="lq_avg_annual_pay" type="string"/>
+<Field name="oty_disclosure_code" type="string"/>
+<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
+<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_chg" type="string"/>
+<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
+<Field name="oty_total_annual_wages_chg" type="string"/>
+<Field name="oty_total_annual_wages_pct_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_chg" type="string"/>
+<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
+<Field name="oty_annual_contributions_chg" type="string"/>
+<Field name="oty_annual_contributions_pct_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
+<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
+<Field name="oty_avg_annual_pay_chg" type="string"/>
+<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata5" previewAttachment="${DATA_SOURCE_DIR}/RSEI_dat.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="RSEI_DB" previewAttachment="${DATA_SOURCE_DIR}/RSEI_dat.csv" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Year" type="string"/>
+<Field name="Facility_ID" type="string"/>
+<Field name="CAS" type="string"/>
+<Field name="MediaText" type="string"/>
+<Field name="NAICS" type="string"/>
+<Field name="Region" type="string"/>
+<Field name="State" type="string"/>
+<Field name="FIPS" type="string"/>
+<Field name="TRI_Pounds" type="string"/>
+<Field name="Cander_Hazard" type="string"/>
+<Field name="NonCancer_Hazard" type="string"/>
+<Field name="RSEI_Hazard" type="string"/>
+<Field name="Cancer_Score" type="string"/>
+<Field name="NonCancer_Score" type="string"/>
+<Field name="RSEI_Score" type="string"/>
+<Field name="Chromium_Speciation" type="string"/>
+<Field name="Facility_Name" type="string"/>
+<Field name="County" type="string"/>
+<Field name="City" type="string"/>
+<Field name="Zip" type="string"/>
+<Field name="New_Industry" type="string"/>
+<Field name="Chemical" type="string"/>
+<Field name="OSHA_Carcinogens_Flags" type="string"/>
+<Field name="Core_Chemical_Since" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata4" previewAttachment="${DATA_SOURCE_DIR}/RSEI_dat.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="RSEI_File" previewAttachment="${DATA_SOURCE_DIR}/RSEI_dat.csv" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Year" type="string"/>
+<Field name="Facility_ID" type="string"/>
+<Field name="CAS" type="string"/>
+<Field name="MediaText" type="string"/>
+<Field name="NAICS" type="string"/>
+<Field name="Region" type="string"/>
+<Field name="State" type="string"/>
+<Field name="FIPS" type="string"/>
+<Field name="TRI_Pounds" type="string"/>
+<Field name="Cander_Hazard" type="string"/>
+<Field name="NonCancer_Hazard" type="string"/>
+<Field name="RSEI_Hazard" type="string"/>
+<Field name="Cancer_Score" type="string"/>
+<Field name="NonCancer_Score" type="string"/>
+<Field name="RSEI_Score" type="string"/>
+<Field name="Chromium_Speciation" type="string"/>
+<Field name="Facility_Name" type="string"/>
+<Field name="County" type="string"/>
+<Field name="City" type="string"/>
+<Field name="Zip" type="string"/>
+<Field name="New_Industry" type="string"/>
+<Field name="Chemical" type="string"/>
+<Field name="OSHA_Carcinogens_Flags" type="string"/>
+<Field delimiter="\n" name="Core_Chemical_Since" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/RSEI_dat.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node dataPolicy="strict" enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="99" guiY="118" id="CSV_READER" quotedStrings="true" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" guiName="Reformat" guiX="286" guiY="118" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Year = $in.0.Year;
+	$out.0.Facility_ID = $in.0.Facility_ID;
+	$out.0.CAS = $in.0.CAS;
+	$out.0.MediaText = $in.0.MediaText;
+	$out.0.NAICS = $in.0.NAICS;
+	$out.0.Region = $in.0.Region;
+	$out.0.State = $in.0.State;
+	$out.0.FIPS = $in.0.FIPS;
+	$out.0.TRI_Pounds = $in.0.TRI_Pounds;
+	$out.0.Cander_Hazard = $in.0.Cander_Hazard;
+	$out.0.NonCancer_Hazard = $in.0.NonCancer_Hazard;
+	$out.0.RSEI_Hazard = $in.0.RSEI_Hazard;
+	$out.0.Cancer_Score = $in.0.Cancer_Score;
+	$out.0.NonCancer_Score = $in.0.NonCancer_Score;
+	$out.0.RSEI_Score = $in.0.RSEI_Score;
+	$out.0.Chromium_Speciation = $in.0.Chromium_Speciation;
+	$out.0.Facility_Name = $in.0.Facility_Name;
+	$out.0.County = $in.0.County;
+	$out.0.City = $in.0.City;
+	$out.0.Zip = $in.0.Zip;
+	$out.0.New_Industry = $in.0.New_Industry;
+	$out.0.Chemical = $in.0.Chemical;
+	$out.0.OSHA_Carcinogens_Flags = $in.0.OSHA_Carcinogens_Flags;
+	$out.0.Core_Chemical_Since = $in.0.Core_Chemical_Since;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/RSEI.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="109" guiY="222" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_RSEI;]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="222" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_EMPLDIST (
+	YEAR VARCHAR(255),
+FACILITY_ID VARCHAR(255),
+CAS VARCHAR(255),
+MEDIATEXT VARCHAR(255),
+NAICS VARCHAR(255),
+REGION VARCHAR(255),
+STATE VARCHAR(255),
+FIPS VARCHAR(255),
+TRI_POUNDS VARCHAR(255),
+CANCER_HAZARD VARCHAR(255),
+NONCANCER_HAZARD VARCHAR(255),
+RSEI_HAZARD VARCHAR(255),
+CANCER_SCORE VARCHAR(255),
+NONCANCER_SCORE VARCHAR(255),
+RSEI_SCORE VARCHAR(255),
+CHROMIUM_SPECIATION VARCHAR(255),
+FACILITY_NAME VARCHAR(255),
+COUNTY VARCHAR(255),
+CITY VARCHAR(255),
+ZIP VARCHAR(255),
+NEW_INDUSTRY VARCHAR(255),
+CHEMICAL VARCHAR(255),
+OSHA_CARCINOGENS_FLAG VARCHAR(255),
+CORE_CHEMICAL_SINCE VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="222" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY STG_EMPLDIST (
+	YEAR,
+FACILITY_ID,
+CAS,
+MEDIATEXT,
+NAICS,
+REGION,
+STATE,
+FIPS,
+TRI_POUNDS,
+CANCER_HAZARD,
+NONCANCER_HAZARD,
+RSEI_HAZARD,
+CANCER_SCORE,
+NONCANCER_SCORE,
+RSEI_SCORE,
+CHROMIUM_SPECIATION,
+FACILITY_NAME,
+COUNTY,
+CITY,
+ZIP,
+NEW_INDUSTRY,
+CHEMICAL,
+OSHA_CARCINOGENS_FLAG,
+CORE_CHEMICAL_SINCE
+)
+FROM LOCAL '${DATA_TRANSFORM_DIR}/RSEI.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/RSEIErrors.txt'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${DATA_TMP_DIR}/*.csv" enabled="enabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TRANSFORM_DIR}/RSEI.txt" enabled="enabled" guiName="Clean transform" guiX="474" guiY="302" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
+</Phase>
+</Graph>
