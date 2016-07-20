@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 20 16:18:36 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.119" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 20 16:34:33 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.121" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata5" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="dunstemplate.csv" name="dunstemplate_DB" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
@@ -193,7 +193,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/dunstemplate.csv" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/dunstemplate.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" quotedStrings="true" type="DATA_READER" verbose="true"/>
