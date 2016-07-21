@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 20 16:19:12 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.125" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 21 00:23:30 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.127" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -207,7 +207,7 @@
 <Field name="New_Industry" type="string"/>
 <Field name="Chemical" type="string"/>
 <Field name="OSHA_Carcinogens_Flags" type="string"/>
-<Field delimiter="\n" name="Core_Chemical_Since" type="string"/>
+<Field name="Core_Chemical_Since" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -218,7 +218,7 @@
 <Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/RSEI_dat.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node dataPolicy="strict" enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="99" guiY="118" id="CSV_READER" quotedStrings="true" type="DATA_READER" verbose="true"/>
+<Node dataPolicy="strict" enabled="enabled" fileURL="${DATA_TMP_DIR}/RSEI_dat.csv" guiName="CSV Reader" guiX="99" guiY="118" id="CSV_READER" quotedStrings="true" type="DATA_READER" verbose="true"/>
 <Node enabled="enabled" guiName="Reformat" guiX="286" guiY="118" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -271,7 +271,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/RSEI.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/RSEICombined.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
 <Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
 </Phase>
@@ -338,13 +338,13 @@ CHEMICAL,
 OSHA_CARCINOGENS_FLAG,
 CORE_CHEMICAL_SINCE
 )
-FROM LOCAL '${DATA_TRANSFORM_DIR}/RSEI.txt'
-EXCEPTIONS '${DATA_TMP_DIR}/RSEIErrors.txt'
+FROM LOCAL '${DATA_TRANSFORM_DIR}/RSEICombined.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/RSEICombinedErrors.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${DATA_TMP_DIR}/*.csv" enabled="enabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
-<Node baseURL="${DATA_TRANSFORM_DIR}/RSEI.txt" enabled="enabled" guiName="Clean transform" guiX="474" guiY="302" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TMP_DIR}/RSEI_dat.csv" enabled="enabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TRANSFORM_DIR}/RSEICombined.txt" enabled="enabled" guiName="Clean transform" guiX="474" guiY="302" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
 </Phase>
 </Graph>

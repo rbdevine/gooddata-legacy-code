@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 20 14:43:58 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.121" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 21 00:18:24 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.127" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata5" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CO2Emissions_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -14,24 +14,24 @@
 <Field label="ZIP CODE" name="ZIP_CODE" type="string"/>
 <Field label="PARENT COMPANIES" name="PARENT_COMPANIES" type="string"/>
 <Field label="GHG QUANTITY (METRIC TONS CO2e)" name="GHG_QUANTITY" type="string"/>
-<Field delimiter="\n" label="SUBPARTS" name="SUBPARTS" type="string"/>
+<Field label="SUBPARTS" name="SUBPARTS" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata4" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="CO2Emissions_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field format="" label="REPORTING YEAR" name="REPORTING_YEAR" type="string"/>
-<Field format="" label="FACILITY NAME" name="FACILITY_NAME" type="string"/>
-<Field format="" label="GHGRP ID" name="GHGRP_ID" type="string"/>
-<Field format="" label="REPORTED ADDRESS" name="REPORTED_ADDRESS" type="string"/>
-<Field format="" label="LATITUDE" name="LATITUDE" type="string"/>
-<Field format="" label="LONGITUDE" name="LONGITUDE" type="string"/>
-<Field format="" label="CITY NAME" name="CITY_NAME" type="string"/>
-<Field format="" label="COUNTY NAME" name="COUNTY_NAME" type="string"/>
-<Field format="" label="STATE" name="STATE" type="string"/>
-<Field format="" label="ZIP CODE" name="ZIP_CODE" type="string"/>
-<Field format="" label="PARENT COMPANIES" name="PARENT_COMPANIES" type="string"/>
-<Field format="" label="GHG QUANTITY (METRIC TONS CO2e)" name="GHG_QUANTITY" type="string"/>
-<Field delimiter="\n" format="" label="SUBPARTS" name="SUBPARTS" type="string"/>
+<Field label="REPORTING YEAR" name="REPORTING_YEAR" type="string"/>
+<Field label="FACILITY NAME" name="FACILITY_NAME" type="string"/>
+<Field label="GHGRP ID" name="GHGRP_ID" type="string"/>
+<Field label="REPORTED ADDRESS" name="REPORTED_ADDRESS" type="string"/>
+<Field label="LATITUDE" name="LATITUDE" type="string"/>
+<Field label="LONGITUDE" name="LONGITUDE" type="string"/>
+<Field label="CITY NAME" name="CITY_NAME" type="string"/>
+<Field label="COUNTY NAME" name="COUNTY_NAME" type="string"/>
+<Field label="STATE" name="STATE" type="string"/>
+<Field label="ZIP CODE" name="ZIP_CODE" type="string"/>
+<Field label="PARENT COMPANIES" name="PARENT_COMPANIES" type="string"/>
+<Field label="GHG QUANTITY (METRIC TONS CO2e)" name="GHG_QUANTITY" type="string"/>
+<Field delimiter="\n" label="SUBPARTS" name="SUBPARTS" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
@@ -190,6 +190,9 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Note alignment="1" backgroundColorB="225" backgroundColorG="255" backgroundColorR="255" enabled="true" folded="false" height="243" id="Note0" textColorB="0" textColorG="0" textColorR="0" textFontSize="12" title="NOTE" titleColorB="0" titleColorG="0" titleColorR="0" titleFontSize="14" width="98" x="607" y="78">
+<attr name="text"><![CDATA[I had to remove any carriage returns from excel files.  Carriage returns existed in 2013 and 2014 for "DENVER ARAPAHOE DISPOSAL SITE-A WASTE MANAGEMENT COMPANY"]]></attr>
+</Note>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -237,8 +240,39 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.xls" guiName="SpreadsheetDataReader" guiX="52" guiY="118" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
-<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/CO2EmissionsCombined.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.xls" guiName="SpreadsheetDataReader" guiX="52" guiY="118" id="SPREADSHEET_DATA_READER" sheet="FLIGHT Facilities and GHG Quant" type="SPREADSHEET_READER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mapping>
+    <globalAttributes>
+        <orientation>VERTICAL</orientation>
+        <step>1</step>
+        <writeHeader>true</writeHeader>
+    </globalAttributes>
+    <defaultSkip>1</defaultSkip>
+    <headerGroups>
+        <headerGroup skip="1">
+            <autoMappingType>ORDER</autoMappingType>
+            <headerRanges>
+                <headerRange begin="A1"/>
+                <headerRange begin="B1"/>
+                <headerRange begin="C1"/>
+                <headerRange begin="D1"/>
+                <headerRange begin="E1"/>
+                <headerRange begin="F1"/>
+                <headerRange begin="G1"/>
+                <headerRange begin="H1"/>
+                <headerRange begin="I1"/>
+                <headerRange begin="J1"/>
+                <headerRange begin="K1"/>
+                <headerRange begin="L1"/>
+                <headerRange begin="M1"/>
+            </headerRanges>
+        </headerGroup>
+    </headerGroups>
+</mapping>
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/CO2EmissionsCombined.txt" guiName="Write Industry File" guiX="470" guiY="118" id="WRITE_INDUSTRY_FILE" quotedStrings="false" type="DATA_WRITER"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
 <Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 </Phase>
@@ -284,12 +318,12 @@ GHG_QUANTITY,
 SUBPARTS
 )
 FROM LOCAL '${DATA_TRANSFORM_DIR}/CO2EmissionsCombined.txt'
-EXCEPTIONS '${DATA_TMP_DIR}/EMPLDISTIndustryCombinedErrors.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/CO2EmissionsCombinedErrors.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${DATA_TMP_DIR}/*.csv" enabled="enabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TMP_DIR}/CO2EmissionsCombinedErrors.txt;${DATA_TMP_DIR}/flight*.xls" enabled="enabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
 <Node baseURL="${DATA_TRANSFORM_DIR}/CO2Emissions.txt" enabled="enabled" guiName="Clean transform" guiX="474" guiY="302" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
 </Phase>
 </Graph>

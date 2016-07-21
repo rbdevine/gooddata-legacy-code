@@ -1,24 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 20 17:58:56 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.134" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 20 23:38:27 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.158" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata5" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" label="dunstemplate.csv" name="dunstemplate_DB" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
-<Field name="Ultimate_Parent" type="string"/>
-<Field name="Company" type="string"/>
-<Field eofAsDelimiter="false" name="DUNS_Number" type="string"/>
-<Field name="Parents_DUNS_Number" type="string"/>
-<Field name="Address" type="string"/>
-<Field name="City" type="string"/>
-<Field name="State" type="string"/>
-<Field name="Zip" type="string"/>
-<Field name="County" type="string"/>
-<Field name="Employment_at_Location__DnB__2015" type="string"/>
-<Field name="Latitude" type="string"/>
-<Field name="Longitude" type="string"/>
-<Field delimiter="\n" name="NAICS" type="string"/>
-</Record>
-</Metadata>
-<Metadata id="Metadata4" previewAttachment="${DATA_TMP_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," label="dunstemplate.csv" name="dunstemplate_File" previewAttachment="${DATA_TMP_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
+<Record fieldDelimiter="|" label="dunstemplate.csv" name="dunstemplate_DB" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
 <Field name="Ultimate_Parent" type="string"/>
 <Field name="Company" type="string"/>
 <Field eofAsDelimiter="false" name="DUNS_Number" type="string"/>
@@ -32,6 +15,23 @@
 <Field name="Latitude" type="string"/>
 <Field name="Longitude" type="string"/>
 <Field name="NAICS" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata4" previewAttachment="${DATA_TMP_DIR}/dunstemplatefromexcel.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="dunstemplate.csv" name="dunstemplate_File" previewAttachment="${DATA_TMP_DIR}/dunstemplatefromexcel.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="Ultimate_Parent" type="string"/>
+<Field name="Company" type="string"/>
+<Field eofAsDelimiter="false" name="DUNS_Number" type="string"/>
+<Field name="Parents_DUNS_Number" type="string"/>
+<Field name="Address" type="string"/>
+<Field name="City" type="string"/>
+<Field name="State" type="string"/>
+<Field name="Zip" type="string"/>
+<Field name="County" type="string"/>
+<Field name="Employment_at_Location__DnB__2015" type="string"/>
+<Field name="Latitude" type="string"/>
+<Field name="Longitude" type="string"/>
+<Field eofAsDelimiter="true" name="NAICS" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
@@ -193,11 +193,11 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/dunstemplate.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/dunstemplate.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/dunstemplate.csv" guiName="CSV Reader" guiX="109" guiY="129" id="CSV_READER" parser="org.jetel.data.parser.DataParser" quotedStrings="true" trim="true" type="DATA_READER"/>
-<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/dunscombined.txt" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/dunstemplate.csv" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quoteCharacter="&quot;" quotedStrings="true" skipRows="1" skipSourceRows="0" trim="true" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/dunscombined.txt" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -243,53 +243,53 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="109" guiY="222" id="DROP_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_DUNSTEMPLATE;]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="222" id="CREATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_DUNSTEMPLATE (
 	ULTIMATE_PARENT VARCHAR(255),
-COMPANY VARCHAR(255),
-DUNS_NUMBER VARCHAR(255),
-PARENT_DUNS_NUMBER VARCHAR(255),
-ADDRESS VARCHAR(255),
-CITY VARCHAR(255),
-STATE VARCHAR(255),
-ZIP VARCHAR(255),
-COUNTY VARCHAR(255),
-EMPLOYMENT_AT_LOCATION__DNB__2015 VARCHAR(255),
-LATITUDE VARCHAR(255),
-LONGITUDE VARCHAR(255),
-NAICS VARCHAR(255)
+	COMPANY VARCHAR(255),
+	DUNS_NUMBER VARCHAR(255),
+	PARENT_DUNS_NUMBER VARCHAR(255),
+	ADDRESS VARCHAR(255),
+	CITY VARCHAR(255),
+	STATE VARCHAR(255),
+	ZIP VARCHAR(255),
+	COUNTY VARCHAR(255),
+	EMPLOYMENT_AT_LOCATION_DNB_2015 VARCHAR(255),
+	LATITUDE VARCHAR(255),
+	LONGITUDE VARCHAR(255),
+	NAICS VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="222" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY STG_DUNSTEMPLATE (
 	ULTIMATE_PARENT,
-COMPANY,
-DUNS_NUMBER,
-PARENT_DUNS_NUMBER,
-ADDRESS,
-CITY,
-STATE,
-ZIP,
-COUNTY,
-EMPLOYMENT_AT_LOCATION__DNB__2015,
-LATITUDE,
-LONGITUDE,
-NAICS
+	COMPANY,
+	DUNS_NUMBER,
+	PARENT_DUNS_NUMBER,
+	ADDRESS,
+	CITY,
+	STATE,
+	ZIP,
+	COUNTY,
+	EMPLOYMENT_AT_LOCATION_DNB_2015,
+	LATITUDE,
+	LONGITUDE,
+	NAICS
 )
-FROM LOCAL '${DATA_TRANSFORM_DIR}/dunstemplate.txt'
+FROM LOCAL '${DATA_TRANSFORM_DIR}/dunscombined.txt'
 EXCEPTIONS '${DATA_TMP_DIR}/dunstemplateErrors.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${DATA_TMP_DIR}/*.csv" enabled="enabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
-<Node baseURL="${DATA_TRANSFORM_DIR}/dunstemplate.txt" enabled="enabled" guiName="Clean transform" guiX="474" guiY="334" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TMP_DIR}/dunstemplate.csv;${DATA_TMP_DIR}/dunserrors.txt" enabled="enabled" guiName="Clean tmp" guiX="63" guiY="334" id="CLEAN_TMP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TRANSFORM_DIR}/dunscombined.txt" enabled="enabled" guiName="Clean transform" guiX="474" guiY="334" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
 </Phase>
 </Graph>
