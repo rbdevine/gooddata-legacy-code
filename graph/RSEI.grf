@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 21 00:23:30 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.127" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 21 03:36:16 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.135" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -182,9 +182,9 @@
 <Field name="Core_Chemical_Since" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata4" previewAttachment="${DATA_SOURCE_DIR}/RSEI_dat.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="RSEI_File" previewAttachment="${DATA_SOURCE_DIR}/RSEI_dat.csv" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="Year" type="string"/>
+<Metadata id="Metadata4" previewAttachment="${DATA_TMP_DIR}/RSEI_dat.csv" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="," name="RSEI_File" previewAttachment="${DATA_TMP_DIR}/RSEI_dat.csv" previewAttachmentCharset="UTF-8" skipSourceRows="1" type="delimited">
+<Field delimiter="," name="Year" type="string"/>
 <Field name="Facility_ID" type="string"/>
 <Field name="CAS" type="string"/>
 <Field name="MediaText" type="string"/>
@@ -207,7 +207,7 @@
 <Field name="New_Industry" type="string"/>
 <Field name="Chemical" type="string"/>
 <Field name="OSHA_Carcinogens_Flags" type="string"/>
-<Field name="Core_Chemical_Since" type="string"/>
+<Field delimiter="\n" name="Core_Chemical_Since" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -218,7 +218,7 @@
 <Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/RSEI_dat.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node dataPolicy="strict" enabled="enabled" fileURL="${DATA_TMP_DIR}/RSEI_dat.csv" guiName="CSV Reader" guiX="99" guiY="118" id="CSV_READER" quotedStrings="true" type="DATA_READER" verbose="true"/>
+<Node dataPolicy="strict" enabled="enabled" fileURL="${DATA_TMP_DIR}/RSEI_dat.csv" guiName="CSV Reader" guiX="99" guiY="118" id="CSV_READER" quotedStrings="true" skipRows="1" trim="true" type="DATA_READER" verbose="true"/>
 <Node enabled="enabled" guiName="Reformat" guiX="286" guiY="118" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
