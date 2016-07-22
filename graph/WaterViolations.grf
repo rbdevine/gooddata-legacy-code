@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 21 16:58:40 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.164" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 21 23:14:55 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.165" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata5" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="dunstemplate.csv" name="dunstemplate_DB" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
@@ -316,6 +316,8 @@ function integer transform() {
 	NAICS_CODE VARCHAR(255)
 );]]></attr>
 </Node>
+</Phase>
+<Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	SOURCE_ID,
