@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 25 15:07:38 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.172" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 25 15:25:09 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.178" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata5" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="dunstemplate.csv" name="dunstemplate_DB" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
@@ -279,7 +279,7 @@
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="73" guiY="129" id="CSV_READER" type="DATA_READER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="73" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
