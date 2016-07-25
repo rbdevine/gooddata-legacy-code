@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 21 16:32:12 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.164" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Sun Jul 24 22:55:46 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.169" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata5" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="dunstemplate.csv" name="dunstemplate_DB" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
@@ -95,24 +95,24 @@
 </Record>
 </Metadata>
 <Metadata id="Metadata6" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="HazardousWaste_DB" previewAttachmentCharset="ISO-8859-1" quotedStrings="true" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="HazardousWaste_DB" previewAttachmentCharset="ISO-8859-1" quotedStrings="false" recordDelimiter="\n" type="delimited">
 <Field format="excel:@" label="source_id" name="source_id" type="string"/>
 <Field format="excel:@" label="registry_id" name="registry_id" type="string"/>
-<Field format="" label="rcr_name" name="rcr_name" type="string"/>
-<Field format="" label="rcr_street" name="rcr_street" type="string"/>
-<Field format="" label="rcr_city" name="rcr_city" type="string"/>
-<Field format="" label="rcr_state" name="rcr_state" type="string"/>
+<Field label="rcr_name" name="rcr_name" type="string"/>
+<Field label="rcr_street" name="rcr_street" type="string"/>
+<Field label="rcr_city" name="rcr_city" type="string"/>
+<Field label="rcr_state" name="rcr_state" type="string"/>
 <Field format="excel:#,##0.000000" label="fac_lat" name="fac_lat" type="string"/>
 <Field format="excel:#,##0.000000" label="fac_long" name="fac_long" type="string"/>
-<Field format="" label="rcra_curr_snc" name="rcra_curr_snc" type="string"/>
-<Field format="" label="rcra_qtrs_in_nc" name="rcra_qtrs_in_nc" type="string"/>
-<Field format="" label="rcra_curr_violation_types" name="rcra_curr_violation_types" type="string"/>
-<Field format="" label="rcra_insp_cnt" name="rcra_insp_cnt" type="string"/>
-<Field format="" label="rcra_iea_cnt" name="rcra_iea_cnt" type="string"/>
+<Field label="rcra_curr_snc" name="rcra_curr_snc" type="string"/>
+<Field label="rcra_qtrs_in_nc" name="rcra_qtrs_in_nc" type="string"/>
+<Field label="rcra_curr_violation_types" name="rcra_curr_violation_types" type="string"/>
+<Field label="rcra_insp_cnt" name="rcra_insp_cnt" type="string"/>
+<Field label="rcra_iea_cnt" name="rcra_iea_cnt" type="string"/>
 <Field label="rcra_last_iea_date" name="rcra_last_iea_date" type="string"/>
-<Field format="" label="rcra_fea_cnt" name="rcra_fea_cnt" type="string"/>
-<Field format="" label="fac_map_flg" name="fac_map_flg" type="string"/>
-<Field format="" label="NAICS Code" name="NAICS_Code" type="string"/>
+<Field label="rcra_fea_cnt" name="rcra_fea_cnt" type="string"/>
+<Field label="fac_map_flg" name="fac_map_flg" type="string"/>
+<Field label="NAICS Code" name="NAICS_Code" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata7">
@@ -231,19 +231,19 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter14" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/violations/hazardouswaste.xlsx"/>
-<Property id="GraphParameter18" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/hazardouswasteerror.txt"/>
-<Property id="GraphParameter15" name="READFILEPATH" value="${DATA_TMP_DIR}/hazardouswaste.xlsx"/>
-<Property id="GraphParameter16" name="TABLENAME" value="STG_HAZARDOUSWASTEVIOLATIONS"/>
-<Property fileURL="workspace.prm" id="GraphParameter0"/>
-<Property id="GraphParameter17" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/hazardouswaste.txt"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/violations/hazardouswaste.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/hazardouswasteerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/hazardouswaste.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_HAZARDOUSWASTEVIOLATIONS"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/hazardouswaste.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 

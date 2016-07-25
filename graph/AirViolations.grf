@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 21 16:58:40 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.167" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Sun Jul 24 22:50:28 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.172" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata7" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="Air_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="Air_DB" previewAttachmentCharset="ISO-8859-1" quotedStrings="false" recordDelimiter="\n" type="delimited">
 <Field format="excel:@" label="source_id" name="source_id" type="string"/>
 <Field label="epa_system" name="epa_system" type="string"/>
 <Field format="excel:@" label="registry_id" name="registry_id" type="string"/>
@@ -246,7 +246,7 @@
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -353,6 +353,6 @@ ABORT ON ERROR;]]></attr>
 <Phase number="5">
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>

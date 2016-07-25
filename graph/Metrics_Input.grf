@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 19 18:18:19 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.113" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Sun Jul 24 23:05:52 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.125" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -67,11 +67,11 @@
 <Field name="VALUE" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata4">
-<Record fieldDelimiter="|" name="Metrics_Input_DB" recordDelimiter="\n" type="delimited">
+<Metadata id="Metadata4" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Metrics_Input_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="TICKER" type="string"/>
 <Field name="METRIC" type="string"/>
-<Field name="VALUE" type="string"/>
+<Field name="VALUE" nullValue="NA" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
@@ -173,10 +173,10 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/metrics_input/*.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/metrics_input/*.csv" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="286" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" type="DATA_READER"/>
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/*.csv" guiName="CSV Reader" guiX="112" guiY="118" id="CSV_READER" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
 <Node enabled="enabled" guiName="Reformat" guiX="286" guiY="118" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -239,7 +239,7 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${DATA_TMP_DIR}/*.csv" enabled="enabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
-<Node baseURL="${DATA_TRANSFORM_DIR}/Metrics_Input.txt" enabled="enabled" guiName="Clean transform" guiX="474" guiY="302" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TMP_DIR}/*.csv" enabled="disabled" guiName="Clean tmp" guiX="109" guiY="302" id="CLEAN_TMP" type="FILE_DELETE"/>
+<Node baseURL="${DATA_TRANSFORM_DIR}/Metrics_Input.txt" enabled="disabled" guiName="Clean transform" guiX="474" guiY="302" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
 </Phase>
 </Graph>
