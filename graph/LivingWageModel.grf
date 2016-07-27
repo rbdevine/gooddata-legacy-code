@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Tue Jul 26 11:33:57 EDT 2016" guiVersion="3.4.4.P" id="1469548969446" licenseType="Commercial" modified="Tue Jul 26 14:31:52 EDT 2016" modifiedBy="scalvillo" name="LivingWageModel" revision="1.1" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" guiName="ApproximativeJoin" guiX="487" guiY="125" id="APPROXIMATIVE_JOIN" type="APROX_MERGE_JOIN"/>
+<Node enabled="enabled" guiName="DBInputTable" guiX="64" guiY="125" id="DBINPUT_TABLE" type="DB_INPUT_TABLE"/>
+</Phase>
+</Graph>
