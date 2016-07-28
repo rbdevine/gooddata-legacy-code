@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 11:09:16 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.124" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 13:28:21 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.127" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="FamilyTrees_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -126,7 +126,14 @@
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.Company_Name = $in.0.Company_Name;
+	if($in.0.Company_Name != null ) 
+	{
+		$out.0.Company_Name = replace($in.0.Company_Name,"[||\\\\]",",");
+	}
+	else
+	{
+		$out.0.Company_Name = $in.0.Company_Name;
+	}
 	$out.0.DUNS_Number = $in.0.DUNS_Number;
 	$out.0.Immediate_Parent = $in.0.Immediate_Parent;
 	$out.0.Immediate_Parent_DUNS = $in.0.Immediate_Parent_DUNS;
@@ -158,7 +165,14 @@ function integer transform() {
 	$out.0.Primary_Zip_Extension = $in.0.Primary_Zip_Extension;
 	$out.0.Primary_Country = $in.0.Primary_Country;
 	$out.0.Line_Of_Business = $in.0.Line_Of_Business;
-	$out.0.Doing_Business_As = $in.0.Doing_Business_As;
+	if($in.0.Doing_Business_As != null ) 
+	{
+		$out.0.Doing_Business_As = replace($in.0.Doing_Business_As,"[||\\\\]",",");
+	}
+	else
+	{
+		$out.0.Doing_Business_As = $in.0.Doing_Business_As;
+	}
 	$out.0.Company_Type = $in.0.Company_Type;
 	$out.0.Is_Subsidiary = $in.0.Is_Subsidiary;
 	$out.0.Location_Type = $in.0.Location_Type;
