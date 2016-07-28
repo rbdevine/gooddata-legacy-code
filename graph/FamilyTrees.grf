@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 11:09:16 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.124" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="FamilyTrees_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="Company Name" name="Company_Name" type="string"/>
+<Field label="D-U-N-S Number" name="DUNS_Number" type="string"/>
+<Field label="Immediate Parent" name="Immediate_Parent" type="string"/>
+<Field label="Immediate Parent D-U-N-S" name="Immediate_Parent_DUNS" type="string"/>
+<Field label="Ultimate Parent" name="Ultimate_Parent" type="string"/>
+<Field label="Ultimate Parent D-U-N-S" name="Ultimate_Parent_DUNS" type="string"/>
+<Field label="Contact Prefix" name="Contact_Prefix" type="string"/>
+<Field label="Contact First Name" name="Contact_First_Name" type="string"/>
+<Field label="Contact Last Name" name="Contact_Last_Name" type="string"/>
+<Field label="Contact Suffix" name="Contact_Suffix" type="string"/>
+<Field label="Contact Title" name="Contact_Title" type="string"/>
+<Field label="Country Phone Code" name="Country_Phone_Code" type="string"/>
+<Field label="Phone Number" name="Phone_Number" type="string"/>
+<Field label="Toll-Free Country Code" name="Toll_Free_Country_Code" type="string"/>
+<Field label="Toll-Free Number" name="Toll_Free_Number" type="string"/>
+<Field label="FAX Country Code" name="FAX_Country_Code" type="string"/>
+<Field label="FAX Number" name="FAX_Number" type="string"/>
+<Field label="Mailing Address 1" name="Mailing_Address_1" type="string"/>
+<Field label="Mailing Address 2" name="Mailing_Address_2" type="string"/>
+<Field label="Mailing City" name="Mailing_City" type="string"/>
+<Field label="Mailing State" name="Mailing_State" type="string"/>
+<Field label="Mailing Zip" name="Mailing_Zip" type="string"/>
+<Field label="Mailing Zip Extension" name="Mailing_Zip_Extension" type="string"/>
+<Field label="Mailing Country" name="Mailing_Country" type="string"/>
+<Field label="Primary Address 1" name="Primary_Address_1" type="string"/>
+<Field label="Primary Address 2" name="Primary_Address_2" type="string"/>
+<Field label="Primary City" name="Primary_City" type="string"/>
+<Field label="Primary State" name="Primary_State" type="string"/>
+<Field label="Primary Zip" name="Primary_Zip" type="string"/>
+<Field label="Primary Zip Extension" name="Primary_Zip_Extension" type="string"/>
+<Field label="Primary Country" name="Primary_Country" type="string"/>
+<Field label="Line Of Business" name="Line_Of_Business" type="string"/>
+<Field label="Doing Business As" name="Doing_Business_As" type="string"/>
+<Field label="Company Type" name="Company_Type" type="string"/>
+<Field label="Is Subsidiary" name="Is_Subsidiary" type="string"/>
+<Field label="Location Type" name="Location_Type" type="string"/>
+<Field label="Exchange" name="Exchange" type="string"/>
+<Field label="Symbol" name="Symbol" type="string"/>
+<Field label="Latitude" name="Latitude" type="string"/>
+<Field label="Longitude" name="Longitude" type="string"/>
+<Field label="Revenue (US Dollars, million)" name="Revenue_US_Dollars_million" type="string"/>
+<Field label="Net Income (US Dollars, million)" name="Net_Income_US_Dollars_million" type="string"/>
+<Field label="Total Employees" name="Total_Employees" type="string"/>
+<Field label="Employees At This Location" name="Employees_At_This_Location" type="string"/>
+<Field label="Primary Industry" name="Primary_Industry" type="string"/>
+<Field label="Primary US SIC Code" name="Primary_US_SIC_Code" type="string"/>
+<Field label="Primary US NAICS Code" name="Primary_US_NAICS_Code" type="string"/>
+<Field label="Web Address " name="Web_Address" type="string"/>
+<Field label="Facility Size (sq.Ft)" name="Facility_Size_sq_Ft" type="string"/>
+<Field label="Marketable?" name="Marketable" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="," name="FamilyTrees_File" recordDelimiter="\n" type="delimited">
+<Field label="Company Name" name="Company_Name" type="string"/>
+<Field label="D-U-N-S Number" name="DUNS_Number" type="string"/>
+<Field label="Immediate Parent" name="Immediate_Parent" type="string"/>
+<Field label="Immediate Parent D-U-N-S" name="Immediate_Parent_DUNS" type="string"/>
+<Field label="Ultimate Parent" name="Ultimate_Parent" type="string"/>
+<Field label="Ultimate Parent D-U-N-S" name="Ultimate_Parent_DUNS" type="string"/>
+<Field label="Contact Prefix" name="Contact_Prefix" type="string"/>
+<Field label="Contact First Name" name="Contact_First_Name" type="string"/>
+<Field label="Contact Last Name" name="Contact_Last_Name" type="string"/>
+<Field label="Contact Suffix" name="Contact_Suffix" type="string"/>
+<Field label="Contact Title" name="Contact_Title" type="string"/>
+<Field label="Country Phone Code" name="Country_Phone_Code" type="string"/>
+<Field label="Phone Number" name="Phone_Number" type="string"/>
+<Field label="Toll-Free Country Code" name="Toll_Free_Country_Code" type="string"/>
+<Field label="Toll-Free Number" name="Toll_Free_Number" type="string"/>
+<Field label="FAX Country Code" name="FAX_Country_Code" type="string"/>
+<Field label="FAX Number" name="FAX_Number" type="string"/>
+<Field label="Mailing Address 1" name="Mailing_Address_1" type="string"/>
+<Field label="Mailing Address 2" name="Mailing_Address_2" type="string"/>
+<Field label="Mailing City" name="Mailing_City" type="string"/>
+<Field label="Mailing State" name="Mailing_State" type="string"/>
+<Field label="Mailing Zip" name="Mailing_Zip" type="string"/>
+<Field label="Mailing Zip Extension" name="Mailing_Zip_Extension" type="string"/>
+<Field label="Mailing Country" name="Mailing_Country" type="string"/>
+<Field label="Primary Address 1" name="Primary_Address_1" type="string"/>
+<Field label="Primary Address 2" name="Primary_Address_2" type="string"/>
+<Field label="Primary City" name="Primary_City" type="string"/>
+<Field label="Primary State" name="Primary_State" type="string"/>
+<Field label="Primary Zip" name="Primary_Zip" type="string"/>
+<Field label="Primary Zip Extension" name="Primary_Zip_Extension" type="string"/>
+<Field label="Primary Country" name="Primary_Country" type="string"/>
+<Field label="Line Of Business" name="Line_Of_Business" type="string"/>
+<Field label="Doing Business As" name="Doing_Business_As" type="string"/>
+<Field label="Company Type" name="Company_Type" type="string"/>
+<Field label="Is Subsidiary" name="Is_Subsidiary" type="string"/>
+<Field label="Location Type" name="Location_Type" type="string"/>
+<Field label="Exchange" name="Exchange" type="string"/>
+<Field label="Symbol" name="Symbol" type="string"/>
+<Field label="Latitude" name="Latitude" type="string"/>
+<Field label="Longitude" name="Longitude" type="string"/>
+<Field label="Revenue (US Dollars, million)" name="Revenue_US_Dollars_million" type="string"/>
+<Field label="Net Income (US Dollars, million)" name="Net_Income_US_Dollars_million" type="string"/>
+<Field label="Total Employees" name="Total_Employees" type="string"/>
+<Field label="Employees At This Location" name="Employees_At_This_Location" type="string"/>
+<Field label="Primary Industry" name="Primary_Industry" type="string"/>
+<Field label="Primary US SIC Code" name="Primary_US_SIC_Code" type="string"/>
+<Field label="Primary US NAICS Code" name="Primary_US_NAICS_Code" type="string"/>
+<Field label="Web Address " name="Web_Address" type="string"/>
+<Field label="Facility Size (sq.Ft)" name="Facility_Size_sq_Ft" type="string"/>
+<Field label="Marketable?" name="Marketable" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/dnb/famTrees/*.xls"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/familytreescombinederrors.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.xls"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_FAMILYTREES"/>
+<Property fileURL="workspace.prm" id="GraphParameter5"/>
+<Property id="GraphParameter4" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/familytreescombined.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="28" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" guiName="Reformat" guiX="286" guiY="118" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Company_Name = $in.0.Company_Name;
+	$out.0.DUNS_Number = $in.0.DUNS_Number;
+	$out.0.Immediate_Parent = $in.0.Immediate_Parent;
+	$out.0.Immediate_Parent_DUNS = $in.0.Immediate_Parent_DUNS;
+	$out.0.Ultimate_Parent = $in.0.Ultimate_Parent;
+	$out.0.Ultimate_Parent_DUNS = $in.0.Ultimate_Parent_DUNS;
+	$out.0.Contact_Prefix = $in.0.Contact_Prefix;
+	$out.0.Contact_First_Name = $in.0.Contact_First_Name;
+	$out.0.Contact_Last_Name = $in.0.Contact_Last_Name;
+	$out.0.Contact_Suffix = $in.0.Contact_Suffix;
+	$out.0.Contact_Title = $in.0.Contact_Title;
+	$out.0.Country_Phone_Code = $in.0.Country_Phone_Code;
+	$out.0.Phone_Number = $in.0.Phone_Number;
+	$out.0.Toll_Free_Country_Code = $in.0.Toll_Free_Country_Code;
+	$out.0.Toll_Free_Number = $in.0.Toll_Free_Number;
+	$out.0.FAX_Country_Code = $in.0.FAX_Country_Code;
+	$out.0.FAX_Number = $in.0.FAX_Number;
+	$out.0.Mailing_Address_1 = $in.0.Mailing_Address_1;
+	$out.0.Mailing_Address_2 = $in.0.Mailing_Address_2;
+	$out.0.Mailing_City = $in.0.Mailing_City;
+	$out.0.Mailing_State = $in.0.Mailing_State;
+	$out.0.Mailing_Zip = $in.0.Mailing_Zip;
+	$out.0.Mailing_Zip_Extension = $in.0.Mailing_Zip_Extension;
+	$out.0.Mailing_Country = $in.0.Mailing_Country;
+	$out.0.Primary_Address_1 = $in.0.Primary_Address_1;
+	$out.0.Primary_Address_2 = $in.0.Primary_Address_2;
+	$out.0.Primary_City = $in.0.Primary_City;
+	$out.0.Primary_State = $in.0.Primary_State;
+	$out.0.Primary_Zip = $in.0.Primary_Zip;
+	$out.0.Primary_Zip_Extension = $in.0.Primary_Zip_Extension;
+	$out.0.Primary_Country = $in.0.Primary_Country;
+	$out.0.Line_Of_Business = $in.0.Line_Of_Business;
+	$out.0.Doing_Business_As = $in.0.Doing_Business_As;
+	$out.0.Company_Type = $in.0.Company_Type;
+	$out.0.Is_Subsidiary = $in.0.Is_Subsidiary;
+	$out.0.Location_Type = $in.0.Location_Type;
+	$out.0.Exchange = $in.0.Exchange;
+	$out.0.Symbol = $in.0.Symbol;
+	$out.0.Latitude = $in.0.Latitude;
+	$out.0.Longitude = $in.0.Longitude;
+	$out.0.Revenue_US_Dollars_million = $in.0.Revenue_US_Dollars_million;
+	$out.0.Net_Income_US_Dollars_million = $in.0.Net_Income_US_Dollars_million;
+	$out.0.Total_Employees = $in.0.Total_Employees;
+	$out.0.Employees_At_This_Location = $in.0.Employees_At_This_Location;
+	$out.0.Primary_Industry = $in.0.Primary_Industry;
+	$out.0.Primary_US_SIC_Code = $in.0.Primary_US_SIC_Code;
+	$out.0.Primary_US_NAICS_Code = $in.0.Primary_US_NAICS_Code;
+	$out.0.Web_Address = $in.0.Web_Address;
+	$out.0.Facility_Size_sq_Ft = $in.0.Facility_Size_sq_Ft;
+	$out.0.Marketable = $in.0.Marketable;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="71" guiY="118" id="SPREADSHEET_DATA_READER" skipSourceRecords="1" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write Industry File" guiX="463" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
+<Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="109" guiY="222" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="286" guiY="222" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+	COMPANY_NAME VARCHAR(255),
+	DUNS_NUMBER VARCHAR(255),
+	IMMEDIATE_PARENT VARCHAR(255),
+	IMMEDIATE_PARENT_DUNS VARCHAR(255),
+	ULTIMATE_PARENT VARCHAR(255),
+	ULTIMATE_PARENT_DUNS VARCHAR(255),
+	CONTACT_PREFIX VARCHAR(255),
+	CONTACT_FIRST_NAME VARCHAR(255),
+	CONTACT_LAST_NAME VARCHAR(255),
+	CONTACT_SUFFIX VARCHAR(255),
+	CONTACT_TITLE VARCHAR(255),
+	COUNTRY_PHONE_CODE VARCHAR(255),
+	PHONE_NUMBER VARCHAR(255),
+	TOLL_FREE_COUNTRY_CODE VARCHAR(255),
+	TOLL_FREE_NUMBER VARCHAR(255),
+	FAX_COUNTRY_CODE VARCHAR(255),
+	FAX_NUMBER VARCHAR(255),
+	MAILING_ADDRESS_1 VARCHAR(255),
+	MAILING_ADDRESS_2 VARCHAR(255),
+	MAILING_CITY VARCHAR(255),
+	MAILING_STATE VARCHAR(255),
+	MAILING_ZIP VARCHAR(255),
+	MAILING_ZIP_EXTENSION VARCHAR(255),
+	MAILING_COUNTRY VARCHAR(255),
+	PRIMARY_ADDRESS_1 VARCHAR(255),
+	PRIMARY_ADDRESS_2 VARCHAR(255),
+	PRIMARY_CITY VARCHAR(255),
+	PRIMARY_STATE VARCHAR(255),
+	PRIMARY_ZIP VARCHAR(255),
+	PRIMARY_ZIP_EXTENSION VARCHAR(255),
+	PRIMARY_COUNTRY VARCHAR(255),
+	LINE_OF_BUSINESS VARCHAR(255),
+	DOING_BUSINESS_AS VARCHAR(255),
+	COMPANY_TYPE VARCHAR(255),
+	IS_SUBSIDIARY VARCHAR(255),
+	LOCATION_TYPE VARCHAR(255),
+	EXCHANGE VARCHAR(255),
+	SYMBOL VARCHAR(255),
+	LATITUDE VARCHAR(255),
+	LONGITUDE VARCHAR(255),
+	REVENUE_US_DOLLARS_MILLION VARCHAR(255),
+	NET_INCOME_US_DOLLARS_MILLION VARCHAR(255),
+	TOTAL_EMPLOYEES VARCHAR(255),
+	EMPLOYEES_AT_THIS_LOCATION VARCHAR(255),
+	PRIMARY_INDUSTRY VARCHAR(255),
+	PRIMARY_US_SIC_CODE VARCHAR(255),
+	PRIMARY_US_NAICS_CODE VARCHAR(255),
+	WEB_ADDRESS VARCHAR(255),
+	FACILITY_SIZE_SQ_FT VARCHAR(255),
+	MARKETABLE VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="463" guiY="222" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+	COMPANY_NAME,
+	DUNS_NUMBER,
+	IMMEDIATE_PARENT,
+	IMMEDIATE_PARENT_DUNS,
+	ULTIMATE_PARENT,
+	ULTIMATE_PARENT_DUNS,
+	CONTACT_PREFIX,
+	CONTACT_FIRST_NAME,
+	CONTACT_LAST_NAME,
+	CONTACT_SUFFIX,
+	CONTACT_TITLE,
+	COUNTRY_PHONE_CODE,
+	PHONE_NUMBER,
+	TOLL_FREE_COUNTRY_CODE,
+	TOLL_FREE_NUMBER,
+	FAX_COUNTRY_CODE,
+	FAX_NUMBER,
+	MAILING_ADDRESS_1,
+	MAILING_ADDRESS_2,
+	MAILING_CITY,
+	MAILING_STATE,
+	MAILING_ZIP,
+	MAILING_ZIP_EXTENSION,
+	MAILING_COUNTRY,
+	PRIMARY_ADDRESS_1,
+	PRIMARY_ADDRESS_2,
+	PRIMARY_CITY,
+	PRIMARY_STATE,
+	PRIMARY_ZIP,
+	PRIMARY_ZIP_EXTENSION,
+	PRIMARY_COUNTRY,
+	LINE_OF_BUSINESS,
+	DOING_BUSINESS_AS,
+	COMPANY_TYPE,
+	IS_SUBSIDIARY,
+	LOCATION_TYPE,
+	EXCHANGE,
+	SYMBOL,
+	LATITUDE,
+	LONGITUDE,
+	REVENUE_US_DOLLARS_MILLION,
+	NET_INCOME_US_DOLLARS_MILLION,
+	TOTAL_EMPLOYEES,
+	EMPLOYEES_AT_THIS_LOCATION,
+	PRIMARY_INDUSTRY,
+	PRIMARY_US_SIC_CODE,
+	PRIMARY_US_NAICS_CODE,
+	WEB_ADDRESS,
+	FACILITY_SIZE_SQ_FT,
+	MARKETABLE
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="109" guiY="302" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="286" guiY="302" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="464" guiY="302" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>

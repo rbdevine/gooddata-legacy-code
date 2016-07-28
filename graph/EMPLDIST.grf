@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 26 09:36:14 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.111" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 26 10:24:22 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.113" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -60,107 +60,13 @@
 <Field label="hourly" name="hourly" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="area_fips" type="string"/>
-<Field name="own_code" type="string"/>
-<Field name="INDUSTRY_CODE" type="string"/>
-<Field name="agglvl_code" type="string"/>
-<Field name="size_code" type="string"/>
-<Field name="year" type="string"/>
-<Field name="qtr" type="string"/>
-<Field name="disclosure_code" type="string"/>
-<Field name="area_title" type="string"/>
-<Field name="own_title" type="string"/>
-<Field name="industry_title" type="string"/>
-<Field name="agglvl_title" type="string"/>
-<Field name="size_title" type="string"/>
-<Field name="annual_avg_estabs_count" type="string"/>
-<Field name="annual_avg_emplvl" type="string"/>
-<Field name="total_annual_wages" type="string"/>
-<Field name="taxable_annual_wages" type="string"/>
-<Field name="annual_contributions" type="string"/>
-<Field name="annual_avg_wkly_wage" type="string"/>
-<Field name="avg_annual_pay" type="string"/>
-<Field name="lq_disclosure_code" type="string"/>
-<Field name="lq_annual_avg_estabs_count" type="string"/>
-<Field name="lq_annual_avg_emplvl" type="string"/>
-<Field name="lq_total_annual_wages" type="string"/>
-<Field name="lq_taxable_annual_wages" type="string"/>
-<Field name="lq_annual_contributions" type="string"/>
-<Field name="lq_annual_avg_wkly_wage" type="string"/>
-<Field name="lq_avg_annual_pay" type="string"/>
-<Field name="oty_disclosure_code" type="string"/>
-<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
-<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
-<Field name="oty_annual_avg_emplvl_chg" type="string"/>
-<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
-<Field name="oty_total_annual_wages_chg" type="string"/>
-<Field name="oty_total_annual_wages_pct_chg" type="string"/>
-<Field name="oty_taxable_annual_wages_chg" type="string"/>
-<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
-<Field name="oty_annual_contributions_chg" type="string"/>
-<Field name="oty_annual_contributions_pct_chg" type="string"/>
-<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
-<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
-<Field name="oty_avg_annual_pay_chg" type="string"/>
-<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
-</Record>
-</Metadata>
-<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="QCEW_Record_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" skipSourceRows="1" type="delimited">
-<Field name="area_fips" type="string"/>
-<Field name="own_code" type="string"/>
-<Field name="INDUSTRY_CODE" type="string"/>
-<Field name="agglvl_code" type="string"/>
-<Field name="size_code" type="string"/>
-<Field name="year" type="string"/>
-<Field name="qtr" type="string"/>
-<Field name="disclosure_code" type="string"/>
-<Field name="area_title" type="string"/>
-<Field name="own_title" type="string"/>
-<Field name="industry_title" type="string"/>
-<Field name="agglvl_title" type="string"/>
-<Field name="size_title" type="string"/>
-<Field name="annual_avg_estabs_count" type="string"/>
-<Field name="annual_avg_emplvl" type="string"/>
-<Field name="total_annual_wages" type="string"/>
-<Field name="taxable_annual_wages" type="string"/>
-<Field name="annual_contributions" type="string"/>
-<Field name="annual_avg_wkly_wage" type="string"/>
-<Field name="avg_annual_pay" type="string"/>
-<Field name="lq_disclosure_code" type="string"/>
-<Field name="lq_annual_avg_estabs_count" type="string"/>
-<Field name="lq_annual_avg_emplvl" type="string"/>
-<Field name="lq_total_annual_wages" type="string"/>
-<Field name="lq_taxable_annual_wages" type="string"/>
-<Field name="lq_annual_contributions" type="string"/>
-<Field name="lq_annual_avg_wkly_wage" type="string"/>
-<Field name="lq_avg_annual_pay" type="string"/>
-<Field name="oty_disclosure_code" type="string"/>
-<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
-<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
-<Field name="oty_annual_avg_emplvl_chg" type="string"/>
-<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
-<Field name="oty_total_annual_wages_chg" type="string"/>
-<Field name="oty_total_annual_wages_pct_chg" type="string"/>
-<Field name="oty_taxable_annual_wages_chg" type="string"/>
-<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
-<Field name="oty_annual_contributions_chg" type="string"/>
-<Field name="oty_annual_contributions_pct_chg" type="string"/>
-<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
-<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
-<Field name="oty_avg_annual_pay_chg" type="string"/>
-<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
-</Record>
-</Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter18" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/dnb/empldist/*.csv"/>
-<Property id="GraphParameter14" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/EMPLDISTIndustryCombinedErrors.txt.txt"/>
-<Property id="GraphParameter15" name="READFILEPATH" value="${DATA_TMP_DIR}/*.csv"/>
-<Property id="GraphParameter16" name="TABLENAME" value="STG_EMPLDIST"/>
-<Property fileURL="workspace.prm" id="GraphParameter0"/>
-<Property id="GraphParameter17" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/EMPLDISTIndustryCombined.txt"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/dnb/empldist/*.csv"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/EMPLDISTIndustryCombinedErrors.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.csv"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_EMPLDIST"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/EMPLDISTIndustryCombined.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">

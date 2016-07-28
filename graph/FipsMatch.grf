@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 25 16:14:35 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.172" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Jul 27 14:48:29 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.174" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata11" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="fipsmatch_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -29,9 +29,9 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/MIT/fipsmatch.csv&#10;"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/MIT/fipsmatchpads.csv&#10;"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/fipsmatcherrors.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/fipsmatch.csv"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/fipsmatchpads.csv"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_FIPSMATCH"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/fipsmatch.txt"/>
@@ -78,12 +78,12 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata11" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="326" id="DROP_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="228" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="326" id="CREATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="234" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	AREA_FIPS VARCHAR(255),
 	STATE VARCHAR(255),
@@ -92,7 +92,7 @@ function integer transform() {
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="474" guiY="326" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="234" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	AREA_FIPS,
 	STATE,
@@ -104,8 +104,8 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="421" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="421" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="421" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="326" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="326" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="326" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>

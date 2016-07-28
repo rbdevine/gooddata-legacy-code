@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jul 25 14:20:50 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.159" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 26 12:08:47 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.163" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata5" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" label="dunstemplate.csv" name="dunstemplate_DB" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
+<Record fieldDelimiter="|" label="dunstemplate.csv" name="fakedunstemplate_DB" previewAttachment="${DATA_SOURCE_DIR}/dunstemplate.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
 <Field name="Ultimate_Parent" type="string"/>
 <Field name="Company" type="string"/>
 <Field eofAsDelimiter="false" name="DUNS_Number" type="string"/>
@@ -11,14 +11,15 @@
 <Field name="State" type="string"/>
 <Field name="Zip" type="string"/>
 <Field name="County" type="string"/>
-<Field name="Employment_at_Location__DnB__2015" type="string"/>
+<Field name="Employment_at_Location" type="string"/>
 <Field name="Latitude" type="string"/>
 <Field name="Longitude" type="string"/>
 <Field name="NAICS" type="string"/>
+<Field name="fips" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata4" previewAttachment="${DATA_TMP_DIR}/dunstemplatefromexcel.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," label="dunstemplate.csv" name="dunstemplate_File" previewAttachment="${DATA_TMP_DIR}/dunstemplatefromexcel.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Record fieldDelimiter="," label="dunstemplate.csv" name="fakedunstemplate_File" previewAttachment="${DATA_TMP_DIR}/dunstemplatefromexcel.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
 <Field name="Ultimate_Parent" type="string"/>
 <Field name="Company" type="string"/>
 <Field eofAsDelimiter="false" name="DUNS_Number" type="string"/>
@@ -28,176 +29,34 @@
 <Field name="State" type="string"/>
 <Field name="Zip" type="string"/>
 <Field name="County" type="string"/>
-<Field name="Employment_at_Location__DnB__2015" type="string"/>
+<Field name="Employment_at_Location" type="string"/>
 <Field name="Latitude" type="string"/>
 <Field name="Longitude" type="string"/>
 <Field eofAsDelimiter="true" name="NAICS" type="string"/>
-</Record>
-</Metadata>
-<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="EMPLDIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field label="area" name="area" type="string"/>
-<Field label="area_title" name="area_title" type="string"/>
-<Field label="naics" name="naics" type="string"/>
-<Field label="naics_title" name="naics_title" type="string"/>
-<Field label="occ code" name="occ_code" type="string"/>
-<Field label="occ title" name="occ_title" type="string"/>
-<Field label="group" name="group" type="string"/>
-<Field label="i_group" name="i_group" type="string"/>
-<Field label="tot_emp" name="tot_emp" type="string"/>
-<Field label="emp_prse" name="emp_prse" type="string"/>
-<Field label="pct_tot" name="pct_tot" type="string"/>
-<Field label="h_mean" name="h_mean" type="string"/>
-<Field label="a_mean" name="a_mean" type="string"/>
-<Field label="mean_prse" name="mean_prse" type="string"/>
-<Field label="h_pct10" name="h_pct10" type="string"/>
-<Field label="h_pct25" name="h_pct25" type="string"/>
-<Field label="h_median" name="h_median" type="string"/>
-<Field label="h_pct75" name="h_pct75" type="string"/>
-<Field label="h_pct90" name="h_pct90" type="string"/>
-<Field label="a_pct10" name="a_pct10" type="string"/>
-<Field label="a_pct25" name="a_pct25" type="string"/>
-<Field label="a_median" name="a_median" type="string"/>
-<Field label="a_pct75" name="a_pct75" type="string"/>
-<Field label="a_pct90" name="a_pct90" type="string"/>
-<Field label="annual" name="annual" type="string"/>
-<Field label="hourly" name="hourly" type="string"/>
-</Record>
-</Metadata>
-<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="EMPLDIST_File" previewAttachmentCharset="ISO-8859-1" quotedStrings="true" recordDelimiter="\n" type="delimited">
-<Field label="area" name="area" type="string"/>
-<Field label="area_title" name="area_title" type="string"/>
-<Field label="naics" name="naics" type="string"/>
-<Field label="naics_title" name="naics_title" type="string"/>
-<Field label="occ code" name="occ_code" type="string"/>
-<Field label="occ title" name="occ_title" type="string"/>
-<Field label="group" name="group" type="string"/>
-<Field label="i_group" name="i_group" type="string"/>
-<Field label="tot_emp" name="tot_emp" type="string"/>
-<Field label="emp_prse" name="emp_prse" type="string"/>
-<Field label="pct_tot" name="pct_tot" type="string"/>
-<Field label="h_mean" name="h_mean" type="string"/>
-<Field label="a_mean" name="a_mean" type="string"/>
-<Field label="mean_prse" name="mean_prse" type="string"/>
-<Field label="h_pct10" name="h_pct10" type="string"/>
-<Field label="h_pct25" name="h_pct25" type="string"/>
-<Field label="h_median" name="h_median" type="string"/>
-<Field label="h_pct75" name="h_pct75" type="string"/>
-<Field label="h_pct90" name="h_pct90" type="string"/>
-<Field label="a_pct10" name="a_pct10" type="string"/>
-<Field label="a_pct25" name="a_pct25" type="string"/>
-<Field label="a_median" name="a_median" type="string"/>
-<Field label="a_pct75" name="a_pct75" type="string"/>
-<Field label="a_pct90" name="a_pct90" type="string"/>
-<Field label="annual" name="annual" type="string"/>
-<Field label="hourly" name="hourly" type="string"/>
-</Record>
-</Metadata>
-<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="QCEW_Record_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="area_fips" type="string"/>
-<Field name="own_code" type="string"/>
-<Field name="INDUSTRY_CODE" type="string"/>
-<Field name="agglvl_code" type="string"/>
-<Field name="size_code" type="string"/>
-<Field name="year" type="string"/>
-<Field name="qtr" type="string"/>
-<Field name="disclosure_code" type="string"/>
-<Field name="area_title" type="string"/>
-<Field name="own_title" type="string"/>
-<Field name="industry_title" type="string"/>
-<Field name="agglvl_title" type="string"/>
-<Field name="size_title" type="string"/>
-<Field name="annual_avg_estabs_count" type="string"/>
-<Field name="annual_avg_emplvl" type="string"/>
-<Field name="total_annual_wages" type="string"/>
-<Field name="taxable_annual_wages" type="string"/>
-<Field name="annual_contributions" type="string"/>
-<Field name="annual_avg_wkly_wage" type="string"/>
-<Field name="avg_annual_pay" type="string"/>
-<Field name="lq_disclosure_code" type="string"/>
-<Field name="lq_annual_avg_estabs_count" type="string"/>
-<Field name="lq_annual_avg_emplvl" type="string"/>
-<Field name="lq_total_annual_wages" type="string"/>
-<Field name="lq_taxable_annual_wages" type="string"/>
-<Field name="lq_annual_contributions" type="string"/>
-<Field name="lq_annual_avg_wkly_wage" type="string"/>
-<Field name="lq_avg_annual_pay" type="string"/>
-<Field name="oty_disclosure_code" type="string"/>
-<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
-<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
-<Field name="oty_annual_avg_emplvl_chg" type="string"/>
-<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
-<Field name="oty_total_annual_wages_chg" type="string"/>
-<Field name="oty_total_annual_wages_pct_chg" type="string"/>
-<Field name="oty_taxable_annual_wages_chg" type="string"/>
-<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
-<Field name="oty_annual_contributions_chg" type="string"/>
-<Field name="oty_annual_contributions_pct_chg" type="string"/>
-<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
-<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
-<Field name="oty_avg_annual_pay_chg" type="string"/>
-<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
-</Record>
-</Metadata>
-<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="QCEW_Record_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" skipSourceRows="1" type="delimited">
-<Field name="area_fips" type="string"/>
-<Field name="own_code" type="string"/>
-<Field name="INDUSTRY_CODE" type="string"/>
-<Field name="agglvl_code" type="string"/>
-<Field name="size_code" type="string"/>
-<Field name="year" type="string"/>
-<Field name="qtr" type="string"/>
-<Field name="disclosure_code" type="string"/>
-<Field name="area_title" type="string"/>
-<Field name="own_title" type="string"/>
-<Field name="industry_title" type="string"/>
-<Field name="agglvl_title" type="string"/>
-<Field name="size_title" type="string"/>
-<Field name="annual_avg_estabs_count" type="string"/>
-<Field name="annual_avg_emplvl" type="string"/>
-<Field name="total_annual_wages" type="string"/>
-<Field name="taxable_annual_wages" type="string"/>
-<Field name="annual_contributions" type="string"/>
-<Field name="annual_avg_wkly_wage" type="string"/>
-<Field name="avg_annual_pay" type="string"/>
-<Field name="lq_disclosure_code" type="string"/>
-<Field name="lq_annual_avg_estabs_count" type="string"/>
-<Field name="lq_annual_avg_emplvl" type="string"/>
-<Field name="lq_total_annual_wages" type="string"/>
-<Field name="lq_taxable_annual_wages" type="string"/>
-<Field name="lq_annual_contributions" type="string"/>
-<Field name="lq_annual_avg_wkly_wage" type="string"/>
-<Field name="lq_avg_annual_pay" type="string"/>
-<Field name="oty_disclosure_code" type="string"/>
-<Field name="oty_annual_avg_estabs_count_chg" type="string"/>
-<Field name="oty_annual_avg_estabs_count_pct_chg" type="string"/>
-<Field name="oty_annual_avg_emplvl_chg" type="string"/>
-<Field name="oty_annual_avg_emplvl_pct_chg" type="string"/>
-<Field name="oty_total_annual_wages_chg" type="string"/>
-<Field name="oty_total_annual_wages_pct_chg" type="string"/>
-<Field name="oty_taxable_annual_wages_chg" type="string"/>
-<Field name="oty_taxable_annual_wages_pct_chg" type="string"/>
-<Field name="oty_annual_contributions_chg" type="string"/>
-<Field name="oty_annual_contributions_pct_chg" type="string"/>
-<Field name="oty_annual_avg_wkly_wage_chg" type="string"/>
-<Field name="oty_annual_avg_wkly_wage_pct_chg" type="string"/>
-<Field name="oty_avg_annual_pay_chg" type="string"/>
-<Field name="oty_avg_annual_pay_pct_chg" type="string"/>
+<Field name="fips" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/faketemps/dunstemplatefake.csv"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/fakedunstemplateerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/dunstemplatefake.csv"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_FAKEDUNSTEMPLATE"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/fakedunstemplate.txt"/>
+<Note alignment="1" backgroundColorB="225" backgroundColorG="255" backgroundColorR="255" enabled="true" folded="false" height="89" id="Note0" textColorB="0" textColorG="0" textColorR="0" textFontSize="12" title="Note" titleColorB="0" titleColorG="0" titleColorR="0" titleFontSize="14" width="214" x="640" y="27">
+<attr name="text"><![CDATA[Remove bar ('|') from values in file
+
+
+]]></attr>
+</Note>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/dunstemplatefake.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/dunstemplatefake.csv" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quoteCharacter="&quot;" quotedStrings="true" skipRows="1" skipSourceRows="0" trim="true" type="DATA_READER" verbose="true"/>
-<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/dunscombined.txt" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quoteCharacter="&quot;" quotedStrings="true" skipRows="1" skipSourceRows="0" trim="true" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -212,10 +71,11 @@ function integer transform() {
 	$out.0.State = $in.0.State;
 	$out.0.Zip = $in.0.Zip;
 	$out.0.County = $in.0.County;
-	$out.0.Employment_at_Location__DnB__2015 = $in.0.Employment_at_Location__DnB__2015;
+	$out.0.Employment_at_Location = $in.0.Employment_at_Location;
 	$out.0.Latitude = $in.0.Latitude;
 	$out.0.Longitude = $in.0.Longitude;
 	$out.0.NAICS = $in.0.NAICS;
+	$out.0.fips = $in.0.fips;
 
 	return ALL;
 }
@@ -244,12 +104,12 @@ function integer transform() {
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS STG_DUNSTEMPLATE;]]></attr>
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS STG_DUNSTEMPLATE (
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	ULTIMATE_PARENT VARCHAR(255),
 	COMPANY VARCHAR(255),
 	DUNS_NUMBER VARCHAR(255),
@@ -262,13 +122,14 @@ function integer transform() {
 	EMPLOYMENT_AT_LOCATION_DNB_2015 VARCHAR(255),
 	LATITUDE VARCHAR(255),
 	LONGITUDE VARCHAR(255),
-	NAICS VARCHAR(255)
+	NAICS VARCHAR(255),
+	FIPS VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[COPY STG_DUNSTEMPLATE (
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	ULTIMATE_PARENT,
 	COMPANY,
 	DUNS_NUMBER,
@@ -281,15 +142,17 @@ function integer transform() {
 	EMPLOYMENT_AT_LOCATION_DNB_2015,
 	LATITUDE,
 	LONGITUDE,
-	NAICS
+	NAICS,
+	FIPS	
 )
-FROM LOCAL '${DATA_TRANSFORM_DIR}/dunscombined.txt'
-EXCEPTIONS '${DATA_TMP_DIR}/dunstemplateErrors.txt'
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${DATA_TMP_DIR}/dunstemplate.csv;${DATA_TMP_DIR}/dunserrors.txt" enabled="enabled" guiName="Clean tmp" guiX="63" guiY="334" id="CLEAN_TMP" type="FILE_DELETE"/>
-<Node baseURL="${DATA_TRANSFORM_DIR}/dunscombined.txt" enabled="enabled" guiName="Clean transform" guiX="474" guiY="334" id="CLEAN_TRANSFORM" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="333" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="333" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="333" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>

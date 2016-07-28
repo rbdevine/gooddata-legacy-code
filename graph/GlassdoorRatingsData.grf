@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 10:28:25 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.168" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="Glassdoor_Ratings_DB" recordDelimiter="\n" type="delimited">
+<Field format="" label="FK_employerId" name="FK_employerId" type="string"/>
+<Field format="" label="shortName" name="shortName" type="string"/>
+<Field format="" label="employerOverallRating" name="employerOverallRating" type="string"/>
+<Field format="" label="ceoOverallRating" name="ceoOverallRating" type="string"/>
+<Field format="" label="recommendToFriendOverallRating" name="recommendToFriendOverallRating" type="string"/>
+<Field format="" label="careerOpportunitiesOverallRating" name="careerOpportunitiesOverallRating" type="string"/>
+<Field format="" label="compensationAndBenefitsOverallRating" name="compensationAndBenefitsOverallRating" type="string"/>
+<Field format="" label="workLifeOverallRating" name="workLifeOverallRating" type="string"/>
+<Field format="" label="seniorManagmentOverallRating" name="seniorManagmentOverallRating" type="string"/>
+<Field format="" label="cultureAndValuesOverallRating" name="cultureAndValuesOverallRating" type="string"/>
+<Field format="" label="businessOutlookOverallRating" name="businessOutlookOverallRating" type="string"/>
+<Field format="" label="industryString" name="industryString" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Glassdoor_Ratings_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="FK_employerId" name="FK_employerId" type="string"/>
+<Field label="shortName" name="shortName" type="string"/>
+<Field label="employerOverallRating" name="employerOverallRating" type="string"/>
+<Field label="ceoOverallRating" name="ceoOverallRating" type="string"/>
+<Field label="recommendToFriendOverallRating" name="recommendToFriendOverallRating" type="string"/>
+<Field label="careerOpportunitiesOverallRating" name="careerOpportunitiesOverallRating" type="string"/>
+<Field label="compensationAndBenefitsOverallRating" name="compensationAndBenefitsOverallRating" type="string"/>
+<Field label="workLifeOverallRating" name="workLifeOverallRating" type="string"/>
+<Field label="seniorManagmentOverallRating" name="seniorManagmentOverallRating" type="string"/>
+<Field label="cultureAndValuesOverallRating" name="cultureAndValuesOverallRating" type="string"/>
+<Field label="businessOutlookOverallRating" name="businessOutlookOverallRating" type="string"/>
+<Field label="industryString" name="industryString" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/glassdoorratingserror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/glassdoorratings.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_GLASSDOORRATINGS"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/glassdoorratings.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.FK_employerId = $in.0.FK_employerId;
+	$out.0.shortName = $in.0.shortName;
+	$out.0.employerOverallRating = $in.0.employerOverallRating;
+	$out.0.ceoOverallRating = $in.0.ceoOverallRating;
+	$out.0.recommendToFriendOverallRating = $in.0.recommendToFriendOverallRating;
+	$out.0.careerOpportunitiesOverallRating = $in.0.careerOpportunitiesOverallRating;
+	$out.0.compensationAndBenefitsOverallRating = $in.0.compensationAndBenefitsOverallRating;
+	$out.0.workLifeOverallRating = $in.0.workLifeOverallRating;
+	$out.0.seniorManagmentOverallRating = $in.0.seniorManagmentOverallRating;
+	$out.0.cultureAndValuesOverallRating = $in.0.cultureAndValuesOverallRating;
+	$out.0.businessOutlookOverallRating = $in.0.businessOutlookOverallRating;
+	$out.0.industryString = $in.0.industryString;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="36" guiY="129" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+	FK_EMPLOYERID VARCHAR(255),
+	SHORTNAME VARCHAR(255),
+	EMPLOYEROVERALLRATING VARCHAR(255),
+	CEOOVERALLRATING VARCHAR(255),
+	RECOMMENDTOFRIENDOVERALLRATING VARCHAR(255),
+	CAREEROPPORTUNITIESOVERALLRATING VARCHAR(255),
+	COMPENSATIONANDBENEFITSOVERALLRATING VARCHAR(255),
+	WORKLIFEOVERALLRATING VARCHAR(255),
+	SENIORMANAGMENTOVERALLRATING VARCHAR(255),
+	CULTUREANDVALUESOVERALLRATING VARCHAR(255),
+	BUSINESSOUTLOOKOVERALLRATING VARCHAR(255),
+	INDUSTRYSTRING VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+	FK_EMPLOYERID,
+	SHORTNAME,
+	EMPLOYEROVERALLRATING,
+	CEOOVERALLRATING,
+	RECOMMENDTOFRIENDOVERALLRATING,
+	CAREEROPPORTUNITIESOVERALLRATING,
+	COMPENSATIONANDBENEFITSOVERALLRATING,
+	WORKLIFEOVERALLRATING,
+	SENIORMANAGMENTOVERALLRATING,
+	CULTUREANDVALUESOVERALLRATING,
+	BUSINESSOUTLOOKOVERALLRATING,
+	INDUSTRYSTRING
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>
