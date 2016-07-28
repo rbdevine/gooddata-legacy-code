@@ -1,36 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 17:21:23 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.168" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 17:27:39 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.169" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="LargestEmployer_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="WARN_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="Company_Name" type="string"/>
-<Field name="Low" type="string"/>
-<Field name="High" type="string"/>
-<Field name="Average" type="string"/>
+<Field name="Date_effective" type="string"/>
 <Field name="County" type="string"/>
 <Field name="State" type="string"/>
-<Field name="Year" type="string"/>
-<Field name="Link" type="string"/>
+<Field name="Number_Affected" type="string"/>
+<Field name="URL" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="LargestEmployer_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="," name="WARN_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="Company_Name" type="string"/>
-<Field name="Low" type="string"/>
-<Field name="High" type="string"/>
-<Field name="Average" type="string"/>
+<Field name="Date_effective" type="string"/>
 <Field name="County" type="string"/>
 <Field name="State" type="string"/>
-<Field name="Year" type="string"/>
-<Field name="Link" type="string"/>
+<Field name="Number_Affected" type="string"/>
+<Field name="URL" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/largestemployererror.txt"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/warnerror.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/"/>
-<Property id="GraphParameter3" name="TABLENAME" value="STG_LARGESTEMPLOYER"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_WARN"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/largestemployer.txt"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/warn.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -44,13 +40,11 @@
 // Transforms input record into output record.
 function integer transform() {
 	$out.0.Company_Name = $in.0.Company_Name;
-	$out.0.Low = $in.0.Low;
-	$out.0.High = $in.0.High;
-	$out.0.Average = $in.0.Average;
+	$out.0.Date_effective = $in.0.Date_effective;
 	$out.0.County = $in.0.County;
 	$out.0.State = $in.0.State;
-	$out.0.Year = $in.0.Year;
-	$out.0.Link = $in.0.Link;
+	$out.0.Number_Affected = $in.0.Number_Affected;
+	$out.0.URL = $in.0.URL;
 
 	return ALL;
 }
@@ -87,13 +81,11 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	COMPANY_NAME VARCHAR(255),
-	LOW VARCHAR(255),
-	HIGH VARCHAR(255),
-	"AVERAGE" VARCHAR(255),
+	DATE_EFFECTIVE VARCHAR(255),
 	COUNTY VARCHAR(255),
 	STATE VARCHAR(255),
-	YEAR VARCHAR(255),
-	"LINK" VARCHAR(255)
+	NUMBER_AFFECTED VARCHAR(255),
+	URL VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -101,13 +93,11 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	COMPANY_NAME,
-	LOW,
-	HIGH,
-	"AVERAGE",
+	DATE_EFFECTIVE,
 	COUNTY,
 	STATE,
-	YEAR,
-	"LINK"
+	NUMBER_AFFECTED,
+	URL
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
