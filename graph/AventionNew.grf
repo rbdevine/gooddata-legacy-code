@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 12:17:07 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.174" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri Jul 29 00:33:16 IST 2016" modifiedBy="samarth" name="Complete County File" revision="1.179" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata9" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="aventiontest_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -65,12 +65,16 @@
 <Node enabled="enabled" fileURL="${DATA_TMP_DIR}/AventionNewReaderErrors.txt" guiName="CSV Writer" guiX="280" guiY="214" id="CSV_WRITER1" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="123" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
-
+string ticker = "";
 // Transforms input record into output record.
 function integer transform() {
+	string currentTicker = $in.0.Ticker;
+	ticker = isnull(currentTicker) ?
+		ticker : currentTicker;
+
 	$out.0.Company_Name = $in.0.Company_Name;
 	$out.0.Ultimate_Parent_Company = $in.0.Ultimate_Parent_Company;
-	$out.0.Ticker = $in.0.Ticker;
+	$out.0.Ticker = ticker;
 	$out.0.Year_Founded = $in.0.Year_Founded;
 	$out.0.Address_Line_1 = $in.0.Address_Line_1;
 	$out.0.City = $in.0.City;
