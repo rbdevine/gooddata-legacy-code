@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 12:17:07 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.174" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 15:32:29 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.180" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata9" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="aventiontest_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -57,20 +57,24 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node charset="ISO-8859-1" dataPolicy="controlled" enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="123" id="CSV_READER" quotedStrings="true" skipRows="1" trim="true" type="DATA_READER" verbose="true"/>
-<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="123" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/AventionNewReaderErrors.txt" guiName="CSV Writer" guiX="280" guiY="214" id="CSV_WRITER1" type="DATA_WRITER"/>
-<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="123" id="REFORMAT" type="REFORMAT">
+<Node charset="ISO-8859-1" dataPolicy="controlled" enabled="disabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="123" id="CSV_READER" quotedStrings="true" skipRows="1" trim="true" type="DATA_READER" verbose="true"/>
+<Node enabled="disabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="123" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="disabled" fileURL="${DATA_TMP_DIR}/AventionNewReaderErrors.txt" guiName="CSV Writer" guiX="280" guiY="214" id="CSV_WRITER1" type="DATA_WRITER"/>
+<Node enabled="disabled" guiName="Reformat" guiX="280" guiY="123" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
-
+string ticker = "";
 // Transforms input record into output record.
 function integer transform() {
+	string currentTicker = $in.0.Ticker;
+	ticker = isnull(currentTicker) ?
+		ticker : currentTicker;
+
 	$out.0.Company_Name = $in.0.Company_Name;
 	$out.0.Ultimate_Parent_Company = $in.0.Ultimate_Parent_Company;
-	$out.0.Ticker = $in.0.Ticker;
+	$out.0.Ticker = ticker;
 	$out.0.Year_Founded = $in.0.Year_Founded;
 	$out.0.Address_Line_1 = $in.0.Address_Line_1;
 	$out.0.City = $in.0.City;
@@ -111,12 +115,12 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata9" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="326" id="DROP_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="DROP TABLE" guiX="63" guiY="326" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="326" id="CREATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="CREATE TABLE" guiX="280" guiY="326" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	COMPANY_NAME VARCHAR(255),
 	ULTIMATE_PARENT_COMPANY VARCHAR(255),
@@ -137,7 +141,7 @@ function integer transform() {
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="474" guiY="326" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="POPULATE TABLE" guiX="474" guiY="326" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	COMPANY_NAME,
 	ULTIMATE_PARENT_COMPANY,
@@ -161,8 +165,8 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="63" guiY="421" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="421" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="421" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="421" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="disabled" guiName="Clean error" guiX="280" guiY="421" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="421" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
