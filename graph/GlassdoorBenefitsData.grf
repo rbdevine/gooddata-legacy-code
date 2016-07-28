@@ -1,40 +1,41 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 10:28:24 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.168" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 16:24:44 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.179" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Glassdoor_Benefits_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field format="" label="BenefitReviewID" name="BenefitReviewID" type="string"/>
-<Field format="" label="FK_employerId" name="FK_employerId" type="string"/>
-<Field format="" label="shortName" name="shortName" type="string"/>
-<Field format="" label="benefitReviewTypeCode" name="benefitReviewTypeCode" type="string"/>
-<Field format="" label="rating" name="rating" type="string"/>
-<Field format="" label="benefitName" name="benefitName" type="string"/>
-<Field format="" label="CategoryName" name="CategoryName" type="string"/>
+<Field label="BenefitReviewID" name="BenefitReviewID" type="string"/>
+<Field label="FK_employerId" name="EmployerId" type="string"/>
+<Field label="shortName" name="EmployerName" type="string"/>
+<Field label="benefitName" name="benefitCategory" type="string"/>
+<Field label="CategoryName" name="benefitName" type="string"/>
+<Field label="benefitReviewTypeCode" name="benefitReviewTypeCode" type="string"/>
+<Field label="rating" name="rating" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Glassdoor_Benefits_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field label="BenefitReviewID" name="BenefitReviewID" type="string"/>
-<Field label="FK_employerId" name="FK_employerId" type="string"/>
-<Field label="shortName" name="shortName" type="string"/>
+<Field label="FK_employerId" name="EmployerId" type="string"/>
+<Field label="shortName" name="EmployerName" type="string"/>
+<Field label="benefitName" name="benefitCategory" type="string"/>
+<Field label="CategoryName" name="benefitName" type="string"/>
 <Field label="benefitReviewTypeCode" name="benefitReviewTypeCode" type="string"/>
 <Field label="rating" name="rating" type="string"/>
-<Field label="benefitName" name="benefitName" type="string"/>
-<Field label="CategoryName" name="CategoryName" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/locationdata/violations/water.xlsx"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/glassdoor/benefits-data-2016-07-27.csv"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/glassdoorbenefitserror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.csv"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_GLASSDOORBENEFITS"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/glassdoorsalaryerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/glassdoorsalary.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="STG_GLASSDOORSALARY"/>
-<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/glassdoorsalary.txt"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/glassdoorbenefits.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
+<Node charset="UTF-8" enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" trim="true" type="DATA_READER" verbose="true"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
@@ -42,12 +43,19 @@
 // Transforms input record into output record.
 function integer transform() {
 	$out.0.BenefitReviewID = $in.0.BenefitReviewID;
-	$out.0.FK_employerId = $in.0.FK_employerId;
-	$out.0.shortName = $in.0.shortName;
+	$out.0.EmployerId = $in.0.EmployerId;
+	if($in.0.EmployerName != null ) 
+	{
+		$out.0.EmployerName = replace($in.0.EmployerName,"[||\\\\]",",");
+	}
+	else
+	{
+		$out.0.EmployerName = $in.0.EmployerName;
+	}
+	$out.0.benefitCategory = $in.0.benefitCategory;
+	$out.0.benefitName = $in.0.benefitName;
 	$out.0.benefitReviewTypeCode = $in.0.benefitReviewTypeCode;
 	$out.0.rating = $in.0.rating;
-	$out.0.benefitName = $in.0.benefitName;
-	$out.0.CategoryName = $in.0.CategoryName;
 
 	return ALL;
 }
@@ -71,9 +79,8 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="36" guiY="129" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
-<Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
@@ -84,12 +91,12 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	BENEFITREVIEWID VARCHAR(255),
-	FK_EMPLOYERID VARCHAR(255),
-	SHORTNAME VARCHAR(255),
-	BENEFITREVIEWTYPECODE VARCHAR(255),
-	RATING VARCHAR(255),
+	EMPLOYERID VARCHAR(255),
+	EMPLOYERNAME VARCHAR(255),
+	BENEFITCATEGORY VARCHAR(255),
 	BENEFITNAME VARCHAR(255),
-	CATEGORYNAME VARCHAR(255)
+	BENEFITREVIEWTYPECODE VARCHAR(255),
+	RATING VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -97,12 +104,12 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	BENEFITREVIEWID,
-	FK_EMPLOYERID,
-	SHORTNAME,
-	BENEFITREVIEWTYPECODE,
-	RATING,
+	EMPLOYERID,
+	EMPLOYERNAME,
+	BENEFITCATEGORY,
 	BENEFITNAME,
-	CATEGORYNAME
+	BENEFITREVIEWTYPECODE,
+	RATING
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
