@@ -1,17 +1,54 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 17:21:17 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.200" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri Jul 29 10:58:53 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.201" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/gdcounties.txt" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" label="GoodDate_County_File" name="GoodData_County_DB" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
-<Field name="geo_id" type="string"/>
-<Field name="County" type="string"/>
-<Field eofAsDelimiter="false" name="State" type="string"/>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="H1B1_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="case_number" name="case_number" type="string"/>
+<Field format="excel:m/d/yy" label="employment_start_date" name="employment_start_date" type="string"/>
+<Field format="excel:m/d/yy" label="employment_end_date" name="employment_end_date" type="string"/>
+<Field label="employer_name" name="employer_name" type="string"/>
+<Field label="employer_country" name="employer_country" type="string"/>
+<Field label="employer_province" name="employer_province" type="string"/>
+<Field label="job_title" name="job_title" type="string"/>
+<Field label="soc_code" name="soc_code" type="string"/>
+<Field label="soc_name" name="soc_name" type="string"/>
+<Field label="naic_code" name="naic_code" type="string"/>
+<Field label="total_workers" name="total_workers" type="string"/>
+<Field label="full_time_position" name="full_time_position" type="string"/>
+<Field label="prevailing_wage" name="prevailing_wage" type="string"/>
+<Field label="pw_unit_of_pay" name="pw_unit_of_pay" type="string"/>
+<Field label="pw_wage_source_year" name="pw_wage_source_year" type="string"/>
+<Field label="pw_source_other" name="pw_source_other" type="string"/>
+<Field label="wage_rate_of_pay_from" name="wage_rate_of_pay_from" type="string"/>
+<Field label="wage_rate_of_pay_to" name="wage_rate_of_pay_to" type="string"/>
+<Field label="worksite_city" name="worksite_city" type="string"/>
+<Field label="worksite_county" name="worksite_county" type="string"/>
+<Field label="worksite_state" name="worksite_state" type="string"/>
+<Field name="year" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata0" previewAttachment="/Users/scalvillo/Desktop/gdcounties.txt" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," label="gdcounties.txt" name="GoodData_County_File" previewAttachment="/Users/scalvillo/Desktop/gdcounties.txt" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
-<Field name="geo_id" type="string"/>
-<Field name="County" type="string"/>
-<Field eofAsDelimiter="false" name="State" type="string"/>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="H1B1_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field format="" label="case_number" name="case_number" type="string"/>
+<Field format="excel:m/d/yy" label="employment_start_date" name="employment_start_date" type="string"/>
+<Field format="excel:m/d/yy" label="employment_end_date" name="employment_end_date" type="string"/>
+<Field format="" label="employer_name" name="employer_name" type="string"/>
+<Field format="" label="employer_country" name="employer_country" type="string"/>
+<Field label="employer_province" name="employer_province" type="string"/>
+<Field format="" label="job_title" name="job_title" type="string"/>
+<Field format="" label="soc_code" name="soc_code" type="string"/>
+<Field format="" label="soc_name" name="soc_name" type="string"/>
+<Field format="" label="naic_code" name="naic_code" type="string"/>
+<Field format="" label="total_workers" name="total_workers" type="string"/>
+<Field format="" label="full_time_position" name="full_time_position" type="string"/>
+<Field format="" label="prevailing_wage" name="prevailing_wage" type="string"/>
+<Field format="" label="pw_unit_of_pay" name="pw_unit_of_pay" type="string"/>
+<Field format="" label="pw_wage_source_year" name="pw_wage_source_year" type="string"/>
+<Field format="" label="pw_source_other" name="pw_source_other" type="string"/>
+<Field format="" label="wage_rate_of_pay_from" name="wage_rate_of_pay_from" type="string"/>
+<Field label="wage_rate_of_pay_to" name="wage_rate_of_pay_to" type="string"/>
+<Field format="" label="worksite_city" name="worksite_city" type="string"/>
+<Field format="" label="worksite_county" name="worksite_county" type="string"/>
+<Field format="" label="worksite_state" name="worksite_state" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -24,19 +61,41 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="28" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/enigma/h1b1/2015/enigma-h1b1-2015.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="175" guiY="28" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node charset="UTF-8" enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="73" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
-<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
-<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
+<Node baseURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/enigma/h1b1/2016/enigma-h1b1-2016.csv" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="382" guiY="28" id="FILE_DOWNLOAD1" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="2">
+<Node charset="UTF-8" enabled="enabled" fileURL="${DATA_TMP_DIR}/enigma-h1b1-2015.csv" guiName="CSV Reader" guiX="73" guiY="105" id="CSV_READER" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="105" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="105" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.geo_id = $in.0.geo_id;
-	$out.0.County = $in.0.County;
-	$out.0.State = $in.0.State;
+	$out.0.case_number = $in.0.case_number;
+	$out.0.employment_start_date = $in.0.employment_start_date;
+	$out.0.employment_end_date = $in.0.employment_end_date;
+	$out.0.employer_name = $in.0.employer_name;
+	$out.0.employer_country = $in.0.employer_country;
+	$out.0.employer_province = $in.0.employer_province;
+	$out.0.job_title = $in.0.job_title;
+	$out.0.soc_code = $in.0.soc_code;
+	$out.0.soc_name = $in.0.soc_name;
+	$out.0.naic_code = $in.0.naic_code;
+	$out.0.total_workers = $in.0.total_workers;
+	$out.0.full_time_position = $in.0.full_time_position;
+	$out.0.prevailing_wage = $in.0.prevailing_wage;
+	$out.0.pw_unit_of_pay = $in.0.pw_unit_of_pay;
+	$out.0.pw_wage_source_year = $in.0.pw_wage_source_year;
+	$out.0.pw_source_other = $in.0.pw_source_other;
+	$out.0.wage_rate_of_pay_from = $in.0.wage_rate_of_pay_from;
+	$out.0.wage_rate_of_pay_to = $in.0.wage_rate_of_pay_to;
+	$out.0.worksite_city = $in.0.worksite_city;
+	$out.0.worksite_county = $in.0.worksite_county;
+	$out.0.worksite_state = $in.0.worksite_state;
+	$out.0.year = "2015";
 
 	return ALL;
 }
@@ -63,35 +122,127 @@ function integer transform() {
 <Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
-<Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="73" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
+<Phase number="3">
+<Node charset="UTF-8" enabled="enabled" fileURL="${DATA_TMP_DIR}/enigma-h1b1-2016.csv" guiName="CSV Reader" guiX="73" guiY="206" id="CSV_READER1" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="206" id="CSV_WRITER1" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="206" id="REFORMAT1" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.case_number = $in.0.case_number;
+	$out.0.employment_start_date = $in.0.employment_start_date;
+	$out.0.employment_end_date = $in.0.employment_end_date;
+	$out.0.employer_name = $in.0.employer_name;
+	$out.0.employer_country = $in.0.employer_country;
+	$out.0.employer_province = $in.0.employer_province;
+	$out.0.job_title = $in.0.job_title;
+	$out.0.soc_code = $in.0.soc_code;
+	$out.0.soc_name = $in.0.soc_name;
+	$out.0.naic_code = $in.0.naic_code;
+	$out.0.total_workers = $in.0.total_workers;
+	$out.0.full_time_position = $in.0.full_time_position;
+	$out.0.prevailing_wage = $in.0.prevailing_wage;
+	$out.0.pw_unit_of_pay = $in.0.pw_unit_of_pay;
+	$out.0.pw_wage_source_year = $in.0.pw_wage_source_year;
+	$out.0.pw_source_other = $in.0.pw_source_other;
+	$out.0.wage_rate_of_pay_from = $in.0.wage_rate_of_pay_from;
+	$out.0.wage_rate_of_pay_to = $in.0.wage_rate_of_pay_to;
+	$out.0.worksite_city = $in.0.worksite_city;
+	$out.0.worksite_county = $in.0.worksite_county;
+	$out.0.worksite_state = $in.0.worksite_state;
+	$out.0.year = "2016";
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="CSV_READER1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT1:0"/>
+<Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER1:0"/>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="73" guiY="310" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="310" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-	GEO_ID VARCHAR(255),
-	COUNTY VARCHAR(255),
-	STATE VARCHAR(255)
+	CASE_NUMBER VARCHAR(255),
+	EMPLOYMENT_START_DATE VARCHAR(255),
+	EMPLOYMENT_END_DATE VARCHAR(255),
+	EMPLOYER_NAME VARCHAR(255),
+	EMPLOYER_COUNTRY VARCHAR(255),
+	EMPLOYER_PROVINCE VARCHAR(255),
+	JOB_TITLE VARCHAR(255),
+	SOC_CODE VARCHAR(255),
+	SOC_NAME VARCHAR(255),
+	NAIC_CODE VARCHAR(255),
+	TOTAL_WORKERS VARCHAR(255),
+	FULL_TIME_POSITION VARCHAR(255),
+	PREVAILING_WAGE VARCHAR(255),
+	PW_UNIT_OF_PAY VARCHAR(255),
+	PW_WAGE_SOURCE_YEAR VARCHAR(255),
+	PW_SOURCE_OTHER VARCHAR(255),
+	WAGE_RATE_OF_PAY_FROM VARCHAR(255),
+	WAGE_RATE_OF_PAY_TO VARCHAR(255),
+	WORKSITE_CITY VARCHAR(255),
+	WORKSITE_COUNTY VARCHAR(255),
+	WORKSITE_STATE VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="310" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	GEO_ID,
-	COUNTY,
-	STATE
+	CASE_NUMBER,
+	EMPLOYMENT_START_DATE,
+	EMPLOYMENT_END_DATE,
+	EMPLOYER_NAME,
+	EMPLOYER_COUNTRY,
+	EMPLOYER_PROVINCE,
+	JOB_TITLE,
+	SOC_CODE,
+	SOC_NAME,
+	NAIC_CODE,
+	TOTAL_WORKERS,
+	FULL_TIME_POSITION,
+	PREVAILING_WAGE,
+	PW_UNIT_OF_PAY,
+	PW_WAGE_SOURCE_YEAR,
+	PW_SOURCE_OTHER,
+	WAGE_RATE_OF_PAY_FROM,
+	WAGE_RATE_OF_PAY_TO,
+	WORKSITE_CITY,
+	WORKSITE_COUNTY,
+	WORKSITE_STATE
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="73" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Phase number="7">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="73" guiY="399" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="399" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="399" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
