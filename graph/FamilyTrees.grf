@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 13:28:21 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.127" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 11:01:22 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.128" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="FamilyTrees_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -113,8 +113,8 @@
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/familytreescombinederrors.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.xls"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_FAMILYTREES"/>
-<Property fileURL="workspace.prm" id="GraphParameter5"/>
-<Property id="GraphParameter4" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/familytreescombined.txt"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/familytreescombined.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -128,7 +128,7 @@
 function integer transform() {
 	if($in.0.Company_Name != null ) 
 	{
-		$out.0.Company_Name = replace($in.0.Company_Name,"[||\\\\]",",");
+		$out.0.Company_Name = trim(replace($in.0.Company_Name,"[||\\\\]",","));
 	}
 	else
 	{
