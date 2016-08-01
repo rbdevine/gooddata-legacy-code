@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="pradeep" created="Wed Dec 02 20:34:37 IST 2015" guiVersion="3.4.4.P" id="1449069673827" licenseType="Commercial" modified="Wed Jul 27 23:51:59 IST 2016" modifiedBy="pradeep" name="glassdoor" revision="1.110" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="pradeep" created="Wed Dec 02 20:34:37 IST 2015" guiVersion="3.4.4.P" id="1449069673827" licenseType="Commercial" modified="Mon Aug 01 17:51:54 EDT 2016" modifiedBy="scalvillo" name="glassdoor" revision="1.120" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="fips_1_csv_reader_to_reformatter_metadata" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Metadata id="Metadata2" previewAttachment="${DATA_TMP_DIR}/lat_long.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="fips_1_csv_reader_to_reformatter_metadata" previewAttachment="${DATA_TMP_DIR}/lat_long.csv" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="latitude" type="string"/>
 <Field name="longitude" type="string"/>
 </Record>
@@ -22,8 +22,8 @@
 <Metadata id="Metadata5" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="fips_4_json_reader_to_reformat_metadat" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
 <Field name="block_fips" type="string"/>
-<Field name="country_fips" type="string"/>
-<Field name="country_name" type="string"/>
+<Field name="county_fips" type="string"/>
+<Field name="county_name" type="string"/>
 <Field name="state_fips" type="string"/>
 <Field name="state_code" type="string"/>
 <Field name="state_name" type="string"/>
@@ -133,17 +133,17 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/output.csv" guiName="CSV Writer" guiX="1281" guiY="77" id="CSV_WRITER1" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/output.txt" guiName="CSV Writer (DATA_WRITER)" guiX="899" guiY="772" id="CSV_WRITER_DATA_WRITER" outputFieldNames="true" type="DATA_WRITER"/>
 <Node charset="UTF-8" ctlFunctionsSource="//#CTL2&#10;&#10;function map[string, string] generateRequestParameters(map[string, string] inputEdgeRecord, integer iterationNumber, integer lastResponseStatus, map[string, string]lastResponseHeaders, string lastResponseBody) {&#10;&#9;printLog(info, &quot;iterationNumber - - - &gt; &quot; + iterationNumber);&#10;    // Copy all input parameters into the request parameters map.&#10;    map[string, string] requestParams = inputEdgeRecord;&#10;&#10;    requestParams[&quot;latitude&quot;] = $in.0.latitude;&#10;    requestParams[&quot;longitude&quot;] = $in.0.longitude;&#10;    &#10;   &#10;    &#10;    return requestParams;&#10;}&#10;function integer transform() {&#10;&#9;&#10;&#9;printLog(info,'inside rest conector transform');&#10;&#9;&#10;&#9;&#10;&#9;$out.0.latitude = $in.0.latitude;&#10;&#9;$out.0.longitude = $in.0.longitude;&#10;&#9;return ALL;&#10;}&#10;function string checkResponse(integer responseStatus, map[string, string] responseHeaders, string responseBody) {&#10;&#9;&#10;&#9;printLog(info, &quot;responseBody - - - &gt; &quot; + responseBody);&#10;&#9; &#10;     if (responseStatus &gt;= 200  &amp;&amp;  responseStatus &lt; 300) {&#10;         return &quot;DONE_WITH_OUTPUT&quot;;&#10;     }&#10;     else if (responseStatus == 404) {&#10;     // HTTP status &quot;404 - NOT FOUND&quot; could mean there are no more pages or records&#10;         return &quot;DONE_NO_OUTPUT&quot;;&#10;    }&#10;     else if (responseStatus &gt;= 500 || responseBody.indexOf('{&quot;error&quot;: &quot;just a temporary error&quot;}') &gt; -1) {&#10;      // Internal server errors could be temporary (this sends the last response to the error output port)&#10;        return &quot;RETRY&quot;;&#10;     }&#10;     else {&#10;       // Otherwise abort the HTTP connector run (this sends the last response to the error output port)&#10;         return &quot;FATAL_ERROR&quot;;&#10;     }&#10;}&#10;&#10;&#10;function map[string, string] modifyRequestParamsBeforeRetryAttempt(map[string, string] failedRequestParams, integer retryNumber,&#10;        integer responseStatus, map[string, string] responseHeaders, string responseBody) {&#10;&#10;    // Copy all the previous parameters into the retry request parameters map.&#10;    map[string, string] modifiedRequestParams = failedRequestParams;&#10;&#10;   &#10;    return modifiedRequestParams;&#10;}" enabled="enabled" guiName="invoke fips rest web-service" guiX="330" guiY="228" id="INVOKE_FIPS_REST_WEB_SERVICE" requestMethod="GET" type="GENERIC_REST_CONNECTOR">
 <attr name="url"><![CDATA[http://data.fcc.gov/api/block/2010/find?format=json&showall=true&latitude=${latitude}&longitude=${longitude}]]></attr>
 </Node>
-<Node charset="UTF-8" enabled="enabled" fileURL="port:$0.response:discrete" guiName="parse fips json response " guiX="843" guiY="473" id="PARSE_FIPS_JSON_RESPONSE" type="JSON_READER">
+<Node charset="UTF-8" enabled="enabled" fileURL="port:$0.response:discrete" guiName="parse fips json response" guiX="843" guiY="473" id="PARSE_FIPS_JSON_RESPONSE1" type="JSON_READER">
 <attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 <Context xpath="/root/object" outPort="0">
   <Mapping cloverField="block_fips" xpath="Block/FIPS"/>
-  <Mapping cloverField="country_fips" xpath="County/FIPS"/>
-  <Mapping cloverField="country_name" xpath="County/name"/>
+  <Mapping cloverField="county_fips" xpath="County/FIPS"/>
+  <Mapping cloverField="county_name" xpath="County/name"/>
   <Mapping cloverField="state_fips" xpath="State/FIPS"/>
   <Mapping cloverField="state_code" xpath="State/code"/>
   <Mapping cloverField="state_name" xpath="State/name"/>
@@ -155,7 +155,7 @@ function integer transform() {
 
 	]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_SOURCE_DIR}/lat_long.csv" guiName="read lat_long.csv" guiX="20" guiY="50" id="READ_LAT_LONG_CSV1" type="DATA_READER"/>
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/lat_long.csv" guiName="Read Inputs" guiX="20" guiY="50" id="READ_INPUTS" type="DATA_READER"/>
 <Node enabled="enabled" guiName="reformat lat-long" guiX="199" guiY="111" id="REFORMAT_LAT_LONG1" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -185,7 +185,7 @@ $out.0.latitude = $in.0.latitude;
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" guiName="reformat parsed response" guiX="1093" guiY="307" id="REFORMAT_PARSED_RESPONSE" type="REFORMAT">
+<Node enabled="enabled" guiName="reformat parsed response" guiX="899" guiY="646" id="REFORMAT_PARSED_RESPONSE" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -194,8 +194,8 @@ function integer transform() {
 	printLog(info,'test---------------- inside transform '+$in.0.block_fips);
 	
 	$out.0.block_fips = $in.0.block_fips;
-	$out.0.country_fips = $in.0.country_fips;
-	$out.0.country_name = $in.0.country_name;
+	$out.0.country_fips = $in.0.county_fips;
+	$out.0.country_name = $in.0.county_name;
 	$out.0.state_fips = $in.0.state_fips;
 	$out.0.state_code = $in.0.state_code;
 	$out.0.state_name = $in.0.state_name;
@@ -223,11 +223,11 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="APPEND_INPUT_PORT_DATA_IN_RESPONSE_JSON_PATCH:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata9" outPort="Port 0 (out)" toNode="PARSE_FIPS_JSON_RESPONSE:0"/>
+<Edge fromNode="APPEND_INPUT_PORT_DATA_IN_RESPONSE_JSON_PATCH:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata9" outPort="Port 0 (out)" toNode="PARSE_FIPS_JSON_RESPONSE1:0"/>
 <Edge fromNode="INVOKE_FIPS_REST_WEB_SERVICE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="APPEND_INPUT_PORT_DATA_IN_RESPONSE_JSON_PATCH:0"/>
-<Edge fromNode="PARSE_FIPS_JSON_RESPONSE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge20" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="REFORMAT_PARSED_RESPONSE:0"/>
-<Edge fromNode="READ_LAT_LONG_CSV1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge16" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="REFORMAT_LAT_LONG1:0"/>
+<Edge fromNode="PARSE_FIPS_JSON_RESPONSE1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge20" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="REFORMAT_PARSED_RESPONSE:0"/>
+<Edge fromNode="READ_INPUTS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge16" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="REFORMAT_LAT_LONG1:0"/>
 <Edge fromNode="REFORMAT_LAT_LONG1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata7" outPort="Port 0 (out)" toNode="INVOKE_FIPS_REST_WEB_SERVICE:0"/>
-<Edge fromNode="REFORMAT_PARSED_RESPONSE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge21" inPort="Port 0 (in)" metadata="Metadata6" outPort="Port 0 (out)" toNode="CSV_WRITER1:0"/>
+<Edge fromNode="REFORMAT_PARSED_RESPONSE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge21" inPort="Port 0 (in)" metadata="Metadata6" outPort="Port 0 (out)" toNode="CSV_WRITER_DATA_WRITER:0"/>
 </Phase>
 </Graph>

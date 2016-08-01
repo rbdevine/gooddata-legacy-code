@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 11:01:22 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.128" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 19:44:27 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.151" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="FamilyTrees_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -108,6 +108,36 @@
 <Field label="Marketable?" name="Marketable" type="string"/>
 </Record>
 </Metadata>
+<Metadata id="Metadata5" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="FIPS_Record" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field name="block_fips" type="string"/>
+<Field name="county_fips" type="string"/>
+<Field name="county_name" type="string"/>
+<Field name="state_fips" type="string"/>
+<Field name="state_code" type="string"/>
+<Field name="state_name" type="string"/>
+<Field name="latitude" type="string"/>
+<Field name="longitude" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="FIPS_Request" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field name="latitude" type="string"/>
+<Field delimiter="\n" name="longitude" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata4" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="FIPS_Response" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field name="response" type="string"/>
+<Field name="latitude" type="string"/>
+<Field name="longitude" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata9" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="FIPS_Response_Combined" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field name="response" type="string"/>
+</Record>
+</Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/dnb/famTrees/*.xls"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/familytreescombinederrors.txt"/>
@@ -121,9 +151,61 @@
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="28" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" guiName="Reformat" guiX="286" guiY="118" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" guiName="Append Data" guiX="623" guiY="230" id="APPEND_DATA" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
+// Transforms input record into output record.
+function integer transform() {
+	string latlonjson = ", \"latitude\" : \""+$in.0.latitude+"\", \"longitude\" : \""+$in.0.longitude+"\" }";
+	$out.0.response = substring($in.0.response,0,length($in.0.response)-1)+latlonjson;
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/fipslookup.txt" guiName="CSV Writer" guiX="946" guiY="230" id="CSV_WRITER1" type="DATA_WRITER"/>
+<Node charset="UTF-8" ctlFunctionsSource="//#CTL2&#10;&#10;function map[string, string] generateRequestParameters(map[string, string] inputEdgeRecord, integer iterationNumber, integer lastResponseStatus, map[string, string]lastResponseHeaders, string lastResponseBody) {&#10;&#9;printLog(info, &quot;iterationNumber - - - &gt; &quot; + iterationNumber);&#10;    // Copy all input parameters into the request parameters map.&#10;    map[string, string] requestParams = inputEdgeRecord;&#10;&#10;    requestParams[&quot;latitude&quot;] = $in.0.latitude;&#10;    requestParams[&quot;longitude&quot;] = $in.0.longitude;&#10;    &#10;   &#10;    &#10;    return requestParams;&#10;}&#10;function integer transform() {&#10;&#9;&#10;&#9;printLog(info,'inside rest conector transform');&#10;&#9;&#10;&#9;&#10;&#9;$out.0.latitude = $in.0.latitude;&#10;&#9;$out.0.longitude = $in.0.longitude;&#10;&#9;return ALL;&#10;}&#10;function string checkResponse(integer responseStatus, map[string, string] responseHeaders, string responseBody) {&#10;&#9;&#10;&#9;printLog(info, &quot;responseBody - - - &gt; &quot; + responseBody);&#10;&#9; &#10;     if (responseStatus &gt;= 200  &amp;&amp;  responseStatus &lt; 300) {&#10;         return &quot;DONE_WITH_OUTPUT&quot;;&#10;     }&#10;     else if (responseStatus == 404) {&#10;     // HTTP status &quot;404 - NOT FOUND&quot; could mean there are no more pages or records&#10;         return &quot;DONE_NO_OUTPUT&quot;;&#10;    }&#10;     else if (responseStatus &gt;= 500 || responseBody.indexOf('{&quot;error&quot;: &quot;just a temporary error&quot;}') &gt; -1) {&#10;      // Internal server errors could be temporary (this sends the last response to the error output port)&#10;        return &quot;RETRY&quot;;&#10;     }&#10;     else {&#10;       // Otherwise abort the HTTP connector run (this sends the last response to the error output port)&#10;         return &quot;FATAL_ERROR&quot;;&#10;     }&#10;}&#10;&#10;&#10;function map[string, string] modifyRequestParamsBeforeRetryAttempt(map[string, string] failedRequestParams, integer retryNumber,&#10;        integer responseStatus, map[string, string] responseHeaders, string responseBody) {&#10;&#10;    // Copy all the previous parameters into the retry request parameters map.&#10;    map[string, string] modifiedRequestParams = failedRequestParams;&#10;&#10;   &#10;    return modifiedRequestParams;&#10;}" enabled="enabled" guiName="get fips" guiX="463" guiY="230" id="GET_FIPS" requestMethod="GET" type="GENERIC_REST_CONNECTOR">
+<attr name="url"><![CDATA[http://data.fcc.gov/api/block/2010/find?format=json&showall=true&latitude=${latitude}&longitude=${longitude}]]></attr>
+</Node>
+<Node charset="UTF-8" enabled="enabled" fileURL="port:$0.response:discrete" guiName="Parse" guiX="785" guiY="230" id="PARSE" type="JSON_READER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<Context xpath="/root/object" outPort="0">
+  <Mapping cloverField="block_fips" xpath="Block/FIPS"/>
+  <Mapping cloverField="county_fips" xpath="County/FIPS"/>
+  <Mapping cloverField="county_name" xpath="County/name"/>
+  <Mapping cloverField="state_fips" xpath="State/FIPS"/>
+  <Mapping cloverField="state_code" xpath="State/code"/>
+  <Mapping cloverField="state_name" xpath="State/name"/>
+  <Mapping cloverField="latitude" xpath="latitude"/>
+  <Mapping cloverField="longitude" xpath="longitude"/>
+  
+  
+</Context>
+
+	]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="286" guiY="120" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+string latitude = "19.42379";
+string longitude = "-99.175324";
 // Transforms input record into output record.
 function integer transform() {
 	if($in.0.Company_Name != null ) 
@@ -190,7 +272,17 @@ function integer transform() {
 	$out.0.Web_Address = $in.0.Web_Address;
 	$out.0.Facility_Size_sq_Ft = $in.0.Facility_Size_sq_Ft;
 	$out.0.Marketable = $in.0.Marketable;
-
+	
+	string currentLatitude = $in.0.Latitude;
+	latitude = isnull(currentLatitude) ?
+		"19.42379": currentLatitude;
+	$out.1.latitude = latitude;
+	
+	string currentLongitude = $in.0.Longitude;
+	longitude = isnull(currentLongitude) ?
+		"-99.175324": currentLongitude;
+	$out.1.longitude = longitude;
+	
 	return ALL;
 }
 
@@ -213,18 +305,49 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="71" guiY="118" id="SPREADSHEET_DATA_READER" skipSourceRecords="1" type="SPREADSHEET_READER"/>
-<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write Industry File" guiX="463" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/SplunkFamilyTree.xls" guiName="SpreadsheetDataReader" guiX="71" guiY="118" id="SPREADSHEET_DATA_READER" skipSourceRecords="1" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write Industry File" guiX="459" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="APPEND_DATA:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata9" outPort="Port 0 (out)" toNode="PARSE:0"/>
+<Edge fromNode="GET_FIPS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="APPEND_DATA:0"/>
+<Edge fromNode="PARSE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="CSV_WRITER1:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
+<Edge fromNode="REFORMAT:1" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 1 (out)" toNode="GET_FIPS:0"/>
 <Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="109" guiY="222" id="DROP_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="108" guiY="330" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="871" guiY="358" id="DROP_TABLE2" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS LKP_FIPS_COORDINATES_TMP;]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="286" guiY="222" id="CREATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE FIPS" guiX="785" guiY="545" id="CREATE_FIPS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS LKP_FIPS_COORDINATES (
+	BLOCK_FIPS VARCHAR(255),
+	COUNTY_FIPS VARCHAR(255),
+	COUNTY_NAME VARCHAR(255),
+	STATE_FIPS VARCHAR(255),
+	STATE_CODE VARCHAR(255),
+	STATE_NAME VARCHAR(255),
+	LATITUDE VARCHAR(255),
+	LONGITUDE VARCHAR(255)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE FIPS TMP" guiX="785" guiY="445" id="CREATE_FIPS_TMP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS LKP_FIPS_COORDINATES_TMP (
+	BLOCK_FIPS VARCHAR(255),
+	COUNTY_FIPS VARCHAR(255),
+	COUNTY_NAME VARCHAR(255),
+	STATE_FIPS VARCHAR(255),
+	STATE_CODE VARCHAR(255),
+	STATE_NAME VARCHAR(255),
+	LATITUDE VARCHAR(255),
+	LONGITUDE VARCHAR(255)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="285" guiY="330" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	COMPANY_NAME VARCHAR(255),
 	DUNS_NUMBER VARCHAR(255),
@@ -280,7 +403,22 @@ function integer transform() {
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="463" guiY="222" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE FIPS_TMP" guiX="946" guiY="445" id="POPULATE_FIPS_TMP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY LKP_FIPS_COORDINATES_TMP (
+	BLOCK_FIPS,
+	COUNTY_FIPS,
+	COUNTY_NAME,
+	STATE_FIPS,
+	STATE_CODE,
+	STATE_NAME,
+	LATITUDE,
+	LONGITUDE
+)
+FROM LOCAL '${DATA_TRANSFORM_DIR}/fipslookup.txt'
+EXCEPTIONS '${DATA_TMP_DIR}/fipslookuperror.txt'
+ABORT ON ERROR;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="462" guiY="330" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	COMPANY_NAME,
 	DUNS_NUMBER,
@@ -339,8 +477,34 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="109" guiY="302" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="286" guiY="302" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="464" guiY="302" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="108" guiY="410" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="285" guiY="410" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="463" guiY="410" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="UPDATE FIPS" guiX="956" guiY="545" id="UPDATE_FIPS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO LKP_FIPS_COORDINATES SELECT
+	BLOCK_FIPS,
+	COUNTY_FIPS,
+	COUNTY_NAME,
+	STATE_FIPS,
+	STATE_CODE,
+	STATE_NAME,
+	LATITUDE,
+	LONGITUDE
+
+FROM LKP_FIPS_COORDINATES_TMP WHERE NOT EXISTS
+
+(SELECT 1 FROM LKP_FIPS_COORDINATES MAIN  WHERE 
+MAIN.BLOCK_FIPS = LKP_FIPS_COORDINATES_TMP.BLOCK_FIPS AND
+MAIN.COUNTY_FIPS = LKP_FIPS_COORDINATES_TMP.COUNTY_FIPS AND
+MAIN.COUNTY_NAME = LKP_FIPS_COORDINATES_TMP.COUNTY_NAME AND
+MAIN.STATE_FIPS = LKP_FIPS_COORDINATES_TMP.STATE_FIPS AND
+MAIN.STATE_CODE = LKP_FIPS_COORDINATES_TMP.STATE_CODE AND
+MAIN.STATE_NAME = LKP_FIPS_COORDINATES_TMP.STATE_NAME AND
+MAIN.LATITUDE = LKP_FIPS_COORDINATES_TMP.LATITUDE AND
+MAIN.LONGITUDE = LKP_FIPS_COORDINATES_TMP.LONGITUDE) AND
+LKP_FIPS_COORDINATES_TMP.COUNTY_FIPS IS NOT NULL
+;
+]]></attr>
+</Node>
 </Phase>
 </Graph>
