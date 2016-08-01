@@ -1,65 +1,69 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 10:28:27 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.168" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri Jul 29 15:12:48 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.183" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Glassdoor_Salary_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="FK_employerId" type="string"/>
 <Field label="FK_reviewId" name="FK_reviewId" type="string"/>
-<Field format="excel:m/d/yy" label="reviewDateTime" name="reviewDateTime" type="string"/>
 <Field label="FK_userId" name="FK_userId" type="string"/>
-<Field label="jobTitle" name="jobTitle" type="string"/>
 <Field label="GOC" name="GOC" type="string"/>
 <Field label="MGOC" name="MGOC" type="string"/>
+<Field name="ONET_Code" type="string"/>
 <Field label="ONET_MajorTitle" name="ONET_MajorTitle" type="string"/>
+<Field name="ONET_Occupation_Names" type="string"/>
 <Field label="birthYear" name="birthYear" type="string"/>
-<Field label="highestEducation" name="highestEducation" type="string"/>
-<Field label="race" name="race" type="string"/>
-<Field label="gender" name="gender" type="string"/>
-<Field label="FK_employerId" name="FK_employerId" type="string"/>
-<Field label="employer" name="employer" type="string"/>
-<Field label="industryName" name="industryName" type="string"/>
-<Field label="sectorName" name="sectorName" type="string"/>
-<Field label="baseSalary" name="baseSalary" type="string"/>
-<Field label="totalSalary" name="totalSalary" type="string"/>
-<Field label="yearofSalary" name="yearofSalary" type="string"/>
-<Field label="employmentStatusCode" name="employmentStatusCode" type="string"/>
-<Field label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
-<Field label="metroName" name="metroName" type="string"/>
-<Field label="stateName" name="stateName" type="string"/>
 <Field label="employeesTotalNum" name="employeesTotalNum" type="string"/>
+<Field label="employer" name="employer" type="string"/>
 <Field label="employerTypeCode" name="employerTypeCode" type="string"/>
+<Field label="employmentStatusCode" name="employmentStatusCode" type="string"/>
+<Field label="gender" name="gender" type="string"/>
+<Field label="highestEducation" name="highestEducation" type="string"/>
+<Field label="industryName" name="industryName" type="string"/>
+<Field label="jobTitle" name="jobTitle" type="string"/>
+<Field label="metroName" name="metroName" type="string"/>
+<Field label="race" name="race" type="string"/>
+<Field format="excel:m/d/yy" label="reviewDateTime" name="reviewDateTime" type="string"/>
+<Field label="sectorName" name="sectorName" type="string"/>
+<Field label="stateName" name="stateName" type="string"/>
+<Field label="baseSalary" name="unadjustedbaseSalary" type="string"/>
+<Field label="totalSalary" name="unadjustedtotalSalary" type="string"/>
+<Field label="yearofSalary" name="yearofSalary" type="string"/>
+<Field label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata0">
-<Record fieldDelimiter="," name="Glassdoor_Salary_File" recordDelimiter="\n" type="delimited">
-<Field format="" label="FK_reviewId" name="FK_reviewId" type="string"/>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Glassdoor_Salary_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="FK_employerId" type="string"/>
+<Field label="FK_reviewId" name="FK_reviewId" type="string"/>
+<Field label="FK_userId" name="FK_userId" type="string"/>
+<Field label="GOC" name="GOC" type="string"/>
+<Field label="MGOC" name="MGOC" type="string"/>
+<Field name="ONET_Code" type="string"/>
+<Field label="ONET_MajorTitle" name="ONET_MajorTitle" type="string"/>
+<Field name="ONET_Occupation_Names" type="string"/>
+<Field label="birthYear" name="birthYear" type="string"/>
+<Field label="employeesTotalNum" name="employeesTotalNum" type="string"/>
+<Field label="employer" name="employer" type="string"/>
+<Field label="employerTypeCode" name="employerTypeCode" type="string"/>
+<Field label="employmentStatusCode" name="employmentStatusCode" type="string"/>
+<Field label="gender" name="gender" type="string"/>
+<Field label="highestEducation" name="highestEducation" type="string"/>
+<Field label="industryName" name="industryName" type="string"/>
+<Field label="jobTitle" name="jobTitle" type="string"/>
+<Field label="metroName" name="metroName" type="string"/>
+<Field label="race" name="race" type="string"/>
 <Field format="excel:m/d/yy" label="reviewDateTime" name="reviewDateTime" type="string"/>
-<Field format="" label="FK_userId" name="FK_userId" type="string"/>
-<Field format="" label="jobTitle" name="jobTitle" type="string"/>
-<Field format="" label="GOC" name="GOC" type="string"/>
-<Field format="" label="MGOC" name="MGOC" type="string"/>
-<Field format="" label="ONET_MajorTitle" name="ONET_MajorTitle" type="string"/>
-<Field format="" label="birthYear" name="birthYear" type="string"/>
-<Field format="" label="highestEducation" name="highestEducation" type="string"/>
-<Field format="" label="race" name="race" type="string"/>
-<Field format="" label="gender" name="gender" type="string"/>
-<Field format="" label="FK_employerId" name="FK_employerId" type="string"/>
-<Field format="" label="employer" name="employer" type="string"/>
-<Field format="" label="industryName" name="industryName" type="string"/>
-<Field format="" label="sectorName" name="sectorName" type="string"/>
-<Field format="" label="baseSalary" name="baseSalary" type="string"/>
-<Field format="" label="totalSalary" name="totalSalary" type="string"/>
-<Field format="" label="yearofSalary" name="yearofSalary" type="string"/>
-<Field format="" label="employmentStatusCode" name="employmentStatusCode" type="string"/>
-<Field format="" label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
-<Field format="" label="metroName" name="metroName" type="string"/>
-<Field format="" label="stateName" name="stateName" type="string"/>
-<Field format="" label="employeesTotalNum" name="employeesTotalNum" type="string"/>
-<Field format="" label="employerTypeCode" name="employerTypeCode" type="string"/>
+<Field label="sectorName" name="sectorName" type="string"/>
+<Field label="stateName" name="stateName" type="string"/>
+<Field label="baseSalary" name="unadjustedbaseSalary" type="string"/>
+<Field label="totalSalary" name="unadjustedtotalSalary" type="string"/>
+<Field label="yearofSalary" name="yearofSalary" type="string"/>
+<Field label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/glassdoor/salarydata/*.csv"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/glassdoorsalaryerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/glassdoorsalary.xlsx"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.csv"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_GLASSDOORSALARY"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/glassdoorsalary.txt"/>
@@ -69,36 +73,53 @@
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="0" skipSourceRows="1" trim="true" type="DATA_READER" verbose="false"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
-<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" guiName="Reformat" guiX="286" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
 function integer transform() {
+	$out.0.FK_employerId = $in.0.FK_employerId;
 	$out.0.FK_reviewId = $in.0.FK_reviewId;
-	$out.0.reviewDateTime = $in.0.reviewDateTime;
 	$out.0.FK_userId = $in.0.FK_userId;
-	$out.0.jobTitle = $in.0.jobTitle;
 	$out.0.GOC = $in.0.GOC;
 	$out.0.MGOC = $in.0.MGOC;
+	$out.0.ONET_Code = $in.0.ONET_Code;
 	$out.0.ONET_MajorTitle = $in.0.ONET_MajorTitle;
+	$out.0.ONET_Occupation_Names = $in.0.ONET_Occupation_Names;
 	$out.0.birthYear = $in.0.birthYear;
-	$out.0.highestEducation = $in.0.highestEducation;
-	$out.0.race = $in.0.race;
-	$out.0.gender = $in.0.gender;
-	$out.0.FK_employerId = $in.0.FK_employerId;
-	$out.0.employer = $in.0.employer;
-	$out.0.industryName = $in.0.industryName;
-	$out.0.sectorName = $in.0.sectorName;
-	$out.0.baseSalary = $in.0.baseSalary;
-	$out.0.totalSalary = $in.0.totalSalary;
-	$out.0.yearofSalary = $in.0.yearofSalary;
-	$out.0.employmentStatusCode = $in.0.employmentStatusCode;
-	$out.0.yearsOfRelevantExpNumber = $in.0.yearsOfRelevantExpNumber;
-	$out.0.metroName = $in.0.metroName;
-	$out.0.stateName = $in.0.stateName;
 	$out.0.employeesTotalNum = $in.0.employeesTotalNum;
+	if($in.0.employer != null ) 
+	{
+		$out.0.employer = replace($in.0.employer,"[||\\\\]",",");
+	}
+	else
+	{
+		$out.0.employer = $in.0.employer;
+	}
 	$out.0.employerTypeCode = $in.0.employerTypeCode;
+	$out.0.employmentStatusCode = $in.0.employmentStatusCode;
+	$out.0.gender = $in.0.gender;
+	$out.0.highestEducation = $in.0.highestEducation;
+	$out.0.industryName = $in.0.industryName;
+	if($in.0.jobTitle != null ) 
+	{
+		$out.0.jobTitle = replace($in.0.jobTitle,"[||\\\\]",",");
+	}
+	else
+	{
+		$out.0.jobTitle = $in.0.jobTitle;
+	}
+	$out.0.metroName = $in.0.metroName;
+	$out.0.race = $in.0.race;
+	$out.0.reviewDateTime = $in.0.reviewDateTime;
+	$out.0.sectorName = $in.0.sectorName;
+	$out.0.stateName = $in.0.stateName;
+	$out.0.unadjustedbaseSalary = $in.0.unadjustedbaseSalary;
+	$out.0.unadjustedtotalSalary = $in.0.unadjustedtotalSalary;
+	$out.0.yearofSalary = $in.0.yearofSalary;
+	$out.0.yearsOfRelevantExpNumber = $in.0.yearsOfRelevantExpNumber;
 
 	return ALL;
 }
@@ -122,9 +143,8 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="36" guiY="129" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
-<Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
@@ -134,60 +154,64 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+	FK_EMPLOYERID VARCHAR(255),
 	FK_REVIEWID VARCHAR(255),
-	REVIEWDATETIME VARCHAR(255),
 	FK_USERID VARCHAR(255),
-	JOBTITLE VARCHAR(255),
 	GOC VARCHAR(255),
 	MGOC VARCHAR(255),
+	ONET_CODE VARCHAR(255),
 	ONET_MAJORTITLE VARCHAR(255),
+	ONET_OCCUPATION_NAMES VARCHAR(255),
 	BIRTHYEAR VARCHAR(255),
-	HIGHESTEDUCATION VARCHAR(255),
-	RACE VARCHAR(255),
-	GENDER VARCHAR(255),
-	FK_EMPLOYERID VARCHAR(255),
-	EMPLOYER VARCHAR(255),
-	INDUSTRYNAME VARCHAR(255),
-	SECTORNAME VARCHAR(255),
-	BASESALARY VARCHAR(255),
-	TOTALSALARY VARCHAR(255),
-	YEAROFSALARY VARCHAR(255),
-	EMPLOYMENTSTATUSCODE VARCHAR(255),
-	YEARSOFRELEVANTEXPNUMBER VARCHAR(255),
-	METRONAME VARCHAR(255),
-	STATENAME VARCHAR(255),
 	EMPLOYEESTOTALNUM VARCHAR(255),
-	EMPLOYERTYPECODE VARCHAR(255)
+	EMPLOYER VARCHAR(255),
+	EMPLOYERTYPECODE VARCHAR(255),
+	EMPLOYMENTSTATUSCODE VARCHAR(255),
+	GENDER VARCHAR(255),
+	HIGHESTEDUCATION VARCHAR(255),
+	INDUSTRYNAME VARCHAR(255),
+	JOBTITLE VARCHAR(255),
+	METRONAME VARCHAR(255),
+	RACE VARCHAR(255),
+	REVIEWDATETIME VARCHAR(255),
+	SECTORNAME VARCHAR(255),
+	STATENAME VARCHAR(255),
+	UNADJUSTEDBASESALARY VARCHAR(255),
+	UNADJUSTEDTOTALSALARY VARCHAR(255),
+	YEAROFSALARY VARCHAR(255),
+	YEARSOFRELEVANTEXPNUMBER VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+	FK_EMPLOYERID,
 	FK_REVIEWID,
-	REVIEWDATETIME,
 	FK_USERID,
-	JOBTITLE,
 	GOC,
 	MGOC,
+	ONET_CODE,
 	ONET_MAJORTITLE,
+	ONET_OCCUPATION_NAMES,
 	BIRTHYEAR,
-	HIGHESTEDUCATION,
-	RACE,
-	GENDER,
-	FK_EMPLOYERID,
-	EMPLOYER,
-	INDUSTRYNAME,
-	SECTORNAME,
-	BASESALARY,
-	TOTALSALARY,
-	YEAROFSALARY,
-	EMPLOYMENTSTATUSCODE,
-	YEARSOFRELEVANTEXPNUMBER,
-	METRONAME,
-	STATENAME,
 	EMPLOYEESTOTALNUM,
-	EMPLOYERTYPECODE
+	EMPLOYER,
+	EMPLOYERTYPECODE,
+	EMPLOYMENTSTATUSCODE,
+	GENDER,
+	HIGHESTEDUCATION,
+	INDUSTRYNAME,
+	JOBTITLE,
+	METRONAME,
+	RACE,
+	REVIEWDATETIME,
+	SECTORNAME,
+	STATENAME,
+	UNADJUSTEDBASESALARY,
+	UNADJUSTEDTOTALSALARY,
+	YEAROFSALARY,
+	YEARSOFRELEVANTEXPNUMBER
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'

@@ -1,11 +1,105 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Tue Jul 26 11:33:57 EDT 2016" guiVersion="3.4.4.P" id="1469548969446" licenseType="Commercial" modified="Tue Jul 26 14:31:52 EDT 2016" modifiedBy="scalvillo" name="LivingWageModel" revision="1.1" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Tue Jul 26 11:33:57 EDT 2016" guiVersion="3.4.4.P" id="1469548969446" licenseType="Commercial" modified="Fri Jul 29 02:01:33 EDT 2016" modifiedBy="scalvillo" name="LivingWageModel" revision="1.7" showComponentDetails="true">
 <Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Living_Wage" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="County_Geo_Id" type="string"/>
+<Field name="LW_1A" type="string"/>
+<Field name="LW_1A1C" type="string"/>
+<Field name="LW_1A2C" type="string"/>
+<Field name="LW_1A3C" type="string"/>
+<Field name="LW_2A1W" type="string"/>
+<Field name="LW_2A1W1C" type="string"/>
+<Field name="LW_2A1W2C" type="string"/>
+<Field name="LW_2A1W3C" type="string"/>
+<Field name="LW_2A2W" type="string"/>
+<Field name="LW_2A2W1C" type="string"/>
+<Field name="LW_2A2W2C" type="string"/>
+<Field name="LW_2A2W3C" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Living_Wage_Numeric" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="County_Geo_Id" type="string"/>
+<Field name="LW_1A" scale="4" type="decimal"/>
+<Field name="LW_1A1C" scale="4" type="decimal"/>
+<Field name="LW_1A2C" scale="4" type="decimal"/>
+<Field name="LW_1A3C" scale="4" type="decimal"/>
+<Field name="LW_2A1W" scale="4" type="decimal"/>
+<Field name="LW_2A1W1C" scale="4" type="decimal"/>
+<Field name="LW_2A1W2C" scale="4" type="decimal"/>
+<Field name="LW_2A1W3C" scale="4" type="decimal"/>
+<Field name="LW_2A2W" scale="4" type="decimal"/>
+<Field name="LW_2A2W1C" scale="4" type="decimal"/>
+<Field name="LW_2A2W2C" scale="4" type="decimal"/>
+<Field name="LW_2A2W3C" scale="4" type="decimal"/>
+</Record>
+</Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="workspace.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" guiName="ApproximativeJoin" guiX="487" guiY="125" id="APPROXIMATIVE_JOIN" type="APROX_MERGE_JOIN"/>
-<Node enabled="enabled" guiName="DBInputTable" guiX="64" guiY="125" id="DBINPUT_TABLE" type="DB_INPUT_TABLE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DBInputTable" guiX="64" guiY="125" id="DBINPUT_TABLE" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[SELECT 
+GEO_ID, 
+LIVINGWAGE_1A, 
+LIVINGWAGE_1A1C, 
+LIVINGWAGE_1A2C, 
+LIVINGWAGE_1A3C, 
+LIVINGWAGE_2A1W, 
+LIVINGWAGE_2A1W1C, 
+LIVINGWAGE_2A1W2C, 
+LIVINGWAGE_2A1W3C, 
+LIVINGWAGE_2A2W, 
+LIVINGWAGE_2A2W1C,
+LIVINGWAGE_2A2W2C, 
+LIVINGWAGE_2A2W3C 
+FROM GEO_ID_AND_ALL_COUNTY_LIVING_WAGES_FINAL;
+]]></attr>
+</Node>
+<Node dataset="dataset.livingwage" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.livingwage&quot;,&quot;datasetTitle&quot;:&quot;Living Wage&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.livingwage.geo_county_id&quot;,&quot;title&quot;:&quot;GEO_County_Id&quot;,&quot;prettyId&quot;:&quot;attr_livingwage_geo_county_id&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.livingwage.geo_county_id&quot;,&quot;title&quot;:&quot;GEO_County_Id&quot;,&quot;prettyId&quot;:&quot;geo_county_id&quot;,&quot;assignedMetadataField&quot;:&quot;County_Geo_Id&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.oneadult&quot;,&quot;title&quot;:&quot;1 Adult&quot;,&quot;prettyId&quot;:&quot;oneadult&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_1A&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.oneadultonechild&quot;,&quot;title&quot;:&quot;1 Adult 1 Child&quot;,&quot;prettyId&quot;:&quot;oneadultonechild&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_1A1C&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.oneadulttwochildren&quot;,&quot;title&quot;:&quot;1 Adult 2 Children&quot;,&quot;prettyId&quot;:&quot;oneadulttwochildren&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_1A2C&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.oneadultthreechildren&quot;,&quot;title&quot;:&quot;1 Adult 3 Children&quot;,&quot;prettyId&quot;:&quot;oneadultthreechildren&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_1A3C&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.twoadultsonewoman&quot;,&quot;title&quot;:&quot;2 Adults 1 Wage&quot;,&quot;prettyId&quot;:&quot;twoadultsonewoman&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_2A1W&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.twoadultsonewomanonechild&quot;,&quot;title&quot;:&quot;2 Adults 1 Wage 1 Child&quot;,&quot;prettyId&quot;:&quot;twoadultsonewomanonechild&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_2A1W1C&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.twoadultsonewomantwochildren&quot;,&quot;title&quot;:&quot;2 Adults 1 Wage 2 Children&quot;,&quot;prettyId&quot;:&quot;twoadultsonewomantwochildren&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_2A1W2C&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.twoadultsonewomanthreechildren&quot;,&quot;title&quot;:&quot;2 Adults 1 Wage 3 Children&quot;,&quot;prettyId&quot;:&quot;twoadultsonewomanthreechildren&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_2A1W3C&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.adults2wages&quot;,&quot;title&quot;:&quot;2 Adults 2 Wages&quot;,&quot;prettyId&quot;:&quot;adults2wages&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_2A2W&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.twoadults&quot;,&quot;title&quot;:&quot;2 Adults 2 Wages 1 Child&quot;,&quot;prettyId&quot;:&quot;twoadults&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_2A2W1C&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.adults2wages2children&quot;,&quot;title&quot;:&quot;2 Adults 2 Wages 2 Children&quot;,&quot;prettyId&quot;:&quot;adults2wages2children&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_2A2W2C&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.livingwage.adults2wages3children&quot;,&quot;title&quot;:&quot;2 Adults 2 Wages 3 Children&quot;,&quot;prettyId&quot;:&quot;adults2wages3children&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;LW_2A2W3C&quot;}}],&quot;dateFacts&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;entitiesWithoutValue&quot;:[],&quot;datesWithFactConflict&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="404" guiY="125" id="GD_DATASET_WRITER" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="234" guiY="125" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.County_Geo_Id = $in.0.County_Geo_Id;
+	$out.0.LW_1A = str2decimal($in.0.LW_1A,"##.##")/100;
+	$out.0.LW_1A1C = str2decimal($in.0.LW_1A1C,"##.##")/100;
+	$out.0.LW_1A2C = str2decimal($in.0.LW_1A2C,"##.##")/100;
+	$out.0.LW_1A3C = str2decimal($in.0.LW_1A3C,"##.##")/100;
+	$out.0.LW_2A1W = str2decimal($in.0.LW_2A1W,"##.##")/100;
+	$out.0.LW_2A1W1C = str2decimal($in.0.LW_2A1W1C,"##.##")/100;
+	$out.0.LW_2A1W2C = str2decimal($in.0.LW_2A1W2C,"##.##")/100;
+	$out.0.LW_2A1W3C = str2decimal($in.0.LW_2A1W3C,"##.##")/100;
+	$out.0.LW_2A2W = str2decimal($in.0.LW_2A2W,"##.##")/100;
+	$out.0.LW_2A2W1C = str2decimal($in.0.LW_2A2W1C,"##.##")/100;
+	$out.0.LW_2A2W2C = str2decimal($in.0.LW_2A2W2C,"##.##")/100;
+	$out.0.LW_2A2W3C = str2decimal($in.0.LW_2A2W3C,"##.##")/100;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="DBINPUT_TABLE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="GD_DATASET_WRITER:0"/>
 </Phase>
 </Graph>
