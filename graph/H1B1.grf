@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 15:36:27 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.213" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 22:42:31 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.214" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/h1bvisadata.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="h1b1_db" name="h1b1_db" previewAttachmentCharset="ISO-8859-1" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
@@ -26,7 +26,7 @@
 </Record>
 </Metadata>
 <Metadata id="Metadata0" previewAttachment="/Users/scalvillo/Desktop/h1bvisadata.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," label="h1b1_file" name="h1b1_file" previewAttachment="/Users/scalvillo/Desktop/h1bvisadata.csv" previewAttachmentCharset="ISO-8859-1" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Record fieldDelimiter="," label="h1b1_file" name="h1b1_file" previewAttachment="/Users/scalvillo/Desktop/h1bvisadata.csv" previewAttachmentCharset="ISO-8859-1" quotedStrings="true" recordDelimiter="\n" skipSourceRows="0" type="delimited">
 <Field name="case_number" type="string"/>
 <Field name="employment_start_date" type="string"/>
 <Field name="employment_end_date" type="string"/>
