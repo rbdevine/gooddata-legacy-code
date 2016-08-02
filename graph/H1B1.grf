@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 22:42:31 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.214" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 02 14:21:31 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.228" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/h1bvisadata.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" label="h1b1_db" name="h1b1_db" previewAttachmentCharset="ISO-8859-1" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
+<Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/h1bcombined.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" label="h1b1_db" name="h1b1_db" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
 <Field name="case_number" type="string"/>
 <Field name="employment_start_date" type="string"/>
 <Field name="employment_end_date" type="string"/>
@@ -15,24 +15,25 @@
 <Field name="total_workers" type="string"/>
 <Field name="full_time_position" type="string"/>
 <Field name="prevailing_wage" type="string"/>
+<Field name="pw_unit_of_pay" type="string"/>
 <Field name="pw_wage_level" type="string"/>
-<Field name="pw_source" type="string"/>
+<Field name="wage_rate_of_pay" type="string"/>
 <Field name="pw_wage_source_year" type="string"/>
 <Field name="pw_source_other" type="string"/>
-<Field name="wage_rate_of_pay" type="string"/>
 <Field name="worksite_city" type="string"/>
 <Field name="worksite_county" type="string"/>
-<Field eofAsDelimiter="false" name="worksite_state" type="string"/>
+<Field name="worksite_state" type="string"/>
+<Field eofAsDelimiter="false" name="original_decision_date" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata0" previewAttachment="/Users/scalvillo/Desktop/h1bvisadata.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," label="h1b1_file" name="h1b1_file" previewAttachment="/Users/scalvillo/Desktop/h1bvisadata.csv" previewAttachmentCharset="ISO-8859-1" quotedStrings="true" recordDelimiter="\n" skipSourceRows="0" type="delimited">
+<Metadata id="Metadata0" previewAttachment="/Users/scalvillo/Desktop/h1bcombined.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="h1b1_file" name="h1b1_file" previewAttachment="/Users/scalvillo/Desktop/h1bcombined.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\n" type="delimited">
 <Field name="case_number" type="string"/>
 <Field name="employment_start_date" type="string"/>
 <Field name="employment_end_date" type="string"/>
 <Field name="employer_name" type="string"/>
 <Field name="employer_country" type="string"/>
-<Field name="employer_province" type="string"/>
+<Field name="employer_province" nullValue="N/A" type="string"/>
 <Field name="job_title" type="string"/>
 <Field name="soc_code" type="string"/>
 <Field name="soc_name" type="string"/>
@@ -40,27 +41,28 @@
 <Field name="total_workers" type="string"/>
 <Field name="full_time_position" type="string"/>
 <Field name="prevailing_wage" type="string"/>
+<Field name="pw_unit_of_pay" type="string"/>
 <Field name="pw_wage_level" type="string"/>
-<Field name="pw_source" type="string"/>
+<Field name="wage_rate_of_pay" type="string"/>
 <Field name="pw_wage_source_year" type="string"/>
 <Field name="pw_source_other" type="string"/>
-<Field name="wage_rate_of_pay" type="string"/>
 <Field name="worksite_city" type="string"/>
 <Field name="worksite_county" type="string"/>
-<Field eofAsDelimiter="true" name="worksite_state" type="string"/>
+<Field name="worksite_state" type="string"/>
+<Field eofAsDelimiter="false" name="original_decision_date" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/enigma/h1b1/h1bvisadata.csv"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/enigma/h1b1/h1bcombined.csv"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/h1b1error.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/h1bvisadata.csv"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/h1bcombined.csv"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_H1B1"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/h1b1write.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node charset="UTF-8" enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="73" guiY="129" id="CSV_READER" quoteCharacter="&quot;" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
@@ -73,66 +75,31 @@ function integer transform() {
 	$out.0.case_number = $in.0.case_number;
 	$out.0.employment_start_date = $in.0.employment_start_date;
 	$out.0.employment_end_date = $in.0.employment_end_date;
-	if ($in.0.employer_name != null)
-	{
-		$out.0.employer_name = replace($in.0.employer_name,"[|]","");
-	}
-	else
-	{
-		$out.0.employer_name = null;
-	}
+	$out.0.employer_name = $in.0.employer_name;
 	$out.0.employer_country = $in.0.employer_country;
 	if ($in.0.employer_province != null)
-	{
-		$out.0.employer_province = replace($in.0.employer_province,"[|]","");
+	{	
+		$out.0.employer_province = replace($in.0.employer_province,"[N||A]","");
 	}
-	else
-	{
-		$out.0.employer_province = null;
-	}
-	if ($in.0.job_title != null)
-	{
-		$out.0.job_title = replace($in.0.job_title,"[|]","");
-	}
-	else
-	{
-		$out.0.job_title = null;
-	}
+	$out.0.job_title = $in.0.job_title;
 	$out.0.soc_code = $in.0.soc_code;
 	$out.0.soc_name = $in.0.soc_name;
 	$out.0.naic_code = $in.0.naic_code;
 	$out.0.total_workers = $in.0.total_workers;
 	$out.0.full_time_position = $in.0.full_time_position;
 	$out.0.prevailing_wage = $in.0.prevailing_wage;
+	$out.0.pw_unit_of_pay = $in.0.pw_unit_of_pay;
 	$out.0.pw_wage_level = $in.0.pw_wage_level;
-	if ($in.0.pw_source != null)
-	{
-		$out.0.pw_source = replace($in.0.pw_source,"[']","");
-	}
-	else
-	{
-		$out.0.pw_source = null;
-	}
-	$out.0.pw_wage_source_year = $in.0.pw_wage_source_year;
-	if ($in.0.pw_source_other != null)
-	{
-		$out.0.pw_source_other = replace($in.0.pw_source_other,"['||]","");
-	}
-	else
-	{
-		$out.0.pw_source_other = null;
-	}
 	$out.0.wage_rate_of_pay = $in.0.wage_rate_of_pay;
+	$out.0.pw_wage_source_year = $in.0.pw_wage_source_year;
+	$out.0.pw_source_other = $in.0.pw_source_other;
 	$out.0.worksite_city = $in.0.worksite_city;
-	if ($in.0.worksite_county != null)
-	{
-		$out.0.worksite_county = replace($in.0.worksite_county,"[\\\\]",",");
-	}
-	else
-	{
-		$out.0.worksite_county = null;
+	if($in.0.worksite_county != null)
+	{ 
+		$out.0.worksite_county = replace($in.0.worksite_county,"[\\\\]","");
 	}
 	$out.0.worksite_state = $in.0.worksite_state;
+	$out.0.original_decision_date = $in.0.original_decision_date;
 
 	return ALL;
 }
@@ -156,8 +123,8 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="73" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
@@ -167,54 +134,56 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-	CASE_NUMBER VARCHAR(255),
-	EMPLOYMENT_START_DATE VARCHAR(255),
-	EMPLOYMENT_END_DATE VARCHAR(255),
-	EMPLOYER_NAME VARCHAR(255),
-	EMPLOYER_COUNTRY VARCHAR(255),
-	EMPLOYER_PROVINCE VARCHAR(255),
-	JOB_TITLE VARCHAR(255),
-	SOC_CODE VARCHAR(255),
-	SOC_NAME VARCHAR(255),
-	NAIC_CODE VARCHAR(255),
-	TOTAL_WORKERS VARCHAR(255),
-	FULL_TIME_POSITION VARCHAR(255),
-	PREVAILING_WAGE VARCHAR(255),
-	PW_WAGE_LEVEL VARCHAR(255),
-	PW_SOURCE VARCHAR(255),
-	PW_WAGE_SOURCE_YEAR VARCHAR(255),
-	PW_SOURCE_OTHER VARCHAR(255),
-	WAGE_RATE_OF_PAY VARCHAR(255),
-	WORKSITE_CITY VARCHAR(255),
-	WORKSITE_COUNTY VARCHAR(255),
-	WORKSITE_STATE VARCHAR(255)
+	case_number VARCHAR(255),
+	employment_start_date VARCHAR(255),
+	employment_end_date VARCHAR(255),
+	employer_name VARCHAR(255),
+	employer_country VARCHAR(255),
+	employer_province VARCHAR(255),
+	job_title VARCHAR(255),
+	soc_code VARCHAR(255),
+	soc_name VARCHAR(255),
+	naic_code VARCHAR(255),
+	total_workers VARCHAR(255),
+	full_time_position VARCHAR(255),
+	prevailing_wage VARCHAR(255),
+	pw_unit_of_pay VARCHAR(255),
+	pw_wage_level VARCHAR(255),
+	wage_rate_of_pay VARCHAR(255),
+	pw_wage_source_year VARCHAR(255),
+	pw_source_other VARCHAR(255),
+	worksite_city VARCHAR(255),
+	worksite_county VARCHAR(255),
+	worksite_state VARCHAR(255),
+	original_decision_date VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	CASE_NUMBER,
-	EMPLOYMENT_START_DATE,
-	EMPLOYMENT_END_DATE,
-	EMPLOYER_NAME,
-	EMPLOYER_COUNTRY,
-	EMPLOYER_PROVINCE,
-	JOB_TITLE,
-	SOC_CODE,
-	SOC_NAME,
-	NAIC_CODE,
-	TOTAL_WORKERS,
-	FULL_TIME_POSITION,
-	PREVAILING_WAGE,
-	PW_WAGE_LEVEL,
-	PW_SOURCE,
-	PW_WAGE_SOURCE_YEAR,
-	PW_SOURCE_OTHER,
-	WAGE_RATE_OF_PAY,
-	WORKSITE_CITY,
-	WORKSITE_COUNTY,
-	WORKSITE_STATE
+	case_number,
+	employment_start_date,
+	employment_end_date,
+	employer_name,
+	employer_country,
+	employer_province,
+	job_title,
+	soc_code,
+	soc_name,
+	naic_code,
+	total_workers,
+	full_time_position,
+	prevailing_wage,
+	pw_unit_of_pay,
+	pw_wage_level,
+	wage_rate_of_pay,
+	pw_wage_source_year,
+	pw_source_other,
+	worksite_city,
+	worksite_county,
+	worksite_state,
+	original_decision_date 
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
