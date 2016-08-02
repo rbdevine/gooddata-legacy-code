@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 22:01:14 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.157" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 02 12:39:33 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.181" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="FamilyTrees_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -148,10 +148,11 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="286" guiY="28" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="286" guiY="28" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" guiName="Reformat" guiX="286" guiY="120" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" guiName="ExtSort" guiX="-284" guiY="139" id="EXT_SORT1" sortKey="latitude(a);longitude(a)" type="EXT_SORT"/>
+<Node enabled="enabled" guiName="Reformat" guiX="285" guiY="124" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 // Transforms input record into output record.
 function integer transform() {
@@ -220,6 +221,15 @@ function integer transform() {
 	$out.0.Facility_Size_sq_Ft = $in.0.Facility_Size_sq_Ft;
 	$out.0.Marketable = $in.0.Marketable;
 	
+	
+	//port 1
+	$out.1.block_fips = "";
+	$out.1.county_fips = "";
+	$out.1.county_name = "";
+	$out.1.state_fips = "";
+	$out.1.state_code = "";
+	$out.1.state_name = "";
+	
 	if ($in.0.Latitude != null)
 	{	
 		$out.1.latitude = trim($in.0.Latitude);
@@ -262,17 +272,18 @@ function integer transform() {
 </Node>
 <Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="71" guiY="118" id="SPREADSHEET_DATA_READER" skipSourceRecords="1" type="SPREADSHEET_READER"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write Industry File" guiX="459" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
+<Edge fromNode="EXT_SORT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge25" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="MERGE:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_INDUSTRY_FILE:0"/>
-<Edge fromNode="REFORMAT:1" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 1 (out)" toNode="EXT_FILTER:0"/>
+<Edge fromNode="REFORMAT:1" guiBendpoints="" guiRouter="Manhattan" id="Edge9" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 1 (out)" toNode="EXT_SORT1:0"/>
 <Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="108" guiY="422" id="DROP_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="DROP TABLE" guiX="108" guiY="422" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="285" guiY="422" id="CREATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="CREATE TABLE" guiX="285" guiY="422" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	COMPANY_NAME VARCHAR(255),
 	DUNS_NUMBER VARCHAR(255),
@@ -328,7 +339,7 @@ function integer transform() {
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="462" guiY="422" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="POPULATE TABLE" guiX="462" guiY="422" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	COMPANY_NAME,
 	DUNS_NUMBER,
@@ -387,11 +398,65 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="108" guiY="502" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="285" guiY="502" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="463" guiY="502" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="108" guiY="502" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="disabled" guiName="Clean error" guiX="285" guiY="502" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="463" guiY="502" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 <Phase number="7">
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/locationstoinvoke.txt" guiName="CSV Writer" guiX="496" guiY="318" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/currentfipscoordinaterecords.txt" guiName="CSV Writer" guiX="-269" guiY="330" id="CSV_WRITER2" type="DATA_WRITER"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DBInputTable" guiX="-300" guiY="234" id="DBINPUT_TABLE" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[SELECT BLOCK_FIPS,COUNTY_FIPS,COUNTY_NAME,STATE_FIPS,STATE_CODE,STATE_NAME,LATITUDE,LONGITUDE FROM LKP_FIPS_COORDINATES ORDER BY LATITUDE,LONGITUDE]]></attr>
+</Node>
+<Node dedupKey="latitude(a);longitude(a)" enabled="enabled" guiName="Dedup" guiX="325" guiY="234" id="DEDUP" type="DEDUP"/>
+<Node enabled="enabled" guiName="ExtFilter" guiX="19" guiY="218" id="EXT_FILTER" type="EXT_FILTER">
+<attr name="filterExpression"><![CDATA[//#CTL2
+$in.0.latitude == null OR $in.0.county_fips != null]]></attr>
+</Node>
+<Node enabled="enabled" guiName="ExtSort" guiX="174" guiY="218" id="EXT_SORT" sortKey="latitude(a);longitude(a)" type="EXT_SORT"/>
+<Node enabled="enabled" guiName="ExtSort" guiX="-4" guiY="330" id="EXT_SORT2" sortKey="latitude(a);longitude(a)" type="EXT_SORT"/>
+<Node enabled="enabled" guiName="Merge" guiX="-142" guiY="227" id="MERGE" mergeKey="latitude;longitude;county_fips" type="MERGE"/>
+<Node enabled="enabled" guiName="Reformat" guiX="652" guiY="105" id="REFORMAT1" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.latitude = $in.0.latitude;
+	$out.0.longitude = $in.0.longitude;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="DBINPUT_TABLE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="EXT_SORT2:0"/>
+<Edge fromNode="DBINPUT_TABLE:1" guiBendpoints="" guiRouter="Manhattan" id="Edge8" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 1 (out)" toNode="CSV_WRITER2:0"/>
+<Edge fromNode="DEDUP:0" guiBendpoints="" guiRouter="Manhattan" id="Edge19" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (unique)" toNode="REFORMAT1:0"/>
+<Edge fromNode="DEDUP:1" guiBendpoints="" guiRouter="Manhattan" id="Edge18" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 1 (duplicate)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="EXT_FILTER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge16" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (accepted)" toNode="EXT_SORT:0"/>
+<Edge fromNode="EXT_SORT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="DEDUP:0"/>
+<Edge fromNode="EXT_SORT2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge7" inPort="Port 1 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="MERGE:1"/>
+<Edge fromNode="MERGE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge15" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="EXT_FILTER:0"/>
+<Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge23" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="GET_FIPS:0"/>
+</Phase>
+<Phase number="8">
 <Node enabled="enabled" guiName="Append Data" guiX="623" guiY="230" id="APPEND_DATA" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -422,13 +487,7 @@ function integer transform() {
 ]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${DATA_TRANSFORM_DIR}/fipslookup.txt" guiName="CSV Writer" guiX="946" guiY="230" id="CSV_WRITER1" type="DATA_WRITER"/>
-<Node dedupKey="latitude(a);longitude(a)" enabled="enabled" guiName="Dedup" guiX="324" guiY="230" id="DEDUP" type="DEDUP"/>
-<Node enabled="enabled" guiName="ExtFilter" guiX="27" guiY="230" id="EXT_FILTER" type="EXT_FILTER">
-<attr name="filterExpression"><![CDATA[//#CTL2
-$in.0.latitude != ""]]></attr>
-</Node>
-<Node enabled="enabled" guiName="ExtSort" guiX="185" guiY="230" id="EXT_SORT" sortKey="latitude(a);longitude(a)" type="EXT_SORT"/>
-<Node charset="UTF-8" ctlFunctionsSource="//#CTL2&#10;&#10;function map[string, string] generateRequestParameters(map[string, string] inputEdgeRecord, integer iterationNumber, integer lastResponseStatus, map[string, string]lastResponseHeaders, string lastResponseBody) {&#10;&#9;printLog(info, &quot;iterationNumber - - - &gt; &quot; + iterationNumber);&#10;    // Copy all input parameters into the request parameters map.&#10;    map[string, string] requestParams = inputEdgeRecord;&#10;&#10;    requestParams[&quot;latitude&quot;] = $in.0.latitude;&#10;    requestParams[&quot;longitude&quot;] = $in.0.longitude;&#10;    &#10;   &#10;    &#10;    return requestParams;&#10;}&#10;function integer transform() {&#10;&#9;&#10;&#9;printLog(info,'inside rest conector transform');&#10;&#9;&#10;&#9;&#10;&#9;$out.0.latitude = $in.0.latitude;&#10;&#9;$out.0.longitude = $in.0.longitude;&#10;&#9;return ALL;&#10;}&#10;function string checkResponse(integer responseStatus, map[string, string] responseHeaders, string responseBody) {&#10;&#9;&#10;&#9;printLog(info, &quot;responseBody - - - &gt; &quot; + responseBody);&#10;&#9; &#10;     if (responseStatus &gt;= 200  &amp;&amp;  responseStatus &lt; 300) {&#10;         return &quot;DONE_WITH_OUTPUT&quot;;&#10;     }&#10;     else if (responseStatus == 404) {&#10;     // HTTP status &quot;404 - NOT FOUND&quot; could mean there are no more pages or records&#10;         return &quot;DONE_NO_OUTPUT&quot;;&#10;    }&#10;     else if (responseStatus &gt;= 500 || responseBody.indexOf('{&quot;error&quot;: &quot;just a temporary error&quot;}') &gt; -1) {&#10;      // Internal server errors could be temporary (this sends the last response to the error output port)&#10;        return &quot;RETRY&quot;;&#10;     }&#10;     else {&#10;       // Otherwise abort the HTTP connector run (this sends the last response to the error output port)&#10;         return &quot;FATAL_ERROR&quot;;&#10;     }&#10;}&#10;&#10;&#10;function map[string, string] modifyRequestParamsBeforeRetryAttempt(map[string, string] failedRequestParams, integer retryNumber,&#10;        integer responseStatus, map[string, string] responseHeaders, string responseBody) {&#10;&#10;    // Copy all the previous parameters into the retry request parameters map.&#10;    map[string, string] modifiedRequestParams = failedRequestParams;&#10;&#10;   &#10;    return modifiedRequestParams;&#10;}" enabled="enabled" guiName="get fips" guiX="463" guiY="230" id="GET_FIPS" requestMethod="GET" type="GENERIC_REST_CONNECTOR">
+<Node charset="UTF-8" ctlFunctionsSource="//#CTL2&#10;&#10;function map[string, string] generateRequestParameters(map[string, string] inputEdgeRecord, integer iterationNumber, integer lastResponseStatus, map[string, string]lastResponseHeaders, string lastResponseBody) {&#10;&#9;printLog(info, &quot;iterationNumber - - - &gt; &quot; + iterationNumber);&#10;    // Copy all input parameters into the request parameters map.&#10;    map[string, string] requestParams = inputEdgeRecord;&#10;&#10;    requestParams[&quot;latitude&quot;] = $in.0.latitude;&#10;    requestParams[&quot;longitude&quot;] = $in.0.longitude;&#10;    &#10;   &#10;    &#10;    return requestParams;&#10;}&#10;function integer transform() {&#10;&#9;&#10;&#9;printLog(info,'inside rest conector transform');&#10;&#9;&#10;&#9;&#10;&#9;$out.0.latitude = $in.0.latitude;&#10;&#9;$out.0.longitude = $in.0.longitude;&#10;&#9;return ALL;&#10;}&#10;function string checkResponse(integer responseStatus, map[string, string] responseHeaders, string responseBody) {&#10;&#9;&#10;&#9;printLog(info, &quot;responseBody - - - &gt; &quot; + responseBody);&#10;&#9; &#10;     if (responseStatus &gt;= 200  &amp;&amp;  responseStatus &lt; 300) {&#10;         return &quot;DONE_WITH_OUTPUT&quot;;&#10;     }&#10;     else if (responseStatus == 404) {&#10;     // HTTP status &quot;404 - NOT FOUND&quot; could mean there are no more pages or records&#10;         return &quot;DONE_NO_OUTPUT&quot;;&#10;    }&#10;     else if (responseStatus &gt;= 500 || responseBody.indexOf('{&quot;error&quot;: &quot;just a temporary error&quot;}') &gt; -1) {&#10;      // Internal server errors could be temporary (this sends the last response to the error output port)&#10;        return &quot;RETRY&quot;;&#10;     }&#10;     else {&#10;       // Otherwise abort the HTTP connector run (this sends the last response to the error output port)&#10;         return &quot;FATAL_ERROR&quot;;&#10;     }&#10;}&#10;&#10;&#10;function map[string, string] modifyRequestParamsBeforeRetryAttempt(map[string, string] failedRequestParams, integer retryNumber,&#10;        integer responseStatus, map[string, string] responseHeaders, string responseBody) {&#10;&#10;    // Copy all the previous parameters into the retry request parameters map.&#10;    map[string, string] modifiedRequestParams = failedRequestParams;&#10;&#10;   &#10;    return modifiedRequestParams;&#10;}" enabled="enabled" guiName="get fips" guiX="488" guiY="230" id="GET_FIPS" requestMethod="GET" type="GENERIC_REST_CONNECTOR">
 <attr name="url"><![CDATA[http://data.fcc.gov/api/block/2010/find?format=json&showall=true&latitude=${latitude}&longitude=${longitude}]]></attr>
 </Node>
 <Node charset="UTF-8" enabled="enabled" fileURL="port:$0.response:discrete" guiName="Parse" guiX="785" guiY="230" id="PARSE" type="JSON_READER">
@@ -450,19 +509,16 @@ $in.0.latitude != ""]]></attr>
 	]]></attr>
 </Node>
 <Edge fromNode="APPEND_DATA:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata9" outPort="Port 0 (out)" toNode="PARSE:0"/>
-<Edge fromNode="DEDUP:0" guiBendpoints="" guiRouter="Manhattan" id="Edge12" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (unique)" toNode="GET_FIPS:0"/>
-<Edge fromNode="EXT_FILTER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge10" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (accepted)" toNode="EXT_SORT:0"/>
-<Edge fromNode="EXT_SORT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge11" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="DEDUP:0"/>
 <Edge fromNode="GET_FIPS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="APPEND_DATA:0"/>
 <Edge fromNode="PARSE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata5" outPort="Port 0 (out)" toNode="CSV_WRITER1:0"/>
 </Phase>
-<Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="871" guiY="358" id="DROP_TABLE2" type="DB_EXECUTE">
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="DROP TABLE" guiX="875" guiY="342" id="DROP_TABLE2" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS LKP_FIPS_COORDINATES_TMP;]]></attr>
 </Node>
 </Phase>
-<Phase number="9">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE FIPS" guiX="785" guiY="545" id="CREATE_FIPS" type="DB_EXECUTE">
+<Phase number="10">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="CREATE FIPS" guiX="785" guiY="545" id="CREATE_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS LKP_FIPS_COORDINATES (
 	BLOCK_FIPS VARCHAR(255),
 	COUNTY_FIPS VARCHAR(255),
@@ -474,7 +530,7 @@ $in.0.latitude != ""]]></attr>
 	LONGITUDE VARCHAR(255)
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE FIPS TMP" guiX="785" guiY="445" id="CREATE_FIPS_TMP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="CREATE FIPS TMP" guiX="785" guiY="445" id="CREATE_FIPS_TMP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS LKP_FIPS_COORDINATES_TMP (
 	BLOCK_FIPS VARCHAR(255),
 	COUNTY_FIPS VARCHAR(255),
@@ -487,8 +543,8 @@ $in.0.latitude != ""]]></attr>
 );]]></attr>
 </Node>
 </Phase>
-<Phase number="10">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE FIPS_TMP" guiX="946" guiY="445" id="POPULATE_FIPS_TMP" type="DB_EXECUTE">
+<Phase number="11">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="POPULATE FIPS_TMP" guiX="946" guiY="445" id="POPULATE_FIPS_TMP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY LKP_FIPS_COORDINATES_TMP (
 	BLOCK_FIPS,
 	COUNTY_FIPS,
@@ -504,8 +560,8 @@ EXCEPTIONS '${DATA_TMP_DIR}/fipslookuperror.txt'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
-<Phase number="11">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="UPDATE FIPS" guiX="956" guiY="545" id="UPDATE_FIPS" type="DB_EXECUTE">
+<Phase number="12">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="UPDATE FIPS" guiX="956" guiY="545" id="UPDATE_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO LKP_FIPS_COORDINATES SELECT
 	BLOCK_FIPS,
 	COUNTY_FIPS,
