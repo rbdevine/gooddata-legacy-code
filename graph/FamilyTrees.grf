@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 19:44:27 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.151" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 01 19:55:22 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.152" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="FamilyTrees_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -305,7 +305,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/SplunkFamilyTree.xls" guiName="SpreadsheetDataReader" guiX="71" guiY="118" id="SPREADSHEET_DATA_READER" skipSourceRecords="1" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="71" guiY="118" id="SPREADSHEET_DATA_READER" skipSourceRecords="1" type="SPREADSHEET_READER"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write Industry File" guiX="459" guiY="118" id="WRITE_INDUSTRY_FILE" type="DATA_WRITER"/>
 <Edge fromNode="APPEND_DATA:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata9" outPort="Port 0 (out)" toNode="PARSE:0"/>
 <Edge fromNode="GET_FIPS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="APPEND_DATA:0"/>
