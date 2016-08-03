@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 02 15:24:16 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.232" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Minimum_Wage" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field delimiter="|" format="" label="State" name="State" type="string"/>
+<Field format="" label="2006" name="_2006" type="string"/>
+<Field format="" label="2007" name="_2007" type="string"/>
+<Field format="" label="2008" name="_2008" type="string"/>
+<Field format="" label="2009" name="_2009" type="string"/>
+<Field format="" label="2010" name="_2010" type="string"/>
+<Field format="" label=" 2011" name="_2011" type="string"/>
+<Field format="" label="2012" name="_2012" type="string"/>
+<Field format="" label="2013" name="_2013" type="string"/>
+<Field format="" label="2014" name="_2014" type="string"/>
+<Field format="" label="2015" name="_2015" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/minWage/Minimum_WageData.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/minwageerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Minimum_WageData.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_MINIMUMWAGE"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/minwagewrite.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="135" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="135" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.State = $in.0.State;
+	$out.0._2006 = $in.0._2006;
+	$out.0._2007 = $in.0._2007;
+	$out.0._2008 = $in.0._2008;
+	$out.0._2009 = $in.0._2009;
+	$out.0._2010 = $in.0._2010;
+	$out.0._2011 = $in.0._2011;
+	$out.0._2012 = $in.0._2012;
+	$out.0._2013 = $in.0._2013;
+	$out.0._2014 = $in.0._2014;
+	$out.0._2015 = $in.0._2015;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="54" guiY="135" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="73" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+	State VARCHAR(255),
+	_2006 VARCHAR(255),
+	_2007 VARCHAR(255),
+	_2008 VARCHAR(255),
+	_2009 VARCHAR(255),
+	_2010 VARCHAR(255),
+	_2011 VARCHAR(255),
+	_2012 VARCHAR(255),
+	_2013 VARCHAR(255),
+	_2014 VARCHAR(255),
+	_2015 VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+	State,
+	_2006,
+	_2007,
+	_2008,
+	_2009,
+	_2010,
+	_2011,
+	_2012,
+	_2013,
+	_2014,
+	_2015
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="73" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>
