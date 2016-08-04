@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 04 14:21:59 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.238" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 04 16:32:12 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.239" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachment="${DATA_TMP_DIR}/LKP_Tickers.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="LKP_TICKERS_DB" name="LKP_TICKERS_DB" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
@@ -41,22 +41,11 @@
 // Transforms input record into output record.
 function integer transform() {
 	$out.0.AVENTION_TICKER = $in.0.AVENTION_TICKER;
-	
-	if ($in.0.AVENTION_NAME != null)
-	{
-		$out.0.AVENTION_NAME = replace($in.0.AVENTION_NAME,"[\\\\]",",");
-	}
+	$out.0.AVENTION_NAME = $in.0.AVENTION_NAME;
 	$out.0.DUNS_TICKER = $in.0.DUNS_TICKER;
-	if ($in.0.DUNS_NAME != null)
-	{
-		$out.0.DUNS_NAME = replace($in.0.DUNS_NAME,"[\\\\]",",");
-	}
+	$out.0.DUNS_NAME = $in.0.DUNS_NAME;
 	$out.0.GD_TICKER = $in.0.GD_TICKER;
-	
-	if($in.0.GD_NAME != null)
-	{
-		$out.0.GD_NAME = replace($in.0.GD_NAME,"[\\\\]",",");
-	}
+	$out.0.GD_NAME = $in.0.GD_NAME;
 
 	return ALL;
 }
