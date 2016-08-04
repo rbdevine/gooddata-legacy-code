@@ -1,17 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 03 20:50:05 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.233" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 04 00:56:12 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.287" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata2" previewAttachment="/Users/scalvillo/Desktop/statecountycity.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" label="STATE_COUNTY_CITY_DB" name="STATE_COUNTY_CITY_DB" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
+<Metadata id="Metadata0" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter=" " name="EXTRA_RECORDS" previewAttachmentCharset="UTF-8" recordDelimiter="\n" type="delimited">
+<Field name="EXTRA_RECORDS_TEXT" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachment="/Users/scalvillo/Desktop/statecountycity.csv" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="|" label="STATE_COUNTY_CITY_DB" name="STATE_COUNTY_CITY_DB" previewAttachmentCharset="UTF-8" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="1" type="delimited">
 <Field label="STATE_ABBREVIATION" name="STATE_ABBREVIATION" type="string"/>
 <Field label="STATE_FIPS" name="STATE_FIPS" type="string"/>
 <Field label="CITY_NAME" name="CITY_NAME" type="string"/>
 <Field label="CITY_FIPS" name="CITY_FIPS" type="string"/>
 <Field label="COUNTY_FIPS" name="COUNTY_FIPS" type="string"/>
 <Field eofAsDelimiter="false" label="COUNTY_NAME" name="COUNTY_NAME" type="string"/>
+<Field name="STATE_COUNTY_FIPS" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/statecountycity.csv" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," label="STATE_COUNTY_CITY_FILE" name="STATE_COUNTY_CITY_FILE" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
+<Record fieldDelimiter="," label="STATE_COUNTY_CITY_FILE" name="STATE_COUNTY_CITY_FILE" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
 <Field label="STATE_ABBREVIATION" name="STATE_ABBREVIATION" type="string"/>
 <Field label="STATE_FIPS" name="STATE_FIPS" type="string"/>
 <Field label="CITY_NAME" name="CITY_NAME" type="string"/>
@@ -24,7 +30,7 @@
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/opengeocode/statecountycity.csv"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/opengeocodeerror.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/statecountycity.csv"/>
-<Property id="GraphParameter3" name="TABLENAME" value="STG_CITY_FIPS"/>
+<Property id="GraphParameter3" name="TABLENAME" value="LKP_CITY_FIPS"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/opengeocodewrite.txt"/>
 <Dictionary/>
@@ -33,21 +39,70 @@
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
 <Node charset="UTF-8" enabled="enabled" fileURL="${READFILEPATH}" guiName="Read Records" guiX="73" guiY="129" id="READ_RECORDS" quoteCharacter="&quot;" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
 function integer transform() {
+	//port 0
 	$out.0.STATE_ABBREVIATION = $in.0.STATE_ABBREVIATION;
 	$out.0.STATE_FIPS = $in.0.STATE_FIPS;
 	$out.0.CITY_NAME = $in.0.CITY_NAME;
 	$out.0.CITY_FIPS = $in.0.CITY_FIPS;
-	$out.0.COUNTY_FIPS = $in.0.COUNTY_FIPS;
-	$out.0.COUNTY_NAME = $in.0.COUNTY_NAME;
+	if(indexOf($in.0.COUNTY_FIPS,",")>0)
+	{
+		$out.0.COUNTY_FIPS = left($in.0.COUNTY_FIPS,indexOf($in.0.COUNTY_FIPS,","));
+	}
+	else
+	{
+		$out.0.COUNTY_FIPS = $in.0.COUNTY_FIPS;
+	}
+	if(indexOf($in.0.COUNTY_NAME,",")>0)
+	{
+		$out.0.COUNTY_NAME = left($in.0.COUNTY_NAME,indexOf($in.0.COUNTY_NAME,","));
+	}
+	else
+	{
+		$out.0.COUNTY_NAME = $in.0.COUNTY_NAME;
+	}
+	//SGC: we will join our datasets using this lookup table on the combination 
+	//of 2 digit state FIPS code and 3 digit COUNTY_FIPS code
+	$out.0.STATE_COUNTY_FIPS = $out.0.STATE_FIPS + $out.0.COUNTY_FIPS;
+	
+	//port 1
+	//SGC: there is a possiblity of multiple county 3 digit FIPS codes in COUNTY_FIPS column and multiple
+	//corresponding county names in COUNTY_NAME column.  we need to run a split and write a string of extra records
+	string extraRecordsText="";
+	string recordText = "";
+	string delim = "|";
+	string lineBreak = "\n";
+	string[] countyFIPSArray = split($in.0.COUNTY_FIPS,"[,]");
+	if(length(countyFIPSArray) > 1)
+	{
+		string[] countyNameArray = split($in.0.COUNTY_NAME,"[,]");
+		for(integer iFIPS=1;iFIPS<(length(countyFIPSArray));iFIPS++)
+		{
+			recordText = 
+				$in.0.STATE_ABBREVIATION + delim +
+				$in.0.STATE_FIPS + delim  +
+				$in.0.CITY_NAME + delim + 
+				$in.0.CITY_FIPS + delim + 
+				trim(countyFIPSArray[iFIPS]) + delim +  
+				trim(countyNameArray[iFIPS]) + delim +  
+				$in.0.STATE_FIPS + trim(countyFIPSArray[iFIPS]);
 
-	return ALL;
+			//**to do** cycle through array elements to build one long string of bar delimited records
+			if(extraRecordsText != "")
+			{
+				extraRecordsText = extraRecordsText + lineBreak;
+			}
+		  	extraRecordsText = extraRecordsText + recordText;
+		}
+		$out.1.EXTRA_RECORDS_TEXT = extraRecordsText;
+		return ALL;
+	}
+	return OK;
 }
 
 // Called during component initialization.
@@ -69,44 +124,63 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write Main" guiX="474" guiY="129" id="WRITE_MAIN" quotedStrings="false" type="DATA_WRITER"/>
 <Edge fromNode="READ_RECORDS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_MAIN:0"/>
+<Edge fromNode="REFORMAT:1" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 1 (out)" toNode="WRITE_EXTRA:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="73" guiY="314" id="DROP_TABLE1" type="DB_EXECUTE">
+<Node append="true" enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write Extra" guiX="474" guiY="238" id="WRITE_EXTRA" type="DATA_WRITER"/>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="65" guiY="440" id="DROP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="314" id="CREATE_TABLE1" type="DB_EXECUTE">
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="272" guiY="440" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	STATE_ABBREVIATION VARCHAR (255),
 	STATE_FIPS VARCHAR (255),
 	CITY_NAME VARCHAR (255),
 	CITY_FIPS VARCHAR (255),
 	COUNTY_FIPS VARCHAR (255),
-	COUNTY_NAME VARCHAR (255)
+	COUNTY_NAME VARCHAR (255),
+	STATE_COUNTY_FIPS VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="314" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="465" guiY="440" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	STATE_ABBREVIATION,
 	STATE_FIPS,
 	CITY_NAME,
 	CITY_FIPS,
 	COUNTY_FIPS,
-	COUNTY_NAME
+	COUNTY_NAME,
+	STATE_COUNTY_FIPS
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
-ABORT ON ERROR;]]></attr>
+ABORT ON ERROR;
+
+DROP TABLE IF EXISTS OPEN_GEO_TEMP;
+
+SELECT  DISTINCT * INTO OPEN_GEO_TEMP FROM LKP_CITY_FIPS
+	;
+
+DELETE FROM LKP_CITY_FIPS;
+
+INSERT INTO LKP_CITY_FIPS SELECT * FROM OPEN_GEO_TEMP;
+        
+DROP TABLE OPEN_GEO_TEMP;
+]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="73" guiY="403" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="403" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="403" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Phase number="6">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="65" guiY="529" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="272" guiY="529" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="466" guiY="529" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
