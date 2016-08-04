@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 02 14:21:31 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.228" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 03 20:47:26 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.229" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/h1bcombined.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="h1b1_db" name="h1b1_db" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
@@ -134,56 +134,56 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-	case_number VARCHAR(255),
-	employment_start_date VARCHAR(255),
-	employment_end_date VARCHAR(255),
-	employer_name VARCHAR(255),
-	employer_country VARCHAR(255),
-	employer_province VARCHAR(255),
-	job_title VARCHAR(255),
-	soc_code VARCHAR(255),
-	soc_name VARCHAR(255),
-	naic_code VARCHAR(255),
-	total_workers VARCHAR(255),
-	full_time_position VARCHAR(255),
-	prevailing_wage VARCHAR(255),
-	pw_unit_of_pay VARCHAR(255),
-	pw_wage_level VARCHAR(255),
-	wage_rate_of_pay VARCHAR(255),
-	pw_wage_source_year VARCHAR(255),
-	pw_source_other VARCHAR(255),
-	worksite_city VARCHAR(255),
-	worksite_county VARCHAR(255),
-	worksite_state VARCHAR(255),
-	original_decision_date VARCHAR(255)
+	CASE_NUMBER VARCHAR(255),
+	EMPLOYMENT_START_DATE VARCHAR(255),
+	EMPLOYMENT_END_DATE VARCHAR(255),
+	EMPLOYER_NAME VARCHAR(255),
+	EMPLOYER_COUNTRY VARCHAR(255),
+	EMPLOYER_PROVINCE VARCHAR(255),
+	JOB_TITLE VARCHAR(255),
+	SOC_CODE VARCHAR(255),
+	SOC_NAME VARCHAR(255),
+	NAIC_CODE VARCHAR(255),
+	TOTAL_WORKERS VARCHAR(255),
+	FULL_TIME_POSITION VARCHAR(255),
+	PREVAILING_WAGE VARCHAR(255),
+	PW_UNIT_OF_PAY VARCHAR(255),
+	PW_WAGE_LEVEL VARCHAR(255),
+	WAGE_RATE_OF_PAY VARCHAR(255),
+	PW_WAGE_SOURCE_YEAR VARCHAR(255),
+	PW_SOURCE_OTHER VARCHAR(255),
+	WORKSITE_CITY VARCHAR(255),
+	WORKSITE_COUNTY VARCHAR(255),
+	WORKSITE_STATE VARCHAR(255),
+	ORIGINAL_DECISION_DATE VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	case_number,
-	employment_start_date,
-	employment_end_date,
-	employer_name,
-	employer_country,
-	employer_province,
-	job_title,
-	soc_code,
-	soc_name,
-	naic_code,
-	total_workers,
-	full_time_position,
-	prevailing_wage,
-	pw_unit_of_pay,
-	pw_wage_level,
-	wage_rate_of_pay,
-	pw_wage_source_year,
-	pw_source_other,
-	worksite_city,
-	worksite_county,
-	worksite_state,
-	original_decision_date 
+	CASE_NUMBER,
+	EMPLOYMENT_START_DATE,
+	EMPLOYMENT_END_DATE,
+	EMPLOYER_NAME,
+	EMPLOYER_COUNTRY,
+	EMPLOYER_PROVINCE,
+	JOB_TITLE,
+	SOC_CODE,
+	SOC_NAME,
+	NAIC_CODE,
+	TOTAL_WORKERS,
+	FULL_TIME_POSITION,
+	PREVAILING_WAGE,
+	PW_UNIT_OF_PAY,
+	PW_WAGE_LEVEL,
+	WAGE_RATE_OF_PAY,
+	PW_WAGE_SOURCE_YEAR,
+	PW_SOURCE_OTHER,
+	WORKSITE_CITY,
+	WORKSITE_COUNTY,
+	WORKSITE_STATE,
+	ORIGINAL_DECISION_DATE 
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
