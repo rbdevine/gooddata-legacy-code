@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri Aug 05 13:17:53 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.208" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri Aug 05 13:46:35 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.210" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Glassdoor_Salary_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -131,7 +131,7 @@ function integer transform() {
 		if(indexOf($in.0.metroName,",") > 0 )
 		{
 			cityName = upperCase(left($in.0.metroName,indexOf($in.0.metroName,",")));
-			stateAbbreviation = upperCase(trim(right($in.0.metroName,length($in.0.metroName)-indexOf($in.0.metroName,","))));
+			stateAbbreviation = upperCase(trim(right($in.0.metroName,length($in.0.metroName)-indexOf($in.0.metroName,",")-1)));
 		}
 		else
 		{
@@ -187,17 +187,22 @@ function integer transform() {
 		}
 		else if (cityName == "PUERTO RICO")
 		{
-			cityName = "SAN JUAN ZONA URBANA";
+			cityName = "SAN JUAN";
 			stateAbbreviation = "PR";
-		}
-		else if (cityName == "WEST HELENA")
-		{
-			cityName = "HELENA-WEST HELENA";
 		}
 		else if (cityName == "HAWAIIAN ISLANDS")
 		{
-			cityName = "EAST HONOLULU";
+			cityName = "HONOLULU";
 			stateAbbreviation  = "HI";
+		}
+		
+		if(stateAbbreviation == "WY-ID")
+		{
+			stateAbbreviation = "WY";	
+		}
+		else if(stateAbbreviation == "MONTANA")
+		{
+			stateAbbreviation = "MT";	
 		}
 		
 		$out.0.cityName = cityName;
