@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri Jul 29 15:12:48 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.183" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri Aug 05 03:29:33 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.201" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Glassdoor_Salary_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -28,6 +28,7 @@
 <Field label="totalSalary" name="unadjustedtotalSalary" type="string"/>
 <Field label="yearofSalary" name="yearofSalary" type="string"/>
 <Field label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
+<Field name="cityName" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
@@ -70,12 +71,12 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="0" skipSourceRows="1" trim="true" type="DATA_READER" verbose="false"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
-<Node enabled="enabled" guiName="Reformat" guiX="286" guiY="129" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -120,7 +121,82 @@ function integer transform() {
 	$out.0.unadjustedtotalSalary = $in.0.unadjustedtotalSalary;
 	$out.0.yearofSalary = $in.0.yearofSalary;
 	$out.0.yearsOfRelevantExpNumber = $in.0.yearsOfRelevantExpNumber;
-
+	if ($in.0.metroName != null)
+	{
+		string cityName = "";
+		
+		// get just city portion of metroname and set city field
+		if(indexOf($in.0.metroName,",") > 0 )
+		{
+			cityName = upperCase(left($in.0.metroName,indexOf($in.0.metroName,",")));
+		}
+		else
+		{
+			cityName = upperCase($in.0.metroName);
+		}
+		
+		// for matching purposes, get rid of dashes in most values
+		if (cityName != "WINSTON-SALEM") 
+		{
+			cityName = replace(cityName,"[-]"," ");
+		}
+		
+		// for matching purposes, normalize specific values
+		if (cityName == "NEW YORK CITY")
+		{
+			cityName = "NEW YORK";
+		}
+		else if (cityName == "DALLAS FORT WORTH")
+		{
+			cityName = "FORT WORTH";
+		}
+		else if (cityName == "HEBER CITY" && upperCase($in.0.stateName) == "UTAH")
+		{
+			cityName = "HEBER";
+		}
+		else if (cityName == "RALEIGH DURHAM")
+		{
+			cityName = "RALEIGH";
+		}
+		else if (cityName == "MIAMI FORT LAUDERDALE" && upperCase($in.0.stateName) == "FLORIDA")
+		{
+			cityName = "FORT LAUDERDALE";
+		}
+		else if (cityName == "MINNEAPOLIS ST. PAUL")
+		{
+			cityName = "MINNEAPOLIS";
+		}
+		else if (cityName == "YORK HANOVER")
+		{
+			cityName = "HANOVER";
+		}
+		else if (cityName == "CANON CITY")
+		{
+			cityName = "CAÑON CITY";
+		}
+		else if (cityName == "FORT POLK")
+		{
+			cityName = "FORT POLK NORTH";
+		}
+		else if (cityName == "MIDDLESBORO")
+		{
+			cityName = "MIDDLESBOROUGH";
+		}
+		else if (cityName == "PUERTO RICO")
+		{
+			cityName = "SAN JUAN ZONA URBANA";
+		}
+		else if (cityName == "WEST HELENA")
+		{
+			cityName = "HELENA-WEST HELENA";
+		}
+		else if (cityName == "HAWAIIAN ISLANDS")
+		{
+			cityName = "EAST HONOLULU";
+		}
+		
+		$out.0.cityName = cityName;
+	}
 	return ALL;
 }
 
@@ -179,7 +255,8 @@ function integer transform() {
 	UNADJUSTEDBASESALARY VARCHAR(255),
 	UNADJUSTEDTOTALSALARY VARCHAR(255),
 	YEAROFSALARY VARCHAR(255),
-	YEARSOFRELEVANTEXPNUMBER VARCHAR(255)
+	YEARSOFRELEVANTEXPNUMBER VARCHAR(255),
+	CITYNAME VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -211,7 +288,8 @@ function integer transform() {
 	UNADJUSTEDBASESALARY,
 	UNADJUSTEDTOTALSALARY,
 	YEAROFSALARY,
-	YEARSOFRELEVANTEXPNUMBER
+	YEARSOFRELEVANTEXPNUMBER,
+	CITYNAME
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
@@ -219,8 +297,8 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>

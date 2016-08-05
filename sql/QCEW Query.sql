@@ -21,6 +21,6 @@ SELECT "YEAR", (AREA_FIPS || '-' || OWN_CODE) AS CODE, AREA_TITLE, OWN_TITLE, IN
 FROM STG_QCEW WHERE "YEAR" = '2015'
 ORDER BY "YEAR", CODE, AREA_TITLE, OWN_TITLE, INDUSTRY_TITLE, AGGLVL_TITLE
 
-select company, duns_number, address, city, "state", longitude, latitude, zip from stg_dunstemplate
+SELECT * 
 
-select * from STG_AVENTION
+SELECT CLOSE_ALL_SESSIONS();
