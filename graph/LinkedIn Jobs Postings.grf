@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Sat Aug 06 06:04:20 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.214" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/linkdln_job_postings.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" label="LINKEDIN_JOB_POSTINGS_READ" name="LINKEDIN_JOB_POSTINGS_READ" previewAttachment="/Users/scalvillo/Desktop/linkdln_job_postings.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
+<Field name="COMPANYTICKER" type="string"/>
+<Field name="LINKEDINCOMPANYNAME" type="string"/>
+<Field name="LINKEDINCOMPANYID" type="string"/>
+<Field name="JOBLOCATION" type="string"/>
+<Field name="JOBPOSTINGDATE" type="date"/>
+<Field name="JOBTITLE" type="string"/>
+<Field eofAsDelimiter="false" name="JOBURL" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" label="LINKEDIN_JOB_POSTINGS_READ" name="LINKEDIN_JOB_POSTINGS_WRITE" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
+<Field name="COMPANYTICKER" type="string"/>
+<Field name="LINKEDINCOMPANYNAME" type="string"/>
+<Field name="LINKEDINCOMPANYID" type="string"/>
+<Field name="JOBLOCATION" type="string"/>
+<Field name="JOBPOSTINGDATE" type="date"/>
+<Field name="JOBTITLE" type="string"/>
+<Field eofAsDelimiter="false" name="JOBURL" type="string"/>
+<Field name="JOBCITY" type="string"/>
+<Field name="JOBSTATEABBREV" type="string"/>
+<Field name="JOBSTATENAME" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/linkedin/salarydata/linkdln_job_postings.csv"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/linkedinjobpostingerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/linkdln_job_postings.csv"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_LINKEDINJOBPOSTINGS"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/linkedinjobpostingwrite.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="1" type="DATA_READER"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.COMPANYTICKER = $in.0.COMPANYTICKER;
+	$out.0.LINKEDINCOMPANYNAME = $in.0.LINKEDINCOMPANYNAME;
+	$out.0.LINKEDINCOMPANYID = $in.0.LINKEDINCOMPANYID;
+	$out.0.JOBLOCATION = $in.0.JOBLOCATION;
+	$out.0.JOBPOSTINGDATE = $in.0.JOBPOSTINGDATE;
+	$out.0.JOBTITLE = $in.0.JOBTITLE;
+	$out.0.JOBURL = $in.0.JOBURL;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+	COMPANYTICKER VARCHAR(255),
+	LINKEDINCOMPANYNAME VARCHAR(255),
+	LINKEDINCOMPANYID VARCHAR(255),
+	JOBLOCATION VARCHAR(255),
+	JOBPOSTINGDATE DATE,
+	JOBTITLE VARCHAR(255),
+	JOBURL VARCHAR(255),
+	JOBCITY VARCHAR(255),
+	JOBSTATEABBREV VARCHAR(255),
+	JOBSTATENAME VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+	COMPANYTICKER,
+	LINKEDINCOMPANYNAME,
+	LINKEDINCOMPANYID,
+	JOBLOCATION,
+	JOBPOSTINGDATE,
+	JOBTITLE,
+	JOBURL,
+	JOBCITY,
+	JOBSTATEABBREV,
+	JOBSTATENAME
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="disabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>
