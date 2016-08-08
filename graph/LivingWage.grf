@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 26 10:24:54 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.179" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 08 18:57:10 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.185" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata8" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Living_Wage_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -17,6 +17,8 @@
 <Field format="excel:&quot;$&quot;#,##0.00_);[Red]\(&quot;$&quot;#,##0.00\)" label="_2a2w2c" name="_2a2w2c" type="string"/>
 <Field format="excel:&quot;$&quot;#,##0.00_);[Red]\(&quot;$&quot;#,##0.00\)" label="_2a2w3c" name="_2a2w3c" type="string"/>
 <Field label="url" name="url" type="string"/>
+<Field name="justcountyname" type="string"/>
+<Field name="juststatename" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata9" previewAttachmentCharset="ISO-8859-1">
@@ -48,7 +50,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="73" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
@@ -73,7 +75,17 @@ function integer transform() {
 	$out.0._2a2w2c = $in.0._2a2w2c;
 	$out.0._2a2w3c = $in.0._2a2w3c;
 	$out.0.url = $in.0.url;
-
+	$out.0.juststatename = upperCase($in.0.state);
+	string county = upperCase($in.0.county_metro);
+	// if we have city state in the county field
+	if (indexOf(county,",") > 1)
+	{
+		$out.0.justcountyname = left(county,indexOf(county,",")) + " COUNTY";
+	}
+	else
+	{
+		$out.0.justcountyname = county;
+	}
 	return ALL;
 }
 
@@ -121,7 +133,9 @@ function integer transform() {
 	_2A2W1C VARCHAR(255),
 	_2A2W2C VARCHAR(255),
 	_2A2W3C VARCHAR(255),
-	URL VARCHAR(255)
+	URL VARCHAR(255),
+	JUSTCOUNTYNAME VARCHAR(255),
+	JUSTSTATENAME VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -142,7 +156,9 @@ function integer transform() {
 	_2A2W1C,
 	_2A2W2C,
 	_2A2W3C,
-	URL
+	URL,
+	JUSTCOUNTYNAME,
+	JUSTSTATENAME
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
@@ -150,7 +166,7 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
