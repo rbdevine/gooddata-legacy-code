@@ -1,0 +1,1204 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="samarth" created="Mon Aug 01 18:11:24 IST 2016" guiVersion="3.4.4.P" id="1470069244680" licenseType="Commercial" modified="Mon Aug 01 22:38:32 IST 2016" modifiedBy="samarth" name="stg_qcew_summary_sql" revision="1.17" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="stg-qcew-summary" password="fA7ErkPjKeD3PrYS" type="JDBC" user="ps-etl+justcapital@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="annual-avg-estabs-count" guiX="-35" guiY="11" id="ANNUAL_AVG_ESTABS_COUNT" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    qcew.AREA_FIPS, qcew.INDUSTRY_CODE,
+    (qcew.AREA_FIPS || '-' || qcew.INDUSTRY_CODE) AS CODE,
+    MAX(estabs2006.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2006,
+    MAX(estabs2007.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2007,
+    MAX(estabs2008.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2008,
+    MAX(estabs2009.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2009,
+    MAX(estabs2010.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2010,
+    MAX(estabs2011.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2011,
+    MAX(estabs2012.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2012,
+    MAX(estabs2013.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2013,
+    MAX(estabs2014.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2014,
+    MAX(estabs2015.ESTABS) AS ANNUAL_AVG_ESTABS_COUNT2015
+INTO
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_annual_avg_estabs_count"
+FROM
+    STG_QCEW qcew
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2006'
+    ) estabs2006
+        ON qcew.YEAR = estabs2006.YEAR
+            AND qcew.AREA_FIPS = estabs2006.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2006.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2007'
+    ) estabs2007
+        ON qcew.YEAR = estabs2007.YEAR
+            AND qcew.AREA_FIPS = estabs2007.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2007.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2008'
+    ) estabs2008
+        ON qcew.YEAR = estabs2008.YEAR
+            AND qcew.AREA_FIPS = estabs2008.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2008.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2009'
+    ) estabs2009
+        ON qcew.YEAR = estabs2009.YEAR
+            AND qcew.AREA_FIPS = estabs2009.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2009.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2010'
+    ) estabs2010
+        ON qcew.YEAR = estabs2010.YEAR
+            AND qcew.AREA_FIPS = estabs2010.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2010.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2011'
+    ) estabs2011
+        ON qcew.YEAR = estabs2011.YEAR
+            AND qcew.AREA_FIPS = estabs2011.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2011.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2012'
+    ) estabs2012
+        ON qcew.YEAR = estabs2012.YEAR
+            AND qcew.AREA_FIPS = estabs2012.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2012.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2013'
+    ) estabs2013
+        ON qcew.YEAR = estabs2013.YEAR
+            AND qcew.AREA_FIPS = estabs2013.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2013.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2014'
+    ) estabs2014
+        ON qcew.YEAR = estabs2014.YEAR
+            AND qcew.AREA_FIPS = estabs2014.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2014.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_ESTABS_COUNT AS INT) AS ESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2015'
+    ) estabs2015
+        ON qcew.YEAR = estabs2015.YEAR
+            AND qcew.AREA_FIPS = estabs2015.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = estabs2015.INDUSTRY_CODE
+GROUP BY qcew.AREA_FIPS, qcew.INDUSTRY_CODE, CODE
+ORDER BY CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="total-annual-wages" guiX="185" guiY="11" id="TOTAL_ANNUAL_WAGES" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    qcew.AREA_FIPS, qcew.INDUSTRY_CODE,
+    (qcew.AREA_FIPS || '-' || qcew.INDUSTRY_CODE) AS CODE,
+    MAX(wages2006.WAGES) AS TOTAL_ANNUAL_WAGES2006,
+    MAX(wages2007.WAGES) AS TOTAL_ANNUAL_WAGES2007,
+    MAX(wages2008.WAGES) AS TOTAL_ANNUAL_WAGES2008,
+    MAX(wages2009.WAGES) AS TOTAL_ANNUAL_WAGES2009,
+    MAX(wages2010.WAGES) AS TOTAL_ANNUAL_WAGES2010,
+    MAX(wages2011.WAGES) AS TOTAL_ANNUAL_WAGES2011,
+    MAX(wages2012.WAGES) AS TOTAL_ANNUAL_WAGES2012,
+    MAX(wages2013.WAGES) AS TOTAL_ANNUAL_WAGES2013,
+    MAX(wages2014.WAGES) AS TOTAL_ANNUAL_WAGES2014,
+    MAX(wages2015.WAGES) AS TOTAL_ANNUAL_WAGES2015
+INTO
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_total_annual_wages"
+FROM
+    STG_QCEW qcew
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2006'
+    ) wages2006
+        ON qcew.YEAR = wages2006.YEAR
+            AND qcew.AREA_FIPS = wages2006.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2006.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2007'
+    ) wages2007
+        ON qcew.YEAR = wages2007.YEAR
+            AND qcew.AREA_FIPS = wages2007.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2007.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2008'
+    ) wages2008
+        ON qcew.YEAR = wages2008.YEAR
+            AND qcew.AREA_FIPS = wages2008.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2008.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2009'
+    ) wages2009
+        ON qcew.YEAR = wages2009.YEAR
+            AND qcew.AREA_FIPS = wages2009.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2009.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2010'
+    ) wages2010
+        ON qcew.YEAR = wages2010.YEAR
+            AND qcew.AREA_FIPS = wages2010.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2010.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2011'
+    ) wages2011
+        ON qcew.YEAR = wages2011.YEAR
+            AND qcew.AREA_FIPS = wages2011.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2011.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2012'
+    ) wages2012
+        ON qcew.YEAR = wages2012.YEAR
+            AND qcew.AREA_FIPS = wages2012.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2012.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2013'
+    ) wages2013
+        ON qcew.YEAR = wages2013.YEAR
+            AND qcew.AREA_FIPS = wages2013.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2013.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2014'
+    ) wages2014
+        ON qcew.YEAR = wages2014.YEAR
+            AND qcew.AREA_FIPS = wages2014.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2014.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.TOTAL_ANNUAL_WAGES AS INT) AS WAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2015'
+    ) wages2015
+        ON qcew.YEAR = wages2015.YEAR
+            AND qcew.AREA_FIPS = wages2015.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = wages2015.INDUSTRY_CODE
+GROUP BY qcew.AREA_FIPS, qcew.INDUSTRY_CODE, CODE
+ORDER BY CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="annual-avg-emplvl" guiX="379" guiY="11" id="ANNUAL_AVG_EMPLVL" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    qcew.AREA_FIPS, qcew.INDUSTRY_CODE,
+    (qcew.AREA_FIPS || '-' || qcew.INDUSTRY_CODE) AS CODE,
+    MAX(emplvl2006.EMPLVL) AS ANNUAL_AVG_EMPLVL2006,
+    MAX(emplvl2007.EMPLVL) AS ANNUAL_AVG_EMPLVL2007,
+    MAX(emplvl2008.EMPLVL) AS ANNUAL_AVG_EMPLVL2008,
+    MAX(emplvl2009.EMPLVL) AS ANNUAL_AVG_EMPLVL2009,
+    MAX(emplvl2010.EMPLVL) AS ANNUAL_AVG_EMPLVL2010,
+    MAX(emplvl2011.EMPLVL) AS ANNUAL_AVG_EMPLVL2011,
+    MAX(emplvl2012.EMPLVL) AS ANNUAL_AVG_EMPLVL2012,
+    MAX(emplvl2013.EMPLVL) AS ANNUAL_AVG_EMPLVL2013,
+    MAX(emplvl2014.EMPLVL) AS ANNUAL_AVG_EMPLVL2014,
+    MAX(emplvl2015.EMPLVL) AS ANNUAL_AVG_EMPLVL2015
+INTO
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_annual_avg_emplvl"
+FROM
+    STG_QCEW qcew
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2006'
+    ) emplvl2006
+        ON qcew.YEAR = emplvl2006.YEAR
+            AND qcew.AREA_FIPS = emplvl2006.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2006.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2007'
+    ) emplvl2007
+        ON qcew.YEAR = emplvl2007.YEAR
+            AND qcew.AREA_FIPS = emplvl2007.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2007.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2008'
+    ) emplvl2008
+        ON qcew.YEAR = emplvl2008.YEAR
+            AND qcew.AREA_FIPS = emplvl2008.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2008.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2009'
+    ) emplvl2009
+        ON qcew.YEAR = emplvl2009.YEAR
+            AND qcew.AREA_FIPS = emplvl2009.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2009.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2010'
+    ) emplvl2010
+        ON qcew.YEAR = emplvl2010.YEAR
+            AND qcew.AREA_FIPS = emplvl2010.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2010.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2011'
+    ) emplvl2011
+        ON qcew.YEAR = emplvl2011.YEAR
+            AND qcew.AREA_FIPS = emplvl2011.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2011.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2012'
+    ) emplvl2012
+        ON qcew.YEAR = emplvl2012.YEAR
+            AND qcew.AREA_FIPS = emplvl2012.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2012.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2013'
+    ) emplvl2013
+        ON qcew.YEAR = emplvl2013.YEAR
+            AND qcew.AREA_FIPS = emplvl2013.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2013.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2014'
+    ) emplvl2014
+        ON qcew.YEAR = emplvl2014.YEAR
+            AND qcew.AREA_FIPS = emplvl2014.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2014.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.ANNUAL_AVG_EMPLVL AS INT) AS EMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2015'
+    ) emplvl2015
+        ON qcew.YEAR = emplvl2015.YEAR
+            AND qcew.AREA_FIPS = emplvl2015.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = emplvl2015.INDUSTRY_CODE
+GROUP BY qcew.AREA_FIPS, qcew.INDUSTRY_CODE, CODE
+ORDER BY CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="oty-annual-avg-estabs-count-chg" guiX="564" guiY="11" id="OTY_ANNUAL_AVG_ESTABS_COUNT_CHG" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    qcew.AREA_FIPS, qcew.INDUSTRY_CODE,
+    (qcew.AREA_FIPS || '-' || qcew.INDUSTRY_CODE) AS CODE,
+    MAX(oestabs2006.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2006,
+    MAX(oestabs2007.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2007,
+    MAX(oestabs2008.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2008,
+    MAX(oestabs2009.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2009,
+    MAX(oestabs2010.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2010,
+    MAX(oestabs2011.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2011,
+    MAX(oestabs2012.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2012,
+    MAX(oestabs2013.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2013,
+    MAX(oestabs2014.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2014,
+    MAX(oestabs2015.OESTABS) AS OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2015
+INTO
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_estabs_count_chg"
+FROM
+    STG_QCEW qcew
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2006'
+    ) oestabs2006
+        ON qcew.YEAR = oestabs2006.YEAR
+            AND qcew.AREA_FIPS = oestabs2006.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2006.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2007'
+    ) oestabs2007
+        ON qcew.YEAR = oestabs2007.YEAR
+            AND qcew.AREA_FIPS = oestabs2007.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2007.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2008'
+    ) oestabs2008
+        ON qcew.YEAR = oestabs2008.YEAR
+            AND qcew.AREA_FIPS = oestabs2008.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2008.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2009'
+    ) oestabs2009
+        ON qcew.YEAR = oestabs2009.YEAR
+            AND qcew.AREA_FIPS = oestabs2009.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2009.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2010'
+    ) oestabs2010
+        ON qcew.YEAR = oestabs2010.YEAR
+            AND qcew.AREA_FIPS = oestabs2010.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2010.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2011'
+    ) oestabs2011
+        ON qcew.YEAR = oestabs2011.YEAR
+            AND qcew.AREA_FIPS = oestabs2011.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2011.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2012'
+    ) oestabs2012
+        ON qcew.YEAR = oestabs2012.YEAR
+            AND qcew.AREA_FIPS = oestabs2012.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2012.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2013'
+    ) oestabs2013
+        ON qcew.YEAR = oestabs2013.YEAR
+            AND qcew.AREA_FIPS = oestabs2013.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2013.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2014'
+    ) oestabs2014
+        ON qcew.YEAR = oestabs2014.YEAR
+            AND qcew.AREA_FIPS = oestabs2014.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2014.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG AS INT) AS OESTABS
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2015'
+    ) oestabs2015
+        ON qcew.YEAR = oestabs2015.YEAR
+            AND qcew.AREA_FIPS = oestabs2015.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oestabs2015.INDUSTRY_CODE
+GROUP BY qcew.AREA_FIPS, qcew.INDUSTRY_CODE, CODE
+ORDER BY CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="oty-annual-avg-emplvl-chg" guiX="-35" guiY="110" id="OTY_ANNUAL_AVG_EMPLVL_CHG" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    qcew.AREA_FIPS, qcew.INDUSTRY_CODE,
+    (qcew.AREA_FIPS || '-' || qcew.INDUSTRY_CODE) AS CODE,
+    MAX(oemplvl2006.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2006,
+    MAX(oemplvl2007.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2007,
+    MAX(oemplvl2008.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2008,
+    MAX(oemplvl2009.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2009,
+    MAX(oemplvl2010.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2010,
+    MAX(oemplvl2011.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2011,
+    MAX(oemplvl2012.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2012,
+    MAX(oemplvl2013.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2013,
+    MAX(oemplvl2014.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2014,
+    MAX(oemplvl2015.OEMPLVL) AS OTY_ANNUAL_AVG_EMPLVL_CHG2015
+INTO
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_emplvl_chg"
+FROM
+    STG_QCEW qcew
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2006'
+    ) oemplvl2006
+        ON qcew.YEAR = oemplvl2006.YEAR
+            AND qcew.AREA_FIPS = oemplvl2006.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2006.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2007'
+    ) oemplvl2007
+        ON qcew.YEAR = oemplvl2007.YEAR
+            AND qcew.AREA_FIPS = oemplvl2007.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2007.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2008'
+    ) oemplvl2008
+        ON qcew.YEAR = oemplvl2008.YEAR
+            AND qcew.AREA_FIPS = oemplvl2008.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2008.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2009'
+    ) oemplvl2009
+        ON qcew.YEAR = oemplvl2009.YEAR
+            AND qcew.AREA_FIPS = oemplvl2009.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2009.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2010'
+    ) oemplvl2010
+        ON qcew.YEAR = oemplvl2010.YEAR
+            AND qcew.AREA_FIPS = oemplvl2010.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2010.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2011'
+    ) oemplvl2011
+        ON qcew.YEAR = oemplvl2011.YEAR
+            AND qcew.AREA_FIPS = oemplvl2011.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2011.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2012'
+    ) oemplvl2012
+        ON qcew.YEAR = oemplvl2012.YEAR
+            AND qcew.AREA_FIPS = oemplvl2012.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2012.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2013'
+    ) oemplvl2013
+        ON qcew.YEAR = oemplvl2013.YEAR
+            AND qcew.AREA_FIPS = oemplvl2013.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2013.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2014'
+    ) oemplvl2014
+        ON qcew.YEAR = oemplvl2014.YEAR
+            AND qcew.AREA_FIPS = oemplvl2014.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2014.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_CHG AS INT) AS OEMPLVL
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2015'
+    ) oemplvl2015
+        ON qcew.YEAR = oemplvl2015.YEAR
+            AND qcew.AREA_FIPS = oemplvl2015.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvl2015.INDUSTRY_CODE
+GROUP BY qcew.AREA_FIPS, qcew.INDUSTRY_CODE, CODE
+ORDER BY CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="oty-annual-avg-emplvl-pct-chg" guiX="158" guiY="110" id="OTY_ANNUAL_AVG_EMPLVL_PCT_CHG" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    qcew.AREA_FIPS, qcew.INDUSTRY_CODE,
+    (qcew.AREA_FIPS || '-' || qcew.INDUSTRY_CODE) AS CODE,
+    MAX(oemplvlp2006.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2006,
+    MAX(oemplvlp2007.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2007,
+    MAX(oemplvlp2008.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2008,
+    MAX(oemplvlp2009.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2009,
+    MAX(oemplvlp2010.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2010,
+    MAX(oemplvlp2011.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2011,
+    MAX(oemplvlp2012.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2012,
+    MAX(oemplvlp2013.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2013,
+    MAX(oemplvlp2014.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2014,
+    MAX(oemplvlp2015.OEMPLVLP) AS OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2015
+INTO
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_emplvl_pct_chg"
+FROM
+    STG_QCEW qcew
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2006'
+    ) oemplvlp2006
+        ON qcew.YEAR = oemplvlp2006.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2006.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2006.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2007'
+    ) oemplvlp2007
+        ON qcew.YEAR = oemplvlp2007.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2007.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2007.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2008'
+    ) oemplvlp2008
+        ON qcew.YEAR = oemplvlp2008.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2008.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2008.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2009'
+    ) oemplvlp2009
+        ON qcew.YEAR = oemplvlp2009.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2009.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2009.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2010'
+    ) oemplvlp2010
+        ON qcew.YEAR = oemplvlp2010.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2010.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2010.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2011'
+    ) oemplvlp2011
+        ON qcew.YEAR = oemplvlp2011.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2011.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2011.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2012'
+    ) oemplvlp2012
+        ON qcew.YEAR = oemplvlp2012.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2012.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2012.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2013'
+    ) oemplvlp2013
+        ON qcew.YEAR = oemplvlp2013.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2013.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2013.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2014'
+    ) oemplvlp2014
+        ON qcew.YEAR = oemplvlp2014.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2014.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2014.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG AS NUMERIC(15, 4)) AS OEMPLVLP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2015'
+    ) oemplvlp2015
+        ON qcew.YEAR = oemplvlp2015.YEAR
+            AND qcew.AREA_FIPS = oemplvlp2015.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = oemplvlp2015.INDUSTRY_CODE
+GROUP BY qcew.AREA_FIPS, qcew.INDUSTRY_CODE, CODE
+ORDER BY CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="oty-total-annual-wages-chg" guiX="372" guiY="110" id="OTY_TOTAL_ANNUAL_WAGES_CHG" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    qcew.AREA_FIPS, qcew.INDUSTRY_CODE,
+    (qcew.AREA_FIPS || '-' || qcew.INDUSTRY_CODE) AS CODE,
+    MAX(owages2006.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2006,
+    MAX(owages2007.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2007,
+    MAX(owages2008.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2008,
+    MAX(owages2009.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2009,
+    MAX(owages2010.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2010,
+    MAX(owages2011.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2011,
+    MAX(owages2012.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2012,
+    MAX(owages2013.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2013,
+    MAX(owages2014.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2014,
+    MAX(owages2015.OWAGES) AS OTY_TOTAL_ANNUAL_WAGES_CHG2015
+INTO
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_total_annual_wages_chg"
+FROM
+    STG_QCEW qcew
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2006'
+    ) owages2006
+        ON qcew.YEAR = owages2006.YEAR
+            AND qcew.AREA_FIPS = owages2006.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2006.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2007'
+    ) owages2007
+        ON qcew.YEAR = owages2007.YEAR
+            AND qcew.AREA_FIPS = owages2007.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2007.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2008'
+    ) owages2008
+        ON qcew.YEAR = owages2008.YEAR
+            AND qcew.AREA_FIPS = owages2008.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2008.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2009'
+    ) owages2009
+        ON qcew.YEAR = owages2009.YEAR
+            AND qcew.AREA_FIPS = owages2009.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2009.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2010'
+    ) owages2010
+        ON qcew.YEAR = owages2010.YEAR
+            AND qcew.AREA_FIPS = owages2010.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2010.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2011'
+    ) owages2011
+        ON qcew.YEAR = owages2011.YEAR
+            AND qcew.AREA_FIPS = owages2011.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2011.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2012'
+    ) owages2012
+        ON qcew.YEAR = owages2012.YEAR
+            AND qcew.AREA_FIPS = owages2012.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2012.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2013'
+    ) owages2013
+        ON qcew.YEAR = owages2013.YEAR
+            AND qcew.AREA_FIPS = owages2013.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2013.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2014'
+    ) owages2014
+        ON qcew.YEAR = owages2014.YEAR
+            AND qcew.AREA_FIPS = owages2014.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2014.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_CHG AS INT) AS OWAGES
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2015'
+    ) owages2015
+        ON qcew.YEAR = owages2015.YEAR
+            AND qcew.AREA_FIPS = owages2015.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owages2015.INDUSTRY_CODE
+GROUP BY qcew.AREA_FIPS, qcew.INDUSTRY_CODE, CODE
+ORDER BY CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="oty-total-annual-wages-pct-chg" guiX="573" guiY="110" id="OTY_TOTAL_ANNUAL_WAGES_PCT_CHG" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    qcew.AREA_FIPS, qcew.INDUSTRY_CODE,
+    (qcew.AREA_FIPS || '-' || qcew.INDUSTRY_CODE) AS CODE,
+    MAX(owagesp2006.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2006,
+    MAX(owagesp2007.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2007,
+    MAX(owagesp2008.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2008,
+    MAX(owagesp2009.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2009,
+    MAX(owagesp2010.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2010,
+    MAX(owagesp2011.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2011,
+    MAX(owagesp2012.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2012,
+    MAX(owagesp2013.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2013,
+    MAX(owagesp2014.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2014,
+    MAX(owagesp2015.OWAGESP) AS OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2015
+INTO
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_total_annual_wages_pct_chg"
+FROM
+    STG_QCEW qcew
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2006'
+    ) owagesp2006
+        ON qcew.YEAR = owagesp2006.YEAR
+            AND qcew.AREA_FIPS = owagesp2006.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2006.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2007'
+    ) owagesp2007
+        ON qcew.YEAR = owagesp2007.YEAR
+            AND qcew.AREA_FIPS = owagesp2007.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2007.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2008'
+    ) owagesp2008
+        ON qcew.YEAR = owagesp2008.YEAR
+            AND qcew.AREA_FIPS = owagesp2008.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2008.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2009'
+    ) owagesp2009
+        ON qcew.YEAR = owagesp2009.YEAR
+            AND qcew.AREA_FIPS = owagesp2009.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2009.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2010'
+    ) owagesp2010
+        ON qcew.YEAR = owagesp2010.YEAR
+            AND qcew.AREA_FIPS = owagesp2010.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2010.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2011'
+    ) owagesp2011
+        ON qcew.YEAR = owagesp2011.YEAR
+            AND qcew.AREA_FIPS = owagesp2011.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2011.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2012'
+    ) owagesp2012
+        ON qcew.YEAR = owagesp2012.YEAR
+            AND qcew.AREA_FIPS = owagesp2012.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2012.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2013'
+    ) owagesp2013
+        ON qcew.YEAR = owagesp2013.YEAR
+            AND qcew.AREA_FIPS = owagesp2013.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2013.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2014'
+    ) owagesp2014
+        ON qcew.YEAR = owagesp2014.YEAR
+            AND qcew.AREA_FIPS = owagesp2014.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2014.INDUSTRY_CODE
+    LEFT OUTER JOIN (
+        SELECT
+            substaging.AREA_FIPS, substaging.INDUSTRY_CODE,
+            substaging.YEAR,
+            CAST(substaging.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG AS NUMERIC(15, 4)) AS OWAGESP
+        FROM STG_QCEW substaging
+        WHERE substaging.YEAR = '2015'
+    ) owagesp2015
+        ON qcew.YEAR = owagesp2015.YEAR
+            AND qcew.AREA_FIPS = owagesp2015.AREA_FIPS
+            AND qcew.INDUSTRY_CODE = owagesp2015.INDUSTRY_CODE
+GROUP BY qcew.AREA_FIPS, qcew.INDUSTRY_CODE, CODE
+ORDER BY CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="drop-stg-qcew-summary" guiX="325" guiY="204" id="DROP_STG_QCEW_SUMMARY" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."STG_QCEW_SUMMARY";
+]]></attr>
+</Node>
+</Phase>
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="stg-qcew-summary" guiX="341" guiY="301" id="STG_QCEW_SUMMARY" printStatements="true" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SELECT
+    ESTABS.AREA_FIPS,
+    ESTABS.INDUSTRY_CODE,
+    ESTABS.CODE,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2006,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2007,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2008,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2009,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2010,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2011,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2012,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2013,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2014,
+    ESTABS.ANNUAL_AVG_ESTABS_COUNT2015,
+    WAGES.TOTAL_ANNUAL_WAGES2006,
+    WAGES.TOTAL_ANNUAL_WAGES2007,
+    WAGES.TOTAL_ANNUAL_WAGES2008,
+    WAGES.TOTAL_ANNUAL_WAGES2009,
+    WAGES.TOTAL_ANNUAL_WAGES2010,
+    WAGES.TOTAL_ANNUAL_WAGES2011,
+    WAGES.TOTAL_ANNUAL_WAGES2012,
+    WAGES.TOTAL_ANNUAL_WAGES2013,
+    WAGES.TOTAL_ANNUAL_WAGES2014,
+    WAGES.TOTAL_ANNUAL_WAGES2015,
+    EMPLVL.ANNUAL_AVG_EMPLVL2006,
+    EMPLVL.ANNUAL_AVG_EMPLVL2007,
+    EMPLVL.ANNUAL_AVG_EMPLVL2008,
+    EMPLVL.ANNUAL_AVG_EMPLVL2009,
+    EMPLVL.ANNUAL_AVG_EMPLVL2010,
+    EMPLVL.ANNUAL_AVG_EMPLVL2011,
+    EMPLVL.ANNUAL_AVG_EMPLVL2012,
+    EMPLVL.ANNUAL_AVG_EMPLVL2013,
+    EMPLVL.ANNUAL_AVG_EMPLVL2014,
+    EMPLVL.ANNUAL_AVG_EMPLVL2015,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2006,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2007,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2008,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2009,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2010,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2011,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2012,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2013,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2014,
+    OESTABS.OTY_ANNUAL_AVG_ESTABS_COUNT_CHG2015,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2006,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2007,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2008,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2009,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2010,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2011,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2012,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2013,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2014,
+    OEMPLVL.OTY_ANNUAL_AVG_EMPLVL_CHG2015,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2006,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2007,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2008,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2009,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2010,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2011,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2012,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2013,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2014,
+    OEMPLVLP.OTY_ANNUAL_AVG_EMPLVL_PCT_CHG2015,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2006,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2007,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2008,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2009,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2010,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2011,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2012,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2013,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2014,
+    OWAGES.OTY_TOTAL_ANNUAL_WAGES_CHG2015,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2006,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2007,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2008,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2009,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2010,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2011,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2012,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2013,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2014,
+    OWAGESP.OTY_TOTAL_ANNUAL_WAGES_PCT_CHG2015
+INTO "d68eb234fff8f2750cbf7dd02b20fd0e"."STG_QCEW_SUMMARY"
+FROM
+    "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_annual_avg_estabs_count" ESTABS
+    INNER JOIN "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_total_annual_wages" WAGES
+        ON ESTABS.CODE = WAGES.CODE
+    INNER JOIN "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_annual_avg_emplvl" EMPLVL
+        ON ESTABS.CODE = EMPLVL.CODE
+    INNER JOIN "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_estabs_count_chg" OESTABS
+        ON ESTABS.CODE = OESTABS.CODE
+    INNER JOIN "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_emplvl_chg" OEMPLVL
+        ON ESTABS.CODE = OEMPLVL.CODE
+    INNER JOIN "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_emplvl_pct_chg" OEMPLVLP
+        ON ESTABS.CODE = OEMPLVLP.CODE
+    INNER JOIN "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_total_annual_wages_chg" OWAGES
+        ON ESTABS.CODE = OWAGES.CODE
+    INNER JOIN "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_total_annual_wages_pct_chg" OWAGESP
+        ON ESTABS.CODE = OWAGESP.CODE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="10">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="drop-temporary-tables" guiX="330" guiY="400" id="DROP_TEMPORARY_TABLES" printStatements="true" sqlStatementDelimiter=";" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_annual_avg_estabs_count";
+DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_total_annual_wages";
+DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_annual_avg_emplvl";
+DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_estabs_count_chg";
+DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_emplvl_chg";
+DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_annual_avg_emplvl_pct_chg";
+DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_total_annual_wages_chg";
+DROP TABLE "d68eb234fff8f2750cbf7dd02b20fd0e"."temp_oty_total_annual_wages_pct_chg";
+]]></attr>
+</Node>
+</Phase>
+</Graph>
