@@ -1,36 +1,43 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Jul 28 17:27:39 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.169" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 08 18:21:04 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.177" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="WARN_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="Company_Name" type="string"/>
-<Field name="Date_effective" type="string"/>
-<Field name="County" type="string"/>
-<Field name="State" type="string"/>
-<Field name="Number_Affected" type="string"/>
-<Field name="URL" type="string"/>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Warn_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field format="" label="Company Name" name="Company_Name" type="string"/>
+<Field format="" label="Location" name="Location" type="string"/>
+<Field format="" label="State" name="State" type="string"/>
+<Field format="" label="# Affected" name="Affected" type="string"/>
+<Field format="" label="Date" name="Date" type="string"/>
+<Field format="" label="URL" name="URL" type="string"/>
+<Field format="" label="Ticker" name="Ticker" type="string"/>
+<Field name="JUST_County" type="string"/>
+<Field name="JUST_State_Abbrev" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="WARN_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="Company_Name" type="string"/>
-<Field name="Date_effective" type="string"/>
-<Field name="County" type="string"/>
-<Field name="State" type="string"/>
-<Field name="Number_Affected" type="string"/>
-<Field name="URL" type="string"/>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Warn_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="Company Name" name="Company_Name" type="string"/>
+<Field label="Location" name="Location" type="string"/>
+<Field label="State" name="State" type="string"/>
+<Field label="# Affected" name="Affected" type="string"/>
+<Field label="Date" name="Date" type="string"/>
+<Field label="URL" name="URL" type="string"/>
+<Field label="Ticker" name="Ticker" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/warns/warn.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/warnerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/warn.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_WARN"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/warn.txt"/>
+<Note alignment="1" backgroundColorB="225" backgroundColorG="255" backgroundColorR="255" enabled="true" folded="false" height="167" id="Note0" textColorB="0" textColorG="0" textColorR="0" textFontSize="12" title="New note" titleColorB="0" titleColorG="0" titleColorR="0" titleFontSize="14" width="376" x="662" y="143">
+<attr name="text"><![CDATA[warn file was sent to us with a lot of line breaks in company names - need to avoid that from happening again for clean upload]]></attr>
+</Note>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
@@ -40,12 +47,22 @@
 // Transforms input record into output record.
 function integer transform() {
 	$out.0.Company_Name = $in.0.Company_Name;
-	$out.0.Date_effective = $in.0.Date_effective;
-	$out.0.County = $in.0.County;
+	$out.0.Location = $in.0.Location;
 	$out.0.State = $in.0.State;
-	$out.0.Number_Affected = $in.0.Number_Affected;
+	$out.0.Affected = $in.0.Affected;
+	$out.0.Date = $in.0.Date;
 	$out.0.URL = $in.0.URL;
-
+	$out.0.Ticker = $in.0.Ticker;
+	if ($in.0.Location != null)
+	{
+		string county = upperCase($in.0.Location);
+		if(indexOf(county,"COUNTY") < 1)
+		{
+			county = county + " COUNTY";
+		}
+		$out.0.JUST_County = county;
+	}
+	$out.0.JUST_State_Abbrev = $in.0.State;
 	return ALL;
 }
 
@@ -69,8 +86,8 @@ function integer transform() {
 ]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="36" guiY="129" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
-<Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
@@ -81,11 +98,14 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	COMPANY_NAME VARCHAR(255),
-	DATE_EFFECTIVE VARCHAR(255),
-	COUNTY VARCHAR(255),
+	LOCATION VARCHAR(255),
 	STATE VARCHAR(255),
-	NUMBER_AFFECTED VARCHAR(255),
-	URL VARCHAR(255)
+	AFFECTED VARCHAR(255),
+	DATE VARCHAR(255),
+	URL VARCHAR(255),
+	TICKER VARCHAR(255),
+	JUST_COUNTY VARCHAR(255),
+	JUST_STATE_ABBREV VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -93,11 +113,14 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	COMPANY_NAME,
-	DATE_EFFECTIVE,
-	COUNTY,
+	LOCATION,
 	STATE,
-	NUMBER_AFFECTED,
-	URL
+	AFFECTED,
+	DATE,
+	URL,
+	TICKER,
+	JUST_COUNTY,
+	JUST_STATE_ABBREV
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
@@ -105,8 +128,8 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
