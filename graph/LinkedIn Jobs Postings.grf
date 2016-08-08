@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Sun Aug 07 13:53:57 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.239" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 08 11:02:44 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.265" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/linkdln_job_postings.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="LINKEDIN_JOB_POSTINGS_READ" name="LINKEDIN_JOB_POSTINGS_READ" previewAttachment="/Users/scalvillo/Desktop/linkdln_job_postings.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
@@ -20,9 +20,9 @@
 <Field name="JOBPOSTINGDATE" type="date"/>
 <Field name="JOBTITLE" type="string"/>
 <Field eofAsDelimiter="false" name="JOBURL" type="string"/>
-<Field name="JOBCITY" type="string"/>
-<Field name="JOBSTATEABBREV" type="string"/>
-<Field name="JOBSTATENAME" type="string"/>
+<Field name="JUSTCITY" type="string"/>
+<Field name="JUSTSTATEABBREV" type="string"/>
+<Field name="JUSTSTATENAME" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -59,10 +59,23 @@ function integer transform() {
 		string stateAbbrev = "";
 		string stateName = "";
 		string [] locationArray = null;
-		if (indexOf($in.0.JOBLOCATION,",") > 0)
+		
+		string location = upperCase($in.0.JOBLOCATION);
+		string companyName = upperCase($in.0.LINKEDINCOMPANYNAME);
+		
+		// special handling for Cognizant
+		if (indexOf(location,",") > 0 && companyName != "COGNIZANT TECHNOLOGY SOLUTIONS")
 		{
-			locationArray = split($in.0.JOBLOCATION,",");
+			locationArray = split(location,",");
 			cityName = upperCase(trim(locationArray[0]));
+			if (cityName == "NEW YORK CITY")
+			{
+				cityName = "NEW YORK";
+			}
+			else if (cityName == "O&#699;AHU" || cityName == "ISLAND OF HAWAI&LSQUO;I")
+			{
+				cityName = "HONOLULU";
+			}
 			if (length(locationArray) > 1)
 			{
 				// location format [CITY], [STATE ABBEV] and [CITY], [STATE NAME]
@@ -93,9 +106,9 @@ function integer transform() {
 				}
 			}
 		}
-		else if (indexOf($in.0.JOBLOCATION,"-") > 0)
+		else if (indexOf(location,"-") > 0)
 		{
-			locationArray = split($in.0.JOBLOCATION,"-");
+			locationArray = split(location,"-");
 			if (length(locationArray) == 2)
 			{
 				//[STATE-ABBREV]-[CITY]
@@ -109,6 +122,7 @@ function integer transform() {
 					//US-[STATE-ABBREV]-[CITY]
 					cityName = upperCase(trim(locationArray[2]));
 					stateAbbrev = upperCase(trim(locationArray[1]));
+			
 				}
 				else
 				{
@@ -119,110 +133,459 @@ function integer transform() {
 			}
 			else if(length(locationArray) == 4)
 			{
-				//SF-Corporate-California-US
-				cityName = upperCase(trim(locationArray[0]));
-				if (cityName == "SF")
+				
+				if(companyName != "COGNIZANT TECHNOLOGY SOLUTIONS")
 				{
-					cityName = "SAN FRANCISCO";	
+					//SF-Corporate-California-US
+					cityName = upperCase(trim(locationArray[0]));
+					if (cityName == "SF")
+					{
+						cityName = "SAN FRANCISCO";	
+					}
+					stateName = upperCase(trim(locationArray[2]));
 				}
-				stateName = upperCase(trim(locationArray[2]));
+				else
+				{
+					// special handling for Cognizant
+					cityName = upperCase(trim(locationArray[2]));
+					string [] stateAbbrevArray  = split(locationArray[3],",");
+					stateAbbrev = left(trim(stateAbbrevArray[0]),2);
+				}
 			}
-			
 		}
-		if (upperCase($in.0.JOBLOCATION) == "ARLINGTON")
+		else if (location == "ALBANY")
+		{
+			cityName = "ALBANY";
+			stateAbbrev = "NY";
+		}
+		else if (location == "ALPHARETTA")
+		{
+			cityName = "ALPHARETTA";
+			stateAbbrev = "GA";
+		}
+		else if (companyName == "AETNA" && location == "AMHERST")
+		{
+			cityName = "AMHERST";
+			stateAbbrev = "NY";
+		}
+		else if (location == "ARLINGTON")
 		{
 			cityName = "ARLINGTON";
 			stateAbbrev = "VA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "GREATER ATLANTA AREA")
+		else if (location == "ATLANTA")
 		{
 			cityName = "ATLANTA";
 			stateAbbrev = "GA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "GREATER CHICAGO AREA")
+		else if (location == "BATON ROUGE")
+		{
+			cityName = "BATON ROUGE";
+			stateAbbrev = "LA";
+		}
+		else if (companyName == "AETNA" && location == "BEACHWOOD")
+		{
+			cityName = "BEACHWOOD";
+			stateAbbrev = "OH";
+		}
+		else if (location == "BOSTON")
+		{
+			cityName = "BOSTON";
+			stateAbbrev = "MA";
+		}
+		else if (location == "BLUE BELL")
+		{
+			cityName = "BLUE BELL";
+			stateAbbrev = "PA";
+		}
+		else if (location == "CHANTILLY VIRGINIA")
+		{
+			cityName = "CHANTILLY";
+			stateAbbrev = "VA";
+		}
+		else if (location == "CHARLESTON")
+		{
+			cityName = "CHARLESTON";
+			stateAbbrev = "SC";
+		}
+		else if (location == "CHARLOTTESVILLE")
+		{
+			cityName = "CHARLOTTESVILLE";
+			stateAbbrev = "VA";
+		}
+		else if (location == "CHICAGO")
 		{
 			cityName = "CHICAGO";
 			stateAbbrev = "IL";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "GREATER DENVER AREA")
+		else if (location == "COLORADO SPRINGS COLORADO")
+		{
+			cityName = "COLORADO SPRINGS";
+			stateAbbrev = "CO";
+		}
+		else if (location == "COLUMBIA")
+		{
+			cityName = "COLUMBIA";
+			stateAbbrev = "SC";
+		}
+		else if (location == "COSTA MESA")
+		{
+			cityName = "COSTA MESA";
+			stateAbbrev = "CA";
+		}
+		else if (location == "DALLAS")
+		{
+			cityName = "DALLAS";
+			stateAbbrev = "TX";
+		}
+		else if (location == "DALLAS/FORT WORTH AREA")
+		{
+			cityName = "DALLAS";
+			stateAbbrev = "TX";
+		}
+		else if (location == "DC")
+		{
+			cityName = "WASHINGTON";
+			stateAbbrev = "DC";
+		}
+		else if (location == "DETROIT")
+		{
+			cityName = "DETROIT";
+			stateAbbrev = "MI";
+		}
+		else if (location == "DOWNERS GROVE")
+		{
+			cityName = "DOWNERS GROVE";
+			stateAbbrev = "IL";
+		}
+		else if (location == "FORT GREELY ALASKA")
+		{
+			cityName = "FORT GREELY";
+			stateAbbrev = "AK";
+		}
+		else if (location == "FORT WALTON BEACH FLORIDA")
+		{
+			cityName = "FORT WALTON BEACH";
+			stateAbbrev = "FL";
+		}
+		else if (companyName == "AETNA" && location == "FRANKLIN")
+		{
+			cityName = "FRANKLIN";
+			stateAbbrev = "TN";
+		}
+		else if (location == "GREATER ATLANTA AREA")
+		{
+			cityName = "ATLANTA";
+			stateAbbrev = "GA";
+		}
+		else if (location == "GREATER BOSTON AREA")
+		{
+			cityName = "BOSTON";
+			stateAbbrev = "MA";
+		}
+		else if (location == "GREATER CHICAGO AREA")
+		{
+			cityName = "CHICAGO";
+			stateAbbrev = "IL";
+		}
+		else if (location == "GREATER DENVER AREA")
 		{
 			cityName = "DENVER";
 			stateAbbrev = "CO";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "GREATER LOS ANGELES AREA")
+		else if (location == "GREATER DETROIT AREA")
+		{
+			cityName = "DETROIT";
+			stateAbbrev = "MI";
+		}
+		else if (location == "GREATER LOS ANGELES AREA")
 		{
 			cityName = "LOS ANGELES";
 			stateAbbrev = "CA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "GREATER NEW YORK CITY AREA")
+		else if (location == "GREATER MEMPHIS AREA")
+		{
+			cityName = "MEMPHIS";
+			stateAbbrev = "TN";
+		}
+		else if (location == "GREATER MILWAUKEE AREA")
+		{
+			cityName = "MILWAUKEE";
+			stateAbbrev = "WI";
+		}
+		else if (location == "GREATER NEW YORK CITY AREA")
 		{
 			cityName = "NEW YORK";
 			stateAbbrev = "NY";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "GREATER PHILADELPHIA AREA")
+		else if (location == "GREATER OMAHA AREA")
+		{
+			cityName = "OMAHA";
+			stateAbbrev = "NE";
+		}
+		else if (location == "GREATER PHILADELPHIA AREA")
 		{
 			cityName = "PHILADELPHIA";
 			stateAbbrev = "PA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "GREATER SAN DIEGO AREA")
+		else if (location == "GREATER PITTSBURGH AREA")
+		{
+			cityName = "PITTSBURGH";
+			stateAbbrev = "PA";
+		}
+		else if (location == "GREATER SAN DIEGO AREA")
 		{
 			cityName = "SAN DIEGO";
 			stateAbbrev = "CA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "GREATER SEATTLE AREA")
+		else if (location == "GREATER SALT LAKE CITY AREA")
 		{
-			cityName = "SAN DIEGO";
-			stateAbbrev = "CA";
+			cityName = "SALT LAKE CITY";
+			stateAbbrev = "UT";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "HUNT VALLEY")
+		else if (location == "GREATER ST. LOUIS AREA")
+		{
+			cityName = "ST. LOUIS";
+			stateAbbrev = "MO";
+		}
+		else if (location == "GREATER SEATTLE AREA")
+		{
+			cityName = "SEATTLE";
+			stateAbbrev = "WA";
+		}
+		else if (location == "HARTFORD")
+		{
+			cityName = "HARTFORD";
+			stateAbbrev = "CT";
+		}
+		else if (location == "HUNT VALLEY")
 		{
 			cityName = "HUNT VALLEY";
 			stateAbbrev = "MD";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "MIAMI/FORT LAUDERDALE AREA")
+		else if (location == "HUNTINGTON BEACH CALIFORNIA")
+		{
+			cityName = "HUNTINGTON BEACH";
+			stateAbbrev = "CA";
+		}
+		else if (location == "HUNTSVILLE ALABAMA")
+		{
+			cityName = "HUNTSVILLE";
+			stateAbbrev = "AL";
+		}
+		else if (location == "JACKSON")
+		{
+			cityName = "JACKSON";
+			stateAbbrev = "MS";
+		}
+		else if (location == "KALAMAZOO")
+		{
+			cityName = "KALAMAZOO";
+			stateAbbrev = "MI";
+		}
+		else if (location == "KENNER")
+		{
+			cityName = "KENNER";
+			stateAbbrev = "LA";
+		}
+		else if (location == "LOS ANGELES")
+		{
+			cityName = "LOS ANGELES";
+			stateAbbrev = "CA";
+		}
+		else if (location == "MCLEAN")
+		{
+			cityName = "MCLEAN";
+			stateAbbrev = "VA";
+		}
+		else if (location == "MIAMI/FORT LAUDERDALE AREA")
 		{
 			cityName = "MIAMI";
 			stateAbbrev = "FL";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "MORRISVILLE")
+		else if (location == ("MIDTOWN/MANHATTAN  NY") || 
+			location == "MIDTOWN MANHATTAN")
+		{
+			cityName = "NEW YORK";
+			stateAbbrev = "NY";
+		}
+		else if (location == "MOON TOWNSHIP")
+		{
+			cityName = "PITTSBURGH";
+			stateAbbrev = "PA";
+		}
+		else if (location == "MORRISVILLE")
 		{
 			cityName = "RALEIGH";
 			stateAbbrev = "NC";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "NORFOLK")
+		else if (location == "NEW ALBANY")
+		{
+			cityName = "NEW ALBANY";
+			stateAbbrev = "PA";
+		}
+		else if (location == "NEW ORLEANS")
+		{
+			cityName = "NEW ORLEANS";
+			stateAbbrev = "LA";
+		}
+		else if (location == "NEW YORK")
+		{
+			cityName = "NEW YORK";
+			stateAbbrev = "NY";
+		}
+		else if (location == "NEW YORK CITY")
+		{
+			cityName = "NEW YORK";
+			stateAbbrev = "NY";
+		}
+		else if (location == "NORTH CHARLESTON SOUTH CAROLINA")
+		{
+			cityName = "NORTH CHARLESTON";
+			stateAbbrev = "SC";
+		}
+		else if (location == "NORFOLK")
 		{
 			cityName = "NORFOLK";
 			stateAbbrev = "VA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "OAKLAND")
+		else if (location == "OAKLAND")
 		{
 			cityName = "OAKLAND";
 			stateAbbrev = "CA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "PISCATAWAY")
+		else if (location == "OKLAHOMA CITY OKLAHOMA")
+		{
+			cityName = "OKLAHOMA CITY";
+			stateAbbrev = "OK";
+		}
+		else if (location == "OVERLAND PARK")
+		{
+			cityName = "OVERLAND PARK";
+			stateAbbrev = "KS";
+		}
+		else if (location == "PHOENIX")
+		{
+			cityName = "PHOENIX";
+			stateAbbrev = "AZ";
+		}
+		else if (location == "PISCATAWAY")
 		{
 			cityName = "PISCATAWAY";
 			stateAbbrev = "NJ";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "SAN FRANCISCO")
+		else if (location == "PITTSBURGH")
+		{
+			cityName = "PITTSBURGH";
+			stateAbbrev = "PA";
+		}
+		else if (companyName == "AETNA" && location == "PLYMOUTH")
+		{
+			cityName = "PLYMOUTH";
+			stateAbbrev = "MN";
+		}
+		else if (location == "PORTLAND")
+		{
+			cityName = "PORTLAND";
+			stateAbbrev = "OR";
+		}
+		else if (location == "RICHFIELD")
+		{
+			cityName = "RICHFIELD";
+			stateAbbrev = "OH";
+		}
+		else if (location == "RICHMOND")
+		{
+			cityName = "RICHMOND";
+			stateAbbrev = "VA";
+		}
+		else if (location == "RIDLEY PARK PENNSYLVANIA")
+		{
+			cityName = "RIDLEY PARK";
+			stateAbbrev = "PA";
+		}
+		else if (location == "SALT LAKE CITY")
+		{
+			cityName = "SALT LAKE CITY";
+			stateAbbrev = "UT";
+		}
+		else if (location == "SAN FRANCISCO" ||
+			location == "SAN FRANCISCO BAY AREA" ||
+			location == "SAN FRANCISCO (MISSION BAY)")
 		{
 			cityName = "SAN FRANCISCO";
 			stateAbbrev = "CA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "SAN FRANCISCO BAY AREA")
+		else if (companyName == "CADENCE DESIGN SYSTEMS" && location == "SAN JOSE")
 		{
-			cityName = "SAN FRANCISCO";
+			cityName = "SAN JOSE";
 			stateAbbrev = "CA";
 		}
-		else if (upperCase($in.0.JOBLOCATION) == "WASHINGTON D.C. METRO AREA")
+		else if (companyName == "AETNA" && location == "SANDY")
+		{
+			cityName = "SANDY";
+			stateAbbrev = "UT";
+		}
+		else if (location == "SANTA CLARA")
+		{
+			cityName = "SANTA CLARA";
+			stateAbbrev = "CA";
+		}
+		else if (location == "SCARSDALE")
+		{
+			cityName = "SCARSDALE";
+			stateAbbrev = "NY";
+		}
+		else if (location == "SEAL BEACH CALIFORNIA")
+		{
+			cityName = "SEAL BEACH";
+			stateAbbrev = "CA";
+		}
+		else if (location == "SEATTLE")
+		{
+			cityName = "SEATTLE";
+			stateAbbrev = "WA";
+		}
+		else if (location == "SITKA")
+		{
+			cityName = "SITKA";
+			stateAbbrev = "AK";
+		}
+		else if (location == "SOUTHFIELD")
+		{
+			cityName = "SOUTHFIELD";
+			stateAbbrev = "MI";
+		}
+		else if (location == "ST LOUIS" || 
+			location == "ST. LOUIS MISSOURI")
+		{
+			cityName = "ST LOUIS";
+			stateAbbrev = "MO";
+		}
+		else if (location == "SUGAR LAND")
+		{
+			cityName = "SUGAR LAND";
+			stateAbbrev = "TX";
+		}
+		else if (companyName == "AETNA" && location == "SUNRISE")
+		{
+			cityName = "SUNRISE";
+			stateAbbrev = "FL";
+		}
+		else if (location == "TUCSON")
+		{
+			cityName = "TUCSON";
+			stateAbbrev = "AZ";
+		}
+		else if (location == "WASHINGTON D.C. METRO AREA")
 		{
 			cityName = "WASHINGTON";
 			stateAbbrev = "DC";
 		}
 		
-		$out.0.JOBCITY = cityName;
-		$out.0.JOBSTATEABBREV = stateAbbrev;
-		$out.0.JOBSTATENAME = stateName;
+		$out.0.JUSTCITY = cityName;
+		$out.0.JUSTSTATEABBREV = stateAbbrev;
+		$out.0.JUSTSTATENAME = stateName;
 	}
 	$out.0.JOBPOSTINGDATE = str2date($in.0.JOBPOSTINGDATE,"MMM d, yyyy");
 	if ($in.0.JOBTITLE != null)
@@ -271,9 +634,9 @@ function integer transform() {
 	JOBPOSTINGDATE DATE,
 	JOBTITLE VARCHAR(255),
 	JOBURL VARCHAR(255),
-	JOBCITY VARCHAR(255),
-	JOBSTATEABBREV VARCHAR(255),
-	JOBSTATENAME VARCHAR(255)
+	JUSTCITY VARCHAR(255),
+	JUSTSTATEABBREV VARCHAR(255),
+	JUSTSTATENAME VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -287,9 +650,9 @@ function integer transform() {
 	JOBPOSTINGDATE,
 	JOBTITLE,
 	JOBURL,
-	JOBCITY,
-	JOBSTATEABBREV,
-	JOBSTATENAME
+	JUSTCITY,
+	JUSTSTATEABBREV,
+	JUSTSTATENAME
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
