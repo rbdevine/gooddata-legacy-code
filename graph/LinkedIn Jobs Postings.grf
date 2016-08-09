@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 08 11:02:44 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.265" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 08 20:20:52 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.266" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/linkdln_job_postings.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="LINKEDIN_JOB_POSTINGS_READ" name="LINKEDIN_JOB_POSTINGS_READ" previewAttachment="/Users/scalvillo/Desktop/linkdln_job_postings.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="true" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
@@ -177,6 +177,11 @@ function integer transform() {
 		{
 			cityName = "ATLANTA";
 			stateAbbrev = "GA";
+		}
+		else if (location == "BALTIMORE")
+		{
+			cityName = "BALTIMORE";
+			stateAbbrev = "MD";
 		}
 		else if (location == "BATON ROUGE")
 		{
@@ -516,7 +521,7 @@ function integer transform() {
 			cityName = "SAN FRANCISCO";
 			stateAbbrev = "CA";
 		}
-		else if (companyName == "CADENCE DESIGN SYSTEMS" && location == "SAN JOSE")
+		else if (location == "SAN JOSE")
 		{
 			cityName = "SAN JOSE";
 			stateAbbrev = "CA";
@@ -577,7 +582,7 @@ function integer transform() {
 			cityName = "TUCSON";
 			stateAbbrev = "AZ";
 		}
-		else if (location == "WASHINGTON D.C. METRO AREA")
+		else if (location == "WASHINGTON D.C. METRO AREA" || location == "WASHINGTON CD")
 		{
 			cityName = "WASHINGTON";
 			stateAbbrev = "DC";
