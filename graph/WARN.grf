@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 08 18:21:04 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.177" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 09 14:28:45 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.178" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Warn_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field format="" label="Company Name" name="Company_Name" type="string"/>
-<Field format="" label="Location" name="Location" type="string"/>
-<Field format="" label="State" name="State" type="string"/>
-<Field format="" label="# Affected" name="Affected" type="string"/>
-<Field format="" label="Date" name="Date" type="string"/>
-<Field format="" label="URL" name="URL" type="string"/>
-<Field format="" label="Ticker" name="Ticker" type="string"/>
+<Field label="Company Name" name="Company_Name" type="string"/>
+<Field label="Location" name="Location" type="string"/>
+<Field label="State" name="State" type="string"/>
+<Field label="# Affected" name="Affected" type="string"/>
+<Field label="Date" name="Date" type="string"/>
+<Field label="URL" name="URL" type="string"/>
+<Field label="Ticker" name="Ticker" type="string"/>
 <Field name="JUST_County" type="string"/>
 <Field name="JUST_State_Abbrev" type="string"/>
 </Record>
@@ -56,12 +56,106 @@ function integer transform() {
 	if ($in.0.Location != null)
 	{
 		string county = upperCase($in.0.Location);
-		if(indexOf(county,"COUNTY") < 1)
+		if (indexOf(county,",") > 0)
 		{
-			county = county + " COUNTY";
+			return SKIP;
 		}
-		$out.0.JUST_County = county;
-	}
+		else
+		{
+			if(county == "GWINNETT")
+			{
+				county == "GWINETT COUNTY";
+			}
+			else if(county == "Pikes Peak/Teller")
+			{
+				county == "Teller County";
+			}
+			else if(county == "Thorofare")
+			{
+				county == "Gloucester County";
+			}
+			else if(county == "Edinburg")
+			{
+				county == "Edinburgh";
+			}
+			else if(county == "Bellevue & Kirkland")
+			{
+				county == "King County";
+			}
+			else if(county == "Bellevue & Kirkland, WA")
+			{
+				county == "King County";
+			}
+			else if(county == "Southeast")
+			{
+				county == "Trinidad";
+			}
+			else if(county == "Malaga")
+			{
+				county == "Chelan County";
+			}
+			else if(county == "Oak Harbor, WA")
+			{
+				county == "Oak Harbor";
+			}
+			else if(county == "Fort Polk")
+			{
+				county == "Vernon Parish";
+			}
+			else if(county == "FAYETTE")
+			{
+				county == "Fayette County";
+			}
+			else if(county == "CHATHAM")
+			{
+				county == "Chatham County";
+			}
+			else if(county == "Silverdale, WA")
+			{
+				county == "Kitsap County";
+			}
+			else if(county == "City and County of San Francisco")
+			{
+				county == "San Francisco";
+			}
+			else if(county == "Sumner, WA")
+			{
+				county == "Sumner";
+			}
+			else if(county == "FULTON")
+			{
+				county == "Fulton County";
+			}
+			else if(county == "COWETA")
+			{
+				county == "Coweta County";
+			}
+			else if(county == "Ledgewood")
+			{
+				county == "Roxbury";
+			}
+			else if(county == "Sldiel")
+			{
+				county == "Slidell";
+			}
+			else if(county == "Parsippany")
+			{
+				county == "Parsippany-Troy Hills";
+			}
+			else if(county == "Whitehouse Station")
+			{
+				county == "Readington";
+			}
+			else if(county == "Basking Ridge")
+			{
+				county == "Bernards";
+			}
+			else if(county == "Rural Resort")
+			{
+				county == "Garfield County";
+			}
+		}	
+	
 	$out.0.JUST_State_Abbrev = $in.0.State;
 	return ALL;
 }
