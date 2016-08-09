@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 26 10:25:33 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.185" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Aug 08 11:30:42 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.186" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata9" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="OES_1_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -132,7 +132,7 @@
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/oescombined.txt"/>
 <Note alignment="1" backgroundColorB="225" backgroundColorG="255" backgroundColorR="255" enabled="true" folded="false" height="89" id="Note0" textColorB="0" textColorG="0" textColorR="0" textFontSize="12" title="Note" titleColorB="0" titleColorG="0" titleColorR="0" titleFontSize="14" width="313" x="697" y="138">
-<attr name="text"><![CDATA[Must modify header in first file in each year folder]]></attr>
+<attr name="text"><![CDATA[may have to modify headers in files - was not consistent which files had the message]]></attr>
 </Note>
 <Dictionary/>
 </Global>
