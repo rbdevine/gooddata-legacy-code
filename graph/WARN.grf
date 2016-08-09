@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 09 14:28:45 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.178" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 09 15:41:02 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.179" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Warn_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -37,7 +37,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
@@ -55,7 +55,7 @@ function integer transform() {
 	$out.0.Ticker = $in.0.Ticker;
 	if ($in.0.Location != null)
 	{
-		string county = upperCase($in.0.Location);
+		string county = upperCase(trim($in.0.Location));
 		if (indexOf(county,",") > 0)
 		{
 			return SKIP;
@@ -64,100 +64,102 @@ function integer transform() {
 		{
 			if(county == "GWINNETT")
 			{
-				county == "GWINETT COUNTY";
+				county = "GWINETT COUNTY";
 			}
 			else if(county == "Pikes Peak/Teller")
 			{
-				county == "Teller County";
+				county = "Teller County";
 			}
 			else if(county == "Thorofare")
 			{
-				county == "Gloucester County";
+				county = "Gloucester County";
 			}
 			else if(county == "Edinburg")
 			{
-				county == "Edinburgh";
+				county = "Edinburgh";
 			}
 			else if(county == "Bellevue & Kirkland")
 			{
-				county == "King County";
+				county = "King County";
 			}
 			else if(county == "Bellevue & Kirkland, WA")
 			{
-				county == "King County";
+				county = "King County";
 			}
 			else if(county == "Southeast")
 			{
-				county == "Trinidad";
+				county = "Trinidad";
 			}
 			else if(county == "Malaga")
 			{
-				county == "Chelan County";
+				county = "Chelan County";
 			}
 			else if(county == "Oak Harbor, WA")
 			{
-				county == "Oak Harbor";
+				county = "Oak Harbor";
 			}
 			else if(county == "Fort Polk")
 			{
-				county == "Vernon Parish";
+				county = "Vernon Parish";
 			}
 			else if(county == "FAYETTE")
 			{
-				county == "Fayette County";
+				county = "Fayette County";
 			}
 			else if(county == "CHATHAM")
 			{
-				county == "Chatham County";
+				county = "Chatham County";
 			}
 			else if(county == "Silverdale, WA")
 			{
-				county == "Kitsap County";
+				county = "Kitsap County";
 			}
 			else if(county == "City and County of San Francisco")
 			{
-				county == "San Francisco";
+				county = "San Francisco";
 			}
 			else if(county == "Sumner, WA")
 			{
-				county == "Sumner";
+				county = "Sumner";
 			}
 			else if(county == "FULTON")
 			{
-				county == "Fulton County";
+				county = "Fulton County";
 			}
 			else if(county == "COWETA")
 			{
-				county == "Coweta County";
+				county = "Coweta County";
 			}
 			else if(county == "Ledgewood")
 			{
-				county == "Roxbury";
+				county = "Roxbury";
 			}
 			else if(county == "Sldiel")
 			{
-				county == "Slidell";
+				county = "Slidell";
 			}
 			else if(county == "Parsippany")
 			{
-				county == "Parsippany-Troy Hills";
+				county = "Parsippany-Troy Hills";
 			}
 			else if(county == "Whitehouse Station")
 			{
-				county == "Readington";
+				county = "Readington";
 			}
 			else if(county == "Basking Ridge")
 			{
-				county == "Bernards";
+				county = "Bernards";
 			}
 			else if(county == "Rural Resort")
 			{
-				county == "Garfield County";
+				county = "Garfield County";
 			}
-		}	
+		}
+	}	
 	
-	$out.0.JUST_State_Abbrev = $in.0.State;
+	$out.0.JUST_State_Abbrev = upperCase(trim($in.0.State));
 	return ALL;
+	
 }
 
 // Called during component initialization.
