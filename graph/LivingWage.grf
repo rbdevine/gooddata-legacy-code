@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 26 10:24:54 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.179" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 09 00:08:56 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.191" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata8" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Living_Wage_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -17,6 +17,8 @@
 <Field format="excel:&quot;$&quot;#,##0.00_);[Red]\(&quot;$&quot;#,##0.00\)" label="_2a2w2c" name="_2a2w2c" type="string"/>
 <Field format="excel:&quot;$&quot;#,##0.00_);[Red]\(&quot;$&quot;#,##0.00\)" label="_2a2w3c" name="_2a2w3c" type="string"/>
 <Field label="url" name="url" type="string"/>
+<Field name="justcountyname" type="string"/>
+<Field name="juststatename" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata9" previewAttachmentCharset="ISO-8859-1">
@@ -73,8 +75,43 @@ function integer transform() {
 	$out.0._2a2w2c = $in.0._2a2w2c;
 	$out.0._2a2w3c = $in.0._2a2w3c;
 	$out.0.url = $in.0.url;
-
-	return ALL;
+	
+	string county = upperCase($in.0.county_metro);
+	string state = upperCase($in.0.state);
+	if(indexOf(county,",") > 0)
+	{
+		return SKIP;
+	}
+	else
+	{
+		if(county == "CLIFTON FORGE CITY")
+		{
+			county = "ALLEGHANY COUNTY";
+		}
+		else if(county == "COLUMBIA CITY")
+		{
+			county = "HOWARD COUNTY";
+		}
+		else if(county == "DONA ANA COUNTY")
+		{
+			county = "DOÑA ANA COUNTY";
+		}
+		else if(county == "HOWARD COUNTY (EX. COLUMBIA CITY)")
+		{
+			county = "HOWARD COUNTY";
+		}
+		else if(county == "LA SALLE COUNTY" && state == "ILLINOIS")
+		{
+			county = "LASALLE COUNTY";
+		}
+		else if(county == "SULLIVAN PART")
+		{
+			county = "SULLIVAN COUNTY";
+		}
+		$out.0.justcountyname = county;
+		$out.0.juststatename = state;
+		return ALL;
+	}
 }
 
 // Called during component initialization.
@@ -121,7 +158,9 @@ function integer transform() {
 	_2A2W1C VARCHAR(255),
 	_2A2W2C VARCHAR(255),
 	_2A2W3C VARCHAR(255),
-	URL VARCHAR(255)
+	URL VARCHAR(255),
+	JUSTCOUNTYNAME VARCHAR(255),
+	JUSTSTATENAME VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -142,7 +181,9 @@ function integer transform() {
 	_2A2W1C,
 	_2A2W2C,
 	_2A2W3C,
-	URL
+	URL,
+	JUSTCOUNTYNAME,
+	JUSTSTATENAME
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
