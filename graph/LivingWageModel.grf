@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Tue Jul 26 11:33:57 EDT 2016" guiVersion="3.4.4.P" id="1469548969446" licenseType="Commercial" modified="Wed Aug 03 17:04:05 EDT 2016" modifiedBy="scalvillo" name="LivingWageModel" revision="1.11" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Tue Jul 26 11:33:57 EDT 2016" guiVersion="3.4.4.P" id="1469548969446" licenseType="Commercial" modified="Tue Aug 09 15:44:07 EDT 2016" modifiedBy="mac" name="LivingWageModel" revision="1.12" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="LIVING_WAGE" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">

@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jul 26 14:44:28 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.199" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 09 14:56:53 EDT 2016" modifiedBy="mac" name="Complete County File" revision="1.202" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/gdcounties.txt" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="GoodDate_County_File" name="GoodData_County_DB" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
 <Field name="geo_id" type="string"/>
 <Field name="County" type="string"/>
 <Field eofAsDelimiter="false" name="State" type="string"/>
+<Field name="JUST_County" type="string"/>
+<Field name="JUST_State" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata0" previewAttachment="/Users/scalvillo/Desktop/gdcounties.txt" previewAttachmentCharset="ISO-8859-1">
@@ -24,7 +26,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="28" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="28" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node charset="UTF-8" enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="73" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="1" type="DATA_READER" verbose="true"/>
@@ -37,6 +39,15 @@ function integer transform() {
 	$out.0.geo_id = $in.0.geo_id;
 	$out.0.County = $in.0.County;
 	$out.0.State = $in.0.State;
+	
+	string county = upperCase($in.0.County);
+	if(indexOf(county,"COUNTY") < 1)
+	{
+		county = county + " COUNTY";	
+	}
+	$out.0.JUST_County=county;
+	$out.0.JUST_State = upperCase($in.0.State);
+	
 
 	return ALL;
 }
@@ -73,7 +84,12 @@ function integer transform() {
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	GEO_ID VARCHAR(255),
 	COUNTY VARCHAR(255),
-	STATE VARCHAR(255)
+	STATE VARCHAR(255),
+	JUSTCOUNTY VARCHAR(255),
+	JUSTSTATE VARCHAR(255)
+
+
+
 );]]></attr>
 </Node>
 </Phase>
@@ -82,7 +98,9 @@ function integer transform() {
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	GEO_ID,
 	COUNTY,
-	STATE
+	STATE,
+	JUSTCOUNTY,
+	JUSTSTATE
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
@@ -90,8 +108,8 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="73" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="73" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
