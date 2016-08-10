@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 10 15:44:43 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.236" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 10 16:48:01 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.241" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="H1BVisa_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -57,11 +57,9 @@ function integer transform() {
 	string COUNTY;
 	string STATE;
 	
-	if(indexOf($out.0.LOCATION,',')>0)	COUNTY=left($out.0.LOCATION,indexOf($out.0.LOCATION,','));
-	if(indexOf($out.0.LOCATION,', ')>0) STATE=right($out.0.LOCATION,indexOf($out.0.LOCATION,', '));
+	if(indexOf($out.0.LOCATION,',')>0)	COUNTY=trim(left($out.0.LOCATION,indexOf($out.0.LOCATION,',')));
+	if(indexOf($out.0.LOCATION,', ')>0) STATE=trim(right($out.0.LOCATION,length($out.0.LOCATION)-indexOf($out.0.LOCATION,',')-2));
 	
-	$out.0.COUNTY = COUNTY;
-	$out.0.STATE = STATE;
 
 	if (COUNTY != null)
 	{
@@ -73,6 +71,57 @@ function integer transform() {
 		{
 			COUNTY = "ENGLEWOOD";
 		}
+		if (COUNTY == "ARLINGTON ÊÊÊÊÊÊÊ")
+		{
+			COUNTY = "ARLINGTON";
+		}
+		if (COUNTY == "COLORADO SPRING")
+		{
+			COUNTY = "COLORADO SPRINGS";
+		}
+		if (COUNTY == "JAMAICA PLAIN")
+		{
+			COUNTY = "BOSTON";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+		if (COUNTY == "ENGELWOOD")
+		{
+			COUNTY = "ENGLEWOOD";
+		}
+	
+	$out.0.COUNTY = COUNTY;
+	$out.0.STATE = STATE;
 	}
 
 	return ALL;
@@ -97,7 +146,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="54" guiY="129" id="SPREADSHEET_DATA_READER" skipSourceRecords="1" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="SpreadsheetDataReader" guiX="54" guiY="129" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 <Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 </Phase>
@@ -144,6 +193,6 @@ ABORT ON ERROR;]]></attr>
 <Phase number="5">
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="73" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
