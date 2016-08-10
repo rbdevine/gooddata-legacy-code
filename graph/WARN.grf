@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 09 21:04:17 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.180" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 10 12:14:43 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.197" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Warn_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -54,117 +54,81 @@ function integer transform() {
 	$out.0.Date = $in.0.Date;
 	$out.0.URL = $in.0.URL;
 	$out.0.Ticker = $in.0.Ticker;
-	$out.0.JUST_City = upperCase(trim($in.0.Location));
-	$out.0.JUST_County = upperCase(trim($in.0.Location));
-	if ($in.0.Location != null)
+	
+	string county = upperCase(trim($in.0.Location));
+	if (county != null)
 	{
-		string county = upperCase(trim($in.0.Location));
-		if (indexOf(county,",") > 1)
+		//if (indexOf(county,"COUNTY") > 0)
+		//{
+			//county = replace(county,"[COUNTY]","");
+		//}
+		if (indexOf(county,"THOROFARE") > 0)
+		{
+			county = "GLOUCESTER";
+		}
 		if (indexOf(county,",") > 0)
 		{
-			return SKIP;
+			county = left(county,indexOf(county,","));
 		}
-		else
+		else if (indexOf(county,"PIKES PEAK/TELLER") > 0)
 		{
-			if(county == "GWINNETT")
-			{
-				county = "GWINETT COUNTY";
-			}
-			else if(county == "Pikes Peak/Teller")
-			{
-				county = "Teller County";
-			}
-			else if(county == "Thorofare")
-			{
-				county = "Gloucester County";
-			}
-			else if(county == "Edinburg")
-			{
-				county = "Edinburgh";
-			}
-			else if(county == "Bellevue & Kirkland")
-			{
-				county = "King County";
-			}
-			else if(county == "Bellevue & Kirkland, WA")
-			{
-				county = "King County";
-			}
-			else if(county == "Southeast")
-			{
-				county = "Trinidad";
-			}
-			else if(county == "Malaga")
-			{
-				county = "Chelan County";
-			}
-			else if(county == "Oak Harbor, WA")
-			{
-				county = "Oak Harbor";
-			}
-			else if(county == "Fort Polk")
-			{
-				county = "Vernon Parish";
-			}
-			else if(county == "FAYETTE")
-			{
-				county = "Fayette County";
-			}
-			else if(county == "CHATHAM")
-			{
-				county = "Chatham County";
-			}
-			else if(county == "Silverdale, WA")
-			{
-				county = "Kitsap County";
-			}
-			else if(county == "City and County of San Francisco")
-			{
-				county = "San Francisco";
-			}
-			else if(county == "Sumner, WA")
-			{
-				county = "Sumner";
-			}
-			else if(county == "FULTON")
-			{
-				county = "Fulton County";
-			}
-			else if(county == "COWETA")
-			{
-				county = "Coweta County";
-			}
-			else if(county == "Ledgewood")
-			{
-				county = "Roxbury";
-			}
-			else if(county == "Sldiel")
-			{
-				county = "Slidell";
-			}
-			else if(county == "Parsippany")
-			{
-				county = "Parsippany-Troy Hills";
-			}
-			else if(county == "Whitehouse Station")
-			{
-				county = "Readington";
-			}
-			else if(county == "Basking Ridge")
-			{
-				county = "Bernards";
-			}
-			else if(county == "Rural Resort")
-			{
-				county = "Garfield County";
-			}
+			county = replace(county,"[\\W|^)PIKES PEAK/TELLER(\\W|$]","TELLER");
 		}
-	}	
-	
+		else if (indexOf(county,"BELLEVUE & KIRKLAND") > 0)
+		{
+			county = replace(county,"[/(\\W|^)BELLEVUE & KIRKLAND(\\W|$)]","KING COUNTY");
+		}
+		else if (indexOf(county,"EDINBURG") > 0)
+		{
+			county = replace(county,"[/(\\W|^)EDINBURG(\\W|$)]","EDINBURGH");
+		}
+		else if (indexOf(county,"SOUTHEAST") > 0)
+		{
+			county = replace(county,"[/(\\W|^)SOUTHEAST(\\W|$)]","TRINIDAD");
+		}
+		else if (indexOf(county,"MALAGA") > 0)
+		{
+			county = replace(county,"[/(\\W|^)MALAGA(\\W|$)]","CHELAN");
+		}
+		else if (indexOf(county,"FORT POLK") > 0)
+		{
+			county = replace(county,"[/(\\W|^)FORT POLK(\\W|$)]","VERNON PARISH");
+		}
+		else if (indexOf(county,"CITY AND COUNTY OF SAN FRANCISCO") > 0)
+		{
+			county = replace(county,"[/(\\W|^)CITY AND COUNTY OF SAN FRANCISCO(\\W|$)]","SAN FRANCISCO");
+		}
+		else if (indexOf(county,"LEDGEWOOD") > 0)
+		{
+			county = replace(county,"[/(\\W|^)LEDGEWOOD(\\W|$)]","ROXBURY");
+		}
+		else if (indexOf(county,"SLDIEL") > 0)
+		{
+			county = replace(county,"[/(\\W|^)SLDIEL(\\W|$)]","SLIDELL");
+		}
+		else if (indexOf(county,"PARSIPPANY") > 0)
+		{
+			county = replace(county,"[/(\\W|^)PARSIPPANY(\\W|$)]","PARSIPPANY-TROY HILLS");
+		}
+		else if (indexOf(county,"WHITEHOUSE STATION") > 0)
+		{
+			county = replace(county,"[/(\\W|^)WHITEHOUSE STATION(\\W|$)]","READINGTON");
+		}
+		else if (indexOf(county,"BASKING RIDGE") > 0)
+		{
+			county = replace(county,"[[/(\\W|^)BASKING RIDGE(\\W|$)]]","BERNARDS");
+		}
+		else if (indexOf(county,"RURAL RESORT") > 0)
+		{
+			county = replace(county,"[[/(\\W|^)RURAL RESORT(\\W|$)]]","GARFIELD COUNTY");
+		}
+	}
+		
+	$out.0.JUST_County = county;
+	$out.0.JUST_City = upperCase(trim($in.0.Location));
 	$out.0.JUST_State_Abbrev = upperCase(trim($in.0.State));
 	return ALL;
-	
-}
+}		
 
 // Called during component initialization.
 // function boolean init() {}
@@ -232,6 +196,6 @@ ABORT ON ERROR;]]></attr>
 <Phase number="5">
 <Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
