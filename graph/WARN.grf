@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 10 12:14:43 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.197" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 10 14:37:40 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.205" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Warn_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -56,77 +56,133 @@ function integer transform() {
 	$out.0.Ticker = $in.0.Ticker;
 	
 	string county = upperCase(trim($in.0.Location));
+	string state = upperCase(trim($in.0.State));
 	if (county != null)
 	{
 		//if (indexOf(county,"COUNTY") > 0)
 		//{
 			//county = replace(county,"[COUNTY]","");
 		//}
-		if (indexOf(county,"THOROFARE") > 0)
-		{
-			county = "GLOUCESTER";
-		}
 		if (indexOf(county,",") > 0)
 		{
 			county = left(county,indexOf(county,","));
 		}
-		else if (indexOf(county,"PIKES PEAK/TELLER") > 0)
+		if (county == "THOROFARE")
 		{
-			county = replace(county,"[\\W|^)PIKES PEAK/TELLER(\\W|$]","TELLER");
+			county = "GLOUCESTER";
 		}
-		else if (indexOf(county,"BELLEVUE & KIRKLAND") > 0)
+		else if (county == "PIKES PEAK/TELLER")
 		{
-			county = replace(county,"[/(\\W|^)BELLEVUE & KIRKLAND(\\W|$)]","KING COUNTY");
+			county = "TELLER";
 		}
-		else if (indexOf(county,"EDINBURG") > 0)
+		else if (county == "BELLEVUE & KIRKLAND")
 		{
-			county = replace(county,"[/(\\W|^)EDINBURG(\\W|$)]","EDINBURGH");
+			county = "KING COUNTY";
 		}
-		else if (indexOf(county,"SOUTHEAST") > 0)
+		else if (county == "EDINBURG")
 		{
-			county = replace(county,"[/(\\W|^)SOUTHEAST(\\W|$)]","TRINIDAD");
+			county = "EDINBURGH";
 		}
-		else if (indexOf(county,"MALAGA") > 0)
+		else if (county == "SOUTHEAST")
 		{
-			county = replace(county,"[/(\\W|^)MALAGA(\\W|$)]","CHELAN");
+			county = "TRINIDAD";
 		}
-		else if (indexOf(county,"FORT POLK") > 0)
+		else if (county == "MALAGA")
 		{
-			county = replace(county,"[/(\\W|^)FORT POLK(\\W|$)]","VERNON PARISH");
+			county = "CHELAN";
 		}
-		else if (indexOf(county,"CITY AND COUNTY OF SAN FRANCISCO") > 0)
+		else if (county == "FORT POLK")
 		{
-			county = replace(county,"[/(\\W|^)CITY AND COUNTY OF SAN FRANCISCO(\\W|$)]","SAN FRANCISCO");
+			county = "VERNON PARISH";
 		}
-		else if (indexOf(county,"LEDGEWOOD") > 0)
+		else if (county == "CITY AND COUNTY OF SAN FRANCISCO")
 		{
-			county = replace(county,"[/(\\W|^)LEDGEWOOD(\\W|$)]","ROXBURY");
+			county = "SAN FRANCISCO";
 		}
-		else if (indexOf(county,"SLDIEL") > 0)
+		else if (county == "LEDGEWOOD")
 		{
-			county = replace(county,"[/(\\W|^)SLDIEL(\\W|$)]","SLIDELL");
+			county = "ROXBURY";
 		}
-		else if (indexOf(county,"PARSIPPANY") > 0)
+		else if (county == "SLDIEL")
 		{
-			county = replace(county,"[/(\\W|^)PARSIPPANY(\\W|$)]","PARSIPPANY-TROY HILLS");
+			county = "SLIDELL";
 		}
-		else if (indexOf(county,"WHITEHOUSE STATION") > 0)
+		else if (county == "PARSIPPANY")
 		{
-			county = replace(county,"[/(\\W|^)WHITEHOUSE STATION(\\W|$)]","READINGTON");
+			county = "PARSIPPANY-TROY HILLS";
 		}
-		else if (indexOf(county,"BASKING RIDGE") > 0)
+		else if (county == "WHITEHOUSE STATION")
 		{
-			county = replace(county,"[[/(\\W|^)BASKING RIDGE(\\W|$)]]","BERNARDS");
+			county = "READINGTON";
 		}
-		else if (indexOf(county,"RURAL RESORT") > 0)
+		else if (county == "BASKING RIDGE")
 		{
-			county = replace(county,"[[/(\\W|^)RURAL RESORT(\\W|$)]]","GARFIELD COUNTY");
+			county = "BERNARDS";
+		}
+		else if (county == "RURAL RESORT")
+		{
+			county = "GARFIELD COUNTY";
+		}
+		else if (county == "EVERGREEN")
+		{
+			county = "EVERGREEN PARK";
+		}
+		else if (county == "ASHFORD" and state == "LA")
+		{
+			county = "ASHFORD";
+			state = "TX";
+		}
+		else if (county == "EAST SAINT LOUIS")
+		{
+			county = "EAST ST. LOUIS";
+		}
+		else if (county == "WATERFORD")
+		{
+			county = "WATERFORD CHARTER";
+		}
+		else if (county == "LOS ANGELES COUNTY" and state == "TX")
+		{
+			county = "LOS ANGELES COUNTY";
+			state = "CA";
+		}
+		else if (county == "MERCED COUNTY" and state == "OK")
+		{
+			county = "MERCED COUNTY";
+			state = "CA";
+		}
+		else if (county == "O FALLON")
+		{
+			county = "O'FALLON";
+		}
+		else if (county == "SAINT CHARLES")
+		{
+			county = "ST. CHARLES";
+		}
+		else if (county == "WATERFORD")
+		{
+			county = "WATERFORD CHARTER";
+		}
+		else if (county == "ONONDONGA")
+		{
+			county = "ONONDAGA COUNTY";
+		}
+		else if (county == "COUNTRY CLUB HILL")
+		{
+			county = "COUNTRY CLUB HILLS";
+		}
+		else if (county == "EARTH CITY")
+		{
+			county = "ST. LOUIS COUNTY";
+		}
+		else if (county == "SAINT LOUIS")
+		{
+			county = "ST. LOUIS";
 		}
 	}
-		
+	
 	$out.0.JUST_County = county;
 	$out.0.JUST_City = upperCase(trim($in.0.Location));
-	$out.0.JUST_State_Abbrev = upperCase(trim($in.0.State));
+	$out.0.JUST_State_Abbrev = state;
 	return ALL;
 }		
 
