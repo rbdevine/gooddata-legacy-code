@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 09 15:41:02 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.179" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 09 21:04:17 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.180" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Warn_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -11,6 +11,7 @@
 <Field label="Ticker" name="Ticker" type="string"/>
 <Field name="JUST_County" type="string"/>
 <Field name="JUST_State_Abbrev" type="string"/>
+<Field name="JUST_City" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
@@ -53,9 +54,12 @@ function integer transform() {
 	$out.0.Date = $in.0.Date;
 	$out.0.URL = $in.0.URL;
 	$out.0.Ticker = $in.0.Ticker;
+	$out.0.JUST_City = upperCase(trim($in.0.Location));
+	$out.0.JUST_County = upperCase(trim($in.0.Location));
 	if ($in.0.Location != null)
 	{
 		string county = upperCase(trim($in.0.Location));
+		if (indexOf(county,",") > 1)
 		if (indexOf(county,",") > 0)
 		{
 			return SKIP;
@@ -201,7 +205,8 @@ function integer transform() {
 	URL VARCHAR(255),
 	TICKER VARCHAR(255),
 	JUST_COUNTY VARCHAR(255),
-	JUST_STATE_ABBREV VARCHAR(255)
+	JUST_STATE_ABBREV VARCHAR(255),
+	JUST_CITY VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -216,7 +221,8 @@ function integer transform() {
 	URL,
 	TICKER,
 	JUST_COUNTY,
-	JUST_STATE_ABBREV
+	JUST_STATE_ABBREV,
+	JUST_CITY
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
