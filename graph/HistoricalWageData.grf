@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 11 12:37:10 EDT 2016" modifiedBy="djbrown" name="Complete County File" revision="1.265" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 11 13:16:56 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.266" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Historical_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -112,7 +112,7 @@ function integer transform() {
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	DUNS_NUMBER
+	DUNS_NUMBER,
 	EMPLOYEES_TOTAL_2011,
 	EMPLOYEES_HERE_2011,
 	EMPLOYEES_TOTAL_2012,
