@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri Jul 29 15:02:00 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.175" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 17 15:59:23 EDT 2016" modifiedBy="hankmobley" name="Complete County File" revision="1.181" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Glassdoor_Ratings_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -32,10 +32,60 @@
 <Field label="workLifeOverallRating" name="workLifeOverallRating" type="string"/>
 </Record>
 </Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="ratings_2016_08_15_Sheet_1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field format="" label="Employer Id" name="Employer_Id" type="string"/>
+<Field format="" label="Employer Name" name="Employer_Name" type="string"/>
+<Field format="" label="Sector" name="Sector" type="string"/>
+<Field format="excel:0%" label="Business Outlook Rating" name="Business_Outlook_Rating" type="string"/>
+<Field format="excel:#,##0" label="Business Outlook Rating Count" name="Business_Outlook_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Career Opportunities Rating" name="Career_Opportunities_Rating" type="string"/>
+<Field format="excel:#,##0" label="Career Oppurtunities Rating COunt" name="Career_Oppurtunities_Rating_COunt" type="string"/>
+<Field format="excel:0%" label="CEO Rating" name="CEO_Rating" type="string"/>
+<Field format="excel:#,##0" label="CEO Rating Count" name="CEO_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Compensation &amp; Benefits Rating" name="Compensation_Benefits_Rating" type="string"/>
+<Field format="excel:#,##0" label="Compensation &amp; Benefit Rating Count" name="Compensation_Benefit_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Culture &amp; Values Rating" name="Culture_Values_Rating" type="string"/>
+<Field format="excel:#,##0" label="Culture &amp; Value Rating Count" name="Culture_Value_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Overall Rating" name="Overall_Rating" type="string"/>
+<Field format="excel:#,##0" label="Aproved Reviews Count" name="Aproved_Reviews_Count" type="string"/>
+<Field format="excel:0%" label="Recommend to a Friend Rating" name="Recommend_to_a_Friend_Rating" type="string"/>
+<Field format="excel:#,##0" label="Recommend to a Friend Count" name="Recommend_to_a_Friend_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Senior Leadership Rating" name="Senior_Leadership_Rating" type="string"/>
+<Field format="excel:#,##0" label="Sr Leadership Rating Count" name="Sr_Leadership_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Work/Life Balance Rating" name="Work_Life_Balance_Rating" type="string"/>
+<Field format="excel:#,##0" label="Work/Life Balance Rating Count" name="Work_Life_Balance_Rating_Count" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="ratings_2016_08_15_Sheet_1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field format="" label="Employer Id" name="Employer_Id" type="string"/>
+<Field format="" label="Employer Name" name="Employer_Name" type="string"/>
+<Field format="" label="Sector" name="Sector" type="string"/>
+<Field format="excel:0%" label="Business Outlook Rating" name="Business_Outlook_Rating" type="string"/>
+<Field format="excel:#,##0" label="Business Outlook Rating Count" name="Business_Outlook_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Career Opportunities Rating" name="Career_Opportunities_Rating" type="string"/>
+<Field format="excel:#,##0" label="Career Oppurtunities Rating COunt" name="Career_Oppurtunities_Rating_COunt" type="string"/>
+<Field format="excel:0%" label="CEO Rating" name="CEO_Rating" type="string"/>
+<Field format="excel:#,##0" label="CEO Rating Count" name="CEO_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Compensation &amp; Benefits Rating" name="Compensation_Benefits_Rating" type="string"/>
+<Field format="excel:#,##0" label="Compensation &amp; Benefit Rating Count" name="Compensation_Benefit_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Culture &amp; Values Rating" name="Culture_Values_Rating" type="string"/>
+<Field format="excel:#,##0" label="Culture &amp; Value Rating Count" name="Culture_Value_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Overall Rating" name="Overall_Rating" type="string"/>
+<Field format="excel:#,##0" label="Aproved Reviews Count" name="Aproved_Reviews_Count" type="string"/>
+<Field format="excel:0%" label="Recommend to a Friend Rating" name="Recommend_to_a_Friend_Rating" type="string"/>
+<Field format="excel:#,##0" label="Recommend to a Friend Count" name="Recommend_to_a_Friend_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Senior Leadership Rating" name="Senior_Leadership_Rating" type="string"/>
+<Field format="excel:#,##0" label="Sr Leadership Rating Count" name="Sr_Leadership_Rating_Count" type="string"/>
+<Field format="excel:#,##0.00_);(#,##0.00)" label="Work/Life Balance Rating" name="Work_Life_Balance_Rating" type="string"/>
+<Field format="excel:#,##0" label="Work/Life Balance Rating Count" name="Work_Life_Balance_Rating_Count" type="string"/>
+</Record>
+</Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/glassdoor/rating-data-2016-07-27.csv"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/glassdoor/ratings-2016-08-15.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/glassdoorratingserror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.csv"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/ratings-2016-08-15.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_GLASSDOORRATINGS"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/glassdoorratings.txt"/>
@@ -45,32 +95,41 @@
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="1" trim="true" type="DATA_READER"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="63" guiY="129" id="READ_FILE" type="SPREADSHEET_READER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.EmployerId = $in.0.EmployerId;
-	if($in.0.EmployerName != null ) 
+	$out.0.Employer_Id = $in.0.Employer_Id;
+	if($in.0.Employer_Name != null ) 
 	{
-		$out.0.EmployerName = replace($in.0.EmployerName,"[||\\\\]",",");
+		$out.0.Employer_Name = replace($in.0.Employer_Name,"[||\\\\]",",");
 	}
 	else
 	{
-		$out.0.EmployerName = $in.0.EmployerName;
+		$out.0.Employer_Name = $in.0.Employer_Name;
 	}
-	$out.0.businessOutlookOverallRating = $in.0.businessOutlookOverallRating;
-	$out.0.careerOpportunitiesOverallRating = $in.0.careerOpportunitiesOverallRating;
-	$out.0.ceoOverallRating = $in.0.ceoOverallRating;
-	$out.0.compensationAndBenefitsOverallRating = $in.0.compensationAndBenefitsOverallRating;
-	$out.0.cultureAndValuesOverallRating = $in.0.cultureAndValuesOverallRating;
-	$out.0.employerOverallRating = $in.0.employerOverallRating;
-	$out.0.industryString = $in.0.industryString;
-	$out.0.recommendToFriendOverallRating = $in.0.recommendToFriendOverallRating;
-	$out.0.seniorManagmentOverallRating = $in.0.seniorManagmentOverallRating;
-	$out.0.workLifeOverallRating = $in.0.workLifeOverallRating;
+	$out.0.Sector = $in.0.Sector;
+	$out.0.Business_Outlook_Rating = $in.0.Business_Outlook_Rating;
+	$out.0.Business_Outlook_Rating_Count = $in.0.Business_Outlook_Rating_Count;
+	$out.0.Career_Opportunities_Rating = $in.0.Career_Opportunities_Rating;
+	$out.0.Career_Oppurtunities_Rating_COunt = $in.0.Career_Oppurtunities_Rating_COunt;
+	$out.0.CEO_Rating = $in.0.CEO_Rating;
+	$out.0.CEO_Rating_Count = $in.0.CEO_Rating_Count;
+	$out.0.Compensation_Benefits_Rating = $in.0.Compensation_Benefits_Rating;
+	$out.0.Compensation_Benefit_Rating_Count = $in.0.Compensation_Benefit_Rating_Count;
+	$out.0.Culture_Values_Rating = $in.0.Culture_Values_Rating;
+	$out.0.Culture_Value_Rating_Count = $in.0.Culture_Value_Rating_Count;
+	$out.0.Overall_Rating = $in.0.Overall_Rating;
+	$out.0.Aproved_Reviews_Count = $in.0.Aproved_Reviews_Count;
+	$out.0.Recommend_to_a_Friend_Rating = $in.0.Recommend_to_a_Friend_Rating;
+	$out.0.Recommend_to_a_Friend_Count = $in.0.Recommend_to_a_Friend_Count;
+	$out.0.Senior_Leadership_Rating = $in.0.Senior_Leadership_Rating;
+	$out.0.Sr_Leadership_Rating_Count = $in.0.Sr_Leadership_Rating_Count;
+	$out.0.Work_Life_Balance_Rating = $in.0.Work_Life_Balance_Rating;
+	$out.0.Work_Life_Balance_Rating_Count = $in.0.Work_Life_Balance_Rating_Count;
 
 	return ALL;
 }
@@ -94,8 +153,8 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
@@ -107,16 +166,25 @@ function integer transform() {
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 	EMPLOYERID VARCHAR(255),
 	EMPLOYERNAME VARCHAR(255),
-	BUSINESSOUTLOOKOVERALLRATING VARCHAR(255),
-	CAREEROPPORTUNITIESOVERALLRATING VARCHAR(255),
-	CEOOVERALLRATING VARCHAR(255),
-	COMPENSATIONANDBENEFITSOVERALLRATING VARCHAR(255),
-	CULTUREANDVALUESOVERALLRATING VARCHAR(255),
-	EMPLOYEROVERALLRATING VARCHAR(255),
-	INDUSTRYSTRING VARCHAR(255),
-	RECOMMENDTOFRIENDOVERALLRATING VARCHAR(255),
-	SENIORMANAGMENTOVERALLRATING VARCHAR(255),
-	WORKLIFEOVERALLRATING VARCHAR(255)
+	SECTOR VARCHAR(255),
+	BUSINESSOUTLOOKRATING VARCHAR(255),
+	BUSINESSOUTLOOKRATINGCOUNT VARCHAR(255),
+	CAREEROPPORTUNITIESRATING VARCHAR(255),
+	CAREEROPPORTUNITIESRATINGCOUNT VARCHAR(255),
+	CEORATING VARCHAR(255),
+	CEORATINGCOUNT VARCHAR(255),
+	COMPENSATIONBENEFITSRATING VARCHAR(255),
+	COMPENSATIONBENEFITSRATINGCOUNT VARCHAR(255),
+	CULTUREVALUESRATING VARCHAR(255),
+	CULTUREVALUESRATINGCOUNT VARCHAR(255),
+	OVERALLRATING VARCHAR(255),
+	APPROVEDREVIEWSCOUNT VARCHAR(255),
+	RECOMMENDTOFRIENDRATING VARCHAR(255),
+	RECOMMENDTOFRIENDRATINGCOUNT VARCHAR(255),
+	SENIORLEADERSHIPRATING VARCHAR(255),
+	SENIORLEADERSHIPRATINGCOUNT VARCHAR(255),
+	WORKLIFEBALANCERATING VARCHAR(255),
+	WORKLIFEBALANCERATINGCOUNT VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -125,16 +193,25 @@ function integer transform() {
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	EMPLOYERID,
 	EMPLOYERNAME,
-	BUSINESSOUTLOOKOVERALLRATING,
-	CAREEROPPORTUNITIESOVERALLRATING,
-	CEOOVERALLRATING,
-	COMPENSATIONANDBENEFITSOVERALLRATING,
-	CULTUREANDVALUESOVERALLRATING,
-	EMPLOYEROVERALLRATING,
-	INDUSTRYSTRING,
-	RECOMMENDTOFRIENDOVERALLRATING,
-	SENIORMANAGMENTOVERALLRATING,
-	WORKLIFEOVERALLRATING
+	SECTOR,
+	BUSINESSOUTLOOKRATING,
+	BUSINESSOUTLOOKRATINGCOUNT,
+	CAREEROPPORTUNITIESRATING,
+	CAREEROPPORTUNITIESRATINGCOUNT,
+	CEORATING,
+	CEORATINGCOUNT,
+	COMPENSATIONBENEFITSRATING,
+	COMPENSATIONBENEFITSRATINGCOUNT,
+	CULTUREVALUESRATING,
+	CULTUREVALUESRATINGCOUNT,
+	OVERALLRATING,
+	APPROVEDREVIEWSCOUNT,
+	RECOMMENDTOFRIENDRATING,
+	RECOMMENDTOFRIENDRATINGCOUNT,
+	SENIORLEADERSHIPRATING,
+	SENIORLEADERSHIPRATINGCOUNT,
+	WORKLIFEBALANCERATING,
+	WORKLIFEBALANCERATINGCOUNT
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
