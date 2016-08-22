@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="samarth" created="Tue Feb 02 17:16:26 IST 2016" guiVersion="3.4.4.P" id="1454440534838" licenseType="Commercial" modified="Sun Aug 21 23:22:51 EDT 2016" modifiedBy="scalvillo" name="securities-master" revision="1.34" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="samarth" created="Tue Feb 02 17:16:26 IST 2016" guiVersion="3.4.4.P" id="1454440534838" licenseType="Commercial" modified="Sun Aug 21 23:26:52 EDT 2016" modifiedBy="scalvillo" name="securities-master" revision="1.35" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" label="securities-master-db" name="securities_master_db" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" recordSize="-1" type="delimited">
@@ -119,30 +119,30 @@ function integer transform() {
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="create-securities-master" guiX="328" guiY="317" id="CREATE_SECURITIES_MASTER" printStatements="true" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS LKP_JUST_CO_SECTY_MASTER (
-    just_co_id VARCHAR(15),
-    co_long_name VARCHAR(255),
-    co_short_name VARCHAR(255),
-    exchange VARCHAR(255),
-    ticker VARCHAR(255),
-    ticker_trim VARCHAR(255),
-    glassdoor_emp_id VARCHAR(255),
-    bloomberg_isin VARCHAR(255),
-    msci_issuerid VARCHAR(255),
-    sustain_co_id VARCHAR(255),
-    reprisk_id VARCHAR(255),
-    column1 VARCHAR(255),
-    column2 VARCHAR(255),
-    column3 VARCHAR(255),
-    column4 VARCHAR(255),
-    column5 VARCHAR(255),
-    column6 VARCHAR(255),
-    column7 VARCHAR(255),
-    column8 VARCHAR(255),
-    column9 VARCHAR(255),
-    column10 VARCHAR(255),
-    created_date NUMERIC(8,0),
-    updated_date NUMERIC(8,0),
-    created_by VARCHAR(255)
+    JUST_CO_ID VARCHAR(15),
+    CO_LONG_NAME VARCHAR(255),
+    CO_SHORT_NAME VARCHAR(255),
+    EXCHANGE VARCHAR(255),
+    TICKER VARCHAR(255),
+    TICKER_TRIM VARCHAR(255),
+    GLASSDOOR_EMP_ID VARCHAR(255),
+    BLOOMBERG_ISIN VARCHAR(255),
+    MSCI_ISSUERID VARCHAR(255),
+    SUSTAIN_CO_ID VARCHAR(255),
+    REPRISK_ID VARCHAR(255),
+    COLUMN1 VARCHAR(255),
+    COLUMN2 VARCHAR(255),
+    COLUMN3 VARCHAR(255),
+    COLUMN4 VARCHAR(255),
+    COLUMN5 VARCHAR(255),
+    COLUMN6 VARCHAR(255),
+    COLUMN7 VARCHAR(255),
+    COLUMN8 VARCHAR(255),
+    COLUMN9 VARCHAR(255),
+    COLUMN10 VARCHAR(255),
+    CREATED_DATE NUMERIC(8,0),
+    UPDATED_DATE NUMERIC(8,0),
+    CREATED_BY VARCHAR(255)
 );
 ]]></attr>
 </Node>
@@ -150,30 +150,30 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="copy-securities-master-data" guiX="318" guiY="425" id="COPY_SECURITIES_MASTER_DATA" printStatements="true" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY LKP_JUST_CO_SECTY_MASTER (
-    just_co_id,
-    co_long_name,
-    co_short_name,
-    exchange,
-    ticker,
-    ticker_trim,
-    glassdoor_emp_id,
-    bloomberg_isin,
-    msci_issuerid,
-    sustain_co_id,
-    reprisk_id,
-    column1,
-    column2,
-    column3,
-    column4,
-    column5,
-    column6,
-    column7,
-    column8,
-    column9,
-    column10,
-    created_date,
-    updated_date,
-    created_by
+    JUST_CO_ID,
+    CO_LONG_NAME,
+    CO_SHORT_NAME,
+    EXCHANGE,
+    TICKER,
+    TICKER_TRIM,
+    GLASSDOOR_EMP_ID,
+    BLOOMBERG_ISIN,
+    MSCI_ISSUERID,
+    SUSTAIN_CO_ID,
+    REPRISK_ID,
+    COLUMN1,
+    COLUMN2,
+    COLUMN3,
+    COLUMN4,
+    COLUMN5,
+    COLUMN6,
+    COLUMN7,
+    COLUMN8,
+    COLUMN9,
+    COLUMN10,
+    CREATED_DATE,
+    UPDATED_DATE,
+    CREATED_BY
 )
 FROM LOCAL '${SECURITY_MASTER_FINAL_FILE}'
 EXCEPTIONS '${ETL_ERROR_LOG_FILE}'
