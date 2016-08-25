@@ -1,65 +1,81 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 25 00:09:24 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.213" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 25 00:18:17 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.214" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="Glassdoor_Salary_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="FK_employerId" type="string"/>
-<Field label="FK_reviewId" name="FK_reviewId" type="string"/>
-<Field label="FK_userId" name="FK_userId" type="string"/>
-<Field label="GOC" name="GOC" type="string"/>
-<Field label="MGOC" name="MGOC" type="string"/>
-<Field name="ONET_Code" type="string"/>
-<Field label="ONET_MajorTitle" name="ONET_MajorTitle" type="string"/>
-<Field name="ONET_Occupation_Names" type="string"/>
-<Field label="birthYear" name="birthYear" type="string"/>
-<Field label="employeesTotalNum" name="employeesTotalNum" type="string"/>
-<Field label="employer" name="employer" type="string"/>
-<Field label="employerTypeCode" name="employerTypeCode" type="string"/>
-<Field label="employmentStatusCode" name="employmentStatusCode" type="string"/>
-<Field label="gender" name="gender" type="string"/>
-<Field label="highestEducation" name="highestEducation" type="string"/>
-<Field label="industryName" name="industryName" type="string"/>
-<Field label="jobTitle" name="jobTitle" type="string"/>
-<Field label="metroName" name="metroName" type="string"/>
-<Field label="race" name="race" type="string"/>
-<Field format="excel:m/d/yy" label="reviewDateTime" name="reviewDateTime" type="string"/>
-<Field label="sectorName" name="sectorName" type="string"/>
-<Field label="stateName" name="stateName" type="string"/>
-<Field label="baseSalary" name="unadjustedbaseSalary" type="string"/>
-<Field label="totalSalary" name="unadjustedtotalSalary" type="string"/>
-<Field label="yearofSalary" name="yearofSalary" type="string"/>
-<Field label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
-<Field name="cityName" type="string"/>
-<Field name="stateAbbreviation" type="string"/>
+<Metadata id="Metadata0" previewAttachment="/Users/scalvillo/Desktop/advance_auto_parts.csv" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="," name="Company_Locations_Read" previewAttachment="/Users/scalvillo/Desktop/advance_auto_parts.csv" previewAttachmentCharset="UTF-8" recordDelimiter="\n" type="delimited">
+<Field label="dba" name="dba" type="string"/>
+<Field label="store_number" name="store_number" type="string"/>
+<Field label="store_name" name="store_name" type="string"/>
+<Field label="store_type" name="store_type" type="string"/>
+<Field format="excel:m/d/yy" label="opening_date" name="opening_date" type="string"/>
+<Field label="address" name="address" type="string"/>
+<Field label="city" name="city" type="string"/>
+<Field label="state" name="state" type="string"/>
+<Field label="zip_code" name="zip_code" type="string"/>
+<Field label="phone_number" name="phone_number" type="string"/>
+<Field label="store_hours" name="store_hours" type="string"/>
+<Field label="pharmacy_phone_number" name="pharmacy_phone_number" type="string"/>
+<Field label="pharmacy_hours" name="pharmacy_hours" type="string"/>
+<Field label="vision_phone_number" name="vision_phone_number" type="string"/>
+<Field label="photo_phone_number" name="photo_phone_number" type="string"/>
+<Field label="tire_phone_number" name="tire_phone_number" type="string"/>
+<Field label="services" name="services" type="string"/>
+<Field label="latitude" name="latitude" type="string"/>
+<Field label="longitude" name="longitude" type="string"/>
+<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field label="country" name="country" type="string"/>
+<Field label="country_code" name="country_code" type="string"/>
+<Field label="county" name="county" type="string"/>
+<Field label="photo_center" name="photo_center" type="string"/>
+<Field label="photo_center_phone_number" name="photo_center_phone_number" type="string"/>
+<Field label="vision_center" name="vision_center" type="string"/>
+<Field label="vision_center_phone_number" name="vision_center_phone_number" type="string"/>
+<Field label="tire_and_lube" name="tire_and_lube" type="string"/>
+<Field label="gas_station" name="gas_station" type="string"/>
+<Field label="tire_lube" name="tire_lube" type="string"/>
+<Field label="vision" name="vision" type="string"/>
+<Field label="pharmacy" name="pharmacy" type="string"/>
+<Field label="address_line_2" name="address_line_2" type="string"/>
+<Field label="neighborhood" name="neighborhood" type="string"/>
+<Field label="fax_number" name="fax_number" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="Glassdoor_Salary_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="FK_employerId" type="string"/>
-<Field label="FK_reviewId" name="FK_reviewId" type="string"/>
-<Field label="FK_userId" name="FK_userId" type="string"/>
-<Field label="GOC" name="GOC" type="string"/>
-<Field label="MGOC" name="MGOC" type="string"/>
-<Field name="ONET_Code" type="string"/>
-<Field label="ONET_MajorTitle" name="ONET_MajorTitle" type="string"/>
-<Field name="ONET_Occupation_Names" type="string"/>
-<Field label="birthYear" name="birthYear" type="string"/>
-<Field label="employeesTotalNum" name="employeesTotalNum" type="string"/>
-<Field label="employer" name="employer" type="string"/>
-<Field label="employerTypeCode" name="employerTypeCode" type="string"/>
-<Field label="employmentStatusCode" name="employmentStatusCode" type="string"/>
-<Field label="gender" name="gender" type="string"/>
-<Field label="highestEducation" name="highestEducation" type="string"/>
-<Field label="industryName" name="industryName" type="string"/>
-<Field label="jobTitle" name="jobTitle" type="string"/>
-<Field label="metroName" name="metroName" type="string"/>
-<Field label="race" name="race" type="string"/>
-<Field format="excel:m/d/yy" label="reviewDateTime" name="reviewDateTime" type="string"/>
-<Field label="sectorName" name="sectorName" type="string"/>
-<Field label="stateName" name="stateName" type="string"/>
-<Field label="baseSalary" name="unadjustedbaseSalary" type="string"/>
-<Field label="totalSalary" name="unadjustedtotalSalary" type="string"/>
-<Field label="yearofSalary" name="yearofSalary" type="string"/>
-<Field label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
+<Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/advance_auto_parts.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Company_Locations_Write" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="dba" name="dba" type="string"/>
+<Field label="store_number" name="store_number" type="string"/>
+<Field label="store_name" name="store_name" type="string"/>
+<Field label="store_type" name="store_type" type="string"/>
+<Field format="excel:m/d/yy" label="opening_date" name="opening_date" type="string"/>
+<Field label="address" name="address" type="string"/>
+<Field label="city" name="city" type="string"/>
+<Field label="state" name="state" type="string"/>
+<Field label="zip_code" name="zip_code" type="string"/>
+<Field label="phone_number" name="phone_number" type="string"/>
+<Field label="store_hours" name="store_hours" type="string"/>
+<Field label="pharmacy_phone_number" name="pharmacy_phone_number" type="string"/>
+<Field label="pharmacy_hours" name="pharmacy_hours" type="string"/>
+<Field label="vision_phone_number" name="vision_phone_number" type="string"/>
+<Field label="photo_phone_number" name="photo_phone_number" type="string"/>
+<Field label="tire_phone_number" name="tire_phone_number" type="string"/>
+<Field label="services" name="services" type="string"/>
+<Field label="latitude" name="latitude" type="string"/>
+<Field label="longitude" name="longitude" type="string"/>
+<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field label="country" name="country" type="string"/>
+<Field label="country_code" name="country_code" type="string"/>
+<Field label="county" name="county" type="string"/>
+<Field label="photo_center" name="photo_center" type="string"/>
+<Field label="photo_center_phone_number" name="photo_center_phone_number" type="string"/>
+<Field label="vision_center" name="vision_center" type="string"/>
+<Field label="vision_center_phone_number" name="vision_center_phone_number" type="string"/>
+<Field label="tire_and_lube" name="tire_and_lube" type="string"/>
+<Field label="gas_station" name="gas_station" type="string"/>
+<Field label="tire_lube" name="tire_lube" type="string"/>
+<Field label="vision" name="vision" type="string"/>
+<Field label="pharmacy" name="pharmacy" type="string"/>
+<Field label="address_line_2" name="address_line_2" type="string"/>
+<Field label="neighborhood" name="neighborhood" type="string"/>
+<Field label="fax_number" name="fax_number" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -246,68 +262,52 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-	FK_EMPLOYERID VARCHAR(255),
-	FK_REVIEWID VARCHAR(255),
-	FK_USERID VARCHAR(255),
-	GOC VARCHAR(255),
-	MGOC VARCHAR(255),
-	ONET_CODE VARCHAR(255),
-	ONET_MAJORTITLE VARCHAR(255),
-	ONET_OCCUPATION_NAMES VARCHAR(255),
-	BIRTHYEAR VARCHAR(255),
-	EMPLOYEESTOTALNUM VARCHAR(255),
-	EMPLOYER VARCHAR(255),
-	EMPLOYERTYPECODE VARCHAR(255),
-	EMPLOYMENTSTATUSCODE VARCHAR(255),
-	GENDER VARCHAR(255),
-	HIGHESTEDUCATION VARCHAR(255),
-	INDUSTRYNAME VARCHAR(255),
-	JOBTITLE VARCHAR(255),
-	METRONAME VARCHAR(255),
-	RACE VARCHAR(255),
-	REVIEWDATETIME VARCHAR(255),
-	SECTORNAME VARCHAR(255),
-	STATENAME VARCHAR(255),
-	UNADJUSTEDBASESALARY VARCHAR(255),
-	UNADJUSTEDTOTALSALARY VARCHAR(255),
-	YEAROFSALARY VARCHAR(255),
-	YEARSOFRELEVANTEXPNUMBER VARCHAR(255),
-	CITYNAME VARCHAR(255),
-	STATEABBREVIATION VARCHAR(255)
+	DBA VARCHAR(255),
+	STORE_NUMBER VARCHAR(255),
+	STORE_BRAND VARCHAR(255),
+	STORE_NAME VARCHAR(255),
+	ADDRESS VARCHAR(255),
+	CITY VARCHAR(255),
+	STATE VARCHAR(255),
+	ZIP_CODE VARCHAR(255),
+	PHONE_NUMBER VARCHAR(255),
+	STORE_HOURS VARCHAR(255),
+	LATITUDE VARCHAR(255),
+	LONGITUDEGEO_ACCURACY VARCHAR(255),
+	COUNTRY VARCHAR(255),
+	COUNTRY_CODE VARCHAR(255),
+	COUNTY VARCHAR(255),
+	STORE_TYPE VARCHAR(255),
+	ADDRESS_LINE_2 VARCHAR(255),
+	FAX_NUMBER VARCHAR(255),
+	DISTRIBUTOR_NAME VARCHAR(255),
+	WEBSITE_ADDRESS VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	FK_EMPLOYERID,
-	FK_REVIEWID,
-	FK_USERID,
-	GOC,
-	MGOC,
-	ONET_CODE,
-	ONET_MAJORTITLE,
-	ONET_OCCUPATION_NAMES,
-	BIRTHYEAR,
-	EMPLOYEESTOTALNUM,
-	EMPLOYER,
-	EMPLOYERTYPECODE,
-	EMPLOYMENTSTATUSCODE,
-	GENDER,
-	HIGHESTEDUCATION,
-	INDUSTRYNAME,
-	JOBTITLE,
-	METRONAME,
-	RACE,
-	REVIEWDATETIME,
-	SECTORNAME,
-	STATENAME,
-	UNADJUSTEDBASESALARY,
-	UNADJUSTEDTOTALSALARY,
-	YEAROFSALARY,
-	YEARSOFRELEVANTEXPNUMBER,
-	CITYNAME,
-	STATEABBREVIATION
+	DBA,
+	STORE_NUMBER,
+	STORE_BRAND,
+	STORE_NAME,
+	ADDRESS,
+	CITY,
+	STATE,
+	ZIP_CODE,
+	PHONE_NUMBER,
+	STORE_HOURS,
+	LATITUDE,
+	LONGITUDEGEO_ACCURACY,
+	COUNTRY,
+	COUNTRY_CODE,
+	COUNTY,
+	STORE_TYPE,
+	ADDRESS_LINE_2,
+	FAX_NUMBER,
+	DISTRIBUTOR_NAME,
+	WEBSITE_ADDRESS
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
