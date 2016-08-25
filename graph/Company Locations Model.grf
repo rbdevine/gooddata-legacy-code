@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Tue Aug 23 11:18:56 EDT 2016" guiVersion="3.4.4.P" id="1471983522824" licenseType="Commercial" modified="Tue Aug 23 19:29:34 EDT 2016" modifiedBy="scalvillo" name="Company Location Model" revision="1.8" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Company_Locations_Read" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field format="" label="dba" name="dba" type="string"/>
+<Field format="" label="store_number" name="store_number" type="string"/>
+<Field format="" label="store_name" name="store_name" type="string"/>
+<Field format="" label="store_type" name="store_type" type="string"/>
+<Field format="excel:m/d/yy" label="opening_date" name="opening_date" type="string"/>
+<Field format="" label="address" name="address" type="string"/>
+<Field format="" label="city" name="city" type="string"/>
+<Field format="" label="state" name="state" type="string"/>
+<Field format="" label="zip_code" name="zip_code" type="string"/>
+<Field format="" label="phone_number" name="phone_number" type="string"/>
+<Field format="" label="store_hours" name="store_hours" type="string"/>
+<Field format="" label="pharmacy_phone_number" name="pharmacy_phone_number" type="string"/>
+<Field format="" label="pharmacy_hours" name="pharmacy_hours" type="string"/>
+<Field format="" label="vision_phone_number" name="vision_phone_number" type="string"/>
+<Field format="" label="photo_phone_number" name="photo_phone_number" type="string"/>
+<Field format="" label="tire_phone_number" name="tire_phone_number" type="string"/>
+<Field format="" label="services" name="services" type="string"/>
+<Field format="" label="latitude" name="latitude" type="string"/>
+<Field format="" label="longitude" name="longitude" type="string"/>
+<Field format="" label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field format="" label="country" name="country" type="string"/>
+<Field format="" label="country_code" name="country_code" type="string"/>
+<Field format="" label="county" name="county" type="string"/>
+<Field label="photo_center" name="photo_center" type="string"/>
+<Field label="photo_center_phone_number" name="photo_center_phone_number" type="string"/>
+<Field label="vision_center" name="vision_center" type="string"/>
+<Field label="vision_center_phone_number" name="vision_center_phone_number" type="string"/>
+<Field label="tire_and_lube" name="tire_and_lube" type="string"/>
+<Field label="gas_station" name="gas_station" type="string"/>
+<Field label="tire_lube" name="tire_lube" type="string"/>
+<Field label="vision" name="vision" type="string"/>
+<Field label="pharmacy" name="pharmacy" type="string"/>
+<Field label="address_line_2" name="address_line_2" type="string"/>
+<Field label="neighborhood" name="neighborhood" type="string"/>
+<Field label="fax_number" name="fax_number" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Company_Locations_Write" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="dba" name="dba" type="string"/>
+<Field label="store_number" name="store_number" type="string"/>
+<Field label="store_name" name="store_name" type="string"/>
+<Field label="store_type" name="store_type" type="string"/>
+<Field format="excel:m/d/yy" label="opening_date" name="opening_date" type="string"/>
+<Field label="address" name="address" type="string"/>
+<Field label="city" name="city" type="string"/>
+<Field label="state" name="state" type="string"/>
+<Field label="zip_code" name="zip_code" type="string"/>
+<Field label="phone_number" name="phone_number" type="string"/>
+<Field label="store_hours" name="store_hours" type="string"/>
+<Field label="pharmacy_phone_number" name="pharmacy_phone_number" type="string"/>
+<Field label="pharmacy_hours" name="pharmacy_hours" type="string"/>
+<Field label="vision_phone_number" name="vision_phone_number" type="string"/>
+<Field label="photo_phone_number" name="photo_phone_number" type="string"/>
+<Field label="tire_phone_number" name="tire_phone_number" type="string"/>
+<Field label="services" name="services" type="string"/>
+<Field label="latitude" name="latitude" type="string"/>
+<Field label="longitude" name="longitude" type="string"/>
+<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field label="country" name="country" type="string"/>
+<Field label="country_code" name="country_code" type="string"/>
+<Field label="county" name="county" type="string"/>
+<Field label="photo_center" name="photo_center" type="string"/>
+<Field label="photo_center_phone_number" name="photo_center_phone_number" type="string"/>
+<Field label="vision_center" name="vision_center" type="string"/>
+<Field label="vision_center_phone_number" name="vision_center_phone_number" type="string"/>
+<Field label="tire_and_lube" name="tire_and_lube" type="string"/>
+<Field label="gas_station" name="gas_station" type="string"/>
+<Field label="tire_lube" name="tire_lube" type="string"/>
+<Field label="vision" name="vision" type="string"/>
+<Field label="pharmacy" name="pharmacy" type="string"/>
+<Field label="address_line_2" name="address_line_2" type="string"/>
+<Field label="neighborhood" name="neighborhood" type="string"/>
+<Field label="fax_number" name="fax_number" type="string"/>
+<Field name="geo_pushpin" type="string"/>
+<Field name="number_of_employees" type="number"/>
+</Record>
+</Metadata>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dataset="dataset.companylocation" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.companylocation&quot;,&quot;datasetTitle&quot;:&quot;Company Location&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.address&quot;,&quot;title&quot;:&quot;Address&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_address&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.address&quot;,&quot;title&quot;:&quot;Address&quot;,&quot;prettyId&quot;:&quot;address&quot;,&quot;assignedMetadataField&quot;:&quot;address&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.address&quot;,&quot;title&quot;:&quot;Address&quot;,&quot;prettyId&quot;:&quot;address&quot;,&quot;assignedMetadataField&quot;:&quot;address&quot;,&quot;referenceKey&quot;:true}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.city&quot;,&quot;title&quot;:&quot;City&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_city&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.city&quot;,&quot;title&quot;:&quot;City&quot;,&quot;prettyId&quot;:&quot;city&quot;,&quot;assignedMetadataField&quot;:&quot;city&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.city&quot;,&quot;title&quot;:&quot;City&quot;,&quot;prettyId&quot;:&quot;city&quot;,&quot;assignedMetadataField&quot;:&quot;city&quot;,&quot;referenceKey&quot;:true}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.company&quot;,&quot;title&quot;:&quot;Company&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_company&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.company&quot;,&quot;title&quot;:&quot;Company&quot;,&quot;prettyId&quot;:&quot;company&quot;,&quot;assignedMetadataField&quot;:&quot;dba&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.county&quot;,&quot;title&quot;:&quot;GEO Pushpin&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_county&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.county&quot;,&quot;title&quot;:&quot;GEO Pushpin&quot;,&quot;prettyId&quot;:&quot;county&quot;,&quot;assignedMetadataField&quot;:&quot;geo_pushpin&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.county&quot;,&quot;title&quot;:&quot;GEO Pushpin&quot;,&quot;prettyId&quot;:&quot;county&quot;,&quot;assignedMetadataField&quot;:&quot;geo_pushpin&quot;,&quot;referenceKey&quot;:true}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.geopushpin&quot;,&quot;title&quot;:&quot;County&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_geopushpin&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.geopushpin&quot;,&quot;title&quot;:&quot;County&quot;,&quot;prettyId&quot;:&quot;geopushpin&quot;,&quot;assignedMetadataField&quot;:&quot;county&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.openingdate&quot;,&quot;title&quot;:&quot;Opening Date&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_openingdate&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.openingdate&quot;,&quot;title&quot;:&quot;Opening Date&quot;,&quot;prettyId&quot;:&quot;openingdate&quot;,&quot;assignedMetadataField&quot;:&quot;opening_date&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.state&quot;,&quot;title&quot;:&quot;State&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_state&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.state&quot;,&quot;title&quot;:&quot;State&quot;,&quot;prettyId&quot;:&quot;state&quot;,&quot;assignedMetadataField&quot;:&quot;state&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.state&quot;,&quot;title&quot;:&quot;State&quot;,&quot;prettyId&quot;:&quot;state&quot;,&quot;assignedMetadataField&quot;:&quot;state&quot;,&quot;referenceKey&quot;:true}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.storenumber&quot;,&quot;title&quot;:&quot;Store Number&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_storenumber&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.storenumber&quot;,&quot;title&quot;:&quot;Store Number&quot;,&quot;prettyId&quot;:&quot;storenumber&quot;,&quot;assignedMetadataField&quot;:&quot;store_number&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.companylocation.zipcode&quot;,&quot;title&quot;:&quot;Zip Code&quot;,&quot;prettyId&quot;:&quot;attr_companylocation_zipcode&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.companylocation.zipcode&quot;,&quot;title&quot;:&quot;Zip Code&quot;,&quot;prettyId&quot;:&quot;zipcode&quot;,&quot;assignedMetadataField&quot;:&quot;zip_code&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.companylocation.numberofemployees&quot;,&quot;title&quot;:&quot;Number of Employees&quot;,&quot;prettyId&quot;:&quot;numberofemployees&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;number_of_employees&quot;}}],&quot;dateFacts&quot;:[],&quot;entitiesWithoutValue&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;datesWithFactConflict&quot;:[],&quot;entitiesWithoutMetadata&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="657" guiY="189" id="GD_DATASET_WRITER" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node enabled="enabled" fileURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/aggdata/CompanyLocations.xlsx" guiName="Read Data" guiX="143" guiY="189" id="READ_DATA" skipRecords="1" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="401" guiY="189" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.dba = $in.0.dba;
+	$out.0.store_number = $in.0.store_number;
+	$out.0.store_name = $in.0.store_name;
+	$out.0.store_type = $in.0.store_type;
+	$out.0.opening_date = $in.0.opening_date;
+	$out.0.address = $in.0.address;
+	$out.0.city = $in.0.city;
+	$out.0.state = $in.0.state;
+	$out.0.zip_code = $in.0.zip_code;
+	$out.0.phone_number = $in.0.phone_number;
+	$out.0.store_hours = $in.0.store_hours;
+	$out.0.pharmacy_phone_number = $in.0.pharmacy_phone_number;
+	$out.0.pharmacy_hours = $in.0.pharmacy_hours;
+	$out.0.vision_phone_number = $in.0.vision_phone_number;
+	$out.0.photo_phone_number = $in.0.photo_phone_number;
+	$out.0.tire_phone_number = $in.0.tire_phone_number;
+	$out.0.services = $in.0.services;
+	$out.0.latitude = $in.0.latitude;
+	$out.0.longitude = $in.0.longitude;
+	$out.0.geo_accuracy = $in.0.geo_accuracy;
+	$out.0.country = $in.0.country;
+	$out.0.country_code = $in.0.country_code;
+	$out.0.county = $in.0.county;
+	$out.0.photo_center = $in.0.photo_center;
+	$out.0.photo_center_phone_number = $in.0.photo_center_phone_number;
+	$out.0.vision_center = $in.0.vision_center;
+	$out.0.vision_center_phone_number = $in.0.vision_center_phone_number;
+	$out.0.tire_and_lube = $in.0.tire_and_lube;
+	$out.0.gas_station = $in.0.gas_station;
+	$out.0.tire_lube = $in.0.tire_lube;
+	$out.0.vision = $in.0.vision;
+	$out.0.pharmacy = $in.0.pharmacy;
+	$out.0.address_line_2 = $in.0.address_line_2;
+	$out.0.neighborhood = $in.0.neighborhood;
+	$out.0.fax_number = $in.0.fax_number;
+	$out.0.geo_pushpin = $in.0.latitude + ";" + $in.0.longitude;
+	$out.0.number_of_employees = 1;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_DATA:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="GD_DATASET_WRITER:0"/>
+</Phase>
+</Graph>
