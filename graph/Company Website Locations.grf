@@ -1,96 +1,73 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 25 00:36:21 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.218" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Aug 25 02:23:56 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.227" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata0" previewAttachment="/Users/scalvillo/Desktop/advance_auto_parts.csv" previewAttachmentCharset="UTF-8">
-<Record fieldDelimiter="," label="agg_company_location_read" name="agg_company_location_read" previewAttachment="/Users/scalvillo/Desktop/advance_auto_parts.csv" previewAttachmentCharset="UTF-8" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
-<Field label="﻿dba" name="dba" type="string"/>
-<Field label="store_number" name="store_number" type="string"/>
-<Field label="store_brand" name="store_brand" type="string"/>
-<Field label="store_name" name="store_name" type="string"/>
-<Field label="address" name="address" type="string"/>
-<Field label="city" name="city" type="string"/>
-<Field label="state" name="state" type="string"/>
-<Field label="zip_code" name="zip_code" type="string"/>
-<Field label="phone_number" name="phone_number" type="string"/>
-<Field label="store_hours" name="store_hours" type="string"/>
-<Field label="latitude" name="latitude" type="string"/>
-<Field label="longitude" name="longitude" type="string"/>
-<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
-<Field label="country" name="country" type="string"/>
-<Field label="country_code" name="country_code" type="string"/>
-<Field label="county" name="county" type="string"/>
-<Field label="store_type" name="store_type" type="string"/>
-<Field label="address_line_2" name="address_line_2" type="string"/>
-<Field label="fax_number" name="fax_number" type="string"/>
-<Field label="distributor_name" name="distributor_name" type="string"/>
-<Field eofAsDelimiter="false" label="website_address" name="website_address" type="string"/>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="CO_WEBSITE_LOCATION_READ" recordDelimiter="\n" type="delimited">
+<Field format="" label="TICKER" name="TICKER" type="string"/>
+<Field format="" label="CITY" name="CITY" type="string"/>
+<Field format="" label="STATE" name="STATE" type="string"/>
+<Field label="DESCRIPTION" name="DESCRIPTION" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/advance_auto_parts.csv" previewAttachmentCharset="UTF-8">
-<Record fieldDelimiter="|" label="agg_company_location_read" name="agg_company_location_write" previewAttachmentCharset="UTF-8" quotedStrings="false" recordDelimiter="\n" skipSourceRows="0" type="delimited">
-<Field label="﻿dba" name="dba" type="string"/>
-<Field label="store_number" name="store_number" type="string"/>
-<Field label="store_brand" name="store_brand" type="string"/>
-<Field label="store_name" name="store_name" type="string"/>
-<Field label="address" name="address" type="string"/>
-<Field label="city" name="city" type="string"/>
-<Field label="state" name="state" type="string"/>
-<Field label="zip_code" name="zip_code" type="string"/>
-<Field label="phone_number" name="phone_number" type="string"/>
-<Field label="store_hours" name="store_hours" type="string"/>
-<Field label="latitude" name="latitude" type="string"/>
-<Field label="longitude" name="longitude" type="string"/>
-<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
-<Field label="country" name="country" type="string"/>
-<Field label="country_code" name="country_code" type="string"/>
-<Field label="county" name="county" type="string"/>
-<Field label="store_type" name="store_type" type="string"/>
-<Field label="address_line_2" name="address_line_2" type="string"/>
-<Field label="fax_number" name="fax_number" type="string"/>
-<Field label="distributor_name" name="distributor_name" type="string"/>
-<Field eofAsDelimiter="false" label="website_address" name="website_address" type="string"/>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="CO_WEBSITE_LOCATION_WRITE" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="CITY" name="CITY" type="string"/>
+<Field label="STATE" name="STATE" type="string"/>
+<Field label="DESCRIPTION" name="DESCRIPTION" type="string"/>
+<Field name="JUST_TICKER" type="string"/>
+<Field name="JUST_CITY_NAME" type="string"/>
+<Field name="JUST_COUNTY_NAME" type="string"/>
+<Field name="JUST_STATE_ABBREV" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/aggdata/companylocations/*.csv"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/aggcompanylocationserror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.csv"/>
-<Property id="GraphParameter3" name="TABLENAME" value="STG_AGGCOMPANYLOCATIONS"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/companywebsites/locations/LocationsMasterFinal.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/cowebsiteslocationserror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/LocationsMasterFinal.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_COWEBSITELOCATIONS"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/aggcompanylocations.txt"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/cowebsitelocations.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="0" skipSourceRows="1" trim="true" type="DATA_READER" verbose="true"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="63" guiY="129" id="READ_FILE" type="SPREADSHEET_READER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.dba = $in.0.dba;
-	$out.0.store_number = $in.0.store_number;
-	$out.0.store_brand = $in.0.store_brand;
-	$out.0.store_name = $in.0.store_name;
-	$out.0.address = $in.0.address;
-	$out.0.city = $in.0.city;
-	$out.0.state = $in.0.state;
-	$out.0.zip_code = $in.0.zip_code;
-	$out.0.phone_number = $in.0.phone_number;
-	$out.0.store_hours = $in.0.store_hours;
-	$out.0.latitude = $in.0.latitude;
-	$out.0.longitude = $in.0.longitude;
-	$out.0.geo_accuracy = $in.0.geo_accuracy;
-	$out.0.country = $in.0.country;
-	$out.0.country_code = $in.0.country_code;
-	$out.0.county = $in.0.county;
-	$out.0.store_type = $in.0.store_type;
-	$out.0.address_line_2 = $in.0.address_line_2;
-	$out.0.fax_number = $in.0.fax_number;
-	$out.0.distributor_name = $in.0.distributor_name;
-	$out.0.website_address = $in.0.website_address;
+	if($in.0.TICKER != null) {
+		$out.0.TICKER = trim($in.0.TICKER);
+	}
+	if($in.0.CITY != null) {
+		$out.0.CITY = trim($in.0.CITY);
+	}
+	if($in.0.STATE != null) {
+		$out.0.STATE = trim($in.0.STATE);
+	}
+	if($in.0.DESCRIPTION != null) {
+		$out.0.DESCRIPTION = trim($in.0.DESCRIPTION);
+	}
+	
+	// special handling for ticker, city and state.  we define additonal fields to hold values 
+	// necessary for joining
+	if($in.0.TICKER != null) {
+		$out.0.JUST_TICKER = upperCase(trim($in.0.TICKER));
+	}
+	if ($in.0.CITY != null) {
+		string city = upperCase(trim($in.0.CITY));
+		//some cities are actually counties
+		$out.0.JUST_COUNTY_NAME = city;
+		// we set city regardless just in case its a city name with the word county in it.
+		$out.0.JUST_CITY_NAME = city;
+	}
+	if ($in.0.STATE != null) {
+		$out.0.JUST_STATE_ABBREV = upperCase(trim($in.0.STATE));
+	}
 
 	return ALL;
 }
@@ -114,7 +91,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
@@ -125,52 +102,28 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-	DBA VARCHAR(255),
-	STORE_NUMBER VARCHAR(255),
-	STORE_BRAND VARCHAR(255),
-	STORE_NAME VARCHAR(255),
-	ADDRESS VARCHAR(255),
+	TICKER VARCHAR(255),
 	CITY VARCHAR(255),
 	STATE VARCHAR(255),
-	ZIP_CODE VARCHAR(255),
-	PHONE_NUMBER VARCHAR(255),
-	STORE_HOURS VARCHAR(255),
-	LATITUDE VARCHAR(255),
-	LONGITUDEGEO_ACCURACY VARCHAR(255),
-	COUNTRY VARCHAR(255),
-	COUNTRY_CODE VARCHAR(255),
-	COUNTY VARCHAR(255),
-	STORE_TYPE VARCHAR(255),
-	ADDRESS_LINE_2 VARCHAR(255),
-	FAX_NUMBER VARCHAR(255),
-	DISTRIBUTOR_NAME VARCHAR(255),
-	WEBSITE_ADDRESS VARCHAR(255)
+	DESCRIPTION VARCHAR(255),
+	JUST_TICKER VARCHAR(255),
+	JUST_CITY_NAME VARCHAR(255),
+	JUST_COUNTY_NAME VARCHAR(255),
+	JUST_STATE_ABBREV VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	DBA,
-	STORE_NUMBER,
-	STORE_BRAND,
-	STORE_NAME,
-	ADDRESS,
+	TICKER,
 	CITY,
 	STATE,
-	ZIP_CODE,
-	PHONE_NUMBER,
-	STORE_HOURS,
-	LATITUDE,
-	LONGITUDEGEO_ACCURACY,
-	COUNTRY,
-	COUNTRY_CODE,
-	COUNTY,
-	STORE_TYPE,
-	ADDRESS_LINE_2,
-	FAX_NUMBER,
-	DISTRIBUTOR_NAME,
-	WEBSITE_ADDRESS
+	DESCRIPTION,
+	JUST_TICKER,
+	JUST_CITY_NAME,
+	JUST_COUNTY_NAME,
+	JUST_STATE_ABBREV
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
