@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 30 19:07:45 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.219" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/aggdata/AggDataforUpload.xls"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/aggcompanylocationserror2.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/AggDataforUpload.xls"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_AGGCOMPANYLOCATIONS"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/aggcompanylocations2.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node enabled="enabled" guiName="Read File" guiX="69" guiY="129" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.dba = $in.0.dba;
+	$out.0.store_number = $in.0.store_number;
+	$out.0.store_brand = $in.0.store_brand;
+	$out.0.store_name = $in.0.store_name;
+	$out.0.address = $in.0.address;
+	$out.0.city = $in.0.city;
+	$out.0.state = $in.0.state;
+	$out.0.zip_code = $in.0.zip_code;
+	$out.0.phone_number = $in.0.phone_number;
+	$out.0.store_hours = $in.0.store_hours;
+	$out.0.latitude = $in.0.latitude;
+	$out.0.longitude = $in.0.longitude;
+	$out.0.geo_accuracy = $in.0.geo_accuracy;
+	$out.0.country = $in.0.country;
+	$out.0.country_code = $in.0.country_code;
+	$out.0.county = $in.0.county;
+	$out.0.store_type = $in.0.store_type;
+	$out.0.address_line_2 = $in.0.address_line_2;
+	$out.0.fax_number = $in.0.fax_number;
+	$out.0.distributor_name = $in.0.distributor_name;
+	$out.0.website_address = $in.0.website_address;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+	DBA VARCHAR(255),
+	STORE_NUMBER VARCHAR(255),
+	STORE_BRAND VARCHAR(255),
+	STORE_NAME VARCHAR(255),
+	ADDRESS VARCHAR(255),
+	CITY VARCHAR(255),
+	STATE VARCHAR(255),
+	ZIP_CODE VARCHAR(255),
+	PHONE_NUMBER VARCHAR(255),
+	STORE_HOURS VARCHAR(255),
+	LATITUDE VARCHAR(255),
+	LONGITUDEGEO_ACCURACY VARCHAR(255),
+	COUNTRY VARCHAR(255),
+	COUNTRY_CODE VARCHAR(255),
+	COUNTY VARCHAR(255),
+	STORE_TYPE VARCHAR(255),
+	ADDRESS_LINE_2 VARCHAR(255),
+	FAX_NUMBER VARCHAR(255),
+	DISTRIBUTOR_NAME VARCHAR(255),
+	WEBSITE_ADDRESS VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+	DBA,
+	STORE_NUMBER,
+	STORE_BRAND,
+	STORE_NAME,
+	ADDRESS,
+	CITY,
+	STATE,
+	ZIP_CODE,
+	PHONE_NUMBER,
+	STORE_HOURS,
+	LATITUDE,
+	LONGITUDEGEO_ACCURACY,
+	COUNTRY,
+	COUNTRY_CODE,
+	COUNTY,
+	STORE_TYPE,
+	ADDRESS_LINE_2,
+	FAX_NUMBER,
+	DISTRIBUTOR_NAME,
+	WEBSITE_ADDRESS
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>
