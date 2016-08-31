@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Wed Aug 31 14:48:24 EDT 2016" description="Used a script to generate a list of fuzzy matched enigma names to old hb1 data &#10;(which in turn, is mapped to just companies.) So, ultimately, these are mapped to just&#10;companies. There are thousands so easier to load via graph than manually do update." guiVersion="3.4.4.P" id="1472670175338" licenseType="Commercial" modified="Wed Aug 31 18:24:10 EDT 2016" modifiedBy="hankmobley" name="H1BVisa#EnigmaManualMatch" revision="1.21" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Enigma_to_H1BVisaOrig_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="enigma_company_name" type="string"/>
+<Field name="h1bvisa_company_name" type="string"/>
+<Field name="h1bvisa_ticker" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Enigma_to_H1BVisaOrig_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="enigma_company_name" type="string"/>
+<Field name="h1bvisa_company_name" type="string"/>
+<Field name="h1bvisa_ticker" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter18" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/justcustom/adjustments/h1bvisa/enigma-to-h1bvisaorig.xlsx"/>
+<Property id="GraphParameter20" name="ENIGMA_TABLENAME" value="STG_ENIGMAH1BVISA"/>
+<Property id="GraphParameter22" name="H1BVISA_JUST_TABLENAME" value="LKP_H1BVISA_COMPANY"/>
+<Property id="GraphParameter21" name="H1BVISA_TABLENAME" value="STG_H1BVISA"/>
+<Property id="GraphParameter14" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/enigmatoh1bvisaorigerror.txt"/>
+<Property id="GraphParameter15" name="READFILEPATH" value="${DATA_TMP_DIR}/enigma-to-h1bvisaorig.xlsx"/>
+<Property id="GraphParameter16" name="TABLENAME" value="LKP_ENIGMA_COMPANY"/>
+<Property id="GraphParameter19" name="TMP_TABLENAME" value="TMP_ENIGMA_H1BVISA"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Property id="GraphParameter17" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmatoh1visaorigerror.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="276" guiY="35" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="453" guiY="129" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="91" guiY="129" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="276" guiY="129" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.enigma_company_name = $in.0.enigma_company_name;
+	$out.0.h1bvisa_company_name = $in.0.h1bvisa_company_name;
+	$out.0.h1bvisa_ticker = $in.0.h1bvisa_ticker;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="91" guiY="223" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="276" guiY="223" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TMP_TABLENAME} (
+  ENIGMA_COMPANY_NAME VARCHAR(255),
+  H1BVISA_COMPANY_NAME VARCHAR(255),
+  H1BVISA_TICKER VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="453" guiY="223" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TMP_TABLENAME} (
+	ENIGMA_COMPANY_NAME,
+	H1BVISA_COMPANY_NAME,
+    H1BVISA_TICKER
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="91" guiY="307" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="276" guiY="307" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="453" guiY="307" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="91" guiY="397" id="DROP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="272" guiY="397" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE ${TABLENAME} (
+  ENIGMA_EMPLOYER_NAME VARCHAR(255) NOT NULL UNIQUE,
+  JUST_CO_ID VARCHAR(15) NOT NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="453" guiY="397" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLENAME}
+SELECT DISTINCT e.ENIGMA_COMPANY_NAME, j.JUST_CO_ID
+FROM ${TMP_TABLENAME} e
+JOIN (SELECT EMPLOYER, TICKER FROM ${H1BVISA_TABLENAME} GROUP BY EMPLOYER, TICKER) h ON h.EMPLOYER = e.H1BVISA_COMPANY_NAME AND h.TICKER = e.H1BVISA_TICKER
+JOIN ${H1BVISA_JUST_TABLENAME} j ON j.H1BVISA_TICKER = h.TICKER;
+
+INSERT INTO ${TABLENAME}
+SELECT DISTINCT e.EMPLOYER_NAME, j.JUST_CO_ID
+FROM (SELECT EMPLOYER_NAME FROM ${ENIGMA_TABLENAME} GROUP BY EMPLOYER_NAME) e
+JOIN (SELECT EMPLOYER, TICKER FROM ${H1BVISA_TABLENAME} GROUP BY EMPLOYER, TICKER) h ON h.EMPLOYER = e.EMPLOYER_NAME
+JOIN ${H1BVISA_JUST_TABLENAME} j ON j.H1BVISA_TICKER = h.TICKER
+WHERE e.EMPLOYER_NAME NOT IN (SELECT ENIGMA_EMPLOYER_NAME FROM ${TABLENAME});
+]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="91" guiY="489" id="DROP_TEMP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>
