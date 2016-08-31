@@ -1,5 +1,41 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 30 19:07:45 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.219" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 30 19:33:29 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.227" showComponentDetails="true">
 <Global>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="Agg_Company_Locations_Read" recordDelimiter="\n" type="delimited">
+<Field format="" label="list_name" name="list_name" type="string"/>
+<Field format="" label="TICKER" name="TICKER" type="string"/>
+<Field label="parent_list_name" name="parent_list_name" type="string"/>
+<Field label="store_name" name="store_name" type="string"/>
+<Field label="store_type" name="store_type" type="string"/>
+<Field format="" label="address" name="address" type="string"/>
+<Field format="" label="city" name="city" type="string"/>
+<Field format="" label="county" name="county" type="string"/>
+<Field format="" label="state" name="state" type="string"/>
+<Field format="" label="country" name="country" type="string"/>
+<Field format="" label="longitude" name="longitude" type="number"/>
+<Field format="" label="latitude" name="latitude" type="number"/>
+<Field format="" label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field format="" label="sic_code" name="sic_code" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="Agg_Company_Locations_Write" recordDelimiter="\n" type="delimited">
+<Field label="list_name" name="list_name" type="string"/>
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="parent_list_name" name="parent_list_name" type="string"/>
+<Field label="store_name" name="store_name" type="string"/>
+<Field label="store_type" name="store_type" type="string"/>
+<Field label="address" name="address" type="string"/>
+<Field label="city" name="city" type="string"/>
+<Field label="county" name="county" type="string"/>
+<Field label="state" name="state" type="string"/>
+<Field label="country" name="country" type="string"/>
+<Field label="longitude" name="longitude" type="number"/>
+<Field label="latitude" name="latitude" type="number"/>
+<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field label="sic_code" name="sic_code" type="string"/>
+</Record>
+</Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/aggdata/AggDataforUpload.xls"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/aggcompanylocationserror2.txt"/>
@@ -10,38 +46,30 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
-<Node enabled="enabled" guiName="Read File" guiX="69" guiY="129" id="READ_FILE" type="SPREADSHEET_READER"/>
-<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="69" guiY="129" id="READ_FILE" type="SPREADSHEET_READER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.dba = $in.0.dba;
-	$out.0.store_number = $in.0.store_number;
-	$out.0.store_brand = $in.0.store_brand;
-	$out.0.store_name = $in.0.store_name;
+	$out.0.list_name = $in.0.list_name;
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.parent_list_name = ($in.0.parent_list_name == null) ? $in.0.parent_list_name : replace($in.0.parent_list_name,"[|]","-") ;;
+	$out.0.store_name = ($in.0.store_name == null) ? $in.0.store_name : replace($in.0.store_name,"[|]","-") ;
+	$out.0.store_type = $in.0.store_type;
 	$out.0.address = $in.0.address;
 	$out.0.city = $in.0.city;
-	$out.0.state = $in.0.state;
-	$out.0.zip_code = $in.0.zip_code;
-	$out.0.phone_number = $in.0.phone_number;
-	$out.0.store_hours = $in.0.store_hours;
-	$out.0.latitude = $in.0.latitude;
-	$out.0.longitude = $in.0.longitude;
-	$out.0.geo_accuracy = $in.0.geo_accuracy;
-	$out.0.country = $in.0.country;
-	$out.0.country_code = $in.0.country_code;
 	$out.0.county = $in.0.county;
-	$out.0.store_type = $in.0.store_type;
-	$out.0.address_line_2 = $in.0.address_line_2;
-	$out.0.fax_number = $in.0.fax_number;
-	$out.0.distributor_name = $in.0.distributor_name;
-	$out.0.website_address = $in.0.website_address;
+	$out.0.state = $in.0.state;
+	$out.0.country = $in.0.country;
+	$out.0.longitude = $in.0.longitude;
+	$out.0.latitude = $in.0.latitude;
+	$out.0.geo_accuracy = $in.0.geo_accuracy;
+	$out.0.sic_code = ($in.0.sic_code == null) ? $in.0.sic_code : replace($in.0.sic_code,"[|]","-") ;
 
 	return ALL;
 }
@@ -65,6 +93,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
@@ -75,52 +104,40 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-	DBA VARCHAR(255),
-	STORE_NUMBER VARCHAR(255),
-	STORE_BRAND VARCHAR(255),
+	LIST_NAME VARCHAR(255),
+	TICKER VARCHAR(255),
+	PARENT_LIST_NAME VARCHAR(255),
 	STORE_NAME VARCHAR(255),
+	STORE_TYPE VARCHAR(255),
 	ADDRESS VARCHAR(255),
 	CITY VARCHAR(255),
-	STATE VARCHAR(255),
-	ZIP_CODE VARCHAR(255),
-	PHONE_NUMBER VARCHAR(255),
-	STORE_HOURS VARCHAR(255),
-	LATITUDE VARCHAR(255),
-	LONGITUDEGEO_ACCURACY VARCHAR(255),
-	COUNTRY VARCHAR(255),
-	COUNTRY_CODE VARCHAR(255),
 	COUNTY VARCHAR(255),
-	STORE_TYPE VARCHAR(255),
-	ADDRESS_LINE_2 VARCHAR(255),
-	FAX_NUMBER VARCHAR(255),
-	DISTRIBUTOR_NAME VARCHAR(255),
-	WEBSITE_ADDRESS VARCHAR(255)
+	STATE VARCHAR(255),
+	COUNTRY VARCHAR(255),
+	LONGITUDE VARCHAR(255),
+	LATITUDE VARCHAR(255),
+	GEO_ACCURACY VARCHAR(255),
+	SIC_CODE VARCHAR(255)	
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	DBA,
-	STORE_NUMBER,
-	STORE_BRAND,
+	LIST_NAME,
+	TICKER,
+	PARENT_LIST_NAME,
 	STORE_NAME,
+	STORE_TYPE,
 	ADDRESS,
 	CITY,
-	STATE,
-	ZIP_CODE,
-	PHONE_NUMBER,
-	STORE_HOURS,
-	LATITUDE,
-	LONGITUDEGEO_ACCURACY,
-	COUNTRY,
-	COUNTRY_CODE,
 	COUNTY,
-	STORE_TYPE,
-	ADDRESS_LINE_2,
-	FAX_NUMBER,
-	DISTRIBUTOR_NAME,
-	WEBSITE_ADDRESS
+	STATE,
+	COUNTRY,
+	LONGITUDE,
+	LATITUDE,
+	GEO_ACCURACY,
+	SIC_CODE
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
@@ -128,8 +145,8 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
