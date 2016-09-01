@@ -1,27 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Aug 30 19:33:29 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.227" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 31 17:11:22 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.232" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata0">
-<Record fieldDelimiter="|" name="Agg_Company_Locations_Read" recordDelimiter="\n" type="delimited">
-<Field format="" label="list_name" name="list_name" type="string"/>
-<Field format="" label="TICKER" name="TICKER" type="string"/>
-<Field label="parent_list_name" name="parent_list_name" type="string"/>
-<Field label="store_name" name="store_name" type="string"/>
-<Field label="store_type" name="store_type" type="string"/>
-<Field format="" label="address" name="address" type="string"/>
-<Field format="" label="city" name="city" type="string"/>
-<Field format="" label="county" name="county" type="string"/>
-<Field format="" label="state" name="state" type="string"/>
-<Field format="" label="country" name="country" type="string"/>
-<Field format="" label="longitude" name="longitude" type="number"/>
-<Field format="" label="latitude" name="latitude" type="number"/>
-<Field format="" label="geo_accuracy" name="geo_accuracy" type="string"/>
-<Field format="" label="sic_code" name="sic_code" type="string"/>
-</Record>
-</Metadata>
-<Metadata id="Metadata1">
-<Record fieldDelimiter="|" name="Agg_Company_Locations_Write" recordDelimiter="\n" type="delimited">
-<Field label="list_name" name="list_name" type="string"/>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Agg_Company_Locations_Read" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field label="TICKER" name="TICKER" type="string"/>
+<Field label="list_name" name="list_name" type="string"/>
 <Field label="parent_list_name" name="parent_list_name" type="string"/>
 <Field label="store_name" name="store_name" type="string"/>
 <Field label="store_type" name="store_type" type="string"/>
@@ -30,16 +12,34 @@
 <Field label="county" name="county" type="string"/>
 <Field label="state" name="state" type="string"/>
 <Field label="country" name="country" type="string"/>
-<Field label="longitude" name="longitude" type="number"/>
-<Field label="latitude" name="latitude" type="number"/>
+<Field label="longitude" name="longitude" type="string"/>
+<Field label="latitude" name="latitude" type="string"/>
+<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field label="sic_code" name="sic_code" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Agg_Company_Locations_Write" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="list_name" name="list_name" type="string"/>
+<Field label="parent_list_name" name="parent_list_name" type="string"/>
+<Field label="store_name" name="store_name" type="string"/>
+<Field label="store_type" name="store_type" type="string"/>
+<Field label="address" name="address" type="string"/>
+<Field label="city" name="city" type="string"/>
+<Field label="county" name="county" type="string"/>
+<Field label="state" name="state" type="string"/>
+<Field label="country" name="country" type="string"/>
+<Field label="longitude" name="longitude" type="string"/>
+<Field label="latitude" name="latitude" type="string"/>
 <Field label="geo_accuracy" name="geo_accuracy" type="string"/>
 <Field label="sic_code" name="sic_code" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/aggdata/AggDataforUpload.xls"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/aggdata/AGGDATAFINALORIQUIT.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/aggcompanylocationserror2.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/AggDataforUpload.xls"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/AGGDATAFINALORIQUIT.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_AGGCOMPANYLOCATIONS"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/aggcompanylocations2.txt"/>
@@ -56,20 +56,20 @@
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.list_name = $in.0.list_name;
-	$out.0.TICKER = $in.0.TICKER;
-	$out.0.parent_list_name = ($in.0.parent_list_name == null) ? $in.0.parent_list_name : replace($in.0.parent_list_name,"[|]","-") ;;
-	$out.0.store_name = ($in.0.store_name == null) ? $in.0.store_name : replace($in.0.store_name,"[|]","-") ;
-	$out.0.store_type = $in.0.store_type;
-	$out.0.address = $in.0.address;
-	$out.0.city = $in.0.city;
-	$out.0.county = $in.0.county;
-	$out.0.state = $in.0.state;
-	$out.0.country = $in.0.country;
-	$out.0.longitude = $in.0.longitude;
-	$out.0.latitude = $in.0.latitude;
-	$out.0.geo_accuracy = $in.0.geo_accuracy;
-	$out.0.sic_code = ($in.0.sic_code == null) ? $in.0.sic_code : replace($in.0.sic_code,"[|]","-") ;
+	$out.0.TICKER = ($out.0.TICKER != null) ? trim($in.0.TICKER): null;
+	$out.0.list_name = ($in.0.list_name != null) ? trim($in.0.list_name): null;
+	$out.0.parent_list_name = ($in.0.parent_list_name != null) ? trim(replace($in.0.parent_list_name,"[|]","-")): null;
+	$out.0.store_name = ($in.0.store_name != null) ? trim(replace($in.0.store_name,"[|]","-")): null ;
+	$out.0.store_type = ($in.0.store_type != null) ? trim(replace($in.0.store_type,"[|]","-")): null;
+	$out.0.address = ($in.0.address != null) ? trim(replace($in.0.address,"[|]","-")): null;
+	$out.0.city = ($in.0.city!= null) ? trim($in.0.city): null;
+	$out.0.county = ($in.0.county != null) ? trim($in.0.county): null;
+	$out.0.state = ($in.0.state != null) ? trim($in.0.state): null;
+	$out.0.country = ($in.0.country!= null) ? trim($in.0.country): null;
+	$out.0.longitude = ($in.0.longitude != null) ? trim($in.0.longitude): null;
+	$out.0.latitude = ($in.0.latitude != null) ? trim($in.0.latitude): null;
+	$out.0.geo_accuracy =  ($in.0.geo_accuracy != null) ? trim($in.0.geo_accuracy): null;
+	$out.0.sic_code = ($in.0.sic_code != null) ? trim(replace($in.0.sic_code,"[|]","-")): null;
 
 	return ALL;
 }
@@ -104,8 +104,8 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+	TICKER VARCHAR(255),	
 	LIST_NAME VARCHAR(255),
-	TICKER VARCHAR(255),
 	PARENT_LIST_NAME VARCHAR(255),
 	STORE_NAME VARCHAR(255),
 	STORE_TYPE VARCHAR(255),
@@ -124,8 +124,8 @@ function integer transform() {
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	LIST_NAME,
-	TICKER,
+	TICKER,	
+	LIST_NAME,	
 	PARENT_LIST_NAME,
 	STORE_NAME,
 	STORE_TYPE,
