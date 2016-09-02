@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Generates a fair pay report for a given industry." guiVersion="3.4.4.P" id="1472786045871" licenseType="Commercial" modified="Fri Sep 02 14:33:59 EDT 2016" modifiedBy="hankmobley" name="GenerateFairPayReport" revision="1.25" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Generates a fair pay report for a given industry." guiVersion="3.4.4.P" id="1472786045871" licenseType="Commercial" modified="Fri Sep 02 14:48:14 EDT 2016" modifiedBy="scalvillo" name="GenerateFairPayReport" revision="1.28" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="GOC_DB" recordDelimiter="\n" type="delimited">
@@ -27,16 +27,16 @@
 </Record>
 </Metadata>
 <Metadata id="Metadata4" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="sql_read" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="sql_read" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" type="delimited">
 <Field name="sql" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="FAIR_TRADE_REPORT_DIR" value="${DATA_DIR}/fair-trade-reports"/>
-<Property id="GraphParameter16" name="INPUT_DATA_DIR" value="${DATA_DIR}/input"/>
-<Property id="GraphParameter15" name="REPORTFILEPATH" value="${FAIR_TRADE_REPORT_DIR}/${REPORTNAME}"/>
-<Property id="GraphParameter19" name="REPORTNAME" value="blah.csv"/>
-<Property fileURL="workspace.prm" id="GraphParameter1"/>
+<Property id="GraphParameter1" name="INPUT_DATA_DIR" value="${DATA_DIR}/input"/>
+<Property id="GraphParameter2" name="REPORTFILEPATH" value="${FAIR_TRADE_REPORT_DIR}/${REPORTNAME}"/>
+<Property id="GraphParameter3" name="REPORTNAME" value="blah.csv"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -45,8 +45,8 @@
 <Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="DBINPUT_TABLE:0"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${REPORTFILEPATH}${job}.csv" guiName="CSV Writer" guiX="469" guiY="125" id="CSV_WRITER" type="DATA_WRITER"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="DBInputTable" guiX="93" guiY="125" id="DBINPUT_TABLE" passThroughOutputPort="0" type="DB_INPUT_TABLE">
+<Node enabled="enabled" fileURL="${DATA_TMP_DIR}/temp.txt" guiName="CSV Writer" guiX="469" guiY="125" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DBInputTable" guiX="93" guiY="125" id="DBINPUT_TABLE" passThroughOutputPort="0" type="DB_INPUT_TABLE" url="port:$0.sql:discrete">
 <attr name="sqlQuery"><![CDATA[
 ]]></attr>
 </Node>
