@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Generates a fair pay report for a given industry." guiVersion="3.4.4.P" id="1472786045871" licenseType="Commercial" modified="Fri Sep 02 14:33:59 EDT 2016" modifiedBy="hankmobley" name="GenerateFairPayReport" revision="1.25" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="GOC_DB" recordDelimiter="\n" type="delimited">
+<Field name="goc" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="GOC_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Job" type="string"/>
+<Field name="C1" type="string"/>
+<Field name="C2" type="string"/>
+<Field name="C3" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3">
+<Record fieldDelimiter="|" name="Industries_Input" recordDelimiter="\n" type="delimited">
+<Field name="job" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2">
+<Record fieldDelimiter="|" name="Job" recordDelimiter="\n" type="delimited">
+<Field name="Job" type="string"/>
+<Field name="C1" type="string"/>
+<Field name="C2" type="string"/>
+<Field name="C3" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata4" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="sql_read" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" recordDelimiter="\n" type="delimited">
+<Field name="sql" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="FAIR_TRADE_REPORT_DIR" value="${DATA_DIR}/fair-trade-reports"/>
+<Property id="GraphParameter16" name="INPUT_DATA_DIR" value="${DATA_DIR}/input"/>
+<Property id="GraphParameter15" name="REPORTFILEPATH" value="${FAIR_TRADE_REPORT_DIR}/${REPORTNAME}"/>
+<Property id="GraphParameter19" name="REPORTNAME" value="blah.csv"/>
+<Property fileURL="workspace.prm" id="GraphParameter1"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="${PROJECT}/sql/fairpay.sql" guiName="CSV Reader" guiX="61" guiY="233" id="CSV_READER" type="DATA_READER"/>
+<Node baseURL="${REPORTFILEPATH}" enabled="enabled" guiName="Delete Report" guiX="269" guiY="31" id="DELETE_REPORT" type="FILE_DELETE"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="DBINPUT_TABLE:0"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${REPORTFILEPATH}${job}.csv" guiName="CSV Writer" guiX="469" guiY="125" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DBInputTable" guiX="93" guiY="125" id="DBINPUT_TABLE" passThroughOutputPort="0" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="276" guiY="125" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+    $out.0.Job = $in.0.Job;
+    $out.0.C1 = $in.0.C1;
+    $out.0.C2 = $in.0.C2;
+    $out.0.C3 = $in.0.C3;
+ 
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="DBINPUT_TABLE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+</Graph>
