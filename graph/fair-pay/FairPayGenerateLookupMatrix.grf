@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Sun Sep 04 17:35:23 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.13" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="industry" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="SQL_Industry_Queue" recordDelimiter="\n" type="delimited">
+<Field name="sql" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Industry Queue" guiX="333" guiY="9" id="CREATE_INDUSTRY_QUEUE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${INDUSTRY_QUEUE_TABLENAME};
+create table if not exists ${INDUSTRY_QUEUE_TABLENAME} (
+  ID AUTO_INCREMENT,
+  INDUSTRY VARCHAR(128)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Lookup Matrix" guiX="153" guiY="9" id="CREATE_LOOKUP_MATRIX" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${FAIRPAY_MATRIX_TABLENAME};
+create table ${FAIRPAY_MATRIX_TABLENAME} (
+  INDUSTRY VARCHAR(255) NOT NULL, 
+  DISPLAY_ORDER INT NOT NULL, /*0=headerr, 1=data, 2=totals*/ 
+  VALUE_TYPE INT NULL, /*0 = header, 1 = adjusted_hourly, 2 = score, 3 = raw hourly, 4 = raw hourly score, 5 = job count*/
+  JOB VARCHAR(255) NOT NULL,
+  JUST_CO_ID VARCHAR(15) NULL,
+  COMPANY_VALUE VARCHAR(255) NULL,
+  C1 VARCHAR(255) NULL, C2 VARCHAR(255) NULL, C3 VARCHAR(255) NULL, C4 VARCHAR(255) NULL, C5 VARCHAR(255) NULL, C6 VARCHAR(255) NULL, C7 VARCHAR(255) NULL, C8 VARCHAR(255) NULL, C9 VARCHAR(255) NULL, C10 VARCHAR(255) NULL,
+  C11 VARCHAR(255) NULL, C12 VARCHAR(255) NULL, C13 VARCHAR(255) NULL, C14 VARCHAR(255) NULL, C15 VARCHAR(255) NULL, C16 VARCHAR(255) NULL, C17 VARCHAR(255) NULL, C18 VARCHAR(255) NULL, C19 VARCHAR(255) NULL, C20 VARCHAR(255) NULL,
+  C21 VARCHAR(255) NULL, C22 VARCHAR(255) NULL, C23 VARCHAR(255) NULL, C24 VARCHAR(255) NULL, C25 VARCHAR(255) NULL, C26 VARCHAR(255) NULL, C27 VARCHAR(255) NULL, C28 VARCHAR(255) NULL, C29 VARCHAR(255) NULL, C30 VARCHAR(255) NULL,
+  C31 VARCHAR(255) NULL, C32 VARCHAR(255) NULL, C33 VARCHAR(255) NULL, C34 VARCHAR(255) NULL, C35 VARCHAR(255) NULL, C36 VARCHAR(255) NULL, C37 VARCHAR(255) NULL, C38 VARCHAR(255) NULL, C39 VARCHAR(255) NULL, C40 VARCHAR(255) NULL,
+  C41 VARCHAR(255) NULL, C42 VARCHAR(255) NULL, C43 VARCHAR(255) NULL, C44 VARCHAR(255) NULL, C45 VARCHAR(255) NULL, C46 VARCHAR(255) NULL, C47 VARCHAR(255) NULL, C48 VARCHAR(255) NULL, C49 VARCHAR(255) NULL, C50 VARCHAR(255) NULL,
+  COMPANY_JOB_SCORE INT NULL, 
+  JOB_COMPANY_COUNT INT NULL, 
+  COMPANY_SALARY_COUNT INT NULL 
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Read List of Industries" guiX="35" guiY="91" id="READ_LIST_OF_INDUSTRIES" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select distinct $industry:= i.just_indy
+from lkp_glassdoor_company g
+join lkp_just_co_indy i on g.just_company_id = i.just_co_id
+group by i.just_indy
+order by i.just_indy;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Run Industry Queue Insert" guiX="504" guiY="91" id="RUN_INDUSTRY_QUEUE_INSERT" type="DB_EXECUTE" url="port:$0.sql:discrete"/>
+<Node enabled="enabled" guiName="Translate to SQL to Industry Queue insert" guiX="216" guiY="91" id="TRANSLATE_TO_SQL_TO_INDUSTRY_QUEUE_INSERT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.sql = replace("insert into ${INDUSTRY_QUEUE_TABLENAME} (INDUSTRY) values ('$0');","\\$0", $in.0.industry);
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_LIST_OF_INDUSTRIES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="TRANSLATE_TO_SQL_TO_INDUSTRY_QUEUE_INSERT:0"/>
+<Edge fromNode="TRANSLATE_TO_SQL_TO_INDUSTRY_QUEUE_INSERT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (input parameters)" metadata="Metadata1" outPort="Port 0 (out)" toNode="RUN_INDUSTRY_QUEUE_INSERT:0"/>
+</Phase>
+<Phase number="2">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fair-pay/FairPayGenerateCurrentIndustryData.grf" guiName="RunGraph" guiX="35" guiY="203" id="RUN_GRAPH" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="3">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fair-pay/FairPayGenerateCurrentIndustryData.grf" guiName="RunGraph" guiX="183" guiY="203" id="RUN_GRAPH1" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="4">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fair-pay/FairPayGenerateCurrentIndustryData.grf" guiName="RunGraph" guiX="329" guiY="203" id="RUN_GRAPH2" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up" guiX="263" guiY="304" id="CLEAN_UP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${INDUSTRY_QUEUE_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>

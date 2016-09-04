@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 02 09:23:20 EDT 2016" description="Generates report for industry only." guiVersion="3.4.4.P" id="1472845738958" licenseType="Commercial" modified="Fri Sep 02 19:15:20 EDT 2016" modifiedBy="hankmobley" name="FairPayReportIndustry" revision="1.17" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 02 09:23:20 EDT 2016" description="Generates report for industry only." guiVersion="3.4.4.P" id="1472845738958" licenseType="Commercial" modified="Sat Sep 03 12:55:21 EDT 2016" modifiedBy="hankmobley" name="FairPayReportIndustry" revision="1.18" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Summary_DB" recordDelimiter="\n" type="delimited">
@@ -159,7 +159,7 @@ insert into TMP_PARAM_INDUSTRY (IND) values (${INDUSTRY});
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Generate Temp Tables" guiX="301" guiY="151" id="GENERATE_TEMP_TABLES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Generate Temp Tables" guiX="313" guiY="150" id="GENERATE_TEMP_TABLES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists TMP_GD_TOTAL_COMPANIES_OF_INTEREST;
 drop table if exists TMP_GD_TOP_JOBS;
 drop table if exists TMP_GD_COMPANIES_OF_INTEREST;
@@ -478,67 +478,67 @@ insert into TMP_JOB_COMPANY_MATRIX_HEADER
 create table TMP_JOB_COMPANY_MATRIX_MASTER (
   /*HEADER INT NOT NULL,*/
   JOB VARCHAR(255) NOT NULL UNIQUE,
-  C1 INT NULL, C2 INT NULL, C3 INT NULL, C4 INT NULL, C5 INT NULL, C6 INT NULL, C7 INT NULL, C8 INT NULL, C9 INT NULL, C10 INT NULL,
-  C11 INT NULL, C12 INT NULL, C13 INT NULL, C14 INT NULL, C15 INT NULL, C16 INT NULL, C17 INT NULL, C18 INT NULL, C19 INT NULL, C20 INT NULL,
-  C21 INT NULL, C22 INT NULL, C23 INT NULL, C24 INT NULL, C25 INT NULL, C26 INT NULL, C27 INT NULL, C28 INT NULL, C29 INT NULL, C30 INT NULL,
-  C31 INT NULL, C32 INT NULL, C33 INT NULL, C34 INT NULL, C35 INT NULL, C36 INT NULL, C37 INT NULL, C38 INT NULL, C39 INT NULL, C40 INT NULL,
-  C41 INT NULL, C42 INT NULL, C43 INT NULL, C44 INT NULL, C45 INT NULL, C46 INT NULL, C47 INT NULL, C48 INT NULL, C49 INT NULL, C50 INT NULL
+  C1 FLOAT NULL, C2 FLOAT NULL, C3 FLOAT NULL, C4 FLOAT NULL, C5 FLOAT NULL, C6 FLOAT NULL, C7 FLOAT NULL, C8 FLOAT NULL, C9 FLOAT NULL, C10 FLOAT NULL,
+  C11 FLOAT NULL, C12 FLOAT NULL, C13 FLOAT NULL, C14 FLOAT NULL, C15 FLOAT NULL, C16 FLOAT NULL, C17 FLOAT NULL, C18 FLOAT NULL, C19 FLOAT NULL, C20 FLOAT NULL,
+  C21 FLOAT NULL, C22 FLOAT NULL, C23 FLOAT NULL, C24 FLOAT NULL, C25 FLOAT NULL, C26 FLOAT NULL, C27 FLOAT NULL, C28 FLOAT NULL, C29 FLOAT NULL, C30 FLOAT NULL,
+  C31 FLOAT NULL, C32 FLOAT NULL, C33 FLOAT NULL, C34 FLOAT NULL, C35 FLOAT NULL, C36 FLOAT NULL, C37 FLOAT NULL, C38 FLOAT NULL, C39 FLOAT NULL, C40 FLOAT NULL,
+  C41 FLOAT NULL, C42 FLOAT NULL, C43 FLOAT NULL, C44 FLOAT NULL, C45 FLOAT NULL, C46 FLOAT NULL, C47 FLOAT NULL, C48 FLOAT NULL, C49 FLOAT NULL, C50 FLOAT NULL
 );
 
 insert into TMP_JOB_COMPANY_MATRIX_MASTER
 select * from (
   select distinct 
     j.job, 
-    max(c1.total) c1, 
-    max(c2.total) c2, 
-    max(c3.total) c3, 
-    max(c4.total) c4, 
-    max(c5.total) c5, 
-    max(c6.total) c6, 
-    max(c7.total) c7, 
-    max(c8.total) c8, 
-    max(c9.total) c9, 
-    max(c10.total) c10,
-    max(c11.total) c11, 
-    max(c12.total) c12, 
-    max(c13.total) c13, 
-    max(c14.total) c14, 
-    max(c15.total) c15, 
-    max(c16.total) c16, 
-    max(c17.total) c17, 
-    max(c18.total) c18, 
-    max(c19.total) c19, 
-    max(c20.total) c20,
-    max(c21.total) c21, 
-    max(c22.total) c22, 
-    max(c23.total) c23, 
-    max(c24.total) c24, 
-    max(c25.total) c25, 
-    max(c26.total) c26, 
-    max(c27.total) c27, 
-    max(c28.total) c28, 
-    max(c29.total) c29, 
-    max(c30.total) c30,
-    max(c31.total) c31, 
-    max(c32.total) c32, 
-    max(c33.total) c33, 
-    max(c34.total) c34, 
-    max(c35.total) c35, 
-    max(c36.total) c36, 
-    max(c37.total) c37, 
-    max(c38.total) c38, 
-    max(c39.total) c39, 
-    max(c40.total) c40,
-    max(c41.total) c41, 
-    max(c42.total) c42, 
-    max(c43.total) c43, 
-    max(c44.total) c44, 
-    max(c45.total) c45, 
-    max(c46.total) c46, 
-    max(c47.total) c47, 
-    max(c48.total) c48, 
-    max(c49.total) c49, 
-    max(c50.total) c50
+    max(c1.rate) c1, 
+    max(c2.rate) c2, 
+    max(c3.rate) c3, 
+    max(c4.rate) c4, 
+    max(c5.rate) c5, 
+    max(c6.rate) c6, 
+    max(c7.rate) c7, 
+    max(c8.rate) c8, 
+    max(c9.rate) c9, 
+    max(c10.rate) c10,
+    max(c11.rate) c11, 
+    max(c12.rate) c12, 
+    max(c13.rate) c13, 
+    max(c14.rate) c14, 
+    max(c15.rate) c15, 
+    max(c16.rate) c16, 
+    max(c17.rate) c17, 
+    max(c18.rate) c18, 
+    max(c19.rate) c19, 
+    max(c20.rate) c20,
+    max(c21.rate) c21, 
+    max(c22.rate) c22, 
+    max(c23.rate) c23, 
+    max(c24.rate) c24, 
+    max(c25.rate) c25, 
+    max(c26.rate) c26, 
+    max(c27.rate) c27, 
+    max(c28.rate) c28, 
+    max(c29.rate) c29, 
+    max(c30.rate) c30,
+    max(c31.rate) c31, 
+    max(c32.rate) c32, 
+    max(c33.rate) c33, 
+    max(c34.rate) c34, 
+    max(c35.rate) c35, 
+    max(c36.rate) c36, 
+    max(c37.rate) c37, 
+    max(c38.rate) c38, 
+    max(c39.rate) c39, 
+    max(c40.rate) c40,
+    max(c41.rate) c41, 
+    max(c42.rate) c42, 
+    max(c43.rate) c43, 
+    max(c44.rate) c44, 
+    max(c45.rate) c45, 
+    max(c46.rate) c46, 
+    max(c47.rate) c47, 
+    max(c48.rate) c48, 
+    max(c49.rate) c49, 
+    max(c50.rate) c50
   from TMP_JOBS_OF_INTEREST j
   join TMP_GD_SALARY_SUMMARY s on j.job = s.job
   left join TMP_COMPANY_JOB_TOTALS c1 on c1.tmp_company_id = 1 and c1.company = s.company and c1.job = j.job 
