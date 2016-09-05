@@ -1,8 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Sun Sep 04 17:35:23 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.13" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Sun Sep 04 20:49:52 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.18" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="industry" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2">
+<Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
+<Field name="Name" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1">
@@ -84,16 +89,48 @@ function integer transform() {
 <Edge fromNode="TRANSLATE_TO_SQL_TO_INDUSTRY_QUEUE_INSERT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (input parameters)" metadata="Metadata1" outPort="Port 0 (out)" toNode="RUN_INDUSTRY_QUEUE_INSERT:0"/>
 </Phase>
 <Phase number="2">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fair-pay/FairPayGenerateCurrentIndustryData.grf" guiName="RunGraph" guiX="35" guiY="203" id="RUN_GRAPH" type="RUN_GRAPH"/>
-</Phase>
-<Phase number="3">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fair-pay/FairPayGenerateCurrentIndustryData.grf" guiName="RunGraph" guiX="183" guiY="203" id="RUN_GRAPH1" type="RUN_GRAPH"/>
-</Phase>
-<Phase number="4">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fair-pay/FairPayGenerateCurrentIndustryData.grf" guiName="RunGraph" guiX="329" guiY="203" id="RUN_GRAPH2" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Read List of Industries" guiX="45" guiY="169" id="READ_LIST_OF_INDUSTRIES1" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select distinct $industry:= i.just_indy
+from lkp_glassdoor_company g
+join lkp_just_co_indy i on g.just_company_id = i.just_co_id
+group by i.just_indy
+order by i.just_indy;]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="278" guiY="169" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Name = "${GRAPH_DIR}/fair-pay/FairPayGenerateCurrentIndustryData.grf";
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="RunGraph" guiX="480" guiY="169" id="RUN_GRAPH" passThroughInputPort="0" type="RUN_GRAPH"/>
+<Edge fromNode="READ_LIST_OF_INDUSTRIES1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in regular mode: names of the graphs to be executed, otherwise nothing)" metadata="Metadata2" outPort="Port 0 (out)" toNode="RUN_GRAPH:0"/>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up" guiX="263" guiY="304" id="CLEAN_UP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up" guiX="265" guiY="266" id="CLEAN_UP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${INDUSTRY_QUEUE_TABLENAME};]]></attr>
 </Node>
 </Phase>
