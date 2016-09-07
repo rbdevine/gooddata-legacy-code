@@ -1,25 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 31 17:11:22 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.232" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Sep 07 10:29:38 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.240" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="Agg_Company_Locations_Read" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field label="TICKER" name="TICKER" type="string"/>
-<Field label="list_name" name="list_name" type="string"/>
+<Record fieldDelimiter="|" name="AGG_COMPANYLOCATIONS_READ" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field format="" label="TICKER" name="TICKER" type="string"/>
+<Field format="" label="list_name" name="list_name" type="string"/>
 <Field label="parent_list_name" name="parent_list_name" type="string"/>
-<Field label="store_name" name="store_name" type="string"/>
-<Field label="store_type" name="store_type" type="string"/>
-<Field label="address" name="address" type="string"/>
-<Field label="city" name="city" type="string"/>
-<Field label="county" name="county" type="string"/>
-<Field label="state" name="state" type="string"/>
-<Field label="country" name="country" type="string"/>
-<Field label="longitude" name="longitude" type="string"/>
-<Field label="latitude" name="latitude" type="string"/>
-<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
-<Field label="sic_code" name="sic_code" type="string"/>
+<Field format="" label="store_name" name="store_name" type="string"/>
+<Field format="" label="store_type" name="store_type" type="string"/>
+<Field format="" label="address" name="address" type="string"/>
+<Field format="" label="city" name="city" type="string"/>
+<Field format="" label="county" name="county" type="string"/>
+<Field format="" label="state" name="state" type="string"/>
+<Field format="" label="country" name="country" type="string"/>
+<Field format="" label="longitude" name="longitude" type="string"/>
+<Field format="" label="latitude" name="latitude" type="string"/>
+<Field format="" label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field format="" label="sic_code" name="sic_code" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="Agg_Company_Locations_Write" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="AGG_COMPANYLOCATIONS_WRITE" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field label="TICKER" name="TICKER" type="string"/>
 <Field label="list_name" name="list_name" type="string"/>
 <Field label="parent_list_name" name="parent_list_name" type="string"/>
@@ -42,7 +42,7 @@
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/AGGDATAFINALORIQUIT.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_AGGCOMPANYLOCATIONS"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/aggcompanylocations2.txt"/>
+<Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/aggcompanylocations2.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -56,7 +56,7 @@
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.TICKER = ($out.0.TICKER != null) ? trim($in.0.TICKER): null;
+	$out.0.TICKER = ($in.0.TICKER != null) ? trim($in.0.TICKER): null;
 	$out.0.list_name = ($in.0.list_name != null) ? trim($in.0.list_name): null;
 	$out.0.parent_list_name = ($in.0.parent_list_name != null) ? trim(replace($in.0.parent_list_name,"[|]","-")): null;
 	$out.0.store_name = ($in.0.store_name != null) ? trim(replace($in.0.store_name,"[|]","-")): null ;
@@ -93,8 +93,8 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
@@ -145,7 +145,7 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH}" enabled="disabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
