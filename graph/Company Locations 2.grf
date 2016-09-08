@@ -1,21 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Sep 07 10:29:38 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.240" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Sep 08 13:43:00 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.249" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="AGG_COMPANYLOCATIONS_READ" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field format="" label="TICKER" name="TICKER" type="string"/>
-<Field format="" label="list_name" name="list_name" type="string"/>
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="list_name" name="list_name" type="string"/>
 <Field label="parent_list_name" name="parent_list_name" type="string"/>
-<Field format="" label="store_name" name="store_name" type="string"/>
-<Field format="" label="store_type" name="store_type" type="string"/>
-<Field format="" label="address" name="address" type="string"/>
-<Field format="" label="city" name="city" type="string"/>
-<Field format="" label="county" name="county" type="string"/>
-<Field format="" label="state" name="state" type="string"/>
-<Field format="" label="country" name="country" type="string"/>
-<Field format="" label="longitude" name="longitude" type="string"/>
-<Field format="" label="latitude" name="latitude" type="string"/>
-<Field format="" label="geo_accuracy" name="geo_accuracy" type="string"/>
-<Field format="" label="sic_code" name="sic_code" type="string"/>
+<Field label="store_name" name="store_name" type="string"/>
+<Field label="store_type" name="store_type" type="string"/>
+<Field label="address" name="address" type="string"/>
+<Field label="city" name="city" type="string"/>
+<Field label="county" name="county" type="string"/>
+<Field label="state" name="state" type="string"/>
+<Field label="country" name="country" type="string"/>
+<Field label="longitude" name="longitude" type="string"/>
+<Field label="latitude" name="latitude" type="string"/>
+<Field label="geo_accuracy" name="geo_accuracy" type="string"/>
+<Field label="sic_code" name="sic_code" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
@@ -34,6 +34,10 @@
 <Field label="latitude" name="latitude" type="string"/>
 <Field label="geo_accuracy" name="geo_accuracy" type="string"/>
 <Field label="sic_code" name="sic_code" type="string"/>
+<Field name="just_city_name" type="string"/>
+<Field name="just_county_name" type="string"/>
+<Field name="just_state_name" type="string"/>
+<Field name="just_state_abbreviation" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -70,8 +74,122 @@ function integer transform() {
 	$out.0.latitude = ($in.0.latitude != null) ? trim($in.0.latitude): null;
 	$out.0.geo_accuracy =  ($in.0.geo_accuracy != null) ? trim($in.0.geo_accuracy): null;
 	$out.0.sic_code = ($in.0.sic_code != null) ? trim(replace($in.0.sic_code,"[|]","-")): null;
-
+	
+	//out parameters to facilitate joining
+	string cityName; string countyName;string stateName;string stateAbbrev;
+	
+	cityName = ($in.0.city != null) ? trim(upperCase($in.0.city)): null;
+	countyName = ($in.0.county != null) ? trim(upperCase($in.0.county)): null;
+	if ($in.0.county != null)
+	{
+		countyName = (indexOf(countyName,"ST ") > 0) ? replace(countyName,"ST\\s","ST. "): countyName;
+	}
+	
+	if($in.0.state != null) {
+		stateName = (length($in.0.state) <> 2) ? trim(upperCase($in.0.state)): null;
+		stateAbbrev = (length($in.0.state) == 2) ? trim(upperCase($in.0.state)): null;
+	}
+	
+	$out.0.just_city_name = cityName;
+	$out.0.just_county_name = countyName;
+	$out.0.just_state_abbreviation = stateAbbrev;
+	if (stateAbbrev=="ALABAMA") {
+		stateAbbrev = "AL";
+	}
+	else if (stateAbbrev=="ARIZONA") {
+		stateAbbrev = "AL";
+	}
+	else if (stateAbbrev=="CAROLINA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="COLORADO") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="FLORIDA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="GEORGIA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="INDIANA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="KANSAS") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="KENTUCKY") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="LOUISIANA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="MICHIGAN") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="MISSISSIPPI") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="NEVADA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="NEW MEXICO") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="NORTH CAROLINA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="PUERTO RICO") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="SAN JUAN") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="TENNESSEE") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="TEXAS") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="UTAH") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="VIRGINIA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="WEST VIRGINIA") {
+		stateAbbrev = "AL";
+	}
+	else if(stateAbbrev=="WYOMING") {
+		stateAbbrev = "AL";
+	}
+	
 	return ALL;
+	
+	/*
+	if (cityName == "SAINT LOUIS") {
+		cityName = "ST. LOUIS";	
+	}
+	if (countyName == "ST CHARLES COUNTY") {
+		countyName = "ST. CHARLES COUNTY";	
+	}
+	else if (countyName == "ST CLAIR COUNTY") {
+		countyName = "ST. CLAIR COUNTY";	
+	}
+	else if (countyName == "ST JAMES PARISH") {
+		countyName = "ST. JAMES PARISH";	
+	}
+	else if (countyName == "ST JOHNS THE BAPTIST PARISH") {
+		countyName = "ST. JOHNS THE BAPTIST PARISH";	
+	}
+	else if (countyName == "ST JOHNS COUNTY") {
+		countyName = "ST. JOHNS COUNTY";	
+	}
+	else if (countyName == "ST LOUIS COUNTY") {
+		countyName = "ST. LOUIS COUNTY";	
+	}
+	else if (countyName == "ST LUCIE COUNTY") {
+		countyName = "ST. LUCIE COUNTY";	
+	}*/
 }
 
 // Called during component initialization.
@@ -117,7 +235,11 @@ function integer transform() {
 	LONGITUDE VARCHAR(255),
 	LATITUDE VARCHAR(255),
 	GEO_ACCURACY VARCHAR(255),
-	SIC_CODE VARCHAR(255)	
+	SIC_CODE VARCHAR(255),
+	JUST_CITY_NAME VARCHAR(255),
+	JUST_COUNTY_NAME VARCHAR(255),
+	JUST_STATE_NAME VARCHAR(255),
+	JUST_STATE_ABBREVIATION VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
@@ -137,7 +259,11 @@ function integer transform() {
 	LONGITUDE,
 	LATITUDE,
 	GEO_ACCURACY,
-	SIC_CODE
+	SIC_CODE,
+	JUST_CITY_NAME,
+	JUST_COUNTY_NAME,
+	JUST_STATE_NAME,
+	JUST_STATE_ABBREVIATION
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
