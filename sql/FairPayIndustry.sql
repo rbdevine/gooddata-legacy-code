@@ -1,60 +1,3 @@
-/*generate temp tables for fair pay*/
-/*
-  Create the temporary tables required for generating 
-  reports for first-cut at fair pay using glass door salary
-  data. Ultimately, we should try to put enough information
-  needed into our data warehouse which could be used to
-  generate reports in the future. All of this code was
-  written under an extreme time crunch. There are many
-  hacks done to get around vertica's limitations (such
-  as no pivot and minimal support for variables.)
-  
-  The tables here are temporary because they are specific to
-  the hard-coded industry we are checking. Ideally, we could
-  make a stored proc that takes industry name, but at time 
-  of this writing, did not want to go down that rabbit hole
-  because vertica has their own quirky way of handling 
-  pseudo stored procedures. Also, I don't think they support
-  returning tables.
-*/
-
-/*
-  TMP_PARAM_CUR_INDUSTRY
-  This is something of a hack to set parameters (e.g. min_jobs)
-  Could use vertica params by placing a dollarsign{param_name}dollarsign 
-  directly in code. I don't like that option because I have to deal with
-  a dialog box and could not find a way to suppress that. Also,
-  dialog box won't let me just hit the enter key to dismiss.
-  I have to actually use my mouse to click on the "Done" button.
-  (Tabbing to the button does not work for some reason.)
-*/
-/*
-  Pop the next industry from the queue and store in parameter table.
-*/
-update TMP_PARAM_CUR_INDUSTRY 
-set INDUSTRY = (
-  select INDUSTRY 
-  from TMP_INDUSTRY_QUEUE 
-  order by id 
-  limit 1
-);
-
-delete from TMP_INDUSTRY_QUEUE 
-where id in (
-  select ID 
-  from TMP_INDUSTRY_QUEUE 
-  order by id 
-  limit 1
-);
-
-/*
-  TMP_GD_SALARY_SUMMARY
-  
-  This a temp table to hold salary info for the specified
-  industry. This is used as a base for multiple queries 
-  for generating various fair trade reports.
-*/
-
 drop table if exists TMP_GD_SALARY_SUMMARY;
 create table if not exists TMP_GD_SALARY_SUMMARY (
   JUST_INDY VARCHAR(255) NOT NULL,
@@ -119,28 +62,17 @@ delete from TMP_GD_SALARY_SUMMARY where job in (select job from TMP_GD_SALARY_SU
 delete from TMP_GD_SALARY_SUMMARY where company in (select company from TMP_GD_SALARY_SUMMARY join TMP_PARAM_CUR_INDUSTRY p on true group by company having count(job) < max(p.MIN_JOBS_PER_CO));
 
 
-/*
-  TMP_JOBS_OF_INTEREST
-  
-  List of all the jobs in the TMP_GD_SALARY_SUMMARY table.
-*/
 drop table if exists TMP_JOBS_OF_INTEREST;
 create table if not exists TMP_JOBS_OF_INTEREST (
-  JOB VARCHAR(255) NOT NULL
+  JOB VARCHAR(255) NOT NULL,
+  COMPANY_COUNT INT NOT NULL
 );
 
 insert into TMP_JOBS_OF_INTEREST 
-select job 
-from TMP_GD_SALARY_SUMMARY 
+select job, count(company)
+from TMP_GD_SALARY_SUMMARY
 group by job;
 
-/*
-  TMP_GD_COMPANIES_OF_INTEREST
-   
-  List of all companies that have records in TMP_GD_SALARY_SUMMARY table.
-  This is used as a base for the hack for creating a header row. Id is used
-  to identify the column. id is ordered 1-n, alphabetical by company name.
-*/
 drop table if exists TMP_GD_COMPANIES_OF_INTEREST;
 create table if not exists TMP_GD_COMPANIES_OF_INTEREST (
   ID INT PRIMARY KEY,
@@ -155,25 +87,7 @@ select rank() over (order by jobCnt desc, company) id, company from (
   group by company
 ) t;
 
-/*
-  TMP_COMPANY_JOB_TOTALS
-  
-  Job totals per company, includes id and company name. Again, needed
-  for simplyfying the header row issue.
-*/
-drop table if exists TMP_COMPANY_JOB_TOTALS;
-create table if not exists TMP_COMPANY_JOB_TOTALS (
-  TMP_COMPANY_ID INT NOT NULL,
-  COMPANY VARCHAR(255) NOT NULL,
-  JOB VARCHAR(255) NOT NULL, 
-  RATE FLOAT NULL,
-  SCORE INT NULL,
-  RATE_RAW FLOAT NULL,
-  SCORE_RAW INT NULL,
-  TOTAL INT NULL
-);
-
-insert into TMP_COMPANY_JOB_TOTALS 
+insert into ${COMPANY_JOB_TOTALS_TABLENAME} 
 select c.id, c.company, s.job, s.unadjusted_avg_base_hourly_cola, r.raterank, s.unadjusted_avg_base_hourly, r.raterank_raw, s.total 
 from TMP_GD_COMPANIES_OF_INTEREST c
 join TMP_GD_SALARY_SUMMARY s on s.company = c.company
@@ -189,7 +103,7 @@ join (
 /*
   Insert header into LKP_FAIRPAY_JOB_COMPANY_MATRIX
 */
-insert into LKP_FAIRPAY_JOB_COMPANY_MATRIX
+insert into ${FAIRPAY_MATRIX_TABLENAME}
 select 
   p.industry, 
   0 display_order, 
@@ -357,7 +271,7 @@ from (
 join TMP_PARAM_CUR_INDUSTRY p on true;
 
 /*
-  Insert data into LKP_FAIRPAY_JOB_COMPANY_MATRIX
+  Insert data into fair pay matrix
   
   Jobs listed in rows 2-n
   Companies listed in first row, corresponding to c1-c50
@@ -369,7 +283,7 @@ join TMP_PARAM_CUR_INDUSTRY p on true;
 /*
   unadjusted hourly cola
 */
-insert into LKP_FAIRPAY_JOB_COMPANY_MATRIX
+insert into ${FAIRPAY_MATRIX_TABLENAME}
 select distinct
   p.industry,
   1 display_order,
@@ -428,68 +342,68 @@ select distinct
   max(c49.rate) c49, 
   max(c50.rate) c50,
   null company_job_score,
-  null job_company_count,
+  max(j.COMPANY_COUNT) job_company_count,
   null company_salary_count
 from TMP_JOBS_OF_INTEREST j
 join TMP_GD_SALARY_SUMMARY s on j.job = s.job
 join TMP_PARAM_CUR_INDUSTRY p on true
-left join TMP_COMPANY_JOB_TOTALS c1 on c1.tmp_company_id = 1 and c1.company = s.company and c1.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c2 on c2.tmp_company_id = 2 and c2.company = s.company and c2.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c3 on c3.tmp_company_id = 3 and c3.company = s.company and c3.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c4 on c4.tmp_company_id = 4 and c4.company = s.company and c4.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c5 on c5.tmp_company_id = 5 and c5.company = s.company and c5.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c6 on c6.tmp_company_id = 6 and c6.company = s.company and c6.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c7 on c7.tmp_company_id = 7 and c7.company = s.company and c7.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c8 on c8.tmp_company_id = 8 and c8.company = s.company and c8.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c9 on c9.tmp_company_id = 9 and c9.company = s.company and c9.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c10 on c10.tmp_company_id = 10 and c10.company = s.company and c10.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c11 on c11.tmp_company_id = 11 and c11.company = s.company and c11.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c12 on c12.tmp_company_id = 12 and c12.company = s.company and c12.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c13 on c13.tmp_company_id = 13 and c13.company = s.company and c13.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c14 on c14.tmp_company_id = 14 and c14.company = s.company and c14.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c15 on c15.tmp_company_id = 15 and c15.company = s.company and c15.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c16 on c16.tmp_company_id = 16 and c16.company = s.company and c16.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c17 on c17.tmp_company_id = 17 and c17.company = s.company and c17.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c18 on c18.tmp_company_id = 18 and c18.company = s.company and c18.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c19 on c19.tmp_company_id = 19 and c19.company = s.company and c19.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c20 on c20.tmp_company_id = 20 and c20.company = s.company and c20.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c21 on c21.tmp_company_id = 21 and c21.company = s.company and c21.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c22 on c22.tmp_company_id = 22 and c22.company = s.company and c22.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c23 on c23.tmp_company_id = 23 and c23.company = s.company and c23.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c24 on c24.tmp_company_id = 24 and c24.company = s.company and c24.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c25 on c25.tmp_company_id = 25 and c25.company = s.company and c25.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c26 on c26.tmp_company_id = 26 and c26.company = s.company and c26.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c27 on c27.tmp_company_id = 27 and c27.company = s.company and c27.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c28 on c28.tmp_company_id = 28 and c28.company = s.company and c28.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c29 on c29.tmp_company_id = 29 and c29.company = s.company and c29.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c30 on c30.tmp_company_id = 30 and c30.company = s.company and c30.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c31 on c31.tmp_company_id = 31 and c31.company = s.company and c31.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c32 on c32.tmp_company_id = 32 and c32.company = s.company and c32.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c33 on c33.tmp_company_id = 33 and c33.company = s.company and c33.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c34 on c34.tmp_company_id = 34 and c34.company = s.company and c34.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c35 on c35.tmp_company_id = 35 and c35.company = s.company and c35.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c36 on c36.tmp_company_id = 36 and c36.company = s.company and c36.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c37 on c37.tmp_company_id = 37 and c37.company = s.company and c37.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c38 on c38.tmp_company_id = 38 and c38.company = s.company and c38.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c39 on c39.tmp_company_id = 39 and c39.company = s.company and c39.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c40 on c40.tmp_company_id = 40 and c40.company = s.company and c40.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c41 on c41.tmp_company_id = 41 and c41.company = s.company and c41.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c42 on c42.tmp_company_id = 42 and c42.company = s.company and c42.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c43 on c43.tmp_company_id = 43 and c43.company = s.company and c43.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c44 on c44.tmp_company_id = 44 and c44.company = s.company and c44.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c45 on c45.tmp_company_id = 45 and c45.company = s.company and c45.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c46 on c46.tmp_company_id = 46 and c46.company = s.company and c46.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c47 on c47.tmp_company_id = 47 and c47.company = s.company and c47.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c48 on c48.tmp_company_id = 48 and c48.company = s.company and c48.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c49 on c49.tmp_company_id = 49 and c49.company = s.company and c49.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c50 on c50.tmp_company_id = 50 and c50.company = s.company and c50.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c1 on c1.TMP_COMPANY_ID = 1 and c1.company = s.company and c1.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c2 on c2.TMP_COMPANY_ID = 2 and c2.company = s.company and c2.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c3 on c3.TMP_COMPANY_ID = 3 and c3.company = s.company and c3.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c4 on c4.TMP_COMPANY_ID = 4 and c4.company = s.company and c4.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c5 on c5.TMP_COMPANY_ID = 5 and c5.company = s.company and c5.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c6 on c6.TMP_COMPANY_ID = 6 and c6.company = s.company and c6.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c7 on c7.TMP_COMPANY_ID = 7 and c7.company = s.company and c7.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c8 on c8.TMP_COMPANY_ID = 8 and c8.company = s.company and c8.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c9 on c9.TMP_COMPANY_ID = 9 and c9.company = s.company and c9.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c10 on c10.TMP_COMPANY_ID = 10 and c10.company = s.company and c10.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c11 on c11.TMP_COMPANY_ID = 11 and c11.company = s.company and c11.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c12 on c12.TMP_COMPANY_ID = 12 and c12.company = s.company and c12.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c13 on c13.TMP_COMPANY_ID = 13 and c13.company = s.company and c13.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c14 on c14.TMP_COMPANY_ID = 14 and c14.company = s.company and c14.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c15 on c15.TMP_COMPANY_ID = 15 and c15.company = s.company and c15.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c16 on c16.TMP_COMPANY_ID = 16 and c16.company = s.company and c16.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c17 on c17.TMP_COMPANY_ID = 17 and c17.company = s.company and c17.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c18 on c18.TMP_COMPANY_ID = 18 and c18.company = s.company and c18.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c19 on c19.TMP_COMPANY_ID = 19 and c19.company = s.company and c19.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c20 on c20.TMP_COMPANY_ID = 20 and c20.company = s.company and c20.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c21 on c21.TMP_COMPANY_ID = 21 and c21.company = s.company and c21.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c22 on c22.TMP_COMPANY_ID = 22 and c22.company = s.company and c22.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c23 on c23.TMP_COMPANY_ID = 23 and c23.company = s.company and c23.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c24 on c24.TMP_COMPANY_ID = 24 and c24.company = s.company and c24.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c25 on c25.TMP_COMPANY_ID = 25 and c25.company = s.company and c25.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c26 on c26.TMP_COMPANY_ID = 26 and c26.company = s.company and c26.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c27 on c27.TMP_COMPANY_ID = 27 and c27.company = s.company and c27.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c28 on c28.TMP_COMPANY_ID = 28 and c28.company = s.company and c28.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c29 on c29.TMP_COMPANY_ID = 29 and c29.company = s.company and c29.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c30 on c30.TMP_COMPANY_ID = 30 and c30.company = s.company and c30.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c31 on c31.TMP_COMPANY_ID = 31 and c31.company = s.company and c31.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c32 on c32.TMP_COMPANY_ID = 32 and c32.company = s.company and c32.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c33 on c33.TMP_COMPANY_ID = 33 and c33.company = s.company and c33.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c34 on c34.TMP_COMPANY_ID = 34 and c34.company = s.company and c34.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c35 on c35.TMP_COMPANY_ID = 35 and c35.company = s.company and c35.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c36 on c36.TMP_COMPANY_ID = 36 and c36.company = s.company and c36.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c37 on c37.TMP_COMPANY_ID = 37 and c37.company = s.company and c37.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c38 on c38.TMP_COMPANY_ID = 38 and c38.company = s.company and c38.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c39 on c39.TMP_COMPANY_ID = 39 and c39.company = s.company and c39.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c40 on c40.TMP_COMPANY_ID = 40 and c40.company = s.company and c40.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c41 on c41.TMP_COMPANY_ID = 41 and c41.company = s.company and c41.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c42 on c42.TMP_COMPANY_ID = 42 and c42.company = s.company and c42.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c43 on c43.TMP_COMPANY_ID = 43 and c43.company = s.company and c43.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c44 on c44.TMP_COMPANY_ID = 44 and c44.company = s.company and c44.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c45 on c45.TMP_COMPANY_ID = 45 and c45.company = s.company and c45.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c46 on c46.TMP_COMPANY_ID = 46 and c46.company = s.company and c46.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c47 on c47.TMP_COMPANY_ID = 47 and c47.company = s.company and c47.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c48 on c48.TMP_COMPANY_ID = 48 and c48.company = s.company and c48.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c49 on c49.TMP_COMPANY_ID = 49 and c49.company = s.company and c49.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c50 on c50.TMP_COMPANY_ID = 50 and c50.company = s.company and c50.job = j.job
 group by p.industry, j.job
 order by job;
 
 /*
   hourly cola score
 */
-insert into LKP_FAIRPAY_JOB_COMPANY_MATRIX
+insert into ${FAIRPAY_MATRIX_TABLENAME}
 select distinct
   p.industry,
   1 display_order,
@@ -548,68 +462,68 @@ select distinct
   max(c49.score) c49, 
   max(c50.score) c50,
   null company_job_score,
-  null job_company_count,
+  max(j.COMPANY_COUNT) job_company_count,
   null company_salary_count
 from TMP_JOBS_OF_INTEREST j
 join TMP_GD_SALARY_SUMMARY s on j.job = s.job
 join TMP_PARAM_CUR_INDUSTRY p on true
-left join TMP_COMPANY_JOB_TOTALS c1 on c1.tmp_company_id = 1 and c1.company = s.company and c1.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c2 on c2.tmp_company_id = 2 and c2.company = s.company and c2.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c3 on c3.tmp_company_id = 3 and c3.company = s.company and c3.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c4 on c4.tmp_company_id = 4 and c4.company = s.company and c4.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c5 on c5.tmp_company_id = 5 and c5.company = s.company and c5.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c6 on c6.tmp_company_id = 6 and c6.company = s.company and c6.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c7 on c7.tmp_company_id = 7 and c7.company = s.company and c7.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c8 on c8.tmp_company_id = 8 and c8.company = s.company and c8.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c9 on c9.tmp_company_id = 9 and c9.company = s.company and c9.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c10 on c10.tmp_company_id = 10 and c10.company = s.company and c10.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c11 on c11.tmp_company_id = 11 and c11.company = s.company and c11.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c12 on c12.tmp_company_id = 12 and c12.company = s.company and c12.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c13 on c13.tmp_company_id = 13 and c13.company = s.company and c13.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c14 on c14.tmp_company_id = 14 and c14.company = s.company and c14.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c15 on c15.tmp_company_id = 15 and c15.company = s.company and c15.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c16 on c16.tmp_company_id = 16 and c16.company = s.company and c16.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c17 on c17.tmp_company_id = 17 and c17.company = s.company and c17.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c18 on c18.tmp_company_id = 18 and c18.company = s.company and c18.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c19 on c19.tmp_company_id = 19 and c19.company = s.company and c19.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c20 on c20.tmp_company_id = 20 and c20.company = s.company and c20.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c21 on c21.tmp_company_id = 21 and c21.company = s.company and c21.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c22 on c22.tmp_company_id = 22 and c22.company = s.company and c22.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c23 on c23.tmp_company_id = 23 and c23.company = s.company and c23.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c24 on c24.tmp_company_id = 24 and c24.company = s.company and c24.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c25 on c25.tmp_company_id = 25 and c25.company = s.company and c25.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c26 on c26.tmp_company_id = 26 and c26.company = s.company and c26.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c27 on c27.tmp_company_id = 27 and c27.company = s.company and c27.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c28 on c28.tmp_company_id = 28 and c28.company = s.company and c28.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c29 on c29.tmp_company_id = 29 and c29.company = s.company and c29.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c30 on c30.tmp_company_id = 30 and c30.company = s.company and c30.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c31 on c31.tmp_company_id = 31 and c31.company = s.company and c31.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c32 on c32.tmp_company_id = 32 and c32.company = s.company and c32.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c33 on c33.tmp_company_id = 33 and c33.company = s.company and c33.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c34 on c34.tmp_company_id = 34 and c34.company = s.company and c34.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c35 on c35.tmp_company_id = 35 and c35.company = s.company and c35.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c36 on c36.tmp_company_id = 36 and c36.company = s.company and c36.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c37 on c37.tmp_company_id = 37 and c37.company = s.company and c37.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c38 on c38.tmp_company_id = 38 and c38.company = s.company and c38.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c39 on c39.tmp_company_id = 39 and c39.company = s.company and c39.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c40 on c40.tmp_company_id = 40 and c40.company = s.company and c40.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c41 on c41.tmp_company_id = 41 and c41.company = s.company and c41.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c42 on c42.tmp_company_id = 42 and c42.company = s.company and c42.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c43 on c43.tmp_company_id = 43 and c43.company = s.company and c43.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c44 on c44.tmp_company_id = 44 and c44.company = s.company and c44.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c45 on c45.tmp_company_id = 45 and c45.company = s.company and c45.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c46 on c46.tmp_company_id = 46 and c46.company = s.company and c46.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c47 on c47.tmp_company_id = 47 and c47.company = s.company and c47.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c48 on c48.tmp_company_id = 48 and c48.company = s.company and c48.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c49 on c49.tmp_company_id = 49 and c49.company = s.company and c49.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c50 on c50.tmp_company_id = 50 and c50.company = s.company and c50.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c1 on c1.TMP_COMPANY_ID = 1 and c1.company = s.company and c1.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c2 on c2.TMP_COMPANY_ID = 2 and c2.company = s.company and c2.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c3 on c3.TMP_COMPANY_ID = 3 and c3.company = s.company and c3.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c4 on c4.TMP_COMPANY_ID = 4 and c4.company = s.company and c4.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c5 on c5.TMP_COMPANY_ID = 5 and c5.company = s.company and c5.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c6 on c6.TMP_COMPANY_ID = 6 and c6.company = s.company and c6.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c7 on c7.TMP_COMPANY_ID = 7 and c7.company = s.company and c7.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c8 on c8.TMP_COMPANY_ID = 8 and c8.company = s.company and c8.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c9 on c9.TMP_COMPANY_ID = 9 and c9.company = s.company and c9.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c10 on c10.TMP_COMPANY_ID = 10 and c10.company = s.company and c10.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c11 on c11.TMP_COMPANY_ID = 11 and c11.company = s.company and c11.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c12 on c12.TMP_COMPANY_ID = 12 and c12.company = s.company and c12.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c13 on c13.TMP_COMPANY_ID = 13 and c13.company = s.company and c13.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c14 on c14.TMP_COMPANY_ID = 14 and c14.company = s.company and c14.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c15 on c15.TMP_COMPANY_ID = 15 and c15.company = s.company and c15.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c16 on c16.TMP_COMPANY_ID = 16 and c16.company = s.company and c16.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c17 on c17.TMP_COMPANY_ID = 17 and c17.company = s.company and c17.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c18 on c18.TMP_COMPANY_ID = 18 and c18.company = s.company and c18.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c19 on c19.TMP_COMPANY_ID = 19 and c19.company = s.company and c19.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c20 on c20.TMP_COMPANY_ID = 20 and c20.company = s.company and c20.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c21 on c21.TMP_COMPANY_ID = 21 and c21.company = s.company and c21.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c22 on c22.TMP_COMPANY_ID = 22 and c22.company = s.company and c22.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c23 on c23.TMP_COMPANY_ID = 23 and c23.company = s.company and c23.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c24 on c24.TMP_COMPANY_ID = 24 and c24.company = s.company and c24.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c25 on c25.TMP_COMPANY_ID = 25 and c25.company = s.company and c25.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c26 on c26.TMP_COMPANY_ID = 26 and c26.company = s.company and c26.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c27 on c27.TMP_COMPANY_ID = 27 and c27.company = s.company and c27.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c28 on c28.TMP_COMPANY_ID = 28 and c28.company = s.company and c28.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c29 on c29.TMP_COMPANY_ID = 29 and c29.company = s.company and c29.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c30 on c30.TMP_COMPANY_ID = 30 and c30.company = s.company and c30.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c31 on c31.TMP_COMPANY_ID = 31 and c31.company = s.company and c31.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c32 on c32.TMP_COMPANY_ID = 32 and c32.company = s.company and c32.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c33 on c33.TMP_COMPANY_ID = 33 and c33.company = s.company and c33.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c34 on c34.TMP_COMPANY_ID = 34 and c34.company = s.company and c34.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c35 on c35.TMP_COMPANY_ID = 35 and c35.company = s.company and c35.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c36 on c36.TMP_COMPANY_ID = 36 and c36.company = s.company and c36.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c37 on c37.TMP_COMPANY_ID = 37 and c37.company = s.company and c37.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c38 on c38.TMP_COMPANY_ID = 38 and c38.company = s.company and c38.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c39 on c39.TMP_COMPANY_ID = 39 and c39.company = s.company and c39.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c40 on c40.TMP_COMPANY_ID = 40 and c40.company = s.company and c40.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c41 on c41.TMP_COMPANY_ID = 41 and c41.company = s.company and c41.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c42 on c42.TMP_COMPANY_ID = 42 and c42.company = s.company and c42.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c43 on c43.TMP_COMPANY_ID = 43 and c43.company = s.company and c43.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c44 on c44.TMP_COMPANY_ID = 44 and c44.company = s.company and c44.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c45 on c45.TMP_COMPANY_ID = 45 and c45.company = s.company and c45.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c46 on c46.TMP_COMPANY_ID = 46 and c46.company = s.company and c46.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c47 on c47.TMP_COMPANY_ID = 47 and c47.company = s.company and c47.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c48 on c48.TMP_COMPANY_ID = 48 and c48.company = s.company and c48.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c49 on c49.TMP_COMPANY_ID = 49 and c49.company = s.company and c49.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c50 on c50.TMP_COMPANY_ID = 50 and c50.company = s.company and c50.job = j.job
 group by p.industry, j.job
 order by job;
 
 /*
   total rate raw
 */
-insert into LKP_FAIRPAY_JOB_COMPANY_MATRIX
+insert into ${FAIRPAY_MATRIX_TABLENAME}
 select distinct
   p.industry,
   1 display_order,
@@ -668,68 +582,68 @@ select distinct
   max(c49.rate_raw) c49, 
   max(c50.rate_raw) c50,
   null company_job_score,
-  null job_company_count,
+  max(j.COMPANY_COUNT) job_company_count,
   null company_salary_count
 from TMP_JOBS_OF_INTEREST j
 join TMP_GD_SALARY_SUMMARY s on j.job = s.job
 join TMP_PARAM_CUR_INDUSTRY p on true
-left join TMP_COMPANY_JOB_TOTALS c1 on c1.tmp_company_id = 1 and c1.company = s.company and c1.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c2 on c2.tmp_company_id = 2 and c2.company = s.company and c2.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c3 on c3.tmp_company_id = 3 and c3.company = s.company and c3.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c4 on c4.tmp_company_id = 4 and c4.company = s.company and c4.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c5 on c5.tmp_company_id = 5 and c5.company = s.company and c5.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c6 on c6.tmp_company_id = 6 and c6.company = s.company and c6.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c7 on c7.tmp_company_id = 7 and c7.company = s.company and c7.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c8 on c8.tmp_company_id = 8 and c8.company = s.company and c8.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c9 on c9.tmp_company_id = 9 and c9.company = s.company and c9.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c10 on c10.tmp_company_id = 10 and c10.company = s.company and c10.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c11 on c11.tmp_company_id = 11 and c11.company = s.company and c11.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c12 on c12.tmp_company_id = 12 and c12.company = s.company and c12.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c13 on c13.tmp_company_id = 13 and c13.company = s.company and c13.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c14 on c14.tmp_company_id = 14 and c14.company = s.company and c14.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c15 on c15.tmp_company_id = 15 and c15.company = s.company and c15.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c16 on c16.tmp_company_id = 16 and c16.company = s.company and c16.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c17 on c17.tmp_company_id = 17 and c17.company = s.company and c17.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c18 on c18.tmp_company_id = 18 and c18.company = s.company and c18.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c19 on c19.tmp_company_id = 19 and c19.company = s.company and c19.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c20 on c20.tmp_company_id = 20 and c20.company = s.company and c20.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c21 on c21.tmp_company_id = 21 and c21.company = s.company and c21.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c22 on c22.tmp_company_id = 22 and c22.company = s.company and c22.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c23 on c23.tmp_company_id = 23 and c23.company = s.company and c23.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c24 on c24.tmp_company_id = 24 and c24.company = s.company and c24.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c25 on c25.tmp_company_id = 25 and c25.company = s.company and c25.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c26 on c26.tmp_company_id = 26 and c26.company = s.company and c26.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c27 on c27.tmp_company_id = 27 and c27.company = s.company and c27.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c28 on c28.tmp_company_id = 28 and c28.company = s.company and c28.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c29 on c29.tmp_company_id = 29 and c29.company = s.company and c29.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c30 on c30.tmp_company_id = 30 and c30.company = s.company and c30.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c31 on c31.tmp_company_id = 31 and c31.company = s.company and c31.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c32 on c32.tmp_company_id = 32 and c32.company = s.company and c32.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c33 on c33.tmp_company_id = 33 and c33.company = s.company and c33.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c34 on c34.tmp_company_id = 34 and c34.company = s.company and c34.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c35 on c35.tmp_company_id = 35 and c35.company = s.company and c35.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c36 on c36.tmp_company_id = 36 and c36.company = s.company and c36.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c37 on c37.tmp_company_id = 37 and c37.company = s.company and c37.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c38 on c38.tmp_company_id = 38 and c38.company = s.company and c38.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c39 on c39.tmp_company_id = 39 and c39.company = s.company and c39.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c40 on c40.tmp_company_id = 40 and c40.company = s.company and c40.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c41 on c41.tmp_company_id = 41 and c41.company = s.company and c41.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c42 on c42.tmp_company_id = 42 and c42.company = s.company and c42.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c43 on c43.tmp_company_id = 43 and c43.company = s.company and c43.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c44 on c44.tmp_company_id = 44 and c44.company = s.company and c44.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c45 on c45.tmp_company_id = 45 and c45.company = s.company and c45.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c46 on c46.tmp_company_id = 46 and c46.company = s.company and c46.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c47 on c47.tmp_company_id = 47 and c47.company = s.company and c47.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c48 on c48.tmp_company_id = 48 and c48.company = s.company and c48.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c49 on c49.tmp_company_id = 49 and c49.company = s.company and c49.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c50 on c50.tmp_company_id = 50 and c50.company = s.company and c50.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c1 on c1.TMP_COMPANY_ID = 1 and c1.company = s.company and c1.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c2 on c2.TMP_COMPANY_ID = 2 and c2.company = s.company and c2.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c3 on c3.TMP_COMPANY_ID = 3 and c3.company = s.company and c3.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c4 on c4.TMP_COMPANY_ID = 4 and c4.company = s.company and c4.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c5 on c5.TMP_COMPANY_ID = 5 and c5.company = s.company and c5.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c6 on c6.TMP_COMPANY_ID = 6 and c6.company = s.company and c6.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c7 on c7.TMP_COMPANY_ID = 7 and c7.company = s.company and c7.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c8 on c8.TMP_COMPANY_ID = 8 and c8.company = s.company and c8.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c9 on c9.TMP_COMPANY_ID = 9 and c9.company = s.company and c9.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c10 on c10.TMP_COMPANY_ID = 10 and c10.company = s.company and c10.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c11 on c11.TMP_COMPANY_ID = 11 and c11.company = s.company and c11.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c12 on c12.TMP_COMPANY_ID = 12 and c12.company = s.company and c12.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c13 on c13.TMP_COMPANY_ID = 13 and c13.company = s.company and c13.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c14 on c14.TMP_COMPANY_ID = 14 and c14.company = s.company and c14.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c15 on c15.TMP_COMPANY_ID = 15 and c15.company = s.company and c15.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c16 on c16.TMP_COMPANY_ID = 16 and c16.company = s.company and c16.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c17 on c17.TMP_COMPANY_ID = 17 and c17.company = s.company and c17.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c18 on c18.TMP_COMPANY_ID = 18 and c18.company = s.company and c18.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c19 on c19.TMP_COMPANY_ID = 19 and c19.company = s.company and c19.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c20 on c20.TMP_COMPANY_ID = 20 and c20.company = s.company and c20.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c21 on c21.TMP_COMPANY_ID = 21 and c21.company = s.company and c21.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c22 on c22.TMP_COMPANY_ID = 22 and c22.company = s.company and c22.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c23 on c23.TMP_COMPANY_ID = 23 and c23.company = s.company and c23.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c24 on c24.TMP_COMPANY_ID = 24 and c24.company = s.company and c24.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c25 on c25.TMP_COMPANY_ID = 25 and c25.company = s.company and c25.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c26 on c26.TMP_COMPANY_ID = 26 and c26.company = s.company and c26.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c27 on c27.TMP_COMPANY_ID = 27 and c27.company = s.company and c27.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c28 on c28.TMP_COMPANY_ID = 28 and c28.company = s.company and c28.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c29 on c29.TMP_COMPANY_ID = 29 and c29.company = s.company and c29.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c30 on c30.TMP_COMPANY_ID = 30 and c30.company = s.company and c30.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c31 on c31.TMP_COMPANY_ID = 31 and c31.company = s.company and c31.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c32 on c32.TMP_COMPANY_ID = 32 and c32.company = s.company and c32.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c33 on c33.TMP_COMPANY_ID = 33 and c33.company = s.company and c33.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c34 on c34.TMP_COMPANY_ID = 34 and c34.company = s.company and c34.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c35 on c35.TMP_COMPANY_ID = 35 and c35.company = s.company and c35.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c36 on c36.TMP_COMPANY_ID = 36 and c36.company = s.company and c36.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c37 on c37.TMP_COMPANY_ID = 37 and c37.company = s.company and c37.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c38 on c38.TMP_COMPANY_ID = 38 and c38.company = s.company and c38.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c39 on c39.TMP_COMPANY_ID = 39 and c39.company = s.company and c39.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c40 on c40.TMP_COMPANY_ID = 40 and c40.company = s.company and c40.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c41 on c41.TMP_COMPANY_ID = 41 and c41.company = s.company and c41.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c42 on c42.TMP_COMPANY_ID = 42 and c42.company = s.company and c42.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c43 on c43.TMP_COMPANY_ID = 43 and c43.company = s.company and c43.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c44 on c44.TMP_COMPANY_ID = 44 and c44.company = s.company and c44.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c45 on c45.TMP_COMPANY_ID = 45 and c45.company = s.company and c45.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c46 on c46.TMP_COMPANY_ID = 46 and c46.company = s.company and c46.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c47 on c47.TMP_COMPANY_ID = 47 and c47.company = s.company and c47.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c48 on c48.TMP_COMPANY_ID = 48 and c48.company = s.company and c48.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c49 on c49.TMP_COMPANY_ID = 49 and c49.company = s.company and c49.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c50 on c50.TMP_COMPANY_ID = 50 and c50.company = s.company and c50.job = j.job
 group by p.industry, j.job
 order by job;
 
 /*
   total score raw
 */
-insert into LKP_FAIRPAY_JOB_COMPANY_MATRIX
+insert into ${FAIRPAY_MATRIX_TABLENAME}
 select distinct
   p.industry,
   1 display_order,
@@ -788,68 +702,68 @@ select distinct
   max(c49.score_raw) c49, 
   max(c50.score_raw) c50,
   null company_job_score,
-  null job_company_count,
+  max(j.COMPANY_COUNT) job_company_count,
   null company_salary_count
 from TMP_JOBS_OF_INTEREST j
 join TMP_GD_SALARY_SUMMARY s on j.job = s.job
 join TMP_PARAM_CUR_INDUSTRY p on true
-left join TMP_COMPANY_JOB_TOTALS c1 on c1.tmp_company_id = 1 and c1.company = s.company and c1.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c2 on c2.tmp_company_id = 2 and c2.company = s.company and c2.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c3 on c3.tmp_company_id = 3 and c3.company = s.company and c3.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c4 on c4.tmp_company_id = 4 and c4.company = s.company and c4.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c5 on c5.tmp_company_id = 5 and c5.company = s.company and c5.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c6 on c6.tmp_company_id = 6 and c6.company = s.company and c6.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c7 on c7.tmp_company_id = 7 and c7.company = s.company and c7.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c8 on c8.tmp_company_id = 8 and c8.company = s.company and c8.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c9 on c9.tmp_company_id = 9 and c9.company = s.company and c9.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c10 on c10.tmp_company_id = 10 and c10.company = s.company and c10.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c11 on c11.tmp_company_id = 11 and c11.company = s.company and c11.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c12 on c12.tmp_company_id = 12 and c12.company = s.company and c12.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c13 on c13.tmp_company_id = 13 and c13.company = s.company and c13.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c14 on c14.tmp_company_id = 14 and c14.company = s.company and c14.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c15 on c15.tmp_company_id = 15 and c15.company = s.company and c15.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c16 on c16.tmp_company_id = 16 and c16.company = s.company and c16.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c17 on c17.tmp_company_id = 17 and c17.company = s.company and c17.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c18 on c18.tmp_company_id = 18 and c18.company = s.company and c18.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c19 on c19.tmp_company_id = 19 and c19.company = s.company and c19.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c20 on c20.tmp_company_id = 20 and c20.company = s.company and c20.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c21 on c21.tmp_company_id = 21 and c21.company = s.company and c21.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c22 on c22.tmp_company_id = 22 and c22.company = s.company and c22.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c23 on c23.tmp_company_id = 23 and c23.company = s.company and c23.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c24 on c24.tmp_company_id = 24 and c24.company = s.company and c24.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c25 on c25.tmp_company_id = 25 and c25.company = s.company and c25.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c26 on c26.tmp_company_id = 26 and c26.company = s.company and c26.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c27 on c27.tmp_company_id = 27 and c27.company = s.company and c27.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c28 on c28.tmp_company_id = 28 and c28.company = s.company and c28.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c29 on c29.tmp_company_id = 29 and c29.company = s.company and c29.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c30 on c30.tmp_company_id = 30 and c30.company = s.company and c30.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c31 on c31.tmp_company_id = 31 and c31.company = s.company and c31.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c32 on c32.tmp_company_id = 32 and c32.company = s.company and c32.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c33 on c33.tmp_company_id = 33 and c33.company = s.company and c33.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c34 on c34.tmp_company_id = 34 and c34.company = s.company and c34.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c35 on c35.tmp_company_id = 35 and c35.company = s.company and c35.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c36 on c36.tmp_company_id = 36 and c36.company = s.company and c36.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c37 on c37.tmp_company_id = 37 and c37.company = s.company and c37.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c38 on c38.tmp_company_id = 38 and c38.company = s.company and c38.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c39 on c39.tmp_company_id = 39 and c39.company = s.company and c39.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c40 on c40.tmp_company_id = 40 and c40.company = s.company and c40.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c41 on c41.tmp_company_id = 41 and c41.company = s.company and c41.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c42 on c42.tmp_company_id = 42 and c42.company = s.company and c42.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c43 on c43.tmp_company_id = 43 and c43.company = s.company and c43.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c44 on c44.tmp_company_id = 44 and c44.company = s.company and c44.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c45 on c45.tmp_company_id = 45 and c45.company = s.company and c45.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c46 on c46.tmp_company_id = 46 and c46.company = s.company and c46.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c47 on c47.tmp_company_id = 47 and c47.company = s.company and c47.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c48 on c48.tmp_company_id = 48 and c48.company = s.company and c48.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c49 on c49.tmp_company_id = 49 and c49.company = s.company and c49.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c50 on c50.tmp_company_id = 50 and c50.company = s.company and c50.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c1 on c1.TMP_COMPANY_ID = 1 and c1.company = s.company and c1.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c2 on c2.TMP_COMPANY_ID = 2 and c2.company = s.company and c2.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c3 on c3.TMP_COMPANY_ID = 3 and c3.company = s.company and c3.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c4 on c4.TMP_COMPANY_ID = 4 and c4.company = s.company and c4.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c5 on c5.TMP_COMPANY_ID = 5 and c5.company = s.company and c5.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c6 on c6.TMP_COMPANY_ID = 6 and c6.company = s.company and c6.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c7 on c7.TMP_COMPANY_ID = 7 and c7.company = s.company and c7.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c8 on c8.TMP_COMPANY_ID = 8 and c8.company = s.company and c8.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c9 on c9.TMP_COMPANY_ID = 9 and c9.company = s.company and c9.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c10 on c10.TMP_COMPANY_ID = 10 and c10.company = s.company and c10.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c11 on c11.TMP_COMPANY_ID = 11 and c11.company = s.company and c11.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c12 on c12.TMP_COMPANY_ID = 12 and c12.company = s.company and c12.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c13 on c13.TMP_COMPANY_ID = 13 and c13.company = s.company and c13.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c14 on c14.TMP_COMPANY_ID = 14 and c14.company = s.company and c14.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c15 on c15.TMP_COMPANY_ID = 15 and c15.company = s.company and c15.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c16 on c16.TMP_COMPANY_ID = 16 and c16.company = s.company and c16.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c17 on c17.TMP_COMPANY_ID = 17 and c17.company = s.company and c17.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c18 on c18.TMP_COMPANY_ID = 18 and c18.company = s.company and c18.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c19 on c19.TMP_COMPANY_ID = 19 and c19.company = s.company and c19.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c20 on c20.TMP_COMPANY_ID = 20 and c20.company = s.company and c20.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c21 on c21.TMP_COMPANY_ID = 21 and c21.company = s.company and c21.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c22 on c22.TMP_COMPANY_ID = 22 and c22.company = s.company and c22.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c23 on c23.TMP_COMPANY_ID = 23 and c23.company = s.company and c23.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c24 on c24.TMP_COMPANY_ID = 24 and c24.company = s.company and c24.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c25 on c25.TMP_COMPANY_ID = 25 and c25.company = s.company and c25.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c26 on c26.TMP_COMPANY_ID = 26 and c26.company = s.company and c26.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c27 on c27.TMP_COMPANY_ID = 27 and c27.company = s.company and c27.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c28 on c28.TMP_COMPANY_ID = 28 and c28.company = s.company and c28.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c29 on c29.TMP_COMPANY_ID = 29 and c29.company = s.company and c29.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c30 on c30.TMP_COMPANY_ID = 30 and c30.company = s.company and c30.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c31 on c31.TMP_COMPANY_ID = 31 and c31.company = s.company and c31.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c32 on c32.TMP_COMPANY_ID = 32 and c32.company = s.company and c32.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c33 on c33.TMP_COMPANY_ID = 33 and c33.company = s.company and c33.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c34 on c34.TMP_COMPANY_ID = 34 and c34.company = s.company and c34.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c35 on c35.TMP_COMPANY_ID = 35 and c35.company = s.company and c35.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c36 on c36.TMP_COMPANY_ID = 36 and c36.company = s.company and c36.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c37 on c37.TMP_COMPANY_ID = 37 and c37.company = s.company and c37.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c38 on c38.TMP_COMPANY_ID = 38 and c38.company = s.company and c38.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c39 on c39.TMP_COMPANY_ID = 39 and c39.company = s.company and c39.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c40 on c40.TMP_COMPANY_ID = 40 and c40.company = s.company and c40.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c41 on c41.TMP_COMPANY_ID = 41 and c41.company = s.company and c41.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c42 on c42.TMP_COMPANY_ID = 42 and c42.company = s.company and c42.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c43 on c43.TMP_COMPANY_ID = 43 and c43.company = s.company and c43.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c44 on c44.TMP_COMPANY_ID = 44 and c44.company = s.company and c44.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c45 on c45.TMP_COMPANY_ID = 45 and c45.company = s.company and c45.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c46 on c46.TMP_COMPANY_ID = 46 and c46.company = s.company and c46.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c47 on c47.TMP_COMPANY_ID = 47 and c47.company = s.company and c47.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c48 on c48.TMP_COMPANY_ID = 48 and c48.company = s.company and c48.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c49 on c49.TMP_COMPANY_ID = 49 and c49.company = s.company and c49.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c50 on c50.TMP_COMPANY_ID = 50 and c50.company = s.company and c50.job = j.job
 group by p.industry, j.job
 order by job;
 
 /*
   total for job
 */
-insert into LKP_FAIRPAY_JOB_COMPANY_MATRIX
+insert into ${FAIRPAY_MATRIX_TABLENAME}
 select distinct
   p.industry,
   1 display_order,
@@ -908,66 +822,65 @@ select distinct
   max(c49.total) c49, 
   max(c50.total) c50,
   null company_job_score,
-  null job_company_count,
+  max(j.COMPANY_COUNT) job_company_count,
   null company_salary_count
 from TMP_JOBS_OF_INTEREST j
 join TMP_GD_SALARY_SUMMARY s on j.job = s.job
 join TMP_PARAM_CUR_INDUSTRY p on true
-left join TMP_COMPANY_JOB_TOTALS c1 on c1.tmp_company_id = 1 and c1.company = s.company and c1.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c2 on c2.tmp_company_id = 2 and c2.company = s.company and c2.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c3 on c3.tmp_company_id = 3 and c3.company = s.company and c3.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c4 on c4.tmp_company_id = 4 and c4.company = s.company and c4.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c5 on c5.tmp_company_id = 5 and c5.company = s.company and c5.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c6 on c6.tmp_company_id = 6 and c6.company = s.company and c6.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c7 on c7.tmp_company_id = 7 and c7.company = s.company and c7.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c8 on c8.tmp_company_id = 8 and c8.company = s.company and c8.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c9 on c9.tmp_company_id = 9 and c9.company = s.company and c9.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c10 on c10.tmp_company_id = 10 and c10.company = s.company and c10.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c11 on c11.tmp_company_id = 11 and c11.company = s.company and c11.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c12 on c12.tmp_company_id = 12 and c12.company = s.company and c12.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c13 on c13.tmp_company_id = 13 and c13.company = s.company and c13.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c14 on c14.tmp_company_id = 14 and c14.company = s.company and c14.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c15 on c15.tmp_company_id = 15 and c15.company = s.company and c15.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c16 on c16.tmp_company_id = 16 and c16.company = s.company and c16.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c17 on c17.tmp_company_id = 17 and c17.company = s.company and c17.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c18 on c18.tmp_company_id = 18 and c18.company = s.company and c18.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c19 on c19.tmp_company_id = 19 and c19.company = s.company and c19.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c20 on c20.tmp_company_id = 20 and c20.company = s.company and c20.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c21 on c21.tmp_company_id = 21 and c21.company = s.company and c21.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c22 on c22.tmp_company_id = 22 and c22.company = s.company and c22.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c23 on c23.tmp_company_id = 23 and c23.company = s.company and c23.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c24 on c24.tmp_company_id = 24 and c24.company = s.company and c24.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c25 on c25.tmp_company_id = 25 and c25.company = s.company and c25.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c26 on c26.tmp_company_id = 26 and c26.company = s.company and c26.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c27 on c27.tmp_company_id = 27 and c27.company = s.company and c27.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c28 on c28.tmp_company_id = 28 and c28.company = s.company and c28.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c29 on c29.tmp_company_id = 29 and c29.company = s.company and c29.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c30 on c30.tmp_company_id = 30 and c30.company = s.company and c30.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c31 on c31.tmp_company_id = 31 and c31.company = s.company and c31.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c32 on c32.tmp_company_id = 32 and c32.company = s.company and c32.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c33 on c33.tmp_company_id = 33 and c33.company = s.company and c33.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c34 on c34.tmp_company_id = 34 and c34.company = s.company and c34.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c35 on c35.tmp_company_id = 35 and c35.company = s.company and c35.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c36 on c36.tmp_company_id = 36 and c36.company = s.company and c36.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c37 on c37.tmp_company_id = 37 and c37.company = s.company and c37.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c38 on c38.tmp_company_id = 38 and c38.company = s.company and c38.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c39 on c39.tmp_company_id = 39 and c39.company = s.company and c39.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c40 on c40.tmp_company_id = 40 and c40.company = s.company and c40.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c41 on c41.tmp_company_id = 41 and c41.company = s.company and c41.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c42 on c42.tmp_company_id = 42 and c42.company = s.company and c42.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c43 on c43.tmp_company_id = 43 and c43.company = s.company and c43.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c44 on c44.tmp_company_id = 44 and c44.company = s.company and c44.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c45 on c45.tmp_company_id = 45 and c45.company = s.company and c45.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c46 on c46.tmp_company_id = 46 and c46.company = s.company and c46.job = j.job 
-left join TMP_COMPANY_JOB_TOTALS c47 on c47.tmp_company_id = 47 and c47.company = s.company and c47.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c48 on c48.tmp_company_id = 48 and c48.company = s.company and c48.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c49 on c49.tmp_company_id = 49 and c49.company = s.company and c49.job = j.job
-left join TMP_COMPANY_JOB_TOTALS c50 on c50.tmp_company_id = 50 and c50.company = s.company and c50.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c1 on c1.TMP_COMPANY_ID = 1 and c1.company = s.company and c1.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c2 on c2.TMP_COMPANY_ID = 2 and c2.company = s.company and c2.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c3 on c3.TMP_COMPANY_ID = 3 and c3.company = s.company and c3.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c4 on c4.TMP_COMPANY_ID = 4 and c4.company = s.company and c4.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c5 on c5.TMP_COMPANY_ID = 5 and c5.company = s.company and c5.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c6 on c6.TMP_COMPANY_ID = 6 and c6.company = s.company and c6.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c7 on c7.TMP_COMPANY_ID = 7 and c7.company = s.company and c7.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c8 on c8.TMP_COMPANY_ID = 8 and c8.company = s.company and c8.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c9 on c9.TMP_COMPANY_ID = 9 and c9.company = s.company and c9.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c10 on c10.TMP_COMPANY_ID = 10 and c10.company = s.company and c10.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c11 on c11.TMP_COMPANY_ID = 11 and c11.company = s.company and c11.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c12 on c12.TMP_COMPANY_ID = 12 and c12.company = s.company and c12.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c13 on c13.TMP_COMPANY_ID = 13 and c13.company = s.company and c13.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c14 on c14.TMP_COMPANY_ID = 14 and c14.company = s.company and c14.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c15 on c15.TMP_COMPANY_ID = 15 and c15.company = s.company and c15.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c16 on c16.TMP_COMPANY_ID = 16 and c16.company = s.company and c16.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c17 on c17.TMP_COMPANY_ID = 17 and c17.company = s.company and c17.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c18 on c18.TMP_COMPANY_ID = 18 and c18.company = s.company and c18.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c19 on c19.TMP_COMPANY_ID = 19 and c19.company = s.company and c19.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c20 on c20.TMP_COMPANY_ID = 20 and c20.company = s.company and c20.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c21 on c21.TMP_COMPANY_ID = 21 and c21.company = s.company and c21.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c22 on c22.TMP_COMPANY_ID = 22 and c22.company = s.company and c22.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c23 on c23.TMP_COMPANY_ID = 23 and c23.company = s.company and c23.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c24 on c24.TMP_COMPANY_ID = 24 and c24.company = s.company and c24.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c25 on c25.TMP_COMPANY_ID = 25 and c25.company = s.company and c25.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c26 on c26.TMP_COMPANY_ID = 26 and c26.company = s.company and c26.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c27 on c27.TMP_COMPANY_ID = 27 and c27.company = s.company and c27.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c28 on c28.TMP_COMPANY_ID = 28 and c28.company = s.company and c28.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c29 on c29.TMP_COMPANY_ID = 29 and c29.company = s.company and c29.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c30 on c30.TMP_COMPANY_ID = 30 and c30.company = s.company and c30.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c31 on c31.TMP_COMPANY_ID = 31 and c31.company = s.company and c31.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c32 on c32.TMP_COMPANY_ID = 32 and c32.company = s.company and c32.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c33 on c33.TMP_COMPANY_ID = 33 and c33.company = s.company and c33.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c34 on c34.TMP_COMPANY_ID = 34 and c34.company = s.company and c34.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c35 on c35.TMP_COMPANY_ID = 35 and c35.company = s.company and c35.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c36 on c36.TMP_COMPANY_ID = 36 and c36.company = s.company and c36.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c37 on c37.TMP_COMPANY_ID = 37 and c37.company = s.company and c37.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c38 on c38.TMP_COMPANY_ID = 38 and c38.company = s.company and c38.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c39 on c39.TMP_COMPANY_ID = 39 and c39.company = s.company and c39.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c40 on c40.TMP_COMPANY_ID = 40 and c40.company = s.company and c40.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c41 on c41.TMP_COMPANY_ID = 41 and c41.company = s.company and c41.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c42 on c42.TMP_COMPANY_ID = 42 and c42.company = s.company and c42.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c43 on c43.TMP_COMPANY_ID = 43 and c43.company = s.company and c43.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c44 on c44.TMP_COMPANY_ID = 44 and c44.company = s.company and c44.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c45 on c45.TMP_COMPANY_ID = 45 and c45.company = s.company and c45.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c46 on c46.TMP_COMPANY_ID = 46 and c46.company = s.company and c46.job = j.job 
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c47 on c47.TMP_COMPANY_ID = 47 and c47.company = s.company and c47.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c48 on c48.TMP_COMPANY_ID = 48 and c48.company = s.company and c48.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c49 on c49.TMP_COMPANY_ID = 49 and c49.company = s.company and c49.job = j.job
+left join ${COMPANY_JOB_TOTALS_TABLENAME} c50 on c50.TMP_COMPANY_ID = 50 and c50.company = s.company and c50.job = j.job
 group by p.industry, j.job
 order by job;
 
 drop table if exists TMP_JOBS_OF_INTEREST;
 drop table if exists TMP_GD_COMPANIES_OF_INTEREST;
-drop table if exists TMP_COMPANY_JOB_TOTALS;
 drop table if exists TMP_GD_SALARY_SUMMARY;
 
