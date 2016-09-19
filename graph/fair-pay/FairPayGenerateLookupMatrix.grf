@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Sep 07 14:04:34 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.32" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Tue Sep 13 17:39:12 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.35" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -20,12 +20,42 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Job Data Table" guiX="37" guiY="85" id="CREATE_COMPANY_JOB_DATA_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_JOB_DATA_TABLENAME};
+create table if not exists ${COMPANY_JOB_DATA_TABLENAME} (
+  JUST_CO_ID VARCHAR(15) NOT NULL,
+  JOB VARCHAR(255) NOT NULL, 
+  RATE FLOAT NULL,
+  SCORE INT NULL,
+  RATE_RAW FLOAT NULL,
+  SCORE_RAW INT NULL,
+  TOTAL INT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Table" guiX="257" guiY="85" id="CREATE_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_TABLENAME};
+create table if not exists ${COMPANY_TABLENAME} (
+  JUST_CO_ID VARCHAR(15) NOT NULL UNIQUE,
+  COMPANY_COLUMN_NO INT
+);
+]]></attr>
+</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Industry Queue" guiX="346" guiY="9" id="CREATE_INDUSTRY_QUEUE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${INDUSTRY_QUEUE_TABLENAME};
 create table if not exists ${INDUSTRY_QUEUE_TABLENAME} (
   ID AUTO_INCREMENT,
   INDUSTRY VARCHAR(128)
 );]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Job Table" guiX="437" guiY="85" id="CREATE_JOB_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${JOB_TABLENAME};
+create table if not exists ${JOB_TABLENAME} (
+  INDUSTRY VARCHAR(255) NOT NULL,
+  JOB VARCHAR(255) NOT NULL,
+  COMPANY_COUNT INT NOT NULL
+);
+]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Lookup Matrix" guiX="161" guiY="9" id="CREATE_LOOKUP_MATRIX" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${FAIRPAY_MATRIX_TABLENAME};
@@ -48,7 +78,7 @@ create table ${FAIRPAY_MATRIX_TABLENAME} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Industry Queue" guiX="257" guiY="88" id="POPULATE_INDUSTRY_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Industry Queue" guiX="250" guiY="160" id="POPULATE_INDUSTRY_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${INDUSTRY_QUEUE_TABLENAME} (
   industry
 )
@@ -60,15 +90,15 @@ order by i.just_indy;]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
-<Node enabled="enabled" guiName="Generate Industry Data" guiX="444" guiY="169" id="GENERATE_INDUSTRY_DATA" passThroughInputPort="0" type="RUN_GRAPH"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Read List of Industries" guiX="74" guiY="169" id="READ_LIST_OF_INDUSTRIES1" type="DB_INPUT_TABLE">
+<Node enabled="enabled" guiName="Generate Industry Data" guiX="437" guiY="241" id="GENERATE_INDUSTRY_DATA" passThroughInputPort="0" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Read List of Industries" guiX="63" guiY="241" id="READ_LIST_OF_INDUSTRIES1" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select distinct $industry:= i.just_indy
 from lkp_glassdoor_company g
 join lkp_just_co_indy i on g.just_company_id = i.just_co_id
 group by i.just_indy
 order by i.just_indy;]]></attr>
 </Node>
-<Node enabled="enabled" guiName="Reformat" guiX="278" guiY="169" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" guiName="Reformat" guiX="271" guiY="241" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -101,7 +131,7 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in regular mode: names of the graphs to be executed, otherwise nothing)" metadata="Metadata2" outPort="Port 0 (out)" toNode="GENERATE_INDUSTRY_DATA:0"/>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up" guiX="278" guiY="261" id="CLEAN_UP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up" guiX="271" guiY="320" id="CLEAN_UP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${INDUSTRY_QUEUE_TABLENAME};]]></attr>
 </Node>
 </Phase>

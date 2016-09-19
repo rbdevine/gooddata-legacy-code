@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Sun Sep 11 18:07:12 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.67" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Tue Sep 13 17:43:40 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.79" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
@@ -11,25 +11,22 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter30" name="COMPANY_TABLENAME" value="LKP_FAIRPAY_COMPANY"/>
-<Property id="GraphParameter8" name="JOB_TABLENAME" value="LKP_FAIRPAY_JOB"/>
-<Property id="GraphParameter0" name="MIN_CO_PER_JOB" value="5"/>
-<Property id="GraphParameter1" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
-<Property id="GraphParameter2" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
-<Property id="GraphParameter3" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>
-<Property id="GraphParameter4" name="MIN_JOBS_PER_CO" value="5"/>
+<Property id="GraphParameter2" name="MIN_CO_PER_JOB" value="5"/>
+<Property id="GraphParameter3" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
+<Property id="GraphParameter4" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
+<Property id="GraphParameter5" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>
+<Property id="GraphParameter6" name="MIN_JOBS_PER_CO" value="5"/>
 <Property id="GraphParameter7" name="name" value="value"/>
-<Property id="GraphParameter5" name="PARAM_TABLENAME" value="TMP_PARAM_CUR_INDUSTRY"/>
-<Property id="GraphParameter6" name="SQL_FILEPATH" value="${SQL_DIR}/FairPayIndusty.sql"/>
-<Property id="GraphParameter9" name="TEMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
-<Property fileURL="workspace.prm" id="GraphParameter10"/>
+<Property id="GraphParameter8" name="PARAM_TABLENAME" value="TMP_PARAM_CUR_INDUSTRY"/>
+<Property id="GraphParameter9" name="SQL_FILEPATH" value="${SQL_DIR}/FairPayIndusty.sql"/>
+<Property id="GraphParameter10" name="TEMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Job Data Table" guiX="27" guiY="94" id="CREATE_COMPANY_JOB_DATA_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Company Job Data Table" guiX="27" guiY="94" id="CREATE_COMPANY_JOB_DATA_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[create table if not exists ${COMPANY_JOB_DATA_TABLENAME} (
-  INDUSTRY VARCHAR(255) NOT NULL,
-  COMPANY_ID INT NOT NULL,
+  JUST_CO_ID VARCHAR(15) NOT NULL,
   JOB VARCHAR(255) NOT NULL, 
   RATE FLOAT NULL,
   SCORE INT NULL,
@@ -39,23 +36,21 @@
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Queue" guiX="199" guiY="15" id="CREATE_COMPANY_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Company Queue" guiX="199" guiY="15" id="CREATE_COMPANY_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_QUEUE_TABLENAME};
 create table ${COMPANY_QUEUE_TABLENAME} (
   ID AUTO_INCREMENT,
-  INDUSTRY VARCHAR(128),
-  COMPANY VARCHAR(255)
+  JUST_CO_ID VARCHAR(15)
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Table" guiX="247" guiY="94" id="CREATE_COMPANY_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Company Table" guiX="247" guiY="94" id="CREATE_COMPANY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[create table if not exists ${COMPANY_TABLENAME} (
-  INDUSTRY VARCHAR(255),
-  ID INT,
-  COMPANY VARCHAR(255) NOT NULL
+  JUST_CO_ID VARCHAR(15) NOT NULL UNIQUE,
+  COMPANY_COLUMN_NO INT
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Job Table" guiX="427" guiY="94" id="CREATE_JOB_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Job Table" guiX="427" guiY="94" id="CREATE_JOB_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[create table if not exists ${JOB_TABLENAME} (
   INDUSTRY VARCHAR(255) NOT NULL,
   JOB VARCHAR(255) NOT NULL,
@@ -78,10 +73,8 @@ create table ${PARAM_TABLENAME} (
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Summary Table" guiX="374" guiY="15" id="CREATE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TEMP_SALARY_SUMMARY_TABLENAME};
 create table if not exists ${TEMP_SALARY_SUMMARY_TABLENAME} (
-  JUST_INDY VARCHAR(255) NOT NULL,
   JOB VARCHAR(255) NOT NULL,
-  COMPANY VARCHAR(255) NOT NULL,
-  TICKER VARCHAR(255) NOT NULL,
+  JUST_CO_ID VARCHAR(15) NOT NULL,
   TOTAL INT NOT NULL,
   QUALITY_SCORE FLOAT NOT NULL,
   UNADJUSTED_AVG_BASE_HOURLY FLOAT NULL,
@@ -1047,10 +1040,8 @@ drop table if exists TMP_GD_SALARY_SUMMARY;
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Summary Table" guiX="180" guiY="237" id="POPULATE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TEMP_SALARY_SUMMARY_TABLENAME}
 select distinct
-  just_indy industry, 
   goc job,
-  m.co_long_name company,
-  s.ticker,
+  m.just_co_id just_co_id,
   count(goc) total,
   case
     when count(goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_1) then 0.0
@@ -1070,7 +1061,7 @@ from LKP_GLASSDOOR_SALARY_DW s
 join LKP_JUST_CO_SECTY_MASTER m on s.just_company_id = m.just_co_id
 join ${PARAM_TABLENAME} p on s.just_indy = p.industry
 where stateabbreviation <> 'PR' and goc is not null
-group by just_indy, s.TICKER, m.co_long_name, GOC
+group by just_indy, m.just_co_id, GOC
 having count(goc) >= max(p.MIN_JOB_COUNT_PER_CO_SCORE_1);]]></attr>
 </Node>
 </Phase>
@@ -1080,91 +1071,95 @@ having count(goc) >= max(p.MIN_JOB_COUNT_PER_CO_SCORE_1);]]></attr>
 where job in (
   select job from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by job having count(company) < max(p.MIN_CO_PER_JOB)
+  group by job having count(just_co_id) < max(p.MIN_CO_PER_JOB)
 );
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
-where company in (
-  select company 
+where just_co_id in (
+  select just_co_id 
   from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by company having count(job) < max(p.MIN_JOBS_PER_CO)
+  group by just_co_id having count(job) < max(p.MIN_JOBS_PER_CO)
 );
 
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
 where job in (
   select job from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by job having count(company) < max(p.MIN_CO_PER_JOB)
+  group by job having count(just_co_id) < max(p.MIN_CO_PER_JOB)
 );
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
-where company in (
-  select company 
+where just_co_id in (
+  select just_co_id 
   from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by company having count(job) < max(p.MIN_JOBS_PER_CO)
+  group by just_co_id having count(job) < max(p.MIN_JOBS_PER_CO)
 );
 
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
 where job in (
   select job from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by job having count(company) < max(p.MIN_CO_PER_JOB)
+  group by job having count(just_co_id) < max(p.MIN_CO_PER_JOB)
 );
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
-where company in (
-  select company 
+where just_co_id in (
+  select just_co_id 
   from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by company having count(job) < max(p.MIN_JOBS_PER_CO)
+  group by just_co_id having count(job) < max(p.MIN_JOBS_PER_CO)
 );
 
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
 where job in (
   select job from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by job having count(company) < max(p.MIN_CO_PER_JOB)
+  group by job having count(just_co_id) < max(p.MIN_CO_PER_JOB)
 );
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
-where company in (
-  select company 
+where just_co_id in (
+  select just_co_id 
   from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by company having count(job) < max(p.MIN_JOBS_PER_CO)
+  group by just_co_id having count(job) < max(p.MIN_JOBS_PER_CO)
 );
 
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
 where job in (
   select job from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by job having count(company) < max(p.MIN_CO_PER_JOB)
+  group by job having count(just_co_id) < max(p.MIN_CO_PER_JOB)
 );
 delete from ${TEMP_SALARY_SUMMARY_TABLENAME}
-where company in (
-  select company 
+where just_co_id in (
+  select just_co_id 
   from ${TEMP_SALARY_SUMMARY_TABLENAME} 
   join ${PARAM_TABLENAME} p on true 
-  group by company having count(job) < max(p.MIN_JOBS_PER_CO)
+  group by just_co_id having count(job) < max(p.MIN_JOBS_PER_CO)
 );
 ]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Companies" guiX="118" guiY="387" id="ADD_INDUSTRY_COMPANIES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_TABLENAME} (industry, id, company)
-select industry, rank() over (order by jobCnt desc, company) id, company from (
-  select p.industry, s.company, count(s.job) jobCnt
+<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_TABLENAME} (just_co_id, company_column_no)
+select just_co_id, rank() over (order by jobCnt desc, company) id from (
+  select s.just_co_id, m.co_long_name company, count(s.job) jobCnt
   from ${TEMP_SALARY_SUMMARY_TABLENAME} s
-  join ${PARAM_TABLENAME} p on true
+  join lkp_just_co_secty_master m on s.just_co_id = m.just_co_id
+  join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+  join ${PARAM_TABLENAME} p on p.industry = i.just_indy
   where s.quality_score > 0
-  group by p.industry, s.company
+  group by p.industry, s.just_co_id, m.co_long_name
 ) t;
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Jobs" guiX="310" guiY="387" id="ADD_INDUSTRY_JOBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${JOB_TABLENAME} (industry, job, company_count)
-select p.industry, s.job, count(s.company)
+select p.industry, s.job, count(s.just_co_id)
 from ${TEMP_SALARY_SUMMARY_TABLENAME} s
-join ${PARAM_TABLENAME} p on true
+join lkp_just_co_secty_master m on s.just_co_id = m.just_co_id
+join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+join ${PARAM_TABLENAME} p on p.industry = i.just_indy
 group by p.industry, s.job;
 ]]></attr>
 </Node>
@@ -1209,18 +1204,20 @@ function integer transform() {
 <Phase number="5">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Company Job Data" guiX="184" guiY="458" id="ADD_INDUSTRY_COMPANY_JOB_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_DATA_TABLENAME} 
-select p.industry, c.id, s.job, s.unadjusted_avg_base_hourly_cola, r.raterank, s.unadjusted_avg_base_hourly, r.raterank_raw, s.total 
+select c.just_co_id, s.job, s.unadjusted_avg_base_hourly_cola, r.raterank, s.unadjusted_avg_base_hourly, r.raterank_raw, s.total 
 from ${COMPANY_TABLENAME} c
-join ${TEMP_SALARY_SUMMARY_TABLENAME} s on s.company = c.company
-join ${PARAM_TABLENAME} p on true
+join ${TEMP_SALARY_SUMMARY_TABLENAME} s on s.just_co_id = c.just_co_id
+join lkp_just_co_secty_master m on m.just_co_id = c.just_co_id
+join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+join ${PARAM_TABLENAME} p on p.industry = i.just_indy
 join (
   select 
-    rank() over (partition by job order by unadjusted_avg_base_hourly_cola desc) raterank, 
-    rank() over (partition by job order by unadjusted_avg_base_hourly desc) raterank_raw, 
-    company,
+    rank() over (partition by job order by unadjusted_avg_base_hourly_cola) raterank, 
+    rank() over (partition by job order by unadjusted_avg_base_hourly) raterank_raw, 
+    just_co_id,
     job
   from ${TEMP_SALARY_SUMMARY_TABLENAME}
-) r on s.company = r.company and r.job = s.job;
+) r on r.just_co_id = s.just_co_id and r.job = s.job;
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Insert Header Row into Matrix" guiX="54" guiY="530" id="INSERT_HEADER_ROW_INTO_MATRIX" type="DB_EXECUTE">
@@ -1255,9 +1252,7 @@ group by c.company, p.industry;]]></attr>
 <Phase number="6">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Up" guiX="217" guiY="845" id="CLEAN_UP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TEMP_SALARY_SUMMARY_TABLENAME};
-drop table if exists ${PARAM_TABLENAME};
-drop table if exists ${COMPANY_QUEUE_TABLENAME};
-]]></attr>
+drop table if exists ${PARAM_TABLENAME};]]></attr>
 </Node>
 </Phase>
 </Graph>
