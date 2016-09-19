@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Sep 08 13:43:00 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.249" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu Sep 08 15:34:39 EDT 2016" modifiedBy="scalvillo" name="Complete County File" revision="1.254" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="AGG_COMPANYLOCATIONS_READ" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -36,7 +36,6 @@
 <Field label="sic_code" name="sic_code" type="string"/>
 <Field name="just_city_name" type="string"/>
 <Field name="just_county_name" type="string"/>
-<Field name="just_state_name" type="string"/>
 <Field name="just_state_abbreviation" type="string"/>
 </Record>
 </Metadata>
@@ -82,7 +81,7 @@ function integer transform() {
 	countyName = ($in.0.county != null) ? trim(upperCase($in.0.county)): null;
 	if ($in.0.county != null)
 	{
-		countyName = (indexOf(countyName,"ST ") > 0) ? replace(countyName,"ST\\s","ST. "): countyName;
+		countyName = (indexOf(countyName,"ST ") > -1) ? replace(countyName,"ST\\s","ST. "): countyName;
 	}
 	
 	if($in.0.state != null) {
@@ -97,70 +96,70 @@ function integer transform() {
 		stateAbbrev = "AL";
 	}
 	else if (stateAbbrev=="ARIZONA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "AK";
 	}
-	else if (stateAbbrev=="CAROLINA") {
+	/*else if (stateAbbrev=="CAROLINA") {
 		stateAbbrev = "AL";
-	}
+	}*/
 	else if(stateAbbrev=="COLORADO") {
-		stateAbbrev = "AL";
+		stateAbbrev = "CO";
 	}
 	else if(stateAbbrev=="FLORIDA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "FL";
 	}
 	else if(stateAbbrev=="GEORGIA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "GA";
 	}
 	else if(stateAbbrev=="INDIANA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "IN";
 	}
 	else if(stateAbbrev=="KANSAS") {
-		stateAbbrev = "AL";
+		stateAbbrev = "KS";
 	}
 	else if(stateAbbrev=="KENTUCKY") {
-		stateAbbrev = "AL";
+		stateAbbrev = "KY";
 	}
 	else if(stateAbbrev=="LOUISIANA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "LA";
 	}
 	else if(stateAbbrev=="MICHIGAN") {
-		stateAbbrev = "AL";
+		stateAbbrev = "MI";
 	}
 	else if(stateAbbrev=="MISSISSIPPI") {
-		stateAbbrev = "AL";
+		stateAbbrev = "MS";
 	}
 	else if(stateAbbrev=="NEVADA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "NV";
 	}
 	else if(stateAbbrev=="NEW MEXICO") {
-		stateAbbrev = "AL";
+		stateAbbrev = "NM";
 	}
 	else if(stateAbbrev=="NORTH CAROLINA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "NC";
 	}
 	else if(stateAbbrev=="PUERTO RICO") {
-		stateAbbrev = "AL";
+		stateAbbrev = "PR";
 	}
 	else if(stateAbbrev=="SAN JUAN") {
-		stateAbbrev = "AL";
+		stateAbbrev = "PR";
 	}
 	else if(stateAbbrev=="TENNESSEE") {
-		stateAbbrev = "AL";
+		stateAbbrev = "TN";
 	}
 	else if(stateAbbrev=="TEXAS") {
-		stateAbbrev = "AL";
+		stateAbbrev = "TX";
 	}
 	else if(stateAbbrev=="UTAH") {
-		stateAbbrev = "AL";
+		stateAbbrev = "UT";
 	}
 	else if(stateAbbrev=="VIRGINIA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "VA";
 	}
 	else if(stateAbbrev=="WEST VIRGINIA") {
-		stateAbbrev = "AL";
+		stateAbbrev = "WV";
 	}
 	else if(stateAbbrev=="WYOMING") {
-		stateAbbrev = "AL";
+		stateAbbrev = "WY";
 	}
 	
 	return ALL;
@@ -238,7 +237,6 @@ function integer transform() {
 	SIC_CODE VARCHAR(255),
 	JUST_CITY_NAME VARCHAR(255),
 	JUST_COUNTY_NAME VARCHAR(255),
-	JUST_STATE_NAME VARCHAR(255),
 	JUST_STATE_ABBREVIATION VARCHAR(255)
 );]]></attr>
 </Node>
@@ -262,7 +260,6 @@ function integer transform() {
 	SIC_CODE,
 	JUST_CITY_NAME,
 	JUST_COUNTY_NAME,
-	JUST_STATE_NAME,
 	JUST_STATE_ABBREVIATION
 )
 FROM LOCAL '${WRITEFILEPATH}'
