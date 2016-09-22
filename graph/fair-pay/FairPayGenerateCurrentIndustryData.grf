@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Tue Sep 13 17:43:40 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.79" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Tue Sep 20 10:41:39 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.84" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
@@ -11,16 +11,16 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter2" name="MIN_CO_PER_JOB" value="5"/>
-<Property id="GraphParameter3" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
-<Property id="GraphParameter4" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
-<Property id="GraphParameter5" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>
-<Property id="GraphParameter6" name="MIN_JOBS_PER_CO" value="5"/>
-<Property id="GraphParameter7" name="name" value="value"/>
-<Property id="GraphParameter8" name="PARAM_TABLENAME" value="TMP_PARAM_CUR_INDUSTRY"/>
-<Property id="GraphParameter9" name="SQL_FILEPATH" value="${SQL_DIR}/FairPayIndusty.sql"/>
-<Property id="GraphParameter10" name="TEMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
-<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Property id="GraphParameter0" name="MIN_CO_PER_JOB" value="1"/>
+<Property id="GraphParameter1" name="MIN_IND_GOC_CO_COUNT" value="3"/>
+<Property id="GraphParameter2" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
+<Property id="GraphParameter3" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
+<Property id="GraphParameter4" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>
+<Property id="GraphParameter5" name="MIN_JOBS_PER_CO" value="1"/>
+<Property id="GraphParameter6" name="PARAM_TABLENAME" value="TMP_PARAM_CUR_INDUSTRY"/>
+<Property id="GraphParameter7" name="SQL_FILEPATH" value="${SQL_DIR}/FairPayIndusty.sql"/>
+<Property id="GraphParameter8" name="TEMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
+<Property fileURL="workspace.prm" id="GraphParameter9"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -67,6 +67,7 @@ create table ${PARAM_TABLENAME} (
   MIN_JOB_COUNT_PER_CO_SCORE_3 INT,  
   MIN_JOBS_PER_CO INT,
   MIN_CO_PER_JOB INT,
+  MIN_IND_GOC_CO_COUNT INT,
   INDUSTRY VARCHAR(255)
 );]]></attr>
 </Node>
@@ -121,13 +122,15 @@ group by
   MIN_JOB_COUNT_PER_CO_SCORE_2,
   MIN_JOB_COUNT_PER_CO_SCORE_3,
   MIN_JOBS_PER_CO,
-  MIN_CO_PER_JOB
+  MIN_CO_PER_JOB,
+  MIN_IND_GOC_CO_COUNT
 ) values (
   ${MIN_JOB_COUNT_PER_CO_SCORE_1},
   ${MIN_JOB_COUNT_PER_CO_SCORE_2},
   ${MIN_JOB_COUNT_PER_CO_SCORE_3},
   ${MIN_JOBS_PER_CO},
-  ${MIN_CO_PER_JOB}
+  ${MIN_CO_PER_JOB},
+  ${MIN_IND_GOC_CO_COUNT}
 );
 
 update ${PARAM_TABLENAME} 
@@ -1040,13 +1043,13 @@ drop table if exists TMP_GD_SALARY_SUMMARY;
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Summary Table" guiX="180" guiY="237" id="POPULATE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TEMP_SALARY_SUMMARY_TABLENAME}
 select distinct
-  goc job,
+  s.goc job,
   m.just_co_id just_co_id,
-  count(goc) total,
+  count(s.goc) total,
   case
-    when count(goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_1) then 0.0
-    when count(goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_2) then 1.0
-    when count(goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_3) then 2.0
+    when count(s.goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_1) then 0.0
+    when count(s.goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_2) then 1.0
+    when count(s.goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_3) then 2.0
     else 3.0
   end quality_score,
   cast(round(avg(UNADJUSTEDBASEHOURLY),2) as numeric(36,2)) unadjusted_hourly_avg_base,
@@ -1060,9 +1063,19 @@ select distinct
 from LKP_GLASSDOOR_SALARY_DW s
 join LKP_JUST_CO_SECTY_MASTER m on s.just_company_id = m.just_co_id
 join ${PARAM_TABLENAME} p on s.just_indy = p.industry
-where stateabbreviation <> 'PR' and goc is not null
-group by just_indy, m.just_co_id, GOC
-having count(goc) >= max(p.MIN_JOB_COUNT_PER_CO_SCORE_1);]]></attr>
+join (
+  select just_indy, goc, count(just_company_id) indy_goc_count
+  from (
+    select just_indy, goc, just_company_id
+    from lkp_glassdoor_salary_dw s
+    where goc is not null
+    group by just_indy, goc, just_company_id
+  ) gc
+  group by just_indy, goc
+) t on t.just_indy = s.just_indy and t.goc = s.goc
+where stateabbreviation <> 'PR' and s.goc is not null and t.indy_goc_count >= p.MIN_IND_GOC_CO_COUNT
+group by s.just_indy, m.just_co_id, s.GOC
+having count(s.goc) >= max(p.MIN_JOB_COUNT_PER_CO_SCORE_1);]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
