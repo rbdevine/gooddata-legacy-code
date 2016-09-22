@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Sep 22 12:14:27 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.25" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Sep 22 17:29:29 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.34" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter22" name="CITY_FIPS_AVERAGES_TABLENAME" value="LKP_CITY_FIPS_AVG"/>
@@ -112,15 +112,26 @@ create table ${SALARY_YEAR_ADJUSTMENT_TABLENAME} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Avgs" guiX="112" guiY="167" id="POPULATE_FIPS_AVGS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${CITY_FIPS_AVERAGES_TABLENAME};
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Avgs" guiX="338" guiY="167" id="POPULATE_FIPS_AVGS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${CITY_FIPS_AVERAGES_TABLENAME}
 select distinct f.city_name, f.state_abbreviation , avg(p.cost_of_living_index)
 from lkp_city_fips f
 join STG_REGIONALPURCHASINGPOWER p on f.state_county_fips = p.fips_code
 group by f.state_abbreviation, f.city_name;
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Salary Yr Adj" guiX="264" guiY="167" id="POPULATE_SALARY_YR_ADJ" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Job Levels" guiX="174" guiY="167" id="POPULATE_JOB_LEVELS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer < 3 years', null, 3);
+insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer 3 - 5 years', 3, 5);
+insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer 5 - 10 years', 5, 10);
+insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer > 10 years', 10, null);
+insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa < 3 years', null, 3);
+insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa 3 - 5 years', 3, 5);
+insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa 5 - 10 years', 5, 10);
+insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa > 10 years', 10, null);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Salary Yr Adj" guiX="5" guiY="167" id="POPULATE_SALARY_YR_ADJ" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2010, 1.127);
 insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2011, 1.105);
 insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2012, 1.083);
