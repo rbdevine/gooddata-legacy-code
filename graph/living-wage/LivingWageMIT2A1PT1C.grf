@@ -1,20 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Mon Sep 26 14:03:40 EDT 2016" modifiedBy="hankmobley" name="LivingWageEmployeeCountByCounty" revision="1.26" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Oct 05 12:56:16 EDT 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.42" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="EMPLOYEE_COUNTS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="AUTO_HAND_COMPARE" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="STATE_COUNTY_FIPS" type="string"/>
-<Field name="TICKER" type="string"/>
-<Field name="SUBSIDIARY" type="string"/>
-<Field name="EMPLOYEE_COUNT" type="string"/>
+<Field name="STATE" type="string"/>
+<Field name="COUNTY" type="string"/>
+<Field name="_2A1PT1C" type="string"/>
+<Field name="_2A1PT1C_HOURLY" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/EmployeeCountsByCounty.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/employeecountsbycountyerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/EmployeeCountsByCounty.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="LKP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/MITLivingWage2A1PT1C.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/mitlivingwage2a1pt1cerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/MITLivingWage2A1PT1C.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="LKP_LIVING_WAGE_MIT"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter26" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/employeecountsbycounty.txt"/>
+<Property id="GraphParameter26" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/mitlivingwage2a1pt1c.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -29,9 +30,10 @@
 // Transforms input record into output record.
 function integer transform() {
 	$out.0.STATE_COUNTY_FIPS = $in.0.STATE_COUNTY_FIPS;
-	$out.0.TICKER = $in.0.TICKER;
-	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
-	$out.0.EMPLOYEE_COUNT = $in.0.EMPLOYEE_COUNT;
+	$out.0.STATE = $in.0.STATE;
+	$out.0.COUNTY = $in.0.COUNTY;
+	$out.0._2A1PT1C = $in.0._2A1PT1C;
+	$out.0._2A1PT1C_HOURLY = $in.0._2A1PT1C_HOURLY;
 	
 	return ALL;
 }
@@ -59,27 +61,28 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="6" guiY="192" id="DROP_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="6" guiY="198" id="DROP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-  STATE_COUNTY_FIPS VARCHAR(5),
-  TICKER VARCHAR(32),
-  SUBSIDIARY VARCHAR(255),
-  EMPLOYEE_COUNT INT
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  STATE VARCHAR(2) NOT NULL,
+  COUNTY VARCHAR(64) NOT NULL,
+  _2A1PT1C FLOAT NOT NULL,
+  _2A1PT1C_HOURLY FLOAT NULL
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-    STATE_COUNTY_FIPS,
-	TICKER,
-    SUBSIDIARY,
-    EMPLOYEE_COUNT
+	STATE_COUNTY_FIPS,
+    STATE,
+    COUNTY,
+    _2A1PT1C
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -88,40 +91,11 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Phase>
 <Phase number="5">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Data" guiX="472" guiY="198" id="CLEANUP_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[delete from ${TABLENAME} where ticker is null;
-update ${TABLENAME} set state_county_fips = ltrim(rtrim(state_county_fips));
-update ${TABLENAME} set ticker = ltrim(rtrim(ticker));
-update ${TABLENAME} set subsidiary = ltrim(rtrim(subsidiary));
-
-delete from ${TABLENAME} where state_county_fips = '(null';
-
-update ${TABLENAME}
-set state_county_fips = concat('0', state_county_fips)
-where length(state_county_fips) = 4;
-
-drop table if exists TMP_${TABLENAME};
-create table TMP_${TABLENAME}(
-  state_county_fips varchar(5),
-  ticker varchar(32),
-  subsidiary varchar(255),
-  employee_count integer
-);
-insert into TMP_${TABLENAME}
-select state_county_fips, ticker, subsidiary, sum(employee_count)
-from ${TABLENAME}
-group by state_county_fips, ticker, subsidiary
-order by ticker, subsidiary, state_county_fips;
-
-truncate table ${TABLENAME};
-
-insert into ${TABLENAME}
-select * from TMP_${TABLENAME};
-
-drop table TMP_${TABLENAME};
-
-delete from ${TABLENAME} 
-where regexp_count(state_county_fips,'^[0-9]{5,5}$') = 0;
-]]></attr>
+<attr name="sqlQuery"><![CDATA[update ${TABLENAME} set STATE_COUNTY_FIPS = ltrim(rtrim(STATE_COUNTY_FIPS));
+update ${TABLENAME} set STATE = ltrim(rtrim(STATE));
+update ${TABLENAME} set COUNTY = ltrim(rtrim(COUNTY));
+update ${TABLENAME} set STATE_COUNTY_FIPS = concat('0', STATE_COUNTY_FIPS) where length(STATE_COUNTY_FIPS) = 4;
+update ${TABLENAME} set _2A1PT1C_HOURLY = _2A1PT1C/3120;]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
