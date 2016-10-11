@@ -1,35 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat Sep 24 18:52:14 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.35" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Tue Oct 11 15:07:53 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.46" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="CITY_FIPS_AVERAGES_TABLENAME" value="LKP_CITY_FIPS_AVG"/>
-<Property id="GraphParameter1" name="ENIGMA_SIMPLIFIED_TABLENAME" value="LKP_ENIGMA_H1BVISA_SIMPLIFIED_DW"/>
-<Property id="GraphParameter2" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
-<Property id="GraphParameter3" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter1" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
+<Property id="GraphParameter2" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
+<Property fileURL="workspace.prm" id="GraphParameter3"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Enigma Table" guiX="301" guiY="9" id="CREATE_ENIGMA_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  ${ENIGMA_SIMPLIFIED_TABLENAME}
-  Used to store a reduced data set of the enigma data that can be incorporated into
-  ${SALARY_LOOKUP_TABLENAME}
-*/
-drop table if exists ${ENIGMA_SIMPLIFIED_TABLENAME};
-create table ${ENIGMA_SIMPLIFIED_TABLENAME} (
-  JUST_CO_ID VARCHAR(15) NOT NULL,
-  EMPLOYER_NAME VARCHAR(255) NOT NULL,
-  GOC VARCHAR(255) NOT NULL,
-  JOB_TITLE VARCHAR(255),
-  UNADJUSTED_YEARLY_SALARY FLOAT NOT NULL,
-  EMPLOYER_CITY VARCHAR(255),
-  EMPLOYER_STATE VARCHAR(255),
-  WORKSITE_CITY VARCHAR(255),
-  WORKSITE_STATE VARCHAR(255),
-  PW_WAGE_SOURCE_YEAR INT
-);
-]]></attr>
-</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create FIPs Avgs Table" guiX="358" guiY="84" id="CREATE_FIPS_AVGS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${CITY_FIPS_AVERAGES_TABLENAME} 
@@ -73,6 +51,7 @@ create table ${JOB_LEVEL_TABLENAME} (
 */
 drop table if exists ${SALARY_LOOKUP_TABLENAME};
 create table ${SALARY_LOOKUP_TABLENAME} (
+  DATA_TYPE_ID INT NOT NULL, 
   JUST_COMPANY_ID VARCHAR(15) NOT NULL,
   GLASSDOOR_EMPLOYER_NAME VARCHAR(255) NOT NULL,
   TICKER VARCHAR(255) NULL,
@@ -80,6 +59,7 @@ create table ${SALARY_LOOKUP_TABLENAME} (
   GOC VARCHAR(255) NULL,
   MGOC VARCHAR(255) NULL,
   JOBTITLE VARCHAR(255) NULL,
+  ONET_CODE VARCHAR(255) NULL,
   UNADJUSTEDBASESALARY FLOAT NULL,
   UNADJUSTEDTOTALSALARY FLOAT NULL,
   UNADJUSTEDBASESALARY_COLA FLOAT NULL,
@@ -92,10 +72,9 @@ create table ${SALARY_LOOKUP_TABLENAME} (
   YEARSOFRELEVANTEXPNUMBER INT NULL,
   CITYNAME VARCHAR(255) NULL,
   STATEABBREVIATION VARCHAR(255) NULL,
-  COST_OF_LIVING_INDEX FLOAT NULL
-);]]></attr>
+  COST_OF_LIVING_INDEX FLOAT NULL);]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Salary Yr Adj Table" guiX="112" guiY="9" id="CREATE_SALARY_YR_ADJ_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Salary Yr Adj Table" guiX="182" guiY="10" id="CREATE_SALARY_YR_ADJ_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${SALARY_YEAR_ADJUSTMENT_TABLENAME} 
   salary adjustments based on the year of the reported salary.  These 
@@ -143,40 +122,18 @@ insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2016, 1.000);
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Enigma Simplified Table" guiX="301" guiY="241" id="POPULATE_ENIGMA_SIMPLIFIED_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${ENIGMA_SIMPLIFIED_TABLENAME}
-select
-    e.just_co_id,
-    h.employer_name,
-    sg.gd_goc,
-    h.job_title,
-    case 
-      when (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) and (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0) then (wage_rate_of_pay_from + wage_rate_of_pay_to)/2
-      when (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) then cast(wage_rate_of_pay_from as numeric(36,2))
-      else cast(wage_rate_of_pay_to as numeric(36,2)) 
-    end UNADJUSTEDBASESALARY,
-    h.employer_city,
-    h.employer_state,
-    h.worksite_city,
-    h.worksite_state,
-    cast(h.pw_wage_source_year as int)
-from lkp_enigma_company e
-join stg_enigmah1bvisa h on h.employer_name = e.enigma_employer_name
-join lkp_soc_goc sg on sg.enigma_soc_code = h.soc_code
-where 
-  (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) or 
-  (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0);]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Glassdoor Data" guiX="5" guiY="241" id="POPULATE_LOOKUP_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Glassdoor Data" guiX="135" guiY="238" id="POPULATE_LOOKUP_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${SALARY_LOOKUP_TABLENAME}
-select distinct 
+select distinct
+  0,
   g.just_company_id, 
   g.glassdoor_employer_name, 
   m.ticker_trim, 
   i.just_indy, 
-  s.goc, 
+  s.goc,
   s.mgoc, 
-  s.jobtitle, 
+  s.jobtitle,
+  s.onet_code,
   s.UNADJUSTEDBASESALARY,
   s.UNADJUSTEDTOTALSALARY,
   cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDBASESALARY*100/isnull(f.avg_cost_of_living_index,'100')) as numeric(36,2)),
@@ -193,8 +150,8 @@ select distinct
 from lkp_glassdoor_company g
 join lkp_just_co_secty_master m on g.just_company_id = m.just_co_id
 join stg_glassdoorsalary s on s.fk_employerid = g.glassdoor_employer_id
-join ${SALARY_YEAR_ADJUSTMENT_TABLENAME} ya on ya.year = cast(s.YEAROFSALARY as int)
-left join ${CITY_FIPS_AVERAGES_TABLENAME} f on f.state = s.stateabbreviation and f.city = s.cityname
+join LKP_SALARY_YEAR_ADJUSTMENT ya on ya.year = cast(s.YEAROFSALARY as int)
+left join lkp_city_fips_avg f on f.state = s.stateabbreviation and f.city = s.cityname
 /*left join lkp_city_fips f on f.state_abbreviation = s.stateabbreviation and f.city_name = s.cityname
 left join stg_regionalpurchasingpower pp on pp.fips_code = f.state_county_fips*/
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
@@ -204,43 +161,88 @@ where
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Lookup Table with Enigma Data" guiX="134" guiY="316" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Enigma Data" guiX="142" guiY="315" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
-  insert ${ENIGMA_SIMPLIFIED_TABLENAME} data into ${SALARY_LOOKUP_TABLENAME}
+  insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
 */
 
 insert into ${SALARY_LOOKUP_TABLENAME}
-select
-  e.just_co_id,
-  e.employer_name,
-  m.ticker_trim, 
-  i.just_indy, 
-  e.goc, 
-  null mgoc, 
-  e.job_title,
-  e.UNADJUSTED_YEARLY_SALARY,
-  null UNADJUSTEDTOTALSALARY,
-  cast(round(isnull(ya.ADJUSTMENT_FACTOR,1)*e.UNADJUSTED_YEARLY_SALARY*100/isnull(f.avg_cost_of_living_index,'100')) as numeric(36,2)),
+select 
+  1,
+  t.just_co_id,
+  t.employer_name,
+  m.ticker_trim,
+  i.just_indy,
+  gd_goc,
   null,
-  e.UNADJUSTED_YEARLY_SALARY/2000,
+  t.job_title,
+  t.soc_code,
+  cast(round(t.UNADJUSTEDBASESALARY,2) as numeric(36,2)) UNADJUSTEDBASESALARY,
   null,
-  cast(round(isnull(ya.ADJUSTMENT_FACTOR,1)*e.UNADJUSTED_YEARLY_SALARY*100/(2000*isnull(f.avg_cost_of_living_index,'100'))) as numeric(36,2)),
+  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index),2) as numeric(36,2)) UNADJUSTEDBASESALARY_COLA,
   null,
+  cast(round((t.UNADJUSTEDBASESALARY / 2000.0),2) as numeric(36,2)) UNADJUSTEDBASEHOURLY,
   null,
+  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index) / 2000.0,2) as numeric(36,2)) UNADJUSTEDBASEHOURLY_COLA,
   null,
-  f.city, 
-  f.state, 
-  f.avg_cost_of_living_index    
-from ${ENIGMA_SIMPLIFIED_TABLENAME} e
-join lkp_just_co_secty_master m on m.just_co_id = e.just_co_id
-left join lkp_city_fips_avg f on 
-  /*(f.state = e.worksite_state and f.city = e.worksite_city) or*/
-/*  
-(f.state = e.employer_state and f.city = e.employer_city)
+  wage_year,
+  null,
+  t.city, 
+  t.state, 
+  t.avg_cost_of_living_index
+from (
+  select
+    just_co_id,
+    employer_name,
+    gd_goc,
+    job_title,
+    soc_code,
+    case 
+      when wage_rate_of_pay = 'Hour' then UNADJUSTEDBASESALARY * 2000.0
+      when wage_rate_of_pay = 'Bi-Weekly' then UNADJUSTEDBASESALARY * 26.0
+      when wage_rate_of_pay = 'Week' then UNADJUSTEDBASESALARY * 52.0
+      when wage_rate_of_pay = 'Month' then UNADJUSTEDBASESALARY * 12.0
+      else UNADJUSTEDBASESALARY
+    end UNADJUSTEDBASESALARY,
+    cast(isnull(f.avg_cost_of_living_index,'100.0') as float) avg_cost_of_living_index, 
+    t.city,
+    t.state,
+    wage_year
+  from (
+    select
+        e.just_co_id,
+        h.employer_name,
+        sg.gd_goc,
+        h.job_title,
+        h.soc_code,
+        wage_rate_of_pay,
+        case 
+          when (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) and (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0) then (wage_rate_of_pay_from + wage_rate_of_pay_to)/2
+          when (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) then cast(wage_rate_of_pay_from as numeric(36,2))
+          else cast(wage_rate_of_pay_to as numeric(36,2)) 
+        end UNADJUSTEDBASESALARY,
+        case
+          when h.worksite_city is null or h.worksite_state is null then h.employer_city
+          else h.worksite_city
+        end city,
+        case
+          when h.worksite_city is null or h.worksite_state is null then h.employer_state
+          else h.worksite_state
+        end state,
+        cast(isnull(left(EMPLOYMENT_START_DATE,4),isnull(pw_wage_source_year,'2016')) as int) wage_year
+    from lkp_enigma_company e
+    join stg_enigmah1bvisa h on h.employer_name = e.enigma_employer_name
+    join lkp_soc_goc sg on sg.enigma_soc_code = h.soc_code
+    where 
+      (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) or 
+      (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0)
+  ) t
+  left join lkp_city_fips_avg f on f.city = t.city and f.state = t.state
+) t
+join lkp_just_co_secty_master m on m.just_co_id = t.just_co_id
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
-left join ${SALARY_YEAR_ADJUSTMENT_TABLENAME} ya on false;
-/*order by cast(round(isnull(ya.ADJUSTMENT_FACTOR,1)*e.UNADJUSTED_YEARLY_SALARY*100/(2000*isnull(f.avg_cost_of_living_index,'100'))) as numeric(36,2)) desc;*/
-]]></attr>
+where ((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index) / 2000.0) <= 100.0 and t.wage_year > 2009 and t.wage_year < 2017
+order by m.ticker_trim, t.gd_goc, t.unadjustedbasesalary desc;]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
@@ -322,7 +324,7 @@ where u.jobtitle = s.jobtitle;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Levels" guiX="181" guiY="477" id="ADD_JOB_LEVELS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Levels" guiX="123" guiY="474" id="ADD_JOB_LEVELS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   update ${SALARY_LOOKUP_TABLENAME} to modify goc by level, given years of experience,
   see above for further explanation.
@@ -337,6 +339,15 @@ where
     (MIN_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER > MIN_YEARS_EXPERIENCE and MAX_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER <= MAX_YEARS_EXPERIENCE)
   );
 ]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update H1B Names" guiX="279" guiY="474" id="UPDATE_H1B_NAMES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+update ${SALARY_LOOKUP_TABLENAME}
+set goc = 'software engineer h1b'
+where goc = 'software engineer' and data_type_id = 1;]]></attr>
 </Node>
 </Phase>
 </Graph>
