@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Tue Sep 20 10:41:39 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.84" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Sat Sep 24 18:52:06 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.85" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
@@ -12,7 +12,7 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="MIN_CO_PER_JOB" value="1"/>
-<Property id="GraphParameter1" name="MIN_IND_GOC_CO_COUNT" value="3"/>
+<Property id="GraphParameter1" name="MIN_IND_GOC_CO_COUNT" value="1"/>
 <Property id="GraphParameter2" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
 <Property id="GraphParameter3" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
 <Property id="GraphParameter4" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>

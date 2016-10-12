@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Sep 26 13:45:12 EDT 2016" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.7" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Column_Data" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="column_name" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="SQLUpdate" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="sql" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter22" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" guiName="Add Missing Subsidiary County Counts" guiX="218" guiY="223" id="ADD_MISSING_SUBSIDIARY_COUNTY_COUNTS" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Cleanup DIst and County Data" guiX="352" guiY="152" id="CLEANUP_DIST_AND_COUNTY_DATA" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Cleanup Ticker Data" guiX="-28" guiY="881" id="CLEANUP_TICKER_DATA" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Create Job Data Table" guiX="31" guiY="77" id="CREATE_JOB_DATA_TABLE1" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Create Parent County Counts" guiX="243" guiY="295" id="CREATE_PARENT_COUNTY_COUNTS" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Create Report Matrix Table" guiX="359" guiY="77" id="CREATE_REPORT_MATRIX_TABLE" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Create Row Type Table" guiX="192" guiY="77" id="CREATE_ROW_TYPE_TABLE" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Create Subsidiary Info Table" guiX="553" guiY="77" id="CREATE_SUBSIDIARY_INFO_TABLE" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Create Temp Col Count Table" guiX="158" guiY="6" id="CREATE_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Create Temp GOC Order Table" guiX="361" guiY="6" id="CREATE_TEMP_GOC_ORDER_TABLE" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Create Update Dist Header SQL" guiX="157" guiY="518" id="CREATE_UPDATE_DIST_HEADER_SQL" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	string sql = "";
+	sql = sql + "update LKP_LIVING_WAGE_REPORT_MATRIX mtx ";
+	sql = sql + "set g" + $in.0.column_name + " = d.distribution";
+	sql = sql + "from TMP_LIVING_WAGE_GOC_ORDER g";
+	sql = sql + "join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id";
+	sql = sql + "join LKP_LIVING_WAGE_SUBSIDIARY_INFO s on s.just_co_id = m.just_co_id";
+	sql = sql + "join lkp_living_wage_goc_distributions d on d.ticker = m.ticker_trim and d.goc = g.goc and d.subsidiary = g.subsidiary";
+	sql = sql + "where (not s.has_subsidiaries) and g.just_co_id = mtx.just_co_id and mtx.row_type = 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS'";
+  	sql = sql + "and g.goc_column_no = " + $in.0.column_name + ";";
+	
+	$out.0.sql = sql;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Create Update GOC Header SQL" guiX="157" guiY="592" id="CREATE_UPDATE_GOC_HEADER_SQL1" type="REFORMAT"/>
+<Node enabled="enabled" guiName="Create Update SQL" guiX="157" guiY="663" id="CREATE_UPDATE_SQL1" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	string sql = "";
+	sql = sql + "update LKP_LIVING_WAGE_REPORT_MATRIX mtx ";
+	sql = sql + "set g" + $in.0.column_name + " = d.distribution";
+	sql = sql + "from TMP_LIVING_WAGE_GOC_ORDER g";
+	sql = sql + "join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id";
+	sql = sql + "join LKP_LIVING_WAGE_SUBSIDIARY_INFO s on s.just_co_id = m.just_co_id";
+	sql = sql + "join lkp_living_wage_goc_distributions d on d.ticker = m.ticker_trim and d.goc = g.goc and d.subsidiary = g.subsidiary";
+	sql = sql + "where (not s.has_subsidiaries) and g.just_co_id = mtx.just_co_id and mtx.row_type = 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS'";
+  	sql = sql + "and g.goc_column_no = " + $in.0.column_name + ";";
+	
+	$out.0.sql = sql;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Create Update SQL" guiX="157" guiY="739" id="CREATE_UPDATE_SQL3" type="REFORMAT"/>
+<Node enabled="enabled" guiName="DBExecute" guiX="157" guiY="896" id="DBEXECUTE" type="DB_EXECUTE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DBExecute" guiX="321" guiY="663" id="DBEXECUTE1" type="DB_EXECUTE" url="port:$0.sql:discrete"/>
+<Node enabled="enabled" guiName="DBExecute" guiX="412" guiY="592" id="DBEXECUTE2" type="DB_EXECUTE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DBExecute" guiX="412" guiY="518" id="DBEXECUTE3" type="DB_EXECUTE" url="port:$0.sql:discrete"/>
+<Node enabled="enabled" guiName="DBExecute" guiX="321" guiY="739" id="DBEXECUTE4" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Drop Temp Col Count Table" guiX="310" guiY="881" id="DROP_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Inserrt Ind Header Blank Bottom 1" guiX="338" guiY="372" id="INSERRT_IND_HEADER_BLANK_BOTTOM_1" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Insert Co Header Blank Top" guiX="806" guiY="372" id="INSERT_CO_HEADER_BLANK_TOP" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Insert Co Name" guiX="-28" guiY="443" id="INSERT_CO_NAME" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Insert GOC Header" guiX="114" guiY="443" id="INSERT_GOC_HEADER" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Insert Ind Header Blank Bottom 2" guiX="573" guiY="372" id="INSERT_IND_HEADER_BLANK_BOTTOM_2" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Insert Ind Header Blank Top" guiX="-28" guiY="372" id="INSERT_IND_HEADER_BLANK_TOP" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Insert Ind Header Name" guiX="165" guiY="372" id="INSERT_IND_HEADER_NAME" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Insert Ticker Count Data" guiX="265" guiY="443" id="INSERT_TICKER_COUNT_DATA" type="DB_EXECUTE"/>
+<Node enabled="enabled" guiName="Populate Temp Col Count" guiX="169" guiY="152" id="POPULATE_TEMP_COL_COUNT" type="DB_EXECUTE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Read Columns" guiX="-13" guiY="592" id="READ_COLUMNS" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select $Column_Number:=column_number
+from ${COLUMN_NUMBERS_TABLENAME};]]></attr>
+</Node>
+<Edge fromNode="CREATE_UPDATE_DIST_HEADER_SQL:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (input parameters)" metadata="Metadata1" outPort="Port 0 (out)" toNode="DBEXECUTE3:0"/>
+<Edge fromNode="CREATE_UPDATE_GOC_HEADER_SQL1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge7" inPort="Port 0 (input parameters)" metadata="Metadata0" outPort="Port 0 (out)" toNode="DBEXECUTE2:0"/>
+<Edge fromNode="CREATE_UPDATE_SQL1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (input parameters)" metadata="Metadata1" outPort="Port 0 (out)" toNode="DBEXECUTE1:0"/>
+<Edge fromNode="CREATE_UPDATE_SQL3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge8" inPort="Port 0 (input parameters)" metadata="Metadata0" outPort="Port 0 (out)" toNode="DBEXECUTE4:0"/>
+<Edge fromNode="READ_COLUMNS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CREATE_UPDATE_DIST_HEADER_SQL:0"/>
+<Edge fromNode="READ_COLUMNS:1" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 1 (out)" toNode="CREATE_UPDATE_GOC_HEADER_SQL1:0"/>
+<Edge fromNode="READ_COLUMNS:2" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 2 (out)" toNode="CREATE_UPDATE_SQL1:0"/>
+<Edge fromNode="READ_COLUMNS:3" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 3 (out)" toNode="CREATE_UPDATE_SQL3:0"/>
+</Phase>
+</Graph>
