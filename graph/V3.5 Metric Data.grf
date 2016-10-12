@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Wed Oct 12 09:55:30 EDT 2016" guiVersion="3.4.4.P" id="1476296764541" licenseType="Commercial" modified="Wed Oct 12 14:46:02 EDT 2016" modifiedBy="LilyL" name="V3.5 Metric Data" revision="1.3" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Wed Oct 12 09:55:30 EDT 2016" guiVersion="3.4.4.P" id="1476296764541" licenseType="Commercial" modified="Wed Oct 12 14:53:42 EDT 2016" modifiedBy="LilyL" name="V3.5 Metric Data" revision="1.4" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="V2_Sheet1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field format="" label="TICKER" name="TICKER" type="string"/>
-<Field format="" label="FIELD" name="FIELD" type="string"/>
-<Field format="" label="VALUE" name="VALUE" type="number"/>
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="FIELD" name="FIELD" type="string"/>
+<Field label="VALUE" name="VALUE" type="number"/>
 <Field name="Hyperlink" type="string"/>
 <Field name="Weight" type="string"/>
 <Field name="Data_ID" type="string"/>
@@ -28,13 +28,14 @@
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
-function integer transform() {
+function integer transform() { 
 
 	return ALL;
 }
 
 // Called during component initialization.
 // function boolean init() {}
+
 
 // Called during each graph run before the transform is executed. May be used to allocate and initialize resources
 // required by the transform. All resources allocated within this method should be released
