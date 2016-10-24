@@ -1,39 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Fri Oct 07 16:26:19 EDT 2016" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.23" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Wed Oct 12 15:58:26 EDT 2016" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.30" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="TICKER" type="string"/>
 <Field name="SUBSIDIARY" type="string"/>
+<Field name="NAME" type="string"/>
 <Field name="CITY" type="string"/>
 <Field name="COUNTY" type="string"/>
 <Field name="STATE" type="string"/>
+<Field name="STATE_COUNTY_FIPS" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CountyAvg" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="TICKER" type="string"/>
 <Field name="SUBSIDIARY" type="string"/>
+<Field name="NAME" type="string"/>
 <Field name="AVGEMPLOYEECOUNT" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter27" name="DOWNLOADFILEPATH_COUNTYAVG" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/AvgEmployeeCounts.xlsx"/>
-<Property id="GraphParameter2" name="DOWNLOADFILEPATH_FIPSMATCH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/CountyCityToLookup.xlsx"/>
-<Property id="GraphParameter3" name="POPULATEERRORFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/avgemployeecountserror.txt"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/countycitytolookuperror.txt"/>
-<Property id="GraphParameter26" name="READFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/AvgEmployeeCounts.xlsx"/>
-<Property id="GraphParameter30" name="READFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/CountyCityToLookup.xlsx"/>
-<Property id="GraphParameter32" name="TABLENAME_COUNTY_COUNTS" value="LKP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
-<Property id="GraphParameter31" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
-<Property id="GraphParameter28" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter0" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
-<Property id="GraphParameter29" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH_COUNTYAVG" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/AvgEmployeeCounts.xlsx"/>
+<Property id="GraphParameter1" name="DOWNLOADFILEPATH_FIPSMATCH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/CountyCityToLookup.xlsx"/>
+<Property id="GraphParameter2" name="POPULATEERRORFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/avgemployeecountserror.txt"/>
+<Property id="GraphParameter3" name="POPULATEERRORFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/countycitytolookuperror.txt"/>
+<Property id="GraphParameter4" name="READFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/AvgEmployeeCounts.xlsx"/>
+<Property id="GraphParameter5" name="READFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/CountyCityToLookup.xlsx"/>
+<Property id="GraphParameter6" name="TABLENAME_COUNTY_COUNTS" value="LKP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
+<Property id="GraphParameter7" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
+<Property id="GraphParameter8" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
+<Property fileURL="workspace.prm" id="GraphParameter9"/>
+<Property id="GraphParameter31" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter32" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH_COUNTYAVG}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="County Avg File Download" guiX="374" guiY="15" id="COUNTY_AVG_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
-<Node baseURL="${DOWNLOADFILEPATH_FIPSMATCH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="Fips Match File Download" guiX="188" guiY="15" id="FIPS_MATCH_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH_COUNTYAVG}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="County Avg File Download" guiX="360" guiY="15" id="COUNTY_AVG_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH_FIPSMATCH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="Fips Match File Download" guiX="179" guiY="15" id="FIPS_MATCH_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" fileURL="${READFILEPATH_COUNTYAVG}" guiName="Read County Avg File" guiX="137" guiY="188" id="READ_COUNTY_AVG_FILE" type="SPREADSHEET_READER"/>
@@ -45,6 +48,7 @@
 function integer transform() {
 	$out.0.TICKER = $in.0.TICKER;
 	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
+	$out.0.NAME = $in.0.NAME;
 	$out.0.AVGEMPLOYEECOUNT = $in.0.AVGEMPLOYEECOUNT;
 	
 	return ALL;
@@ -76,9 +80,11 @@ function integer transform() {
 function integer transform() {
 	$out.0.TICKER = $in.0.TICKER;
 	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
+	$out.0.NAME = $in.0.NAME;
 	$out.0.CITY = $in.0.CITY;
 	$out.0.COUNTY = $in.0.COUNTY;
 	$out.0.STATE = $in.0.STATE;
+	$out.0.STATE_COUNTY_FIPS = $in.0.STATE_COUNTY_FIPS;
 	
 	return ALL;
 }
@@ -129,6 +135,7 @@ function integer transform() {
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME_COUNTYAVG} (
   TICKER VARCHAR(32),
   SUBSIDIARY VARCHAR(255),
+  NAME VARCHAR(255),
   AVGEMPLOYEECOUNT FLOAT
 );]]></attr>
 </Node>
@@ -144,6 +151,7 @@ function integer transform() {
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME_FIPSMATCH} (
   TICKER VARCHAR(32),
   SUBSIDIARY VARCHAR(255),
+  NAME VARCHAR(255),
   CITY VARCHAR(64),
   COUNTY VARCHAR(128),
   STATE VARCHAR(2),
@@ -156,6 +164,7 @@ function integer transform() {
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_COUNTYAVG} (
   TICKER,
   SUBSIDIARY,
+  NAME,
   AVGEMPLOYEECOUNT
 )
 FROM LOCAL '${WRITEFILEPATH_COUNTYAVG}'
@@ -166,9 +175,11 @@ EXCEPTIONS '${POPULATEERRORFILEPATH_COUNTYAVG}';
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_FIPSMATCH} (
   TICKER,
   SUBSIDIARY,
+  NAME,
   CITY,
   COUNTY,
-  STATE
+  STATE,
+  STATE_COUNTY_FIPS
 )
 FROM LOCAL '${WRITEFILEPATH_FIPSMATCH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH_FIPSMATCH}';
@@ -181,11 +192,13 @@ EXCEPTIONS '${POPULATEERRORFILEPATH_FIPSMATCH}';
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Trim County Avg Data" guiX="551" guiY="369" id="TRIM_COUNTY_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLENAME_COUNTYAVG} set ticker = ltrim(rtrim(ticker));
 update ${TABLENAME_COUNTYAVG} set subsidiary = ltrim(rtrim(subsidiary));
+update ${TABLENAME_COUNTYAVG} set name = ltrim(rtrim(name));
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Trim Fips Match Data" guiX="542" guiY="291" id="TRIM_FIPS_MATCH_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLENAME_FIPSMATCH} set ticker = ltrim(rtrim(ticker));
 update ${TABLENAME_FIPSMATCH} set subsidiary = ltrim(rtrim(subsidiary));
+update ${TABLENAME_FIPSMATCH} set name = ltrim(rtrim(name));
 update ${TABLENAME_FIPSMATCH} set city = ltrim(rtrim(city));
 update ${TABLENAME_FIPSMATCH} set county = ltrim(rtrim(county));
 update ${TABLENAME_FIPSMATCH} set state = ltrim(rtrim(state));
@@ -327,7 +340,7 @@ update ${TABLENAME_FIPSMATCH} set county = 'St. Tammany Parish' where county = '
 UPDATE ${TABLENAME_FIPSMATCH} m
 SET STATE_COUNTY_FIPS = f.STATE_COUNTY_FIPS
 FROM LKP_CITY_FIPS f
-WHERE f.county_name = m.county and f.state_abbreviation = m.state;]]></attr>
+WHERE m.state_county_fips is null and f.county_name = m.county and f.state_abbreviation = m.state;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">
@@ -345,18 +358,27 @@ WHERE m.state_county_fips is null and f.city_name = m.city and f.state_abbreviat
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 INSERT INTO ${TABLENAME_COUNTY_COUNTS}
-SELECT 
-  fm.state_county_fips,
-  fm.ticker,
-  fm.subsidiary,
-  cast(round(ca.avgemployeecount*fm.store_count,0) as int)
+SELECT
+  r.state_county_fips,
+  r.ticker,
+  r.subsidiary,
+  cast(round(sum(r.emp_count),0) as int)
 FROM (
-  SELECT TICKER, SUBSIDIARY, STATE_COUNTY_FIPS, COUNT('X') STORE_COUNT
-  FROM ${TABLENAME_FIPSMATCH}
-  WHERE state_county_fips is not null
-  GROUP BY TICKER, SUBSIDIARY, STATE_COUNTY_FIPS
-) fm
-JOIN ${TABLENAME_COUNTYAVG} ca on ca.ticker = fm.ticker and ca.subsidiary = fm.subsidiary;]]></attr>
+  SELECT 
+    fm.state_county_fips,
+    fm.ticker,
+    fm.subsidiary,
+    fm.name,
+    ca.avgemployeecount*fm.store_count emp_count
+  FROM (
+    SELECT TICKER, SUBSIDIARY, NAME, STATE_COUNTY_FIPS, COUNT('X') STORE_COUNT
+    FROM ${TABLENAME_FIPSMATCH}
+    WHERE state_county_fips is not null
+    GROUP BY TICKER, SUBSIDIARY, NAME, STATE_COUNTY_FIPS
+  ) fm
+  JOIN ${TABLENAME_COUNTYAVG} ca on ca.ticker = fm.ticker and ca.subsidiary = fm.subsidiary and ca.name = fm.name
+) r
+group by state_county_fips, ticker, subsidiary;]]></attr>
 </Node>
 </Phase>
 </Graph>
