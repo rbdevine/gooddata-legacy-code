@@ -1,68 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed Oct 26 13:35:14 PDT 2016" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.143" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Oct 27 15:10:13 PDT 2016" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.144" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
 <Field name="column_number" type="string"/>
-</Record>
-</Metadata>
-<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," name="Report_Details" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="state_county_fips" type="string"/>
-<Field name="description_1" type="string"/>
-<Field name="description_2" type="string"/>
-<Field name="description_3" type="string"/>
-<Field name="description_4" type="string"/>
-<Field name="g1" type="string"/>
-<Field name="g2" type="string"/>
-<Field name="g3" type="string"/>
-<Field name="g4" type="string"/>
-<Field name="g5" type="string"/>
-<Field name="g6" type="string"/>
-<Field name="g7" type="string"/>
-<Field name="g8" type="string"/>
-<Field name="g9" type="string"/>
-<Field name="g10" type="string"/>
-<Field name="g11" type="string"/>
-<Field name="g12" type="string"/>
-<Field name="g13" type="string"/>
-<Field name="g14" type="string"/>
-<Field name="g15" type="string"/>
-<Field name="g16" type="string"/>
-<Field name="g17" type="string"/>
-<Field name="g18" type="string"/>
-<Field name="g19" type="string"/>
-<Field name="g20" type="string"/>
-<Field name="g21" type="string"/>
-<Field name="g22" type="string"/>
-<Field name="g23" type="string"/>
-<Field name="g24" type="string"/>
-<Field name="g25" type="string"/>
-<Field name="g26" type="string"/>
-<Field name="g27" type="string"/>
-<Field name="g28" type="string"/>
-<Field name="g29" type="string"/>
-<Field name="g30" type="string"/>
-<Field name="g31" type="string"/>
-<Field name="g32" type="string"/>
-<Field name="g33" type="string"/>
-<Field name="g34" type="string"/>
-<Field name="g35" type="string"/>
-<Field name="g36" type="string"/>
-<Field name="g37" type="string"/>
-<Field name="g38" type="string"/>
-<Field name="g39" type="string"/>
-<Field name="g40" type="string"/>
-<Field name="g41" type="string"/>
-<Field name="g42" type="string"/>
-<Field name="g43" type="string"/>
-<Field name="g44" type="string"/>
-<Field name="g45" type="string"/>
-<Field name="g46" type="string"/>
-<Field name="g47" type="string"/>
-<Field name="g48" type="string"/>
-<Field name="g49" type="string"/>
-<Field name="g50" type="string"/>
-<Field name="living_wage_total" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
@@ -75,9 +15,9 @@
 <Property id="GraphParameter1" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
 <Property id="GraphParameter2" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
 <Property id="GraphParameter3" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter20"/>
-<Property id="GraphParameter4" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
-<Property fileURL="workspace.prm" id="GraphParameter5"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter4"/>
+<Property id="GraphParameter16" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
+<Property fileURL="workspace.prm" id="GraphParameter17"/>
 <Dictionary/>
 </Global>
 <Phase number="0">

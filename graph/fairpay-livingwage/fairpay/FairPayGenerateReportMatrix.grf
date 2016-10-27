@@ -1,14 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Wed Oct 26 12:41:18 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.73" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Thu Oct 27 15:43:24 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.111" showComponentDetails="true">
 <Global>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
+<Field name="column_number" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="SQLUpdate" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="sql" type="string"/>
+</Record>
+</Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="fairpay-parameters.prm" id="GraphParameter24"/>
-<Property id="GraphParameter7" name="TMP_COMPANY_IDS_REMAPPED" value="TMP_COMPANY_IDS_REMAPPED"/>
-<Property fileURL="workspace.prm" id="GraphParameter9"/>
+<Property id="GraphParameter0" name="COLUMN_NUMBERS_TABLENAME" value="TMP_REPORT_COLUMN_NUMBERS"/>
+<Property id="GraphParameter1" name="COMPANY_IDS_REMAPPED_TABLENAME" value="TMP_COMPANY_IDS_REMAPPED"/>
+<Property fileURL="fairpay-parameters.prm" id="GraphParameter2"/>
+<Property fileURL="workspace.prm" id="GraphParameter8"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix" guiX="496" guiY="8" id="TABLE_REPORT_MATRIX" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix" guiX="449" guiY="8" id="TABLE_REPORT_MATRIX" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_TABLENAME};
 create table if not exists ${REPORT_MATRIX_TABLENAME} (
     INDUSTRY VARCHAR(255) NOT NULL, ROW_TYPE VARCHAR(32) NOT NULL, JUST_CO_ID VARCHAR(15) DEFAULT '', TICKER VARCHAR(255) DEFAULT '',
@@ -27,7 +37,7 @@ create table if not exists ${REPORT_MATRIX_TABLENAME} (
     RANK_VALUE VARCHAR(8) DEFAULT '', INDUSTRY_JOB_TOTAL VARCHAR(8) DEFAULT ''
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix Row Type" guiX="286" guiY="8" id="TABLE_REPORT_MATRIX_ROW_TYPE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix Row Type" guiX="238" guiY="8" id="TABLE_REPORT_MATRIX_ROW_TYPE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME};
 create table if not exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (
   ROW_TYPE VARCHAR(32) NOT NULL UNIQUE,
@@ -35,9 +45,15 @@ create table if not exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (
   DISPLAY_ORDER INT NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Company Ids Remapped" guiX="41" guiY="8" id="TABLE_TEMP_COMPANY_IDS_REMAPPED" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_COMPANY_IDS_REMAPPED_TABLENAME};
-create table if not exists ${TMP_COMPANY_IDS_REMAPPED_TABLENAME} (
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Col Numbers" guiX="602" guiY="8" id="TABLE_TEMP_COL_NUMBERS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${COLUMN_NUMBERS_TABLENAME};
+create table ${COLUMN_NUMBERS_TABLENAME} (
+  COLUMN_NUMBER VARCHAR(4) UNIQUE NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Company Ids Remapped" guiX="-15" guiY="8" id="TABLE_TEMP_COMPANY_IDS_REMAPPED" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_IDS_REMAPPED_TABLENAME};
+create table if not exists ${COMPANY_IDS_REMAPPED_TABLENAME} (
   JUST_CO_ID VARCHAR(15) NOT NULL,
   JUST_CO_ID_2 VARCHAR(15) NOT NULL,
   COMPANY_COLUMN_NO_ADJ INT NOT NULL
@@ -45,44 +61,333 @@ create table if not exists ${TMP_COMPANY_IDS_REMAPPED_TABLENAME} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Param Table" guiX="53" guiY="91" id="POPULATE_PARAM_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${PARAM_TABLENAME} (
-  MIN_JOB_COUNT_PER_CO_SCORE_1,
-  MIN_JOB_COUNT_PER_CO_SCORE_2,
-  MIN_JOB_COUNT_PER_CO_SCORE_3,
-  MIN_JOBS_PER_CO,
-  MIN_CO_PER_JOB,
-  MIN_IND_GOC_CO_COUNT
-) values (
-  ${MIN_JOB_COUNT_PER_CO_SCORE_1},
-  ${MIN_JOB_COUNT_PER_CO_SCORE_2},
-  ${MIN_JOB_COUNT_PER_CO_SCORE_3},
-  ${MIN_JOBS_PER_CO},
-  ${MIN_CO_PER_JOB},
-  ${MIN_IND_GOC_CO_COUNT}
-);]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Col Numbers" guiX="502" guiY="95" id="ADD_COL_NUMBERS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${COLUMN_NUMBERS_TABLENAME} values('1');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('2');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('3');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('4');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('5');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('6');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('7');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('8');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('9');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('10');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('11');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('12');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('13');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('14');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('15');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('16');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('17');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('18');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('19');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('20');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('21');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('22');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('23');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('24');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('25');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('26');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('27');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('28');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('29');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('30');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('31');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('32');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('33');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('34');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('35');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('36');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('37');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('38');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('39');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('40');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('41');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('42');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('43');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('44');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('45');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('46');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('47');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('48');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('49');
+insert into ${COLUMN_NUMBERS_TABLENAME} values('50');]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Report Matrix Row Types" guiX="298" guiY="95" id="ADD_REPORT_MATRIX_ROW_TYPES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('IND_HEADER_BLANK_TOP', 0, 0);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('IND_HEADER_NAME', 0, 1);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('IND_HEADER_BLANK_BOTTOM_1', 0, 2);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('IND_HEADER_BLANK_BOTTOM_2', 0, 3);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('CO_HEADER_BLANK_TOP', 1, 0);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('CO_HEADER_NAME', 1, 1);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('CO_HEADER_COLUMN_HEADERS', 1, 2);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('CO_DATA', 1, 3);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('CO_TOTAL', 1, 4);
+insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+values ('IND_FOOTER_BLANK_BOTTOM', 2, 0);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Temp Company Ids Remapped" guiX="65" guiY="95" id="ADD_TEMP_COMPANY_IDS_REMAPPED" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_IDS_REMAPPED_TABLENAME}
+select
+  c.just_co_id,
+  c2.just_co_id other_id,
+  case 
+    when c2.company_column_no > c.company_column_no then c2.company_column_no - 1
+    else c2.company_column_no
+  end company_column_no_adj
+from ${COMPANY_TABLENAME} c
+join lkp_just_co_indy i on c.just_co_id = i.just_co_id
+join ${COMPANY_TABLENAME} c2 on c.just_co_id <> c2.just_co_id
+join lkp_just_co_indy i2 on i2.just_indy = i.just_indy and i2.just_co_id = c2.just_co_id;]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/GenerateJobData.grf" guiName="Run GenerateJobData" guiX="287" guiY="164" id="RUN_GENERATE_JOB_DATA" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Data" guiX="123" guiY="346" id="ADD_CO_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type, just_co_id, ticker, description,
+  company_value, 
+  industry_value, 
+  company_value_2, 
+  industry_value_2, 
+  rank_value, 
+  industry_job_total
+)
+select
+  j.industry, 'CO_DATA', c.just_co_id, m.ticker_trim, j.job, 
+  cast(cast(round(cjd.rate,2) as numeric(36,2)) as varchar(8)),
+  cast(cast(round(a.avg_rate,2) as numeric(36,2)) as varchar(8)),
+  cast(cast(round(cjd.rate_raw,2) as numeric(36,2)) as varchar(8)),
+  cast(cast(round(ar.avg_rate_raw,2) as numeric(36,2)) as varchar(8)),
+  cast(cjd.score as varchar(8)),
+  cast(j.company_count as varchar(8))
+from LKP_FAIRPAY_JOB j
+join LKP_JUST_CO_INDY i on j.industry = i.just_indy
+join LKP_FAIRPAY_COMPANY c on c.just_co_id = i.just_co_id 
+join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = i.just_co_id
+join (
+  select 
+    ji.just_indy industry, 
+    job, 
+    avg(jd.rate) avg_rate 
+  from lkp_fairpay_company_job_data jd
+  join lkp_just_co_indy ji on ji.just_co_id = jd.just_co_id
+  group by ji.just_indy, jd.job
+) a on a.industry = j.industry and a.job = j.job
+join (
+  select 
+    ji.just_indy industry, 
+    job, 
+    avg(jd.rate_raw) avg_rate_raw 
+  from lkp_fairpay_company_job_data jd
+  join lkp_just_co_indy ji on ji.just_co_id = jd.just_co_id
+  group by ji.just_indy, jd.job
+) ar on ar.industry = j.industry and ar.job = j.job
+left join LKP_FAIRPAY_COMPANY_JOB_DATA cjd on cjd.job = j.job and cjd.just_co_id = c.just_co_id;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Columns" guiX="440" guiY="267" id="ADD_CO_HEADER_COLUMNS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type, just_co_id, ticker, description,
+  company_value, industry_value, company_value_2, industry_value_2, rank_value, industry_job_total
+)
+select
+    i.just_indy industry, 'CO_HEADER_COLUMN_HEADERS', c.just_co_id, m.ticker_trim, 'JOB', 
+    'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG INDUSTRY', 'UNADJUSTED HOURLY AVG', 'UNADJUSTED HOURLY AVG INDUSTRY', 'SCORE', 'MAX'
+from LKP_FAIRPAY_COMPANY c
+join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id
+join LKP_JUST_CO_INDY i on i.just_co_id = c.just_co_id;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Name" guiX="268" guiY="267" id="ADD_CO_HEADER_NAME" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type, just_co_id, ticker, description, company_value,
+  c1, c2, c3, c4, c5, c6, c7, c8, c9, c10,
+  c11, c12, c13, c14, c15, c16, c17, c18, c19, c20,
+  c21, c22, c23, c24, c25, c26, c27, c28, c29, c30,
+  c31, c32, c33, c34, c35, c36, c37, c38, c39, c40,
+  c41, c42, c43, c44, c45, c46, c47, c48, c49, c50
+)
+select i.just_indy industry, 'CO_HEADER_NAME', c.just_co_id, m.ticker_trim, m.ticker_trim, m.co_long_name,
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG'
+from LKP_FAIRPAY_COMPANY c
+join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id
+join LKP_JUST_CO_INDY i on i.just_co_id = c.just_co_id;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Top" guiX="106" guiY="267" id="ADD_CO_HEADER_TOP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type, just_co_id, ticker
+)
+select
+    i.just_indy industry, 'CO_HEADER_BLANK_TOP', c.just_co_id, m.ticker_trim
+from LKP_FAIRPAY_COMPANY c
+join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id
+join LKP_JUST_CO_INDY i on i.just_co_id = c.just_co_id;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Total" guiX="277" guiY="346" id="ADD_CO_TOTAL" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type, just_co_id, ticker, description,
+  company_value, industry_value, rank_value, industry_job_total
+)
+select
+  i.just_indy, 'CO_TOTAL', c.just_co_id, m.ticker_trim, 'SCORE', 
+  cast(cast(round((cst.score_tot/ist.score_tot)*100,1) as numeric(36,1)) as varchar(8)),
+  concat(concat(cast(cst.score_tot as varchar(8)), '/'),cast(ist.score_tot as varchar(8))),
+  cast(cst.score_tot as varchar(8)),
+  cast(ist.score_tot as varchar(8))
+from LKP_FAIRPAY_COMPANY c
+join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id
+join LKP_JUST_CO_INDY i on i.just_co_id = c.just_co_id
+join (select just_co_id, sum(score) score_tot from LKP_FAIRPAY_COMPANY_JOB_DATA group by just_co_id) cst on cst.just_co_id = c.just_co_id
+join (
+  select industry, cjd.just_co_id, sum(j.company_count) score_tot 
+  from LKP_FAIRPAY_JOB j
+  join LKP_FAIRPAY_COMPANY_JOB_DATA cjd on j.job = cjd.job
+  join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = cjd.just_co_id
+  join LKP_JUST_CO_INDY i on i.just_co_id = m.just_co_id and j.industry = i.just_indy
+  group by j.industry, cjd.just_co_id
+  order by industry, just_co_id
+) ist on ist.just_co_id = c.just_co_id;
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Footer Bottom" guiX="426" guiY="346" id="ADD_IND_FOOTER_BOTTOM" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type
+)
+select industry, 'IND_FOOTER_BLANK_BOTTOM'
+from LKP_FAIRPAY_JOB
+group by industry;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Bottom 1" guiX="351" guiY="185" id="ADD_IND_HEADER_BOTTOM_1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type
+)
+select industry, 'IND_HEADER_BLANK_BOTTOM_1'
+from LKP_FAIRPAY_JOB 
+group by industry;
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Bottom 2" guiX="535" guiY="185" id="ADD_IND_HEADER_BOTTOM_2" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type
+)
+select industry, 'IND_HEADER_BLANK_BOTTOM_2'
+from LKP_FAIRPAY_JOB 
+group by industry;
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Name" guiX="183" guiY="185" id="ADD_IND_HEADER_NAME" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type, description
+)
+select industry, 'IND_HEADER_NAME', industry
+from LKP_FAIRPAY_JOB
+group by industry;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Top" guiX="28" guiY="185" id="ADD_IND_HEADER_TOP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type
+)
+select industry, 'IND_HEADER_BLANK_TOP'
+from ${JOB_TABLENAME} 
+group by industry;]]></attr>
+</Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Companies to Fair Pay Table" guiX="493" guiY="269" id="COPY_COMPANIES_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_TABLENAME}
-select * from ${TMP_COMPANY_TABLENAME};]]></attr>
+<Node enabled="enabled" guiName="Create Update Column Header SQL" guiX="190" guiY="435" id="CREATE_UPDATE_COLUMN_HEADER_SQL" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	string sql = "";
+	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
+	sql = sql + "set c" + $in.0.column_number + " = m.co_long_name ";
+	sql = sql + "from ${COMPANY_IDS_REMAPPED_TABLENAME} r ";
+	sql = sql + "join ${COMPANY_TABLENAME} c on c.just_co_id = r.just_co_id_2 ";
+	sql = sql + "join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id ";
+	sql = sql + "where r.just_co_id = mtx.just_co_id and ";
+	sql = sql + "  mtx.row_type = 'CO_HEADER_COLUMN_HEADERS' and ";
+	sql = sql + "  r.company_column_no_adj = " + $in.0.column_number + ";";
+
+	$out.0.sql = sql;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Company Job Data to Fair Pay Table" guiX="23" guiY="269" id="COPY_COMPANY_JOB_DATA_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_DATA_TABLENAME}
-select * from ${TMP_COMPANY_JOB_DATA_TABLENAME};]]></attr>
+<Node enabled="enabled" guiName="Create Update Data SQL" guiX="226" guiY="525" id="CREATE_UPDATE_DATA_SQL" type="REFORMAT">
+<attr name="transform"><![CDATA[// Transforms input record into output record.
+function integer transform() {
+	string sql = "";	
+	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
+	sql = sql + "set c" + $in.0.column_number + " = cast(cast(round(cjd.rate,2) as numeric(36,2)) as varchar(8)) ";
+	sql = sql + "from ${COMPANY_IDS_REMAPPED_TABLENAME} r ";
+	sql = sql + "join ${COMPANY_TABLENAME} c on c.just_co_id = r.just_co_id_2 ";
+	sql = sql + "join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = c.just_co_id ";
+	sql = sql + "where mtx.description = cjd.job and ";
+	sql = sql + "  r.just_co_id = mtx.just_co_id and ";
+	sql = sql + "  mtx.row_type = 'CO_DATA' and ";
+	sql = sql + "  r.company_column_no_adj = " + $in.0.column_number + ";";
+	
+	$out.0.sql = sql;
+
+	return ALL;
+}]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Jobs to Fair Pay Table" guiX="295" guiY="269" id="COPY_JOBS_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${JOB_TABLENAME}
-select * from ${TMP_JOB_TABLENAME};]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Read Columns" guiX="-4" guiY="477" id="READ_COLUMNS" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select $column_number:=column_number
+from ${COLUMN_NUMBERS_TABLENAME}
+order by column_number;]]></attr>
 </Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Column Header" guiX="471" guiY="435" id="UPDATE_COLUMN_HEADER" type="DB_EXECUTE" url="port:$0.sql:discrete"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Data" guiX="487" guiY="525" id="UPDATE_DATA" type="DB_EXECUTE" url="port:$0.sql:discrete"/>
+<Edge fromNode="CREATE_UPDATE_COLUMN_HEADER_SQL:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (input parameters)" metadata="Metadata1" outPort="Port 0 (out)" toNode="UPDATE_COLUMN_HEADER:0"/>
+<Edge fromNode="CREATE_UPDATE_DATA_SQL:0" guiBendpoints="" guiRouter="Manhattan" id="Edge7" inPort="Port 0 (input parameters)" metadata="Metadata1" outPort="Port 0 (out)" toNode="UPDATE_DATA:0"/>
+<Edge fromNode="READ_COLUMNS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CREATE_UPDATE_COLUMN_HEADER_SQL:0"/>
+<Edge fromNode="READ_COLUMNS:1" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 1 (out)" toNode="CREATE_UPDATE_DATA_SQL:0"/>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Company Ids Remapped Table" guiX="256" guiY="341" id="DROP_TEMP_COMPANY_IDS_REMAPPED_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_COMPANY_IDS_REMAPPED_TABLENAME};]]></attr>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/fairpay/FairPayGenerateReports.grf" guiName="Run GenerateJobData" guiX="238" guiY="610" id="RUN_GENERATE_JOB_DATA" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Numbers Table" guiX="382" guiY="734" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${COLUMN_NUMBERS_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Company Ids Remapped Table" guiX="99" guiY="734" id="DROP_TEMP_COMPANY_IDS_REMAPPED_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_IDS_REMAPPED_TABLENAME};]]></attr>
 </Node>
 </Phase>
 </Graph>

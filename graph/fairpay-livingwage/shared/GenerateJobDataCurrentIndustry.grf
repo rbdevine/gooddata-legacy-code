@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Wed Oct 26 12:40:21 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.127" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Thu Oct 27 14:51:38 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.130" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
@@ -178,7 +178,7 @@ where just_co_id in (
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Low Data Companies" guiX="186" guiY="324" id="ADD_LOW_DATA_COMPANIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Low Data Companies" guiX="192" guiY="469" id="ADD_LOW_DATA_COMPANIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_LOW_DATA_COMPANIES_TABLENAME}
 select cjd.just_co_id
 from (
@@ -201,7 +201,7 @@ having sum(j.company_count) < max(p.MIN_DATA_POINTS_PER_CO);]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Low Data Companies From Summary Table" guiX="120" guiY="401" id="REMOVE_LOW_DATA_COMPANIES_FROM_SUMMARY_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Low Data Companies From Summary Table" guiX="126" guiY="547" id="REMOVE_LOW_DATA_COMPANIES_FROM_SUMMARY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TMP_COMPANY_TABLENAME}
 where just_co_id in (
   select just_co_id
@@ -211,7 +211,7 @@ where just_co_id in (
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Companies" guiX="114" guiY="474" id="ADD_INDUSTRY_COMPANIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Companies" guiX="114" guiY="323" id="ADD_INDUSTRY_COMPANIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_COMPANY_TABLENAME} (just_co_id, company_column_no)
 select just_co_id, rank() over (order by jobCnt desc, company) id from (
   select s.just_co_id, m.co_long_name company, count(s.job) jobCnt
@@ -224,7 +224,7 @@ select just_co_id, rank() over (order by jobCnt desc, company) id from (
 ) t;
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Jobs" guiX="306" guiY="474" id="ADD_INDUSTRY_JOBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Jobs" guiX="306" guiY="323" id="ADD_INDUSTRY_JOBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_JOB_TABLENAME} (industry, job, company_count)
 select p.industry, s.job, count(s.just_co_id)
 from ${TMP_SALARY_SUMMARY_TABLENAME} s
@@ -236,7 +236,7 @@ group by p.industry, s.job;
 </Node>
 </Phase>
 <Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Company Job Data" guiX="180" guiY="545" id="ADD_INDUSTRY_COMPANY_JOB_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Company Job Data" guiX="180" guiY="394" id="ADD_INDUSTRY_COMPANY_JOB_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_COMPANY_JOB_DATA_TABLENAME} 
 select c.just_co_id, s.job, s.unadjusted_avg_base_hourly_cola, r.raterank, s.unadjusted_avg_base_hourly, r.raterank_raw, s.total 
 from ${TMP_COMPANY_TABLENAME} c
