@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Wed Oct 26 12:41:18 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.73" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="fairpay-parameters.prm" id="GraphParameter24"/>
+<Property id="GraphParameter7" name="TMP_COMPANY_IDS_REMAPPED" value="TMP_COMPANY_IDS_REMAPPED"/>
+<Property fileURL="workspace.prm" id="GraphParameter9"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix" guiX="496" guiY="8" id="TABLE_REPORT_MATRIX" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_TABLENAME};
+create table if not exists ${REPORT_MATRIX_TABLENAME} (
+    INDUSTRY VARCHAR(255) NOT NULL, ROW_TYPE VARCHAR(32) NOT NULL, JUST_CO_ID VARCHAR(15) DEFAULT '', TICKER VARCHAR(255) DEFAULT '',
+    DESCRIPTION VARCHAR(255) DEFAULT '', COMPANY_VALUE VARCHAR(255) DEFAULT '', COMPANY_VALUE_2 VARCHAR(255) DEFAULT '', 
+    INDUSTRY_VALUE VARCHAR(255) DEFAULT '', INDUSTRY_VALUE_2 VARCHAR(255) DEFAULT '',
+    C1 VARCHAR(255) DEFAULT '', C2 VARCHAR(255) DEFAULT '', C3 VARCHAR(255) DEFAULT '', C4 VARCHAR(255) DEFAULT '', C5 VARCHAR(255) DEFAULT '', 
+    C6 VARCHAR(255) DEFAULT '', C7 VARCHAR(255) DEFAULT '', C8 VARCHAR(255) DEFAULT '', C9 VARCHAR(255) DEFAULT '', C10 VARCHAR(255) DEFAULT '',
+    C11 VARCHAR(255) DEFAULT '', C12 VARCHAR(255) DEFAULT '', C13 VARCHAR(255) DEFAULT '', C14 VARCHAR(255) DEFAULT '', C15 VARCHAR(255) DEFAULT '', 
+    C16 VARCHAR(255) DEFAULT '', C17 VARCHAR(255) DEFAULT '', C18 VARCHAR(255) DEFAULT '', C19 VARCHAR(255) DEFAULT '', C20 VARCHAR(255) DEFAULT '',
+    C21 VARCHAR(255) DEFAULT '', C22 VARCHAR(255) DEFAULT '', C23 VARCHAR(255) DEFAULT '', C24 VARCHAR(255) DEFAULT '', C25 VARCHAR(255) DEFAULT '', 
+    C26 VARCHAR(255) DEFAULT '', C27 VARCHAR(255) DEFAULT '', C28 VARCHAR(255) DEFAULT '', C29 VARCHAR(255) DEFAULT '', C30 VARCHAR(255) DEFAULT '',
+    C31 VARCHAR(255) DEFAULT '', C32 VARCHAR(255) DEFAULT '', C33 VARCHAR(255) DEFAULT '', C34 VARCHAR(255) DEFAULT '', C35 VARCHAR(255) DEFAULT '', 
+    C36 VARCHAR(255) DEFAULT '', C37 VARCHAR(255) DEFAULT '', C38 VARCHAR(255) DEFAULT '', C39 VARCHAR(255) DEFAULT '', C40 VARCHAR(255) DEFAULT '',
+    C41 VARCHAR(255) DEFAULT '', C42 VARCHAR(255) DEFAULT '', C43 VARCHAR(255) DEFAULT '', C44 VARCHAR(255) DEFAULT '', C45 VARCHAR(255) DEFAULT '', 
+    C46 VARCHAR(255) DEFAULT '', C47 VARCHAR(255) DEFAULT '', C48 VARCHAR(255) DEFAULT '', C49 VARCHAR(255) DEFAULT '', C50 VARCHAR(255) DEFAULT '',
+    RANK_VALUE VARCHAR(8) DEFAULT '', INDUSTRY_JOB_TOTAL VARCHAR(8) DEFAULT ''
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix Row Type" guiX="286" guiY="8" id="TABLE_REPORT_MATRIX_ROW_TYPE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME};
+create table if not exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (
+  ROW_TYPE VARCHAR(32) NOT NULL UNIQUE,
+  ROW_SECTION INT NOT NULL,  /*0 industry header, 1 companies 2 industry footer*/
+  DISPLAY_ORDER INT NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Company Ids Remapped" guiX="41" guiY="8" id="TABLE_TEMP_COMPANY_IDS_REMAPPED" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_COMPANY_IDS_REMAPPED_TABLENAME};
+create table if not exists ${TMP_COMPANY_IDS_REMAPPED_TABLENAME} (
+  JUST_CO_ID VARCHAR(15) NOT NULL,
+  JUST_CO_ID_2 VARCHAR(15) NOT NULL,
+  COMPANY_COLUMN_NO_ADJ INT NOT NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Param Table" guiX="53" guiY="91" id="POPULATE_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${PARAM_TABLENAME} (
+  MIN_JOB_COUNT_PER_CO_SCORE_1,
+  MIN_JOB_COUNT_PER_CO_SCORE_2,
+  MIN_JOB_COUNT_PER_CO_SCORE_3,
+  MIN_JOBS_PER_CO,
+  MIN_CO_PER_JOB,
+  MIN_IND_GOC_CO_COUNT
+) values (
+  ${MIN_JOB_COUNT_PER_CO_SCORE_1},
+  ${MIN_JOB_COUNT_PER_CO_SCORE_2},
+  ${MIN_JOB_COUNT_PER_CO_SCORE_3},
+  ${MIN_JOBS_PER_CO},
+  ${MIN_CO_PER_JOB},
+  ${MIN_IND_GOC_CO_COUNT}
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/GenerateJobData.grf" guiName="Run GenerateJobData" guiX="287" guiY="164" id="RUN_GENERATE_JOB_DATA" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Companies to Fair Pay Table" guiX="493" guiY="269" id="COPY_COMPANIES_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_TABLENAME}
+select * from ${TMP_COMPANY_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Company Job Data to Fair Pay Table" guiX="23" guiY="269" id="COPY_COMPANY_JOB_DATA_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_DATA_TABLENAME}
+select * from ${TMP_COMPANY_JOB_DATA_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Jobs to Fair Pay Table" guiX="295" guiY="269" id="COPY_JOBS_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${JOB_TABLENAME}
+select * from ${TMP_JOB_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Company Ids Remapped Table" guiX="256" guiY="341" id="DROP_TEMP_COMPANY_IDS_REMAPPED_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_COMPANY_IDS_REMAPPED_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>

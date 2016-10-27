@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Sep 03 12:46:46 EDT 2016" guiVersion="3.4.4.P" id="1472924578025" licenseType="Commercial" modified="Sun Sep 04 12:36:28 EDT 2016" modifiedBy="hankmobley" name="AAAFairPayTest" revision="1.24" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Sep 03 12:46:46 EDT 2016" guiVersion="3.4.4.P" id="1472924578025" licenseType="Commercial" modified="Sun Oct 23 13:42:53 PDT 2016" modifiedBy="hankmobley" name="AAAFairPayTest" revision="1.25" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Industry_From_DB" recordDelimiter="\n" type="delimited">
@@ -32,7 +32,7 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="FAIR_TRADE_REPORT_DIR" value="${DATA_DIR}/fair-trade-reports"/>
+<Property id="GraphParameter0" name="FAIR_TRADE_REPORT_DIR" value="${DATA_DIR}/fair-pay-reports"/>
 <Property id="GraphParameter1" name="INDUSTRY" value="'Aerospace &amp; Defense'"/>
 <Property id="GraphParameter2" name="INDUSTRY_PARAM_NAME" value="Industry"/>
 <Property id="GraphParameter3" name="INDUSTRY_SQL_FILEPATH" value="${PROJECT}/sql/fairpay-industry.sql"/>

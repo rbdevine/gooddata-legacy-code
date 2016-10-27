@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 02 09:23:20 EDT 2016" description="Runs all reports for all industies. &#10;Produces:&#10;  Summary reports for each industry.&#10;  Summary reports for each company in each industry." guiVersion="3.4.4.P" id="1472829807141" licenseType="Commercial" modified="Fri Sep 02 15:59:08 EDT 2016" modifiedBy="hankmobley" name="FairPayReportAll" revision="1.18" showComponentDetails="true">
-<Global>
-<Property fileURL="workspace.prm" id="GraphParameter0"/>
-<Dictionary/>
-</Global>
-<Phase number="0">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/GenerateFairPayReport.grf" guiName="RunGraph" guiX="291" guiY="102" id="RUN_GRAPH" type="RUN_GRAPH"/>
-</Phase>
-</Graph>
