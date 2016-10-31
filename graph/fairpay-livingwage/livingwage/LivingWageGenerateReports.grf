@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Oct 27 15:50:44 PDT 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.47" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Ticker" type="string"/>
+<Field name="Subsidiary" type="string"/>
+<Field name="Avg_lw_unweighted" type="string"/>
+<Field name="Avg_lw_weighted" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Report_Details" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="state_county_fips" type="string"/>
+<Field name="description_1" type="string"/>
+<Field name="description_2" type="string"/>
+<Field name="description_3" type="string"/>
+<Field name="description_4" type="string"/>
+<Field name="g1" type="string"/>
+<Field name="g2" type="string"/>
+<Field name="g3" type="string"/>
+<Field name="g4" type="string"/>
+<Field name="g5" type="string"/>
+<Field name="g6" type="string"/>
+<Field name="g7" type="string"/>
+<Field name="g8" type="string"/>
+<Field name="g9" type="string"/>
+<Field name="g10" type="string"/>
+<Field name="g11" type="string"/>
+<Field name="g12" type="string"/>
+<Field name="g13" type="string"/>
+<Field name="g14" type="string"/>
+<Field name="g15" type="string"/>
+<Field name="g16" type="string"/>
+<Field name="g17" type="string"/>
+<Field name="g18" type="string"/>
+<Field name="g19" type="string"/>
+<Field name="g20" type="string"/>
+<Field name="g21" type="string"/>
+<Field name="g22" type="string"/>
+<Field name="g23" type="string"/>
+<Field name="g24" type="string"/>
+<Field name="g25" type="string"/>
+<Field name="g26" type="string"/>
+<Field name="g27" type="string"/>
+<Field name="g28" type="string"/>
+<Field name="g29" type="string"/>
+<Field name="g30" type="string"/>
+<Field name="g31" type="string"/>
+<Field name="g32" type="string"/>
+<Field name="g33" type="string"/>
+<Field name="g34" type="string"/>
+<Field name="g35" type="string"/>
+<Field name="g36" type="string"/>
+<Field name="g37" type="string"/>
+<Field name="g38" type="string"/>
+<Field name="g39" type="string"/>
+<Field name="g40" type="string"/>
+<Field name="g41" type="string"/>
+<Field name="g42" type="string"/>
+<Field name="g43" type="string"/>
+<Field name="g44" type="string"/>
+<Field name="g45" type="string"/>
+<Field name="g46" type="string"/>
+<Field name="g47" type="string"/>
+<Field name="g48" type="string"/>
+<Field name="g49" type="string"/>
+<Field name="g50" type="string"/>
+<Field name="living_wage_total" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="," name="Report_Score_Quality" recordDelimiter="\n" type="delimited">
+<Field name="Ticker" type="string"/>
+<Field name="Company" type="string"/>
+<Field name="GOC" type="string"/>
+<Field name="AvgPercentUnweighted" type="string"/>
+<Field name="AvgPercentWeighted" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="," name="Report_Scores" recordDelimiter="\n" type="delimited">
+<Field name="Ticker" type="string"/>
+<Field name="Company" type="string"/>
+<Field name="Subsidiary" type="string"/>
+<Field name="Score" type="string"/>
+<Field name="LWPerCounty" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
+<Property id="GraphParameter12" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
+<Property id="GraphParameter13" name="REPORTFILEPATH_LWAVG" value="${REPORTS_DIR}/LWAverages.csv"/>
+<Property id="GraphParameter14" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
+<Property id="GraphParameter15" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
+<Property id="GraphParameter16" name="REPORTS_DIR" value="${DATA_DIR}/livingwage-reports"/>
+<Property fileURL="workspace.prm" id="GraphParameter17"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" guiName="Reformat" guiX="223" guiY="22" id="REFORMAT1" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="223" guiY="245" id="REFORMAT2" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="223" guiY="133" id="REFORMAT3" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="223" guiY="348" id="REFORMAT4" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Avg Living Wage" guiX="26" guiY="348" id="SELECT_AVG_LIVING_WAGE" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select 
+  $Ticker:=ticker, 
+  $Subsidiary:=company, 
+  $Avg_lw_unweighted:=avg_lw_unweighted, 
+  $Avg_lw_weighted:=avg_lw_weighted
+from (
+  select 
+    ticker,
+    subsidiary company,
+    cast(round(avg(_2a1pt1c_hourly),3) as numeric(36,3)) avg_lw_unweighted,
+    cast(round(sum(lw_hourly_weighted),3) as numeric(36,3)) avg_lw_weighted
+  from (
+    select 
+      m.ticker_trim ticker,
+      c.subsidiary,
+      d.goc,
+      mit._2a1pt1c_hourly,
+      mit._2a1pt1c_hourly * (c.employee_count / t.emp_count_tot) lw_hourly_weighted
+    from ${SUBSIDIARY_INFO_TABLENAME} s
+    join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
+    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
+    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.subsidiary = c.subsidiary
+    join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id and t.subsidiary = c.subsidiary
+    join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
+      cjd.just_co_id = s.just_co_id 
+      and cjd.subsidiary = c.subsidiary
+      and cjd.state_county_fips = c.state_county_fips
+      and cjd.goc = d.goc
+    join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+    where c.subsidiary is not null /*m.ticker_trim not in ('WMT','BBY','TGT','KR')*//* and d.goc = 'assistant manager'*/
+    order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
+  ) t
+  group by ticker, subsidiary, goc
+  union all
+  select 
+    ticker,
+    company,
+    cast(round(avg(_2a1pt1c_hourly),3) as numeric(36,3)) avg_lw_unweighted,
+    cast(round(sum(lw_hourly_weighted),3) as numeric(36,3)) avg_lw_weighted
+  from (
+    select 
+      m.ticker_trim ticker,
+      s.alt_company_name company,
+      d.goc,
+      mit._2a1pt1c_hourly,
+      mit._2a1pt1c_hourly * (c.employee_count / t.emp_count_tot) lw_hourly_weighted
+    from ${SUBSIDIARY_INFO_TABLENAME} s
+    join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
+    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
+    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim
+    join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id
+    join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
+      cjd.just_co_id = s.just_co_id 
+      and cjd.state_county_fips = c.state_county_fips
+      and cjd.goc = d.goc
+    join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+    where c.subsidiary is null and m.ticker_trim not in ('WMT','BBY','TGT','KR')/* and d.goc = 'assistant manager'*/
+    order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
+  ) t
+  group by ticker, company, goc
+  order by ticker, company
+) t
+group by ticker, company, avg_lw_unweighted, avg_lw_weighted
+order by ticker, company;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details" guiX="26" guiY="22" id="SELECT_DETAILS" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select 
+  $state_county_fips:=state_county_fips,
+  $description_1:=description_1, $description_2:=description_2, $description_3:=description_3, $description_4:=description_4,
+  $g1:=g1, $g2:=g2, $g3:=g3, $g4:=g4, $g5:=g5, $g6:=g6, $g7:=g7, $g8:=g8, $g9:=g9, $g10:=g10,
+  $g11:=g11, $g12:=g12, $g13:=g13, $g14:=g14, $g15:=g15, $g16:=g16, $g17:=g17, $g18:=g18, $g19:=g19, $g20:=g20,
+  $g21:=g21, $g22:=g22, $g23:=g23, $g24:=g24, $g25:=g25, $g26:=g26, $g27:=g27, $g28:=g28, $g29:=g29, $g30:=g30,
+  $g31:=g31, $g32:=g32, $g33:=g33, $g34:=g34, $g35:=g35, $g36:=g36, $g37:=g37, $g38:=g38, $g39:=g39, $g40:=g40,
+  $g41:=g41, $g42:=g42, $g43:=g43, $g44:=g44, $g45:=g45, $g46:=g46, $g47:=g47, $g48:=g48, $g49:=g49, $g50:=g50,
+  $living_wage_total:=living_wage_total
+from ${REPORT_MATRIX_TABLENAME} mtx
+join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+where rt.row_type not in ('IND_HEADER_BLANK_BOTTOM_1','IND_HEADER_BLANK_BOTTOM_2')
+order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_county_fips, description_1, description_2, description_3, description_4;
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Scores" guiX="26" guiY="133" id="SELECT_SCORES" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select 
+  $Ticker:=mtx.ticker, $Company:=m.co_long_name, $Subsidiary:=subsidiary, 
+  $Score:=description_2, $LWPerCounty:=description_3
+from ${REPORT_MATRIX_TABLENAME} mtx
+join lkp_just_co_secty_master m on m.just_co_id = mtx.just_co_id
+join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+where rt.row_type in ('CO_TICKER_COUNT_TOTAL','CO_SUBSIDIARY_COUNT_TOTAL')
+order by mtx.ticker, subsidiary;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Score Quality" guiX="26" guiY="245" id="SELECT_SCORE_QUALITY" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select 
+  $Ticker:=ticker,
+  $Company:=company,
+  $GOC:=goc,
+  $AvgPercentUnweighted:=avg_rate_proportion_unweighted,
+  $AvgPercentWeighted:=avg_rate_proportion_weighted
+from (
+select 
+  ticker,
+  subsidiary company,
+  goc,
+  cast(round(avg(rate_proportion),3) as numeric(36,3)) avg_rate_proportion_unweighted,
+  cast(round(sum(rate_proportion_weighted),3) as numeric(36,3)) avg_rate_proportion_weighted
+from (
+  select 
+    s.just_co_id,
+    m.ticker_trim ticker,
+    c.subsidiary,
+    c.state_county_fips,
+    c.employee_count,
+    d.goc,
+    mit._2a1pt1c_hourly,
+    cjd.unadjusted_rate,
+    cjd.unadjusted_rate / mit._2a1pt1c_hourly rate_proportion,
+    (cjd.unadjusted_rate / mit._2a1pt1c_hourly) * (c.employee_count / t.emp_count_tot) rate_proportion_weighted,
+    c.employee_count / t.emp_count_tot count_ratio
+  from ${SUBSIDIARY_INFO_TABLENAME} s
+  join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
+  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
+  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.subsidiary = c.subsidiary
+  join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id and t.subsidiary = c.subsidiary
+  join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
+    cjd.just_co_id = s.just_co_id 
+    and cjd.subsidiary = c.subsidiary
+    and cjd.state_county_fips = c.state_county_fips
+    and cjd.goc = d.goc
+  join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+  where c.subsidiary is not null /*m.ticker_trim not in ('WMT','BBY','TGT','KR')*//* and d.goc = 'assistant manager'*/
+  order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
+) t
+group by ticker, subsidiary, goc
+union all
+select 
+  ticker,
+  company,
+  goc,
+  cast(round(avg(rate_proportion),3) as numeric(36,3)) avg_rate_proportion_unweighted,
+  cast(round(sum(rate_proportion_weighted),3) as numeric(36,3)) avg_rate_proportion_weighted
+from (
+  select 
+    s.just_co_id,
+    m.ticker_trim ticker,
+    s.alt_company_name company,
+    c.state_county_fips,
+    c.employee_count,
+    d.goc,
+    mit._2a1pt1c_hourly,
+    cjd.unadjusted_rate,
+    cjd.unadjusted_rate / mit._2a1pt1c_hourly rate_proportion,
+    (cjd.unadjusted_rate / mit._2a1pt1c_hourly) * (c.employee_count / t.emp_count_tot) rate_proportion_weighted,
+    c.employee_count / t.emp_count_tot count_ratio
+  from ${SUBSIDIARY_INFO_TABLENAME} s
+  join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
+  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
+  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim
+  join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id
+  join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
+    cjd.just_co_id = s.just_co_id 
+    and cjd.state_county_fips = c.state_county_fips
+    and cjd.goc = d.goc
+  join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+  where c.subsidiary is null and m.ticker_trim not in ('WMT','BBY','TGT','KR')/* and d.goc = 'assistant manager'*/
+  order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
+) t
+group by ticker, company, goc
+order by ticker, company, goc
+) t;]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="22" id="WRITE_REPORT" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="133" id="WRITE_REPORT1" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_LWAVG}" guiName="Write Report" guiX="419" guiY="245" id="WRITE_REPORT2" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_SCOREQUALITY}" guiName="Write Report" guiX="419" guiY="348" id="WRITE_REPORT3" outputFieldNames="true" type="DATA_WRITER"/>
+<Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge15" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_REPORT:0"/>
+<Edge fromNode="REFORMAT2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge19" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_REPORT2:0"/>
+<Edge fromNode="REFORMAT3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_REPORT1:0"/>
+<Edge fromNode="REFORMAT4:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="WRITE_REPORT3:0"/>
+<Edge fromNode="SELECT_AVG_LIVING_WAGE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="REFORMAT4:0"/>
+<Edge fromNode="SELECT_DETAILS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge14" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="REFORMAT1:0"/>
+<Edge fromNode="SELECT_SCORES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge16" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT3:0"/>
+<Edge fromNode="SELECT_SCORE_QUALITY:0" guiBendpoints="" guiRouter="Manhattan" id="Edge18" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="REFORMAT2:0"/>
+</Phase>
+</Graph>

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 02 09:23:20 EDT 2016" description="Generates summary reports for industry and all child companies." guiVersion="3.4.4.P" id="1472845843130" licenseCode="CLP1DGOODD71636137BY" licenseType="Commercial" modified="Fri Sep 02 09:23:20 EDT 2016" modifiedBy="hankmobley" name="FairPayReportIndustryCompanies" revision="1.0" showComponentDetails="true">
-<Global>
-<Property fileURL="workspace.prm" id="GraphParameter0"/>
-<Dictionary/>
-</Global>
-</Graph>

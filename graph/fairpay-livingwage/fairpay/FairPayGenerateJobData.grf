@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Fri Oct 28 14:41:12 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.57" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="fairpay-parameters.prm" id="GraphParameter6"/>
+<Property id="GraphParameter12" name="MIN_CO_PER_JOB" value="3"/>
+<Property id="GraphParameter13" name="MIN_DATA_POINTS_PER_CO" value="40"/>
+<Property id="GraphParameter14" name="MIN_IND_GOC_CO_COUNT" value="5"/>
+<Property id="GraphParameter15" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
+<Property id="GraphParameter16" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
+<Property id="GraphParameter17" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>
+<Property id="GraphParameter18" name="MIN_JOBS_PER_CO" value="5"/>
+<Property fileURL="workspace.prm" id="GraphParameter19"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Job Data Table" guiX="176" guiY="11" id="CREATE_COMPANY_JOB_DATA_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_JOB_DATA_TABLENAME};
+create table if not exists ${COMPANY_JOB_DATA_TABLENAME} (
+  JUST_CO_ID VARCHAR(15) NOT NULL,
+  JOB VARCHAR(255) NOT NULL, 
+  RATE FLOAT NULL,
+  SCORE INT NULL,
+  RATE_RAW FLOAT NULL,
+  SCORE_RAW INT NULL,
+  TOTAL INT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Table" guiX="532" guiY="11" id="CREATE_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_TABLENAME};
+create table if not exists ${COMPANY_TABLENAME} (
+  JUST_CO_ID VARCHAR(15) NOT NULL UNIQUE,
+  COMPANY_COLUMN_NO INT
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Job Table" guiX="397" guiY="11" id="CREATE_JOB_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${JOB_TABLENAME};
+create table if not exists ${JOB_TABLENAME} (
+  INDUSTRY VARCHAR(255) NOT NULL,
+  JOB VARCHAR(255) NOT NULL,
+  COMPANY_COUNT INT NOT NULL
+);]]></attr>
+</Node>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/CreateParamsTable.grf" guiName="Create Param Tables" guiX="23" guiY="-1" id="CREATE_PARAM_TABLES1" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Param Table" guiX="283" guiY="86" id="POPULATE_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${PARAM_TABLENAME} (
+  MIN_JOB_COUNT_PER_CO_SCORE_1,
+  MIN_JOB_COUNT_PER_CO_SCORE_2,
+  MIN_JOB_COUNT_PER_CO_SCORE_3,
+  MIN_JOBS_PER_CO,
+  MIN_CO_PER_JOB,
+  MIN_IND_GOC_CO_COUNT,
+  MIN_DATA_POINTS_PER_CO
+) values (
+  ${MIN_JOB_COUNT_PER_CO_SCORE_1},
+  ${MIN_JOB_COUNT_PER_CO_SCORE_2},
+  ${MIN_JOB_COUNT_PER_CO_SCORE_3},
+  ${MIN_JOBS_PER_CO},
+  ${MIN_CO_PER_JOB},
+  ${MIN_IND_GOC_CO_COUNT},
+  ${MIN_DATA_POINTS_PER_CO}
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/GenerateJobData.grf" guiName="Run GenerateJobData" guiX="287" guiY="164" id="RUN_GENERATE_JOB_DATA" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Companies to Fair Pay Table" guiX="493" guiY="269" id="COPY_COMPANIES_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_TABLENAME}
+select * from ${TMP_COMPANY_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Company Job Data to Fair Pay Table" guiX="23" guiY="269" id="COPY_COMPANY_JOB_DATA_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_DATA_TABLENAME}
+select * from ${TMP_COMPANY_JOB_DATA_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Copy Jobs to Fair Pay Table" guiX="295" guiY="269" id="COPY_JOBS_TO_FAIR_PAY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${JOB_TABLENAME}
+select * from ${TMP_JOB_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Param Table" guiX="23" guiY="343" id="DROP_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${PARAM_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Company Job Data Table" guiX="164" guiY="343" id="DROP_TEMP_COMPANY_JOB_DATA_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_COMPANY_JOB_DATA_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Company Table" guiX="558" guiY="343" id="DROP_TEMP_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_COMPANY_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Job Table" guiX="404" guiY="343" id="DROP_TEMP_JOB_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_JOB_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>

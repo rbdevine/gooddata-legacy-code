@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Wed Oct 26 10:40:05 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.116" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
+<Field name="Company" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="GraphName" recordDelimiter="\n" type="delimited">
+<Field name="Name" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="workspace.prm" id="GraphParameter13"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Param Tables" guiX="335" guiY="122" id="CREATE_PARAM_TABLES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${PARAM_TABLENAME};
+
+create table ${PARAM_TABLENAME} (
+  MIN_JOB_COUNT_PER_CO_SCORE_1 INT,
+  MIN_JOB_COUNT_PER_CO_SCORE_2 INT,
+  MIN_JOB_COUNT_PER_CO_SCORE_3 INT,  
+  MIN_JOBS_PER_CO INT,
+  MIN_CO_PER_JOB INT,
+  MIN_IND_GOC_CO_COUNT INT,
+  MIN_DATA_POINTS_PER_CO INT,
+  INDUSTRY VARCHAR(64)
+);]]></attr>
+</Node>
+</Phase>
+</Graph>
