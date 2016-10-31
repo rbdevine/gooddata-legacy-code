@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Wed Oct 26 10:44:12 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.56" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Fri Oct 28 14:41:12 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.57" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter21"/>
-<Property fileURL="fairpay-parameters.prm" id="GraphParameter27"/>
-<Property id="GraphParameter0" name="MIN_CO_PER_JOB" value="3"/>
-<Property id="GraphParameter33" name="MIN_DATA_POINTS_PER_CO" value="45"/>
-<Property id="GraphParameter1" name="MIN_IND_GOC_CO_COUNT" value="5"/>
-<Property id="GraphParameter2" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
-<Property id="GraphParameter3" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
-<Property id="GraphParameter4" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>
-<Property id="GraphParameter5" name="MIN_JOBS_PER_CO" value="5"/>
-<Property fileURL="workspace.prm" id="GraphParameter6"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="fairpay-parameters.prm" id="GraphParameter6"/>
+<Property id="GraphParameter12" name="MIN_CO_PER_JOB" value="3"/>
+<Property id="GraphParameter13" name="MIN_DATA_POINTS_PER_CO" value="40"/>
+<Property id="GraphParameter14" name="MIN_IND_GOC_CO_COUNT" value="5"/>
+<Property id="GraphParameter15" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
+<Property id="GraphParameter16" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
+<Property id="GraphParameter17" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>
+<Property id="GraphParameter18" name="MIN_JOBS_PER_CO" value="5"/>
+<Property fileURL="workspace.prm" id="GraphParameter19"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
