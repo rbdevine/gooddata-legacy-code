@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Wed Oct 12 15:58:26 EDT 2016" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.30" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Mon Oct 31 22:06:50 EDT 2016" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.32" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -22,6 +22,7 @@
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH_COUNTYAVG" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/AvgEmployeeCounts.xlsx"/>
 <Property id="GraphParameter1" name="DOWNLOADFILEPATH_FIPSMATCH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/CountyCityToLookup.xlsx"/>
+<Property fileURL="fairpay-parameters.prm" id="GraphParameter26"/>
 <Property id="GraphParameter2" name="POPULATEERRORFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/avgemployeecountserror.txt"/>
 <Property id="GraphParameter3" name="POPULATEERRORFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/countycitytolookuperror.txt"/>
 <Property id="GraphParameter4" name="READFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/AvgEmployeeCounts.xlsx"/>
@@ -30,18 +31,48 @@
 <Property id="GraphParameter7" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
 <Property id="GraphParameter8" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
 <Property fileURL="workspace.prm" id="GraphParameter9"/>
-<Property id="GraphParameter31" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
-<Property id="GraphParameter32" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Property id="GraphParameter24" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter25" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH_COUNTYAVG}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="County Avg File Download" guiX="360" guiY="15" id="COUNTY_AVG_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
-<Node baseURL="${DOWNLOADFILEPATH_FIPSMATCH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="Fips Match File Download" guiX="179" guiY="15" id="FIPS_MATCH_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH_COUNTYAVG}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="County Avg File Download" guiX="351" guiY="3" id="COUNTY_AVG_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Avg Table" guiX="258" guiY="80" id="CREATE_COUNTY_AVG_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_COUNTYAVG};
+CREATE TABLE ${TABLENAME_COUNTYAVG} (
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  NAME VARCHAR(255),
+  AVGEMPLOYEECOUNT FLOAT
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Count Table" guiX="437" guiY="80" id="CREATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_COUNTY_COUNTS};
+CREATE TABLE ${TABLENAME_COUNTY_COUNTS} (
+  STATE_COUNTY_FIPS VARCHAR(5),
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  EMPLOYEE_COUNT INTEGER
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Fips Match Table" guiX="80" guiY="80" id="CREATE_FIPS_MATCH_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_FIPSMATCH};
+CREATE TABLE ${TABLENAME_FIPSMATCH} (
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  NAME VARCHAR(255),
+  CITY VARCHAR(64),
+  COUNTY VARCHAR(128),
+  STATE VARCHAR(2),
+  STATE_COUNTY_FIPS VARCHAR(5)
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH_FIPSMATCH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="Fips Match File Download" guiX="172" guiY="3" id="FIPS_MATCH_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${READFILEPATH_COUNTYAVG}" guiName="Read County Avg File" guiX="137" guiY="188" id="READ_COUNTY_AVG_FILE" type="SPREADSHEET_READER"/>
-<Node enabled="enabled" fileURL="${READFILEPATH_FIPSMATCH}" guiName="Read Fips Match File" guiX="140" guiY="88" id="READ_FIPS_MATCH_FILE" type="SPREADSHEET_READER"/>
-<Node enabled="enabled" guiName="Reformat County Avg" guiX="298" guiY="200" id="REFORMAT_COUNTY_AVG" type="REFORMAT">
+<Node enabled="enabled" fileURL="${READFILEPATH_COUNTYAVG}" guiName="Read County Avg File" guiX="116" guiY="257" id="READ_COUNTY_AVG_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH_FIPSMATCH}" guiName="Read Fips Match File" guiX="119" guiY="157" id="READ_FIPS_MATCH_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat County Avg" guiX="277" guiY="269" id="REFORMAT_COUNTY_AVG" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -73,7 +104,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" guiName="Reformat Fips Match" guiX="300" guiY="94" id="REFORMAT_FIPS_MATCH" type="REFORMAT">
+<Node enabled="enabled" guiName="Reformat Fips Match" guiX="279" guiY="163" id="REFORMAT_FIPS_MATCH" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -108,59 +139,17 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${WRITEFILEPATH_COUNTYAVG}" guiName="Write County Avg" guiX="458" guiY="188" id="WRITE_COUNTY_AVG" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${WRITEFILEPATH_FIPSMATCH}" guiName="Write Fips Match" guiX="459" guiY="94" id="WRITE_FIPS_MATCH" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH_COUNTYAVG}" guiName="Write County Avg" guiX="437" guiY="257" id="WRITE_COUNTY_AVG" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH_FIPSMATCH}" guiName="Write Fips Match" guiX="438" guiY="163" id="WRITE_FIPS_MATCH" type="DATA_WRITER"/>
 <Edge fromNode="READ_COUNTY_AVG_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT_COUNTY_AVG:0"/>
 <Edge fromNode="READ_FIPS_MATCH_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT_FIPS_MATCH:0"/>
 <Edge fromNode="REFORMAT_COUNTY_AVG:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_COUNTY_AVG:0"/>
 <Edge fromNode="REFORMAT_FIPS_MATCH:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_FIPS_MATCH:0"/>
 </Phase>
 <Phase number="2">
-<Node baseURL="${READFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Download" guiX="81" guiY="676" id="CLEAN_COUNTY_AVG_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Error" guiX="282" guiY="676" id="CLEAN_COUNTY_AVG_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${READFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Download" guiX="81" guiY="603" id="CLEAN_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Error" guiX="285" guiY="603" id="CLEAN_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop County Avg Table" guiX="26" guiY="369" id="DROP_COUNTY_AVG_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_COUNTYAVG};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop County Count Table" guiX="71" guiY="522" id="DROP_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_COUNTY_COUNTS};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Fips Match Table" guiX="27" guiY="291" id="DROP_FIPS_MATCH_TABLE1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_FIPSMATCH};]]></attr>
-</Node>
-</Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Avg Table" guiX="192" guiY="369" id="CREATE_COUNTY_AVG_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME_COUNTYAVG} (
-  TICKER VARCHAR(32),
-  SUBSIDIARY VARCHAR(255),
-  NAME VARCHAR(255),
-  AVGEMPLOYEECOUNT FLOAT
-);]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Count Table" guiX="261" guiY="522" id="CREATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE ${TABLENAME_COUNTY_COUNTS} (
-  STATE_COUNTY_FIPS VARCHAR(5),
-  TICKER VARCHAR(32),
-  SUBSIDIARY VARCHAR(255),
-  EMPLOYEE_COUNT INTEGER
-);]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Fips Match Table" guiX="182" guiY="291" id="CREATE_FIPS_MATCH_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME_FIPSMATCH} (
-  TICKER VARCHAR(32),
-  SUBSIDIARY VARCHAR(255),
-  NAME VARCHAR(255),
-  CITY VARCHAR(64),
-  COUNTY VARCHAR(128),
-  STATE VARCHAR(2),
-  STATE_COUNTY_FIPS VARCHAR(5)
-);]]></attr>
-</Node>
-</Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Avg Table" guiX="363" guiY="369" id="POPULATE_COUNTY_AVG_TABLE" type="DB_EXECUTE">
+<Node baseURL="${READFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Download" guiX="70" guiY="973" id="CLEAN_COUNTY_AVG_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Download" guiX="70" guiY="900" id="CLEAN_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Avg Table" guiX="363" guiY="359" id="POPULATE_COUNTY_AVG_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_COUNTYAVG} (
   TICKER,
   SUBSIDIARY,
@@ -171,7 +160,7 @@ FROM LOCAL '${WRITEFILEPATH_COUNTYAVG}'
 EXCEPTIONS '${POPULATEERRORFILEPATH_COUNTYAVG}';
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Fips Match Table" guiX="351" guiY="291" id="POPULATE_FIPS_MATCH_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Fips Match Table" guiX="169" guiY="359" id="POPULATE_FIPS_MATCH_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_FIPSMATCH} (
   TICKER,
   SUBSIDIARY,
@@ -186,16 +175,18 @@ EXCEPTIONS '${POPULATEERRORFILEPATH_FIPSMATCH}';
 ]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
-<Node baseURL="${WRITEFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Write" guiX="458" guiY="676" id="CLEAN_COUNTY_AVG_WRITE" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Write" guiX="461" guiY="603" id="CLEAN_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Trim County Avg Data" guiX="551" guiY="369" id="TRIM_COUNTY_AVG_DATA" type="DB_EXECUTE">
+<Phase number="3">
+<Node baseURL="${POPULATEERRORFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Error" guiX="271" guiY="973" id="CLEAN_COUNTY_AVG_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Write" guiX="447" guiY="973" id="CLEAN_COUNTY_AVG_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Error" guiX="274" guiY="900" id="CLEAN_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Write" guiX="450" guiY="900" id="CLEAN_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Trim County Avg Data" guiX="363" guiY="431" id="TRIM_COUNTY_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLENAME_COUNTYAVG} set ticker = ltrim(rtrim(ticker));
 update ${TABLENAME_COUNTYAVG} set subsidiary = ltrim(rtrim(subsidiary));
 update ${TABLENAME_COUNTYAVG} set name = ltrim(rtrim(name));
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Trim Fips Match Data" guiX="542" guiY="291" id="TRIM_FIPS_MATCH_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Trim Fips Match Data" guiX="196" guiY="431" id="TRIM_FIPS_MATCH_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLENAME_FIPSMATCH} set ticker = ltrim(rtrim(ticker));
 update ${TABLENAME_FIPSMATCH} set subsidiary = ltrim(rtrim(subsidiary));
 update ${TABLENAME_FIPSMATCH} set name = ltrim(rtrim(name));
@@ -209,8 +200,8 @@ update ${TABLENAME_FIPSMATCH} set state = null where state = '0';
 ]]></attr>
 </Node>
 </Phase>
-<Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Adjust Saints" guiX="701" guiY="291" id="ADJUST_SAINTS" type="DB_EXECUTE">
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Adjust Saints" guiX="288" guiY="505" id="ADJUST_SAINTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 update ${TABLENAME_FIPSMATCH} set city = 'St. Albans' where city = 'St Albans';
@@ -333,8 +324,8 @@ update ${TABLENAME_FIPSMATCH} set county = 'St. Tammany Parish' where county = '
 ]]></attr>
 </Node>
 </Phase>
-<Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Lookup Fips by County" guiX="177" guiY="441" id="LOOKUP_FIPS_BY_COUNTY" type="DB_EXECUTE">
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Lookup Fips by County" guiX="272" guiY="577" id="LOOKUP_FIPS_BY_COUNTY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 UPDATE ${TABLENAME_FIPSMATCH} m
@@ -343,8 +334,8 @@ FROM LKP_CITY_FIPS f
 WHERE m.state_county_fips is null and f.county_name = m.county and f.state_abbreviation = m.state;]]></attr>
 </Node>
 </Phase>
-<Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Lookup Fips by City" guiX="344" guiY="441" id="LOOKUP_FIPS_BY_CITY" type="DB_EXECUTE">
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Lookup Fips by City" guiX="281" guiY="651" id="LOOKUP_FIPS_BY_CITY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 UPDATE ${TABLENAME_FIPSMATCH} m
@@ -353,8 +344,8 @@ FROM LKP_CITY_FIPS f
 WHERE m.state_county_fips is null and f.city_name = m.city and f.state_abbreviation = m.state;]]></attr>
 </Node>
 </Phase>
-<Phase number="9">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Count Table" guiX="461" guiY="522" id="POPULATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Count Table" guiX="255" guiY="723" id="POPULATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 INSERT INTO ${TABLENAME_COUNTY_COUNTS}
@@ -380,5 +371,8 @@ FROM (
 ) r
 group by state_county_fips, ticker, subsidiary;]]></attr>
 </Node>
+</Phase>
+<Phase number="8">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageEmployeeCountByCounty.grf" guiName="Load Other Employee Counts" guiX="255" guiY="800" id="LOAD_OTHER_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
 </Phase>
 </Graph>
