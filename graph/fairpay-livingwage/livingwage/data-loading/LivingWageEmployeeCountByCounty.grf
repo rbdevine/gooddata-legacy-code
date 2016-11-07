@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Mon Oct 31 15:53:20 EDT 2016" modifiedBy="hankmobley" name="LivingWageEmployeeCountByCounty" revision="1.36" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Tue Nov 01 17:19:56 EDT 2016" modifiedBy="hankmobley" name="LivingWageEmployeeCountByCounty" revision="1.51" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLOYEE_COUNTS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -143,8 +143,7 @@ select * from TMP_${TABLENAME};
 drop table TMP_${TABLENAME};
 
 delete from ${TABLENAME} 
-where regexp_count(state_county_fips,'^[0-9]{5,5}$') = 0;
-]]></attr>
+where regexp_count(state_county_fips,'^[0-9]{5,5}$') = 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Temp Data" guiX="479" guiY="276" id="CLEANUP_TEMP_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TABLENAMETEMP} where ticker is null;
