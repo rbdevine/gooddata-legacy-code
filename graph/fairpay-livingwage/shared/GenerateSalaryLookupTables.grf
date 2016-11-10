@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Oct 24 14:39:00 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.48" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Nov 07 16:17:18 EST 2016" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.50" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="CITY_FIPS_AVERAGES_TABLENAME" value="LKP_CITY_FIPS_AVG"/>
-<Property fileURL="fairpay-parameters.prm" id="GraphParameter18"/>
-<Property id="GraphParameter1" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
-<Property id="GraphParameter2" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
-<Property fileURL="workspace.prm" id="GraphParameter3"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter24"/>
+<Property id="GraphParameter7" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
+<Property id="GraphParameter8" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
+<Property fileURL="workspace.prm" id="GraphParameter9"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -151,8 +151,8 @@ select distinct
 from lkp_glassdoor_company g
 join lkp_just_co_secty_master m on g.just_company_id = m.just_co_id
 join stg_glassdoorsalary s on s.fk_employerid = g.glassdoor_employer_id
-join LKP_SALARY_YEAR_ADJUSTMENT ya on ya.year = cast(s.YEAROFSALARY as int)
-left join lkp_city_fips_avg f on f.state = s.stateabbreviation and f.city = s.cityname
+join ${SALARY_YEAR_ADJUSTMENT_TABLENAME} ya on ya.year = cast(s.YEAROFSALARY as int)
+left join ${CITY_FIPS_AVERAGES_TABLENAME} f on f.state = s.stateabbreviation and f.city = s.cityname
 /*left join lkp_city_fips f on f.state_abbreviation = s.stateabbreviation and f.city_name = s.cityname
 left join stg_regionalpurchasingpower pp on pp.fips_code = f.state_county_fips*/
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Thu Oct 27 15:43:24 PDT 2016" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.111" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Thu Nov 10 00:13:23 EST 2016" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.112" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -380,7 +380,7 @@ order by column_number;]]></attr>
 <Edge fromNode="READ_COLUMNS:1" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 1 (out)" toNode="CREATE_UPDATE_DATA_SQL:0"/>
 </Phase>
 <Phase number="4">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/fairpay/FairPayGenerateReports.grf" guiName="Run GenerateJobData" guiX="238" guiY="610" id="RUN_GENERATE_JOB_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/fairpay/FairPayGenerateReports.grf" guiName="Run GenerateReports" guiX="238" guiY="610" id="RUN_GENERATE_REPORTS" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="5">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Numbers Table" guiX="382" guiY="734" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
