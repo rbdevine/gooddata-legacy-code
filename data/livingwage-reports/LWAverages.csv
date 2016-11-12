@@ -1,4 +1,247 @@
 Ticker,Company,GOC,AvgPercentUnweighted,AvgPercentWeighted
+AAP,AAP Stores,driver,0.518,1.571
+AMZN,AMZN Dist. Centers,facilities manager,2.905,8.607
+AMZN,AMZN Dist. Centers,maintenance technician,1.536,4.552
+AZO,AZO Stores,assistant manager,0.805,2.483
+AZO,AZO Stores,parts sales,0.570,1.761
+AZO,AZO Stores,sales associate,0.519,1.601
+BBBY,BBBY Stores,assistant manager,1.510,4.629
+BBBY,BBBY Stores,receiving,0.646,1.982
+BBY,BBY Large Stores,assistant manager,1.618,4.968
+BBY,BBY Large Stores,cashier,0.527,1.617
+BBY,BBY Large Stores,channel sales manager,0.831,2.551
+BBY,BBY Large Stores,computer specialist,0.608,1.868
+BBY,BBY Large Stores,customer experience manager,1.756,5.390
+BBY,BBY Large Stores,customer service representative,0.603,1.852
+BBY,BBY Large Stores,sales manager,1.212,3.722
+BBY,BBY Small Stores,geek squad,0.804,2.430
+BURL,BURL Stores,merchandise manager,1.560,4.787
+BURL,BURL Stores,store manager,2.139,6.563
+CASY,CASY Stores,cashier,0.548,1.632
+COST,COST Stores,assistant manager,0.965,2.944
+COST,COST Stores,tire technician,0.706,2.154
+CVS,CVS Stores,cashier,0.470,1.467
+CVS,CVS Stores,customer service representative,0.632,1.974
+CVS,CVS Stores,pharmacist,3.371,10.525
+DDS,DDS Stores,cosmetics counter manager,0.950,2.877
+DDS,DDS Stores,customer service representative,0.675,2.045
+DDS,DDS Stores,sales specialist,0.836,2.531
+DG,DG Stores,assistant manager,0.666,2.009
+DG,DG Stores,sales associate,0.510,1.540
+DKS,DKS Stores,materials coordinator,0.638,1.934
+DLTR,DLTR Stores,assistant manager,0.594,1.830
+DLTR,DLTR Stores,cashier,0.450,1.385
+DLTR,DLTR Stores,store manager,1.229,3.784
+FL,FL Stores,assistant manager,0.541,1.681
+FL,FL Stores,sales associate,0.412,1.279
+GME,GME Stores,sales associate,0.486,1.506
+GPS,GPS Stores,merchandise,0.719,2.240
+HD,HD Stores,administrative assistant,1.210,3.707
+HD,HD Stores,customer service representative,0.698,2.139
+HD,HD Stores,delivery coordinator,0.674,2.065
+HD,HD Stores,inventory specialist,0.698,2.137
+JCP,JCP Stores,department manager,0.937,2.836
+JCP,JCP Stores,hair stylist,0.520,1.572
+JCP,JCP Stores,sales manager,1.337,4.044
+JCP,JCP Stores,support specialist,0.519,1.570
+JCP,JCP Stores,visual merchandiser,0.711,2.151
+JWN,JWN Stores,barista,0.545,1.660
+JWN,JWN Stores,cashier,0.592,1.801
+JWN,JWN Stores,hr manager,1.411,4.296
+JWN,JWN Stores,loss prevention,0.775,2.360
+JWN,JWN Stores,sales associate,0.646,1.965
+JWN,JWN Stores,sales manager,1.115,3.395
+JWN,JWN Stores,visual merchandiser,1.004,3.055
+KMX,KMX Stores,detailer,0.746,2.248
+KR,KR Large Stores,baker,0.638,1.963
+KR,KR Large Stores,barista,0.545,1.677
+KR,KR Large Stores,customer service representative,0.590,1.814
+KR,KR Large Stores,deli clerk,0.516,1.587
+KR,KR Large Stores,deli manager,0.984,3.027
+KR,KR Large Stores,grocery manager,1.222,3.758
+KR,KR Small Stores,cashier,0.507,1.540
+KR,KR Small Stores,grocery clerk,0.611,1.858
+KR,KR Small Stores,store manager,2.034,6.183
+KSS,KSS Stores,material handler,0.684,2.081
+LB,LB Stores,sales associate,0.501,1.541
+LOW,LOW Stores,cashier,0.686,2.093
+LOW,LOW Stores,customer care manager,1.120,3.418
+LOW,LOW Stores,financial services specialist,1.053,3.211
+M,M Stores,asset protection,0.861,2.647
+M,M Stores,beauty advisor,0.594,1.827
+M,M Stores,customer service representative,0.641,1.969
+M,M Stores,stock clerk,0.439,1.348
+MIK,MIK Stores,certified custom framer,0.548,1.680
+MIK,MIK Stores,sales associate,0.479,1.470
+ORLY,ORLY Stores,territory sales manager,1.343,4.118
+RAD,RAD Stores,assistant manager,0.847,2.671
+ROST,ROST Stores,area manager,0.699,2.162
+ROST,ROST Stores,loss prevention,0.558,1.725
+SFM,SFM Stores,grocery clerk,0.528,1.639
+SIG,SIG Stores,store manager,1.215,3.701
+SPLS,SPLS Stores,cashier,0.494,1.543
+SPLS,SPLS Stores,copy and print associate,0.499,1.559
+SPLS,SPLS Stores,customer service representative,0.654,2.041
+SYY,SYY Stores,business analyst,2.427,7.338
+TGT,TGT Dist. Centers,flow team member,0.571,1.707
+TGT,TGT Dist. Centers,warehouse worker,1.142,3.415
+TGT,TGT Stores,cashier,0.497,1.524
+TGT,TGT Stores,merchandiser,0.600,1.841
+TGT,TGT Stores,packer,0.978,3.003
+TGT,TGT Stores,sales manager,1.021,3.134
+TIF,TIF Stores,security officer,1.014,3.112
+TSCO,TSCO Stores,sales associate,0.553,1.665
+URBN,URBN Stores,associate,0.542,1.701
+URBN,URBN Stores,cashier,0.535,1.680
+URBN,URBN Stores,store manager,1.466,4.604
+WBA,WBA Stores,pharmacy technician,0.737,2.278
+WBA,WBA Stores,sales clerk,0.471,1.457
+WBA,WBA Stores,stock clerk,0.406,1.257
+WBA,WBA Stores,store manager,1.675,5.179
+WFM,WFM Stores,bagger,0.616,1.908
+WFM,WFM Stores,cashier,0.591,1.833
+WFM,WFM Stores,grocery manager,1.186,3.676
+WFM,WFM Stores,sales associate,0.594,1.841
+WFM,WFM Stores,store manager,1.903,5.899
+WMT,WMT Dist. Centers,office assistant,0.929,2.800
+WMT,WMT Dist. Centers,operations manager,1.522,4.588
+WMT,WMT Dist. Centers,unloader,0.722,2.177
+WMT,WMT Stores,assistant manager,1.383,4.207
+WMT,WMT Stores,loss prevention,0.705,2.146
+WMT,WMT Stores,sales associate,0.559,1.701
+WMT,WMT Stores,stock clerk,0.573,1.744
+WSM,WSM Stores,assistant manager,1.025,3.112
+WSM,WSM Stores,coordinator,0.951,2.887
+WSM,WSM Stores,planner,1.366,4.150
+WSM,WSM Stores,store manager,1.536,4.665
+WSM,WSM Stores,visual merchandiser,0.654,1.988
+AAP,AAP Stores,assistant manager,0.906,2.747
+AMZN,AMZN Dist. Centers,logistics specialist,1.043,3.091
+AMZN,AMZN Dist. Centers,receiving,0.830,2.459
+AMZN,AMZN Dist. Centers,trainer,1.054,3.122
+AN,AN Stores,car sales,0.719,2.205
+AZO,AZO Stores,customer service manager,0.556,1.716
+AZO,AZO Stores,customer service representative,0.529,1.634
+AZO,AZO Stores,delivery driver,0.579,1.786
+AZO,AZO Stores,parts sales manager,0.669,2.066
+AZO,AZO Stores,store manager,1.314,4.055
+BBBY,BBBY Stores,customer service sales,0.546,1.673
+BBBY,BBBY Stores,sales associate,0.505,1.549
+BBBY,BBBY Stores,stocker,0.517,1.586
+BBY,BBY Large Stores,administrative assistant,0.895,2.747
+BBY,BBY Large Stores,computer sales,0.637,1.956
+BBY,BBY Large Stores,sales representative,0.605,1.858
+BBY,BBY Small Stores,store manager,2.141,6.473
+BURL,BURL Stores,cashier,0.458,1.404
+BURL,BURL Stores,sales associate,0.467,1.432
+CAB,CAB Stores,cashier,0.600,1.801
+CAB,CAB Stores,department manager,1.241,3.723
+CASY,CASY Stores,store manager,1.068,3.181
+COST,COST Stores,food service worker,0.614,1.874
+COST,COST Stores,service clerk,1.031,3.145
+COST,COST Stores,stocker,0.703,2.146
+CVS,CVS Stores,sales associate,0.472,1.475
+DDS,DDS Stores,cashier,0.730,2.209
+DDS,DDS Stores,store manager,2.474,7.488
+DDS,DDS Stores,visual manager,1.300,3.936
+DKS,DKS Stores,sales associate,0.539,1.634
+DKS,DKS Stores,store manager,2.291,6.947
+DLTR,DLTR Stores,stocker,0.448,1.380
+FL,FL Stores,cashier,0.410,1.273
+GPS,GPS Stores,cashier,0.494,1.540
+GPS,GPS Stores,customer experience,0.695,2.166
+GPS,GPS Stores,sales representative,0.472,1.470
+GPS,GPS Stores,stocker,0.564,1.758
+HD,HD Stores,bookkeeper,0.660,2.022
+HD,HD Stores,forklift operator,0.855,2.619
+HD,HD Stores,loader,0.594,1.818
+HD,HD Stores,office assistant,0.674,2.065
+HD,HD Stores,sales associate,0.590,1.807
+JCP,JCP Stores,assistant manager,1.683,5.091
+JCP,JCP Stores,hr manager,1.635,4.946
+JCP,JCP Stores,sales associate,0.516,1.561
+JWN,JWN Stores,cosmetics counter manager,0.946,2.881
+JWN,JWN Stores,department manager,1.138,3.465
+KMX,KMX Stores,auto technician,1.342,4.041
+KMX,KMX Stores,car sales,1.105,3.327
+KMX,KMX Stores,sales consultant,0.734,2.209
+KR,KR Large Stores,customer service manager,0.819,2.519
+KR,KR Large Stores,meat cutter,0.836,2.573
+KR,KR Large Stores,office assistant,0.554,1.704
+KR,KR Large Stores,pharmacy technician,0.730,2.245
+KSS,KSS Stores,area manager,0.833,2.535
+KSS,KSS Stores,cashier,0.469,1.428
+KSS,KSS Stores,customer service representative,0.572,1.742
+KSS,KSS Stores,loss prevention,0.632,1.922
+KSS,KSS Stores,loss prevention manager,1.027,3.124
+KSS,KSS Stores,merchandising specialist,1.045,3.180
+KSS,KSS Stores,stocker,0.501,1.523
+KSS,KSS Stores,store manager,1.868,5.684
+LB,LB Stores,store manager,1.563,4.812
+LB,LB Stores,visual merchandiser,0.569,1.753
+LOW,LOW Stores,area manager,1.914,5.840
+LOW,LOW Stores,delivery driver,0.888,2.710
+LOW,LOW Stores,facility service associate,0.729,2.224
+LOW,LOW Stores,flooring sales specialist,0.966,2.946
+LOW,LOW Stores,sales associate,0.677,2.064
+LOW,LOW Stores,sales coordinator,0.788,2.402
+LOW,LOW Stores,store manager,2.611,7.965
+M,M Stores,cashier,0.469,1.442
+MIK,MIK Stores,assistant manager,1.147,3.518
+MIK,MIK Stores,store manager,1.794,5.506
+MUSA,MUSA Stores,store manager,1.213,3.669
+ORLY,ORLY Stores,client service specialist,0.754,2.313
+RAD,RAD Stores,associate,0.599,1.890
+RAD,RAD Stores,store manager,1.291,4.074
+ROST,ROST Stores,cashier,0.478,1.480
+ROST,ROST Stores,store manager,1.679,5.194
+ROST,ROST Stores,team member,0.469,1.452
+SFM,SFM Stores,courtesy clerk,0.459,1.425
+SIG,SIG Stores,sales associate,0.621,1.891
+SPLS,SPLS Stores,account executive,1.496,4.670
+SPLS,SPLS Stores,assistant manager,1.140,3.559
+SYY,SYY Stores,manager,3.203,9.684
+SYY,SYY Stores,order selector,1.133,3.425
+SYY,SYY Stores,sales marketing,1.398,4.227
+SYY,SYY Stores,truck driver,1.668,5.042
+TGT,TGT Dist. Centers,operator,0.599,1.790
+TGT,TGT Stores,asset protection,0.709,2.176
+TGT,TGT Stores,attendant,0.485,1.489
+TGT,TGT Stores,food service worker,0.521,1.600
+TGT,TGT Stores,guest service attendant,0.552,1.694
+TGT,TGT Stores,loss prevention,0.597,1.833
+TGT,TGT Stores,stocker,0.528,1.620
+TIF,TIF Stores,manager,2.383,7.318
+TJX,TJX Stores,backroom associate,0.429,1.332
+TJX,TJX Stores,stock clerk,0.400,1.241
+TJX,TJX Stores,team member,0.470,1.459
+TSCO,TSCO Stores,cashier,0.541,1.629
+TSCO,TSCO Stores,store manager,1.545,4.655
+ULTA,ULTA Stores,cashier,0.537,1.640
+ULTA,ULTA Stores,sales associate,0.521,1.592
+URBN,URBN Stores,merchandising manager,0.868,2.728
+URBN,URBN Stores,receiver,0.605,1.901
+URBN,URBN Stores,sales associate,0.502,1.578
+WFM,WFM Stores,cook,0.714,2.215
+WFM,WFM Stores,department manager,1.286,3.989
+WFM,WFM Stores,floral designer,0.726,2.250
+WFM,WFM Stores,meat cutter,0.950,2.945
+WFM,WFM Stores,receiver,0.749,2.324
+WFM,WFM Stores,stock clerk,0.610,1.892
+WMT,WMT Dist. Centers,customer service representative,0.626,1.887
+WMT,WMT Dist. Centers,distribution manager,1.141,3.440
+WMT,WMT Dist. Centers,receiving,0.691,2.084
+WMT,WMT Dist. Centers,warehouse manager,1.290,3.889
+WMT,WMT Stores,baker,0.606,1.843
+WMT,WMT Stores,deli clerk,0.605,1.839
+WMT,WMT Stores,hr manager,2.523,7.673
+WMT,WMT Stores,janitor,0.714,2.171
+WMT,WMT Stores,merchandise manager,0.918,2.793
+WMT,WMT Stores,stocker,0.589,1.791
+WMT,WMT Stores,store manager,2.761,8.398
+WSM,WSM Stores,associate,0.555,1.685
+WSM,WSM Stores,design specialist,0.654,1.988
+WSM,WSM Stores,stock clerk,0.551,1.673
 AAP,AAP Stores,sales,0.843,2.556
 AAP,AAP Stores,sales associate,0.555,1.683
 AAP,AAP Stores,store manager,1.395,4.232
@@ -105,12 +348,12 @@ SPLS,SPLS Stores,area sales manager,2.471,7.713
 SPLS,SPLS Stores,computer technician,0.553,1.727
 SPLS,SPLS Stores,easy tech expert,0.633,1.976
 SPLS,SPLS Stores,inventory,0.607,1.896
-SYY,SYY Stores,accountant,1.607,4.856
-TGT,TGT Dist. Centers,customer service manager,0.623,1.864
-TGT,TGT Dist. Centers,customer service representative,0.615,1.838
-TGT,TGT Dist. Centers,distribution manager,2.101,6.281
-TGT,TGT Dist. Centers,etl logistics,1.832,5.478
-TGT,TGT Dist. Centers,receiving,0.724,2.164
+SYY,SYY Stores,accountant,1.607,4.857
+TGT,TGT Dist. Centers,customer service manager,0.624,1.866
+TGT,TGT Dist. Centers,customer service representative,0.615,1.841
+TGT,TGT Dist. Centers,distribution manager,2.103,6.289
+TGT,TGT Dist. Centers,etl logistics,1.834,5.485
+TGT,TGT Dist. Centers,receiving,0.724,2.167
 TGT,TGT Stores,overnight flow team member,0.555,1.702
 TGT,TGT Stores,sales clerk,0.553,1.698
 TGT,TGT Stores,sales floor manager,0.901,2.766
@@ -131,11 +374,11 @@ WBA,WBA Stores,sales associate,0.474,1.465
 WFM,WFM Stores,customer service representative,0.600,1.859
 WFM,WFM Stores,dishwasher,0.648,2.011
 WFM,WFM Stores,team member,0.629,1.951
-WMT,WMT Dist. Centers,assistant manager,1.388,4.175
-WMT,WMT Dist. Centers,forklift operator,0.931,2.801
-WMT,WMT Dist. Centers,janitor,0.716,2.154
-WMT,WMT Dist. Centers,loader,0.676,2.034
-WMT,WMT Dist. Centers,truck driver,2.213,6.654
+WMT,WMT Dist. Centers,assistant manager,1.387,4.183
+WMT,WMT Dist. Centers,forklift operator,0.930,2.806
+WMT,WMT Dist. Centers,janitor,0.716,2.158
+WMT,WMT Dist. Centers,loader,0.676,2.038
+WMT,WMT Dist. Centers,truck driver,2.211,6.666
 WMT,WMT Stores,asset protection,1.022,3.110
 WMT,WMT Stores,cashier,0.573,1.744
 WMT,WMT Stores,department manager,0.773,2.353
@@ -144,133 +387,6 @@ WMT,WMT Stores,receiving,0.689,2.096
 WMT,WMT Stores,sales clerk,0.557,1.696
 WSM,WSM Stores,customer service representative,0.737,2.238
 WSM,WSM Stores,sales associate,0.547,1.661
-AAP,AAP Stores,assistant manager,0.906,2.747
-AMZN,AMZN Dist. Centers,logistics specialist,1.043,3.091
-AMZN,AMZN Dist. Centers,receiving,0.830,2.459
-AMZN,AMZN Dist. Centers,trainer,1.054,3.122
-AN,AN Stores,car sales,0.719,2.205
-AZO,AZO Stores,customer service manager,0.556,1.716
-AZO,AZO Stores,customer service representative,0.529,1.634
-AZO,AZO Stores,delivery driver,0.579,1.786
-AZO,AZO Stores,parts sales manager,0.669,2.066
-AZO,AZO Stores,store manager,1.314,4.055
-BBBY,BBBY Stores,customer service sales,0.546,1.673
-BBBY,BBBY Stores,sales associate,0.505,1.549
-BBBY,BBBY Stores,stocker,0.517,1.586
-BBY,BBY Large Stores,administrative assistant,0.895,2.747
-BBY,BBY Large Stores,computer sales,0.637,1.956
-BBY,BBY Large Stores,sales representative,0.605,1.858
-BBY,BBY Small Stores,store manager,2.141,6.473
-BURL,BURL Stores,cashier,0.458,1.404
-BURL,BURL Stores,sales associate,0.467,1.432
-CAB,CAB Stores,cashier,0.600,1.801
-CAB,CAB Stores,department manager,1.241,3.723
-CASY,CASY Stores,store manager,1.068,3.181
-COST,COST Stores,food service worker,0.614,1.874
-COST,COST Stores,service clerk,1.031,3.145
-COST,COST Stores,stocker,0.703,2.146
-CVS,CVS Stores,sales associate,0.472,1.475
-DDS,DDS Stores,cashier,0.730,2.209
-DDS,DDS Stores,store manager,2.474,7.488
-DDS,DDS Stores,visual manager,1.300,3.936
-DKS,DKS Stores,sales associate,0.539,1.634
-DKS,DKS Stores,store manager,2.291,6.947
-DLTR,DLTR Stores,stocker,0.448,1.380
-FL,FL Stores,cashier,0.410,1.273
-GPS,GPS Stores,cashier,0.494,1.540
-GPS,GPS Stores,customer experience,0.695,2.166
-GPS,GPS Stores,sales representative,0.472,1.470
-GPS,GPS Stores,stocker,0.564,1.758
-HD,HD Stores,bookkeeper,0.660,2.022
-HD,HD Stores,forklift operator,0.855,2.619
-HD,HD Stores,loader,0.594,1.818
-HD,HD Stores,office assistant,0.674,2.065
-HD,HD Stores,sales associate,0.590,1.807
-JCP,JCP Stores,assistant manager,1.683,5.091
-JCP,JCP Stores,hr manager,1.635,4.946
-JCP,JCP Stores,sales associate,0.516,1.561
-JWN,JWN Stores,cosmetics counter manager,0.946,2.881
-JWN,JWN Stores,department manager,1.138,3.465
-KMX,KMX Stores,auto technician,1.342,4.041
-KMX,KMX Stores,car sales,1.105,3.327
-KMX,KMX Stores,sales consultant,0.734,2.209
-KR,KR Large Stores,customer service manager,0.819,2.519
-KR,KR Large Stores,meat cutter,0.836,2.573
-KR,KR Large Stores,office assistant,0.554,1.704
-KR,KR Large Stores,pharmacy technician,0.730,2.245
-KSS,KSS Stores,area manager,0.833,2.535
-KSS,KSS Stores,cashier,0.469,1.428
-KSS,KSS Stores,customer service representative,0.572,1.742
-KSS,KSS Stores,loss prevention,0.632,1.922
-KSS,KSS Stores,loss prevention manager,1.027,3.124
-KSS,KSS Stores,merchandising specialist,1.045,3.180
-KSS,KSS Stores,stocker,0.501,1.523
-KSS,KSS Stores,store manager,1.868,5.684
-LB,LB Stores,store manager,1.563,4.811
-LB,LB Stores,visual merchandiser,0.569,1.753
-LOW,LOW Stores,area manager,1.914,5.840
-LOW,LOW Stores,delivery driver,0.888,2.710
-LOW,LOW Stores,facility service associate,0.729,2.224
-LOW,LOW Stores,flooring sales specialist,0.966,2.946
-LOW,LOW Stores,sales associate,0.677,2.064
-LOW,LOW Stores,sales coordinator,0.788,2.402
-LOW,LOW Stores,store manager,2.611,7.965
-M,M Stores,cashier,0.469,1.442
-MIK,MIK Stores,assistant manager,1.147,3.518
-MIK,MIK Stores,store manager,1.794,5.506
-MUSA,MUSA Stores,store manager,1.213,3.669
-ORLY,ORLY Stores,client service specialist,0.754,2.313
-RAD,RAD Stores,associate,0.599,1.890
-RAD,RAD Stores,store manager,1.291,4.074
-ROST,ROST Stores,cashier,0.478,1.480
-ROST,ROST Stores,store manager,1.679,5.194
-ROST,ROST Stores,team member,0.469,1.452
-SFM,SFM Stores,courtesy clerk,0.459,1.425
-SIG,SIG Stores,sales associate,0.621,1.891
-SPLS,SPLS Stores,account executive,1.496,4.670
-SPLS,SPLS Stores,assistant manager,1.140,3.559
-SYY,SYY Stores,manager,3.203,9.684
-SYY,SYY Stores,order selector,1.133,3.425
-SYY,SYY Stores,sales marketing,1.398,4.227
-SYY,SYY Stores,truck driver,1.668,5.042
-TGT,TGT Dist. Centers,operator,0.598,1.788
-TGT,TGT Stores,asset protection,0.709,2.176
-TGT,TGT Stores,attendant,0.485,1.489
-TGT,TGT Stores,food service worker,0.521,1.600
-TGT,TGT Stores,guest service attendant,0.552,1.694
-TGT,TGT Stores,loss prevention,0.597,1.833
-TGT,TGT Stores,stocker,0.528,1.620
-TIF,TIF Stores,manager,2.383,7.318
-TJX,TJX Stores,backroom associate,0.429,1.332
-TJX,TJX Stores,stock clerk,0.400,1.241
-TJX,TJX Stores,team member,0.470,1.459
-TSCO,TSCO Stores,cashier,0.541,1.629
-TSCO,TSCO Stores,store manager,1.545,4.655
-ULTA,ULTA Stores,cashier,0.537,1.640
-ULTA,ULTA Stores,sales associate,0.521,1.592
-URBN,URBN Stores,merchandising manager,0.868,2.728
-URBN,URBN Stores,receiver,0.605,1.901
-URBN,URBN Stores,sales associate,0.502,1.578
-WFM,WFM Stores,cook,0.714,2.215
-WFM,WFM Stores,department manager,1.286,3.989
-WFM,WFM Stores,floral designer,0.726,2.250
-WFM,WFM Stores,meat cutter,0.950,2.945
-WFM,WFM Stores,receiver,0.749,2.324
-WFM,WFM Stores,stock clerk,0.610,1.892
-WMT,WMT Dist. Centers,customer service representative,0.626,1.884
-WMT,WMT Dist. Centers,distribution manager,1.142,3.434
-WMT,WMT Dist. Centers,receiving,0.692,2.080
-WMT,WMT Dist. Centers,warehouse manager,1.291,3.882
-WMT,WMT Stores,baker,0.606,1.843
-WMT,WMT Stores,deli clerk,0.605,1.839
-WMT,WMT Stores,hr manager,2.523,7.673
-WMT,WMT Stores,janitor,0.714,2.171
-WMT,WMT Stores,merchandise manager,0.918,2.793
-WMT,WMT Stores,stocker,0.589,1.791
-WMT,WMT Stores,store manager,2.761,8.398
-WSM,WSM Stores,associate,0.555,1.685
-WSM,WSM Stores,design specialist,0.654,1.988
-WSM,WSM Stores,stock clerk,0.551,1.673
 AAP,AAP Stores,delivery driver,0.554,1.680
 AAP,AAP Stores,general manager,1.293,3.920
 AAP,AAP Stores,retail parts pro,0.736,2.231
@@ -303,7 +419,7 @@ COST,COST Stores,customer service manager,0.866,2.644
 COST,COST Stores,merchandiser,0.757,2.310
 COST,COST Stores,sales assistant,0.747,2.281
 CVS,CVS Stores,pharmacy technician,0.618,1.930
-DDS,DDS Stores,assistant manager,1.597,4.833
+DDS,DDS Stores,assistant manager,1.597,4.834
 DDS,DDS Stores,beauty advisor,0.837,2.534
 DDS,DDS Stores,sales associate,0.751,2.274
 DG,DG Stores,cashier,0.491,1.483
@@ -369,13 +485,13 @@ SPLS,SPLS Stores,store manager,1.863,5.817
 SYY,SYY Stores,delivery driver,1.661,5.021
 SYY,SYY Stores,sales associate,1.494,4.516
 SYY,SYY Stores,sales representative,1.537,4.647
-TGT,TGT Dist. Centers,assistant manager,1.466,4.385
-TGT,TGT Dist. Centers,hr specialist,1.349,4.034
-TGT,TGT Dist. Centers,logistics manager,0.984,2.944
-TGT,TGT Dist. Centers,order selector,1.043,3.120
-TGT,TGT Dist. Centers,packer,0.994,2.973
-TGT,TGT Dist. Centers,sales representative,0.619,1.852
-TGT,TGT Dist. Centers,trainer,0.589,1.763
+TGT,TGT Dist. Centers,assistant manager,1.468,4.390
+TGT,TGT Dist. Centers,hr specialist,1.350,4.039
+TGT,TGT Dist. Centers,logistics manager,0.985,2.947
+TGT,TGT Dist. Centers,order selector,1.045,3.124
+TGT,TGT Dist. Centers,packer,0.995,2.977
+TGT,TGT Dist. Centers,sales representative,0.620,1.854
+TGT,TGT Dist. Centers,trainer,0.590,1.765
 TGT,TGT Stores,assistant manager,1.443,4.429
 TGT,TGT Stores,customer service representative,0.605,1.857
 TGT,TGT Stores,executive manager,1.653,5.073
@@ -398,124 +514,8 @@ WFM,WFM Stores,baker,0.762,2.362
 WFM,WFM Stores,barista,0.676,2.097
 WFM,WFM Stores,customer service manager,0.727,2.254
 WFM,WFM Stores,grocery clerk,0.627,1.943
-WMT,WMT Dist. Centers,inventory,0.589,1.772
-WMT,WMT Dist. Centers,maintenance,0.555,1.669
+WMT,WMT Dist. Centers,inventory,0.589,1.775
+WMT,WMT Dist. Centers,maintenance,0.555,1.672
 WMT,WMT Stores,accounting associate,0.672,2.044
 WMT,WMT Stores,customer service representative,0.624,1.899
 WMT,WMT Stores,pharmacist,3.913,11.902
-AAP,AAP Stores,driver,0.518,1.571
-AMZN,AMZN Dist. Centers,facilities manager,2.905,8.607
-AMZN,AMZN Dist. Centers,maintenance technician,1.536,4.552
-AZO,AZO Stores,assistant manager,0.805,2.483
-AZO,AZO Stores,parts sales,0.570,1.761
-AZO,AZO Stores,sales associate,0.519,1.601
-BBBY,BBBY Stores,assistant manager,1.510,4.629
-BBBY,BBBY Stores,receiving,0.646,1.982
-BBY,BBY Large Stores,assistant manager,1.618,4.968
-BBY,BBY Large Stores,cashier,0.527,1.617
-BBY,BBY Large Stores,channel sales manager,0.831,2.551
-BBY,BBY Large Stores,computer specialist,0.608,1.868
-BBY,BBY Large Stores,customer experience manager,1.756,5.390
-BBY,BBY Large Stores,customer service representative,0.603,1.852
-BBY,BBY Large Stores,sales manager,1.212,3.722
-BBY,BBY Small Stores,geek squad,0.804,2.430
-BURL,BURL Stores,merchandise manager,1.560,4.787
-BURL,BURL Stores,store manager,2.139,6.563
-CASY,CASY Stores,cashier,0.548,1.632
-COST,COST Stores,assistant manager,0.965,2.944
-COST,COST Stores,tire technician,0.706,2.154
-CVS,CVS Stores,cashier,0.470,1.467
-CVS,CVS Stores,customer service representative,0.632,1.974
-CVS,CVS Stores,pharmacist,3.371,10.525
-DDS,DDS Stores,cosmetics counter manager,0.950,2.877
-DDS,DDS Stores,customer service representative,0.675,2.045
-DDS,DDS Stores,sales specialist,0.836,2.530
-DG,DG Stores,assistant manager,0.666,2.009
-DG,DG Stores,sales associate,0.510,1.540
-DKS,DKS Stores,materials coordinator,0.638,1.934
-DLTR,DLTR Stores,assistant manager,0.594,1.830
-DLTR,DLTR Stores,cashier,0.450,1.385
-DLTR,DLTR Stores,store manager,1.229,3.784
-FL,FL Stores,assistant manager,0.541,1.681
-FL,FL Stores,sales associate,0.412,1.279
-GME,GME Stores,sales associate,0.486,1.506
-GPS,GPS Stores,merchandise,0.719,2.240
-HD,HD Stores,administrative assistant,1.210,3.707
-HD,HD Stores,customer service representative,0.698,2.139
-HD,HD Stores,delivery coordinator,0.674,2.065
-HD,HD Stores,inventory specialist,0.698,2.137
-JCP,JCP Stores,department manager,0.937,2.836
-JCP,JCP Stores,hair stylist,0.520,1.572
-JCP,JCP Stores,sales manager,1.337,4.044
-JCP,JCP Stores,support specialist,0.519,1.570
-JCP,JCP Stores,visual merchandiser,0.711,2.151
-JWN,JWN Stores,barista,0.545,1.660
-JWN,JWN Stores,cashier,0.592,1.801
-JWN,JWN Stores,hr manager,1.411,4.296
-JWN,JWN Stores,loss prevention,0.775,2.360
-JWN,JWN Stores,sales associate,0.646,1.965
-JWN,JWN Stores,sales manager,1.115,3.395
-JWN,JWN Stores,visual merchandiser,1.004,3.055
-KMX,KMX Stores,detailer,0.746,2.248
-KR,KR Large Stores,baker,0.638,1.963
-KR,KR Large Stores,barista,0.545,1.677
-KR,KR Large Stores,customer service representative,0.590,1.814
-KR,KR Large Stores,deli clerk,0.516,1.587
-KR,KR Large Stores,deli manager,0.984,3.027
-KR,KR Large Stores,grocery manager,1.222,3.758
-KR,KR Small Stores,cashier,0.507,1.540
-KR,KR Small Stores,grocery clerk,0.611,1.858
-KR,KR Small Stores,store manager,2.034,6.183
-KSS,KSS Stores,material handler,0.684,2.081
-LB,LB Stores,sales associate,0.501,1.541
-LOW,LOW Stores,cashier,0.686,2.093
-LOW,LOW Stores,customer care manager,1.120,3.418
-LOW,LOW Stores,financial services specialist,1.053,3.211
-M,M Stores,asset protection,0.861,2.647
-M,M Stores,beauty advisor,0.594,1.827
-M,M Stores,customer service representative,0.641,1.969
-M,M Stores,stock clerk,0.439,1.348
-MIK,MIK Stores,certified custom framer,0.548,1.680
-MIK,MIK Stores,sales associate,0.479,1.470
-ORLY,ORLY Stores,territory sales manager,1.343,4.118
-RAD,RAD Stores,assistant manager,0.847,2.671
-ROST,ROST Stores,area manager,0.699,2.162
-ROST,ROST Stores,loss prevention,0.558,1.725
-SFM,SFM Stores,grocery clerk,0.528,1.639
-SIG,SIG Stores,store manager,1.215,3.701
-SPLS,SPLS Stores,cashier,0.494,1.543
-SPLS,SPLS Stores,copy and print associate,0.499,1.559
-SPLS,SPLS Stores,customer service representative,0.654,2.041
-SYY,SYY Stores,business analyst,2.427,7.337
-TGT,TGT Dist. Centers,flow team member,0.570,1.705
-TGT,TGT Dist. Centers,warehouse worker,1.141,3.411
-TGT,TGT Stores,cashier,0.497,1.524
-TGT,TGT Stores,merchandiser,0.600,1.841
-TGT,TGT Stores,packer,0.978,3.003
-TGT,TGT Stores,sales manager,1.021,3.134
-TIF,TIF Stores,security officer,1.014,3.112
-TSCO,TSCO Stores,sales associate,0.553,1.665
-URBN,URBN Stores,associate,0.542,1.701
-URBN,URBN Stores,cashier,0.535,1.680
-URBN,URBN Stores,store manager,1.466,4.604
-WBA,WBA Stores,pharmacy technician,0.737,2.278
-WBA,WBA Stores,sales clerk,0.471,1.457
-WBA,WBA Stores,stock clerk,0.406,1.257
-WBA,WBA Stores,store manager,1.675,5.179
-WFM,WFM Stores,bagger,0.616,1.908
-WFM,WFM Stores,cashier,0.591,1.833
-WFM,WFM Stores,grocery manager,1.186,3.676
-WFM,WFM Stores,sales associate,0.594,1.841
-WFM,WFM Stores,store manager,1.903,5.899
-WMT,WMT Dist. Centers,office assistant,0.929,2.795
-WMT,WMT Dist. Centers,operations manager,1.523,4.580
-WMT,WMT Dist. Centers,unloader,0.723,2.173
-WMT,WMT Stores,assistant manager,1.383,4.207
-WMT,WMT Stores,loss prevention,0.705,2.146
-WMT,WMT Stores,sales associate,0.559,1.701
-WMT,WMT Stores,stock clerk,0.573,1.744
-WSM,WSM Stores,assistant manager,1.025,3.112
-WSM,WSM Stores,coordinator,0.951,2.887
-WSM,WSM Stores,planner,1.366,4.150
-WSM,WSM Stores,store manager,1.536,4.665
-WSM,WSM Stores,visual merchandiser,0.654,1.988

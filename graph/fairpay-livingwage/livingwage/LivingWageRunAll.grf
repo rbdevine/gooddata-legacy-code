@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Nov 10 14:54:30 EST 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.56" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Ticker" type="string"/>
+<Field name="Subsidiary" type="string"/>
+<Field name="Avg_lw_unweighted" type="string"/>
+<Field name="Avg_lw_weighted" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Report_Details" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="state_county_fips" type="string"/>
+<Field name="description_1" type="string"/>
+<Field name="description_2" type="string"/>
+<Field name="description_3" type="string"/>
+<Field name="description_4" type="string"/>
+<Field name="g1" type="string"/>
+<Field name="g2" type="string"/>
+<Field name="g3" type="string"/>
+<Field name="g4" type="string"/>
+<Field name="g5" type="string"/>
+<Field name="g6" type="string"/>
+<Field name="g7" type="string"/>
+<Field name="g8" type="string"/>
+<Field name="g9" type="string"/>
+<Field name="g10" type="string"/>
+<Field name="g11" type="string"/>
+<Field name="g12" type="string"/>
+<Field name="g13" type="string"/>
+<Field name="g14" type="string"/>
+<Field name="g15" type="string"/>
+<Field name="g16" type="string"/>
+<Field name="g17" type="string"/>
+<Field name="g18" type="string"/>
+<Field name="g19" type="string"/>
+<Field name="g20" type="string"/>
+<Field name="g21" type="string"/>
+<Field name="g22" type="string"/>
+<Field name="g23" type="string"/>
+<Field name="g24" type="string"/>
+<Field name="g25" type="string"/>
+<Field name="g26" type="string"/>
+<Field name="g27" type="string"/>
+<Field name="g28" type="string"/>
+<Field name="g29" type="string"/>
+<Field name="g30" type="string"/>
+<Field name="g31" type="string"/>
+<Field name="g32" type="string"/>
+<Field name="g33" type="string"/>
+<Field name="g34" type="string"/>
+<Field name="g35" type="string"/>
+<Field name="g36" type="string"/>
+<Field name="g37" type="string"/>
+<Field name="g38" type="string"/>
+<Field name="g39" type="string"/>
+<Field name="g40" type="string"/>
+<Field name="g41" type="string"/>
+<Field name="g42" type="string"/>
+<Field name="g43" type="string"/>
+<Field name="g44" type="string"/>
+<Field name="g45" type="string"/>
+<Field name="g46" type="string"/>
+<Field name="g47" type="string"/>
+<Field name="g48" type="string"/>
+<Field name="g49" type="string"/>
+<Field name="g50" type="string"/>
+<Field name="living_wage_total" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="," name="Report_Score_Quality" recordDelimiter="\n" type="delimited">
+<Field name="Ticker" type="string"/>
+<Field name="Company" type="string"/>
+<Field name="GOC" type="string"/>
+<Field name="AvgPercentUnweighted" type="string"/>
+<Field name="AvgPercentWeighted" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="," name="Report_Scores" recordDelimiter="\n" type="delimited">
+<Field name="Ticker" type="string"/>
+<Field name="Company" type="string"/>
+<Field name="Subsidiary" type="string"/>
+<Field name="Score" type="string"/>
+<Field name="LWPerCounty" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
+<Property id="GraphParameter12" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
+<Property id="GraphParameter13" name="REPORTFILEPATH_LWAVG" value="${REPORTS_DIR}/LWAverages.csv"/>
+<Property id="GraphParameter14" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
+<Property id="GraphParameter15" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
+<Property id="GraphParameter16" name="REPORTS_DIR" value="${DATA_DIR}/livingwage-reports"/>
+<Property fileURL="workspace.prm" id="GraphParameter17"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageDistByGOC.grf" guiName="Load GOC Distribution Data" guiX="415" guiY="109" id="LOAD_GOC_DISTRIBUTION_DATA" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageAllCountyCount.grf" guiName="Load County Count Data" guiX="423" guiY="216" id="LOAD_COUNTY_COUNT_DATA" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="2">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateJobData.grf" guiName="Generate Job Data" guiX="439" guiY="319" id="GENERATE_JOB_DATA1" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="3">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateReportMatrixAndFiles.grf" guiName="Generate Reports" guiX="441" guiY="425" id="GENERATE_REPORTS1" type="RUN_GRAPH"/>
+</Phase>
+</Graph>
