@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Nov 10 14:51:33 EST 2016" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.219" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Nov 14 12:39:26 EST 2016" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.225" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -12,7 +12,6 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="ACTIVE_TICKERS_TABLENAME" value="LKP_LIVING_WAGE_ACTIVE"/>
-<Property id="GraphParameter1" name="AVG_PROPORTION" value="1/3"/>
 <Property id="GraphParameter2" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
 <Property id="GraphParameter3" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
 <Property id="GraphParameter4" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
@@ -21,8 +20,10 @@
 <Property fileURL="livingwage-parameters.prm" id="GraphParameter7"/>
 <Property id="GraphParameter19" name="LOW_TOLERANCE" value=".9"/>
 <Property id="GraphParameter20" name="LOW_TOLERANCE_PROPORTION" value="1/3"/>
-<Property id="GraphParameter21" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
-<Property fileURL="workspace.prm" id="GraphParameter22"/>
+<Property id="GraphParameter21" name="MID_TOLERANCE" value="1.0"/>
+<Property id="GraphParameter22" name="MID_TOLERANCE_PROPORTION" value="1/3"/>
+<Property id="GraphParameter23" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
+<Property fileURL="workspace.prm" id="GraphParameter24"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -591,12 +592,12 @@ select
   d.subsidiary,
   1,
   cjd.job, 
-  (cjd.rate/100.0)*cost_of_living_index reverse_adj, 
+  (${MID_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when ((cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
+      when ((${MID_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
-    end)*c.employee_count*d.distribution*(${AVG_PROPORTION})
+    end)*c.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} c
 join (
@@ -630,12 +631,12 @@ select
   d.subsidiary,
   1,
   cjd.job, 
-  (cjd.rate/100.0)*cost_of_living_index reverse_adj, 
+  (${MID_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when ((cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
+      when ((${MID_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
-    end)*c.employee_count*d.distribution*(${AVG_PROPORTION})
+    end)*c.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} c
 join (
@@ -679,7 +680,7 @@ select
   (${HIGH_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when (((cjd.rate/100.0)*cost_of_living_index)*(${HIGH_TOLERANCE})) >= l.LIVING_WAGE_AVG then 1
+      when ((${HIGH_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${HIGH_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
@@ -718,7 +719,7 @@ select
   (${HIGH_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when (((cjd.rate/100.0)*cost_of_living_index)*(${HIGH_TOLERANCE})) >= l.LIVING_WAGE_AVG then 1
+      when ((${HIGH_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${HIGH_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
@@ -808,7 +809,7 @@ select
   (${LOW_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when (((cjd.rate/100.0)*cost_of_living_index)*(${LOW_TOLERANCE})) >= l.LIVING_WAGE_AVG then 1
+      when ((${LOW_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${LOW_TOLERANCE_PROPORTION})
   /*,2) as numeric(18,3))*/ pays_living_wage
@@ -847,7 +848,7 @@ select
   (${LOW_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when (((cjd.rate/100.0)*cost_of_living_index)*(${LOW_TOLERANCE})) >= l.LIVING_WAGE_AVG then 1
+      when ((${LOW_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${LOW_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
@@ -941,7 +942,7 @@ select
   f.county_name, 
   f.state_abbreviation,
   concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
-  cast(round(e.employee_count*(${AVG_PROPORTION}),2) as numeric(18,3))
+  cast(round(e.employee_count*(${MID_TOLERANCE_PROPORTION}),2) as numeric(18,3))
 from ${COUNTY_COUNT_TABLENAME} e
 join (
   select m.ticker_trim ticker
@@ -959,7 +960,7 @@ join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
 join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = f.state_county_fips
 join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
-where s.has_subsidiaries and e.subsidiary is not null and (${AVG_PROPORTION}) > 0;]]></attr>
+where s.has_subsidiaries and e.subsidiary is not null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Blank Top" guiX="95" guiY="1949" id="ADD_SUBSIDIARY_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
@@ -1140,7 +1141,7 @@ select
   f.county_name, 
   f.state_abbreviation,
   concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
-  cast(round(e.employee_count*(${AVG_PROPORTION}),2) as numeric(18,2))
+  cast(round(e.employee_count*(${MID_TOLERANCE_PROPORTION}),2) as numeric(18,2))
 from ${COUNTY_COUNT_TABLENAME} e
 join (
   select m.ticker_trim ticker
@@ -1157,7 +1158,7 @@ join (
 join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
 join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = f.state_county_fips
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
-where e.subsidiary is null and (${AVG_PROPORTION}) > 0;]]></attr>
+where e.subsidiary is null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker GOC Headers" guiX="503" guiY="1710" id="ADD_TICKER_GOC_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (

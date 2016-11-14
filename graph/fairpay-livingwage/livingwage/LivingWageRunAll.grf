@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Nov 10 14:54:30 EST 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.56" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Nov 14 12:10:20 EST 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.57" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -107,5 +107,8 @@
 </Phase>
 <Phase number="3">
 <Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateReportMatrixAndFiles.grf" guiName="Generate Reports" guiX="441" guiY="425" id="GENERATE_REPORTS1" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="4">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageCleanUpMatrixData.grf" guiName="Clean Up Matrix Data" guiX="433" guiY="535" id="CLEAN_UP_MATRIX_DATA" type="RUN_GRAPH"/>
 </Phase>
 </Graph>
