@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Nov 14 16:55:05 EST 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.51" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Dec 16 18:01:29 EST 2016" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.53" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -213,6 +213,35 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
+<Node enabled="enabled" guiName="Reformat" guiX="241" guiY="454" id="REFORMAT5" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Avg Living Wage" guiX="26" guiY="348" id="SELECT_AVG_LIVING_WAGE" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select 
   $Ticker:=ticker, 
@@ -278,6 +307,22 @@ from (
 ) t
 group by ticker, company, avg_lw_unweighted, avg_lw_weighted
 order by ticker, company;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select BLS and LW By County" guiX="26" guiY="454" id="SELECT_BLS_AND_LW_BY_COUNTY" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select 
+  $state_county_fips:=state_county_fips,
+  $description_1:=description_1, $description_2:=description_2, $description_3:=description_3, $description_4:=description_4,
+  $g1:=g1, $g2:=g2, $g3:=g3, $g4:=g4, $g5:=g5, $g6:=g6, $g7:=g7, $g8:=g8, $g9:=g9, $g10:=g10,
+  $g11:=g11, $g12:=g12, $g13:=g13, $g14:=g14, $g15:=g15, $g16:=g16, $g17:=g17, $g18:=g18, $g19:=g19, $g20:=g20,
+  $g21:=g21, $g22:=g22, $g23:=g23, $g24:=g24, $g25:=g25, $g26:=g26, $g27:=g27, $g28:=g28, $g29:=g29, $g30:=g30,
+  $g31:=g31, $g32:=g32, $g33:=g33, $g34:=g34, $g35:=g35, $g36:=g36, $g37:=g37, $g38:=g38, $g39:=g39, $g40:=g40,
+  $g41:=g41, $g42:=g42, $g43:=g43, $g44:=g44, $g45:=g45, $g46:=g46, $g47:=g47, $g48:=g48, $g49:=g49, $g50:=g50,
+  $living_wage_total:=living_wage_total
+from ${REPORT_MATRIX_TABLENAME} mtx
+join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+where rt.row_type not in ('IND_HEADER_BLANK_BOTTOM_1','IND_HEADER_BLANK_BOTTOM_2')
+order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4;
+]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details" guiX="26" guiY="22" id="SELECT_DETAILS" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select 
@@ -388,11 +433,14 @@ order by ticker, company, goc
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="133" id="WRITE_REPORT1" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_LWAVG}" guiName="Write Report" guiX="419" guiY="245" id="WRITE_REPORT2" outputFieldNames="true" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCOREQUALITY}" guiName="Write Report" guiX="419" guiY="348" id="WRITE_REPORT3" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="454" id="WRITE_REPORT4" type="DATA_WRITER"/>
 <Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge15" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_REPORT:0"/>
 <Edge fromNode="REFORMAT2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge19" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_REPORT2:0"/>
 <Edge fromNode="REFORMAT3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_REPORT1:0"/>
 <Edge fromNode="REFORMAT4:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="WRITE_REPORT3:0"/>
+<Edge fromNode="REFORMAT5:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_REPORT4:0"/>
 <Edge fromNode="SELECT_AVG_LIVING_WAGE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="REFORMAT4:0"/>
+<Edge fromNode="SELECT_BLS_AND_LW_BY_COUNTY:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="REFORMAT5:0"/>
 <Edge fromNode="SELECT_DETAILS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge14" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="REFORMAT1:0"/>
 <Edge fromNode="SELECT_SCORES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge16" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT3:0"/>
 <Edge fromNode="SELECT_SCORE_QUALITY:0" guiBendpoints="" guiRouter="Manhattan" id="Edge18" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="REFORMAT2:0"/>
