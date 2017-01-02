@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Wed Aug 17 13:13:44 EDT 2016" modifiedBy="hankmobley" name="Complete County File" revision="1.212" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Glassdoor_Salary_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="FK_employerId" type="string"/>
+<Field label="FK_reviewId" name="FK_reviewId" type="string"/>
+<Field label="FK_userId" name="FK_userId" type="string"/>
+<Field label="GOC" name="GOC" type="string"/>
+<Field label="MGOC" name="MGOC" type="string"/>
+<Field name="ONET_Code" type="string"/>
+<Field label="ONET_MajorTitle" name="ONET_MajorTitle" type="string"/>
+<Field name="ONET_Occupation_Names" type="string"/>
+<Field label="birthYear" name="birthYear" type="string"/>
+<Field label="employeesTotalNum" name="employeesTotalNum" type="string"/>
+<Field label="employer" name="employer" type="string"/>
+<Field label="employerTypeCode" name="employerTypeCode" type="string"/>
+<Field label="employmentStatusCode" name="employmentStatusCode" type="string"/>
+<Field label="gender" name="gender" type="string"/>
+<Field label="highestEducation" name="highestEducation" type="string"/>
+<Field label="industryName" name="industryName" type="string"/>
+<Field label="jobTitle" name="jobTitle" type="string"/>
+<Field label="metroName" name="metroName" type="string"/>
+<Field label="race" name="race" type="string"/>
+<Field format="excel:m/d/yy" label="reviewDateTime" name="reviewDateTime" type="string"/>
+<Field label="sectorName" name="sectorName" type="string"/>
+<Field label="stateName" name="stateName" type="string"/>
+<Field label="baseSalary" name="unadjustedbaseSalary" type="string"/>
+<Field label="totalSalary" name="unadjustedtotalSalary" type="string"/>
+<Field label="yearofSalary" name="yearofSalary" type="string"/>
+<Field label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
+<Field name="cityName" type="string"/>
+<Field name="stateAbbreviation" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Glassdoor_Salary_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="FK_employerId" type="string"/>
+<Field label="FK_reviewId" name="FK_reviewId" type="string"/>
+<Field label="FK_userId" name="FK_userId" type="string"/>
+<Field label="GOC" name="GOC" type="string"/>
+<Field label="MGOC" name="MGOC" type="string"/>
+<Field name="ONET_Code" type="string"/>
+<Field label="ONET_MajorTitle" name="ONET_MajorTitle" type="string"/>
+<Field name="ONET_Occupation_Names" type="string"/>
+<Field label="birthYear" name="birthYear" type="string"/>
+<Field label="employeesTotalNum" name="employeesTotalNum" type="string"/>
+<Field label="employer" name="employer" type="string"/>
+<Field label="employerTypeCode" name="employerTypeCode" type="string"/>
+<Field label="employmentStatusCode" name="employmentStatusCode" type="string"/>
+<Field label="gender" name="gender" type="string"/>
+<Field label="highestEducation" name="highestEducation" type="string"/>
+<Field label="industryName" name="industryName" type="string"/>
+<Field label="jobTitle" name="jobTitle" type="string"/>
+<Field label="metroName" name="metroName" type="string"/>
+<Field label="race" name="race" type="string"/>
+<Field format="excel:m/d/yy" label="reviewDateTime" name="reviewDateTime" type="string"/>
+<Field label="sectorName" name="sectorName" type="string"/>
+<Field label="stateName" name="stateName" type="string"/>
+<Field label="baseSalary" name="unadjustedbaseSalary" type="string"/>
+<Field label="totalSalary" name="unadjustedtotalSalary" type="string"/>
+<Field label="yearofSalary" name="yearofSalary" type="string"/>
+<Field label="yearsOfRelevantExpNumber" name="yearsOfRelevantExpNumber" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/glassdoor/salarydata/*.csv"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/glassdoorsalaryerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.csv"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_GLASSDOORSALARY"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/glassdoorsalary.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="0" skipSourceRows="1" trim="true" type="DATA_READER" verbose="false"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.FK_employerId = $in.0.FK_employerId;
+	$out.0.FK_reviewId = $in.0.FK_reviewId;
+	$out.0.FK_userId = $in.0.FK_userId;
+	$out.0.GOC = $in.0.GOC;
+	$out.0.MGOC = $in.0.MGOC;
+	$out.0.ONET_Code = $in.0.ONET_Code;
+	$out.0.ONET_MajorTitle = $in.0.ONET_MajorTitle;
+	$out.0.ONET_Occupation_Names = $in.0.ONET_Occupation_Names;
+	$out.0.birthYear = $in.0.birthYear;
+	$out.0.employeesTotalNum = $in.0.employeesTotalNum;
+	if($in.0.employer != null ) 
+	{
+		$out.0.employer = replace($in.0.employer,"[||\\\\]",",");
+	}
+	else
+	{
+		$out.0.employer = $in.0.employer;
+	}
+	$out.0.employerTypeCode = $in.0.employerTypeCode;
+	$out.0.employmentStatusCode = $in.0.employmentStatusCode;
+	$out.0.gender = $in.0.gender;
+	$out.0.highestEducation = $in.0.highestEducation;
+	$out.0.industryName = $in.0.industryName;
+	if($in.0.jobTitle != null ) 
+	{
+		$out.0.jobTitle = replace($in.0.jobTitle,"[||\\\\]",",");
+	}
+	else
+	{
+		$out.0.jobTitle = $in.0.jobTitle;
+	}
+	$out.0.metroName = $in.0.metroName;
+	$out.0.race = $in.0.race;
+	$out.0.reviewDateTime = $in.0.reviewDateTime;
+	$out.0.sectorName = $in.0.sectorName;
+	$out.0.stateName = $in.0.stateName;
+	$out.0.unadjustedbaseSalary = $in.0.unadjustedbaseSalary;
+	$out.0.unadjustedtotalSalary = $in.0.unadjustedtotalSalary;
+	$out.0.yearofSalary = $in.0.yearofSalary;
+	$out.0.yearsOfRelevantExpNumber = $in.0.yearsOfRelevantExpNumber;
+	if ($in.0.metroName != null)
+	{
+		string cityName = "";
+		string stateAbbreviation = "";
+		
+		// get just city portion of metroname and set city field and also set the fipsState field = state field passed in
+		if(indexOf($in.0.metroName,",") > 0 )
+		{
+			cityName = upperCase(left($in.0.metroName,indexOf($in.0.metroName,",")));
+			stateAbbreviation = upperCase(trim(right($in.0.metroName,length($in.0.metroName)-indexOf($in.0.metroName,",")-1)));
+		}
+		else
+		{
+			cityName = upperCase($in.0.metroName);
+		}
+		
+		// for matching purposes, get rid of dashes in most values
+		if (cityName != "WINSTON-SALEM") 
+		{
+			cityName = replace(cityName,"[-]"," ");
+		}
+		
+		// for matching purposes, normalize specific city and state name values to LKP_CITY_FIPS table
+		if (cityName == "NEW YORK CITY")
+		{
+			cityName = "NEW YORK";
+		}
+		else if (cityName == "DALLAS FORT WORTH")
+		{
+			cityName = "FORT WORTH";
+		}
+		else if (cityName == "HEBER CITY")
+		{
+			cityName = "HEBER";
+		}
+		else if (cityName == "RALEIGH DURHAM")
+		{
+			cityName = "RALEIGH";
+		}
+		else if (cityName == "MIAMI FORT LAUDERDALE")
+		{
+			cityName = "FORT LAUDERDALE";
+		}
+		else if (cityName == "MINNEAPOLIS ST. PAUL")
+		{
+			cityName = "MINNEAPOLIS";
+		}
+		else if (cityName == "YORK HANOVER")
+		{
+			cityName = "HANOVER";
+		}
+		else if (cityName == "CANON CITY")
+		{
+			cityName = "CAÑON CITY";
+		}
+		else if (cityName == "FORT POLK")
+		{
+			cityName = "FORT POLK NORTH";
+		}
+		else if (cityName == "MIDDLESBORO")
+		{
+			cityName = "MIDDLESBOROUGH";
+		}
+		else if (cityName == "PUERTO RICO")
+		{
+			cityName = "SAN JUAN";
+			stateAbbreviation = "PR";
+		}
+		else if (cityName == "COAMO")
+		{
+			cityName = "LOS LLANOS COMUNIDAD";
+			stateAbbreviation = "PR";
+		}
+		else if (cityName == "HAWAIIAN ISLANDS")
+		{
+			cityName = "HONOLULU";
+			stateAbbreviation  = "HI";
+		}
+		
+		if(stateAbbreviation == "WY-ID")
+		{
+			stateAbbreviation = "WY";	
+		}
+		else if(stateAbbreviation == "MONTANA")
+		{
+			stateAbbreviation = "MT";	
+		}
+		
+		$out.0.cityName = cityName;
+		$out.0.stateAbbreviation = stateAbbreviation;
+	}
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="DROP TABLE" guiX="63" guiY="245" id="DROP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+	FK_EMPLOYERID VARCHAR(255),
+	FK_REVIEWID VARCHAR(255),
+	FK_USERID VARCHAR(255),
+	GOC VARCHAR(255),
+	MGOC VARCHAR(255),
+	ONET_CODE VARCHAR(255),
+	ONET_MAJORTITLE VARCHAR(255),
+	ONET_OCCUPATION_NAMES VARCHAR(255),
+	BIRTHYEAR VARCHAR(255),
+	EMPLOYEESTOTALNUM VARCHAR(255),
+	EMPLOYER VARCHAR(255),
+	EMPLOYERTYPECODE VARCHAR(255),
+	EMPLOYMENTSTATUSCODE VARCHAR(255),
+	GENDER VARCHAR(255),
+	HIGHESTEDUCATION VARCHAR(255),
+	INDUSTRYNAME VARCHAR(255),
+	JOBTITLE VARCHAR(255),
+	METRONAME VARCHAR(255),
+	RACE VARCHAR(255),
+	REVIEWDATETIME VARCHAR(255),
+	SECTORNAME VARCHAR(255),
+	STATENAME VARCHAR(255),
+	UNADJUSTEDBASESALARY VARCHAR(255),
+	UNADJUSTEDTOTALSALARY VARCHAR(255),
+	YEAROFSALARY VARCHAR(255),
+	YEARSOFRELEVANTEXPNUMBER VARCHAR(255),
+	CITYNAME VARCHAR(255),
+	STATEABBREVIATION VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="473" guiY="245" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+	FK_EMPLOYERID,
+	FK_REVIEWID,
+	FK_USERID,
+	GOC,
+	MGOC,
+	ONET_CODE,
+	ONET_MAJORTITLE,
+	ONET_OCCUPATION_NAMES,
+	BIRTHYEAR,
+	EMPLOYEESTOTALNUM,
+	EMPLOYER,
+	EMPLOYERTYPECODE,
+	EMPLOYMENTSTATUSCODE,
+	GENDER,
+	HIGHESTEDUCATION,
+	INDUSTRYNAME,
+	JOBTITLE,
+	METRONAME,
+	RACE,
+	REVIEWDATETIME,
+	SECTORNAME,
+	STATENAME,
+	UNADJUSTEDBASESALARY,
+	UNADJUSTEDTOTALSALARY,
+	YEAROFSALARY,
+	YEARSOFRELEVANTEXPNUMBER,
+	CITYNAME,
+	STATEABBREVIATION
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>
