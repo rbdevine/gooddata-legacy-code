@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Wed Oct 12 09:55:30 EDT 2016" guiVersion="3.4.4.P" id="1476296764541" licenseType="Commercial" modified="Thu Dec 22 12:37:23 EST 2016" modifiedBy="LilyL" name="V3.5 Metric Data" revision="1.47" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata2" previewAttachment="/users/LilyL/Desktop/gui_output_scores25.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="gui_output_scores25.csv" name="gui_output_scores25_csv" previewAttachment="/users/LilyL/Desktop/gui_output_scores25.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="FIELD" type="string"/>
+<Field eofAsDelimiter="false" name="VALUE" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3" previewAttachment="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/metrics/gui_output_scores25.csv" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="," label="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/metrics/gui_output_scores25.csv" name="https_AKIAIJF44KUAT6SGEJWA_I0lKNCl_2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX_justdata_s3_amazonaws_com_ranking_metrics_gui_output_scores25_csv" previewAttachment="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/metrics/gui_output_scores25.csv" previewAttachmentCharset="UTF-8" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="FIELD" type="string"/>
+<Field eofAsDelimiter="false" name="VALUE" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata4">
+<Record fieldDelimiter="|" name="JUST_Full_raw_individual_logit_estimates_JUST_FULL" recordDelimiter="\n" type="delimited">
+<Field label="MEMBER_PIN" name="MEMBER_PIN" type="long"/>
+<Field label="CaseId" name="CaseId" type="long"/>
+<Field label="weight1" name="weight1" type="number"/>
+<Field label="weight2" name="weight2" type="number"/>
+<Field label="QUAL" name="QUAL" type="long"/>
+<Field label="Q1A" name="Q1A" type="long"/>
+<Field label="Q1B" name="Q1B" type="long"/>
+<Field label="Q2" name="Q2" type="long"/>
+<Field label="Q3" name="Q3" type="long"/>
+<Field label="P_VERSION" name="P_VERSION" type="long"/>
+<Field label="SET1_ITEM1" name="SET1_ITEM1" type="long"/>
+<Field label="SET1_ITEM2" name="SET1_ITEM2" type="long"/>
+<Field label="SET1_ITEM3" name="SET1_ITEM3" type="long"/>
+<Field label="SET1_ITEM4" name="SET1_ITEM4" type="long"/>
+<Field label="Q4A_MOST" name="Q4A_MOST" type="long"/>
+<Field label="Q4A_LEAST" name="Q4A_LEAST" type="long"/>
+<Field label="SET2_ITEM1" name="SET2_ITEM1" type="long"/>
+<Field label="SET2_ITEM2" name="SET2_ITEM2" type="long"/>
+<Field label="SET2_ITEM3" name="SET2_ITEM3" type="long"/>
+<Field label="SET2_ITEM4" name="SET2_ITEM4" type="long"/>
+<Field label="Q4B_MOST" name="Q4B_MOST" type="long"/>
+<Field label="Q4B_LEAST" name="Q4B_LEAST" type="long"/>
+<Field label="SET3_ITEM1" name="SET3_ITEM1" type="long"/>
+<Field label="SET3_ITEM2" name="SET3_ITEM2" type="long"/>
+<Field label="SET3_ITEM3" name="SET3_ITEM3" type="long"/>
+<Field label="SET3_ITEM4" name="SET3_ITEM4" type="long"/>
+<Field label="Q4C_MOST" name="Q4C_MOST" type="long"/>
+<Field label="Q4C_LEAST" name="Q4C_LEAST" type="long"/>
+<Field label="SET4_ITEM1" name="SET4_ITEM1" type="long"/>
+<Field label="SET4_ITEM2" name="SET4_ITEM2" type="long"/>
+<Field label="SET4_ITEM3" name="SET4_ITEM3" type="long"/>
+<Field label="SET4_ITEM4" name="SET4_ITEM4" type="long"/>
+<Field label="Q4D_MOST" name="Q4D_MOST" type="long"/>
+<Field label="Q4D_LEAST" name="Q4D_LEAST" type="long"/>
+<Field label="SET5_ITEM1" name="SET5_ITEM1" type="long"/>
+<Field label="SET5_ITEM2" name="SET5_ITEM2" type="long"/>
+<Field label="SET5_ITEM3" name="SET5_ITEM3" type="long"/>
+<Field label="SET5_ITEM4" name="SET5_ITEM4" type="long"/>
+<Field label="Q4E_MOST" name="Q4E_MOST" type="long"/>
+<Field label="Q4E_LEAST" name="Q4E_LEAST" type="long"/>
+<Field label="SET6_ITEM1" name="SET6_ITEM1" type="long"/>
+<Field label="SET6_ITEM2" name="SET6_ITEM2" type="long"/>
+<Field label="SET6_ITEM3" name="SET6_ITEM3" type="long"/>
+<Field label="SET6_ITEM4" name="SET6_ITEM4" type="long"/>
+<Field label="Q4F_MOST" name="Q4F_MOST" type="long"/>
+<Field label="Q4F_LEAST" name="Q4F_LEAST" type="long"/>
+<Field label="SET7_ITEM1" name="SET7_ITEM1" type="long"/>
+<Field label="SET7_ITEM2" name="SET7_ITEM2" type="long"/>
+<Field label="SET7_ITEM3" name="SET7_ITEM3" type="long"/>
+<Field label="SET7_ITEM4" name="SET7_ITEM4" type="long"/>
+<Field label="Q4G_MOST" name="Q4G_MOST" type="long"/>
+<Field label="Q4G_LEAST" name="Q4G_LEAST" type="long"/>
+<Field label="SET8_ITEM1" name="SET8_ITEM1" type="long"/>
+<Field label="SET8_ITEM2" name="SET8_ITEM2" type="long"/>
+<Field label="SET8_ITEM3" name="SET8_ITEM3" type="long"/>
+<Field label="SET8_ITEM4" name="SET8_ITEM4" type="long"/>
+<Field label="Q4H_MOST" name="Q4H_MOST" type="long"/>
+<Field label="Q4H_LEAST" name="Q4H_LEAST" type="long"/>
+<Field label="SET9_ITEM1" name="SET9_ITEM1" type="long"/>
+<Field label="SET9_ITEM2" name="SET9_ITEM2" type="long"/>
+<Field label="SET9_ITEM3" name="SET9_ITEM3" type="long"/>
+<Field label="SET9_ITEM4" name="SET9_ITEM4" type="long"/>
+<Field label="Q4I_MOST" name="Q4I_MOST" type="long"/>
+<Field label="Q4I_LEAST" name="Q4I_LEAST" type="long"/>
+<Field label="SET10_ITEM1" name="SET10_ITEM1" type="long"/>
+<Field label="SET10_ITEM2" name="SET10_ITEM2" type="long"/>
+<Field label="SET10_ITEM3" name="SET10_ITEM3" type="long"/>
+<Field label="SET10_ITEM4" name="SET10_ITEM4" type="long"/>
+<Field label="Q4J_MOST" name="Q4J_MOST" type="long"/>
+<Field label="Q4J_LEAST" name="Q4J_LEAST" type="long"/>
+<Field label="SET11_ITEM1" name="SET11_ITEM1" type="long"/>
+<Field label="SET11_ITEM2" name="SET11_ITEM2" type="long"/>
+<Field label="SET11_ITEM3" name="SET11_ITEM3" type="long"/>
+<Field label="SET11_ITEM4" name="SET11_ITEM4" type="long"/>
+<Field label="Q4K_MOST" name="Q4K_MOST" type="long"/>
+<Field label="Q4K_LEAST" name="Q4K_LEAST" type="long"/>
+<Field label="SET12_ITEM1" name="SET12_ITEM1" type="long"/>
+<Field label="SET12_ITEM2" name="SET12_ITEM2" type="long"/>
+<Field label="SET12_ITEM3" name="SET12_ITEM3" type="long"/>
+<Field label="SET12_ITEM4" name="SET12_ITEM4" type="long"/>
+<Field label="Q4L_MOST" name="Q4L_MOST" type="long"/>
+<Field label="Q4L_LEAST" name="Q4L_LEAST" type="long"/>
+<Field label="SET13_ITEM1" name="SET13_ITEM1" type="long"/>
+<Field label="SET13_ITEM2" name="SET13_ITEM2" type="long"/>
+<Field label="SET13_ITEM3" name="SET13_ITEM3" type="long"/>
+<Field label="SET13_ITEM4" name="SET13_ITEM4" type="long"/>
+<Field label="Q4M_MOST" name="Q4M_MOST" type="long"/>
+<Field label="Q4M_LEAST" name="Q4M_LEAST" type="long"/>
+<Field label="SET14_ITEM1" name="SET14_ITEM1" type="long"/>
+<Field label="SET14_ITEM2" name="SET14_ITEM2" type="long"/>
+<Field label="SET14_ITEM3" name="SET14_ITEM3" type="long"/>
+<Field label="SET14_ITEM4" name="SET14_ITEM4" type="long"/>
+<Field label="Q4N_MOST" name="Q4N_MOST" type="long"/>
+<Field label="Q4N_LEAST" name="Q4N_LEAST" type="long"/>
+<Field label="DOV_Q16" name="DOV_Q16" type="long"/>
+<Field label="DOV_Q17" name="DOV_Q17" type="long"/>
+<Field label="DOV_Q18" name="DOV_Q18" type="long"/>
+<Field label="DOV_Q19" name="DOV_Q19" type="long"/>
+<Field label="Q16orig" name="Q16orig" type="long"/>
+<Field label="Q17orig" name="Q17orig" type="long"/>
+<Field label="Q18orig" name="Q18orig" type="long"/>
+<Field label="Q19orig" name="Q19orig" type="long"/>
+<Field label="Q10" name="Q10" type="long"/>
+<Field label="Q11" name="Q11" type="long"/>
+<Field label="Q12" name="Q12" type="string"/>
+<Field label="Q13" name="Q13" type="string"/>
+<Field label="Q14" name="Q14" type="string"/>
+<Field label="Q15" name="Q15" type="long"/>
+<Field label="Q16" name="Q16" type="string"/>
+<Field label="Q17" name="Q17" type="string"/>
+<Field label="Q18" name="Q18" type="long"/>
+<Field label="Q19" name="Q19" type="string"/>
+<Field label="Q20" name="Q20" type="long"/>
+<Field label="Q21A" name="Q21A" type="long"/>
+<Field label="Q21B" name="Q21B" type="long"/>
+<Field label="Q22A" name="Q22A" type="long"/>
+<Field label="Q22B" name="Q22B" type="long"/>
+<Field label="Q22C" name="Q22C" type="long"/>
+<Field label="Q22D" name="Q22D" type="long"/>
+<Field label="Q24" name="Q24" type="long"/>
+<Field label="Q26A" name="Q26A" type="long"/>
+<Field label="Q26B" name="Q26B" type="string"/>
+<Field label="Q26C" name="Q26C" type="long"/>
+<Field label="Q29" name="Q29" type="long"/>
+<Field label="Q30" name="Q30" type="long"/>
+<Field label="Q31_CODES" name="Q31_CODES" type="long"/>
+<Field label="Q31" name="Q31" type="string"/>
+<Field label="Q32" name="Q32" type="long"/>
+<Field label="Q33" name="Q33" type="string"/>
+<Field label="Q34A_CODES" name="Q34A_CODES" type="string"/>
+<Field label="Q34A" name="Q34A" type="string"/>
+<Field label="Q34B_CODES" name="Q34B_CODES" type="string"/>
+<Field label="Q34B" name="Q34B" type="string"/>
+<Field label="Q34_CODES" name="Q34_CODES" type="string"/>
+<Field label="Q34" name="Q34" type="string"/>
+<Field label="Q35" name="Q35" type="long"/>
+<Field format="excel:m/d/yy" label="STARTDT" name="STARTDT" type="date"/>
+<Field format="excel:m/d/yy" label="ENDDT" name="ENDDT" type="date"/>
+<Field label="duration" name="duration" type="long"/>
+<Field label="SURV_MODE" name="SURV_MODE" type="long"/>
+<Field label="Device" name="Device" type="string"/>
+<Field label="GENDER" name="GENDER" type="long"/>
+<Field label="AGE" name="AGE" type="long"/>
+<Field label="AGE4" name="AGE4" type="long"/>
+<Field label="AGE7" name="AGE7" type="long"/>
+<Field label="RACETHNICITY" name="RACETHNICITY" type="long"/>
+<Field label="EDUC" name="EDUC" type="long"/>
+<Field label="EDUC4" name="EDUC4" type="long"/>
+<Field label="MARITAL" name="MARITAL" type="long"/>
+<Field label="EMPLOY" name="EMPLOY" type="long"/>
+<Field label="INCOME" name="INCOME" type="long"/>
+<Field label="STATE" name="STATE" type="string"/>
+<Field label="REGION4" name="REGION4" type="long"/>
+<Field label="REGION9" name="REGION9" type="long"/>
+<Field label="METRO" name="METRO" type="long"/>
+<Field label="INTERNET" name="INTERNET" type="long"/>
+<Field label="HOUSING" name="HOUSING" type="long"/>
+<Field label="HOME_TYPE" name="HOME_TYPE" type="long"/>
+<Field label="PHONESERVICE" name="PHONESERVICE" type="long"/>
+<Field label="HHSIZE" name="HHSIZE" type="long"/>
+<Field label="HH01" name="HH01" type="long"/>
+<Field label="HH25" name="HH25" type="long"/>
+<Field label="HH612" name="HH612" type="long"/>
+<Field label="HH1317" name="HH1317" type="long"/>
+<Field label="HH18OV" name="HH18OV" type="long"/>
+<Field label="QFINAL1" name="QFINAL1" type="long"/>
+<Field label="QFINAL2" name="QFINAL2" type="long"/>
+<Field label="QFINAL3" name="QFINAL3" type="string"/>
+<Field label="INCENT_GROUP" name="INCENT_GROUP" type="long"/>
+<Field label="TRANS_TYPE" name="TRANS_TYPE" type="long"/>
+<Field label="IS_CREDIT" name="IS_CREDIT" type="long"/>
+<Field label="SYSTEM" name="SYSTEM" type="long"/>
+<Field label="USER" name="USER" type="long"/>
+<Field label="DESCRIPTION" name="DESCRIPTION" type="long"/>
+<Field label="SQL_INCENT" name="SQL_INCENT" type="long"/>
+<Field label="TRANS_ID" name="TRANS_ID" type="long"/>
+<Field label="Component_1" name="Component_1" type="number"/>
+<Field label="Component_2" name="Component_2" type="number"/>
+<Field label="Component_3" name="Component_3" type="number"/>
+<Field label="Component_4" name="Component_4" type="number"/>
+<Field label="Component_5" name="Component_5" type="number"/>
+<Field label="Component_6" name="Component_6" type="number"/>
+<Field label="Component_7" name="Component_7" type="number"/>
+<Field label="Component_8" name="Component_8" type="number"/>
+<Field label="Component_9" name="Component_9" type="number"/>
+<Field label="Component_10" name="Component_10" type="number"/>
+<Field label="Component_11" name="Component_11" type="number"/>
+<Field label="Component_12" name="Component_12" type="number"/>
+<Field label="Component_13" name="Component_13" type="number"/>
+<Field label="Component_14" name="Component_14" type="number"/>
+<Field label="Component_15" name="Component_15" type="number"/>
+<Field label="Component_16" name="Component_16" type="number"/>
+<Field label="Component_17" name="Component_17" type="number"/>
+<Field label="Component_18" name="Component_18" type="number"/>
+<Field label="Component_19" name="Component_19" type="number"/>
+<Field label="Component_20" name="Component_20" type="number"/>
+<Field label="Component_21" name="Component_21" type="number"/>
+<Field label="Component_22" name="Component_22" type="number"/>
+<Field label="Component_23" name="Component_23" type="number"/>
+<Field label="Component_24" name="Component_24" type="number"/>
+<Field label="Component_25" name="Component_25" type="number"/>
+<Field label="Component_26" name="Component_26" type="number"/>
+<Field label="Component_27" name="Component_27" type="number"/>
+<Field label="Component_28" name="Component_28" type="number"/>
+<Field label="Component_29" name="Component_29" type="number"/>
+<Field label="Component_30" name="Component_30" type="number"/>
+<Field label="Component_31" name="Component_31" type="number"/>
+<Field label="Component_32" name="Component_32" type="number"/>
+<Field label="Component_33" name="Component_33" type="number"/>
+<Field label="Component_34" name="Component_34" type="number"/>
+<Field label="Component_35" name="Component_35" type="number"/>
+<Field label="Component_36" name="Component_36" type="number"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="V2_Sheet1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="FIELD" name="FIELD" type="string"/>
+<Field label="VALUE" name="VALUE" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="V2_Sheet1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="FIELD" name="FIELD" type="string"/>
+<Field label="VALUE" name="VALUE" type="number"/>
+<Field name="Hyperlink" type="string"/>
+<Field name="Weight" type="string"/>
+<Field name="Data_ID" type="string"/>
+<Field name="Data_Name" type="string"/>
+<Field name="Description" type="string"/>
+<Field name="Metric_ID" type="string"/>
+<Field name="Industry" type="string"/>
+<Field name="Company_Name" type="string"/>
+<Field name="Data_Source" type="string"/>
+<Field name="Component_Name" type="string"/>
+<Field name="Driver_Name" type="string"/>
+<Field name="Unit_Of_Measurement" type="string"/>
+</Record>
+</Metadata>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node charset="ISO-8859-1" dataPolicy="lenient" enabled="disabled" fileURL="/Users/just/Downloads/gui_output_scores_20161024.csv" guiName="CSV Reader" guiX="137" guiY="286" id="CSV_READER" quotedStrings="true" skipLeadingBlanks="true" skipTrailingBlanks="true" type="DATA_READER"/>
+<Node dataset="dataset.metric" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.metric&quot;,&quot;datasetTitle&quot;:&quot;Metric Data Values&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.dataid&quot;,&quot;title&quot;:&quot;Data ID&quot;,&quot;prettyId&quot;:&quot;attr_metric_dataid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.dataid&quot;,&quot;title&quot;:&quot;Data ID&quot;,&quot;prettyId&quot;:&quot;dataid&quot;,&quot;assignedMetadataField&quot;:&quot;FIELD&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.metricdescription&quot;,&quot;title&quot;:&quot;Data Description&quot;,&quot;prettyId&quot;:&quot;attr_metric_metricdescription&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricdescription&quot;,&quot;title&quot;:&quot;Data Description&quot;,&quot;prettyId&quot;:&quot;metricdescription&quot;,&quot;assignedMetadataField&quot;:&quot;Description&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.metricname&quot;,&quot;title&quot;:&quot;Data Name&quot;,&quot;prettyId&quot;:&quot;attr_metric_metricname&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricname&quot;,&quot;title&quot;:&quot;Data Name&quot;,&quot;prettyId&quot;:&quot;metricname&quot;,&quot;assignedMetadataField&quot;:&quot;Data_Name&quot;,&quot;referenceKey&quot;:true}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricname.metrichyperlink&quot;,&quot;title&quot;:&quot;Metric Hyperlink&quot;,&quot;prettyId&quot;:&quot;metricname_metrichyperlink&quot;,&quot;assignedMetadataField&quot;:&quot;Hyperlink&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.metricname.metricweightsort&quot;,&quot;title&quot;:&quot;Metric Weight Sort&quot;,&quot;prettyId&quot;:&quot;metricname_metricweightsort&quot;,&quot;assignedMetadataField&quot;:&quot;Weight&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metric.unitofmeasurement&quot;,&quot;title&quot;:&quot;Unit of Measurement&quot;,&quot;prettyId&quot;:&quot;attr_metric_unitofmeasurement&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metric.unitofmeasurement&quot;,&quot;title&quot;:&quot;Unit of Measurement&quot;,&quot;prettyId&quot;:&quot;unitofmeasurement&quot;,&quot;assignedMetadataField&quot;:&quot;Unit_Of_Measurement&quot;,&quot;referenceKey&quot;:true}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.comp.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;attr_comp_componentname&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.component.componenthyperlink&quot;,&quot;title&quot;:&quot;Component Hyperlink&quot;,&quot;prettyId&quot;:&quot;comp__component_componenthyperlink&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;comp__componentname&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.component.componentweight&quot;,&quot;title&quot;:&quot;Component Weight Sort&quot;,&quot;prettyId&quot;:&quot;comp__component_componentweight&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Component_Name&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.comp.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;comp__componentname&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.company.ticker&quot;,&quot;title&quot;:&quot;Ticker&quot;,&quot;prettyId&quot;:&quot;attr_company_ticker&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.company.ticker&quot;,&quot;title&quot;:&quot;Ticker&quot;,&quot;prettyId&quot;:&quot;company__ticker&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;TICKER&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.company.ticker&quot;,&quot;title&quot;:&quot;Ticker&quot;,&quot;prettyId&quot;:&quot;company__ticker&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source&quot;,&quot;prettyId&quot;:&quot;attr_datasource_datasourcename&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename.datasourcehyperlink&quot;,&quot;title&quot;:&quot;Data Source Hyperlink&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename_datasourcehyperlink&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename.datasourcesort&quot;,&quot;title&quot;:&quot;Data Source Sort&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename_datasourcesort&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Data_Source&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.driver.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;attr_driver_drivername&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driver.driverhyperlink&quot;,&quot;title&quot;:&quot;Driver Hyperlink&quot;,&quot;prettyId&quot;:&quot;driver__driver_driverhyperlink&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;driver__drivername&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driver.driversort&quot;,&quot;title&quot;:&quot;Driver Sort&quot;,&quot;prettyId&quot;:&quot;driver__driver_driversort&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Driver_Name&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;driver__drivername&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metrics.metricid&quot;,&quot;title&quot;:&quot;Metric ID&quot;,&quot;prettyId&quot;:&quot;attr_metrics_metricid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metrics.metricid&quot;,&quot;title&quot;:&quot;Metric ID&quot;,&quot;prettyId&quot;:&quot;metrics__metricid&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Metric_ID&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metrics.metricid&quot;,&quot;title&quot;:&quot;Metric ID&quot;,&quot;prettyId&quot;:&quot;metrics__metricid&quot;,&quot;assignedMetadataField&quot;:null,&quot;referenceKey&quot;:false}}}}],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.metric.companydatavalue&quot;,&quot;title&quot;:&quot;Company Data Value&quot;,&quot;prettyId&quot;:&quot;companydatavalue&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;VALUE&quot;}}],&quot;dateFacts&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;entitiesWithoutValue&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;datesWithFactConflict&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="545" guiY="151" id="GD_DATASET_WRITER" mode="INCREMENTAL" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="343" guiY="151" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	for  
+	$in.0.SET1_ITEM1;
+	 = $in.0.SET1_ITEM2;
+	 = $in.0.SET1_ITEM3;
+	 = $in.0.SET1_ITEM4;
+	 = $in.0.Q4A_MOST;
+	 = $in.0.Q4A_LEAST;
+	 = $in.0.SET2_ITEM1;
+	 = $in.0.SET2_ITEM2;
+	 = $in.0.SET2_ITEM3;
+	 = $in.0.SET2_ITEM4;
+	 = $in.0.Q4B_MOST;
+	 = $in.0.Q4B_LEAST;
+	 = $in.0.SET3_ITEM1;
+	 = $in.0.SET3_ITEM2;
+	 = $in.0.SET3_ITEM3;
+	 = $in.0.SET3_ITEM4;
+	 = $in.0.Q4C_MOST;
+	 = $in.0.Q4C_LEAST;
+	 = $in.0.SET4_ITEM1;
+	 = $in.0.SET4_ITEM2;
+	 = $in.0.SET4_ITEM3;
+	 = $in.0.SET4_ITEM4;
+	 = $in.0.Q4D_MOST;
+	 = $in.0.Q4D_LEAST;
+	 = $in.0.SET5_ITEM1;
+	 = $in.0.SET5_ITEM2;
+	 = $in.0.SET5_ITEM3;
+	 = $in.0.SET5_ITEM4;
+	 = $in.0.Q4E_MOST;
+	 = $in.0.Q4E_LEAST;
+	 = $in.0.SET6_ITEM1;
+	 = $in.0.SET6_ITEM2;
+	 = $in.0.SET6_ITEM3;
+	 = $in.0.SET6_ITEM4;
+	 = $in.0.Q4F_MOST;
+	 = $in.0.Q4F_LEAST;
+	 = $in.0.SET7_ITEM1;
+	 = $in.0.SET7_ITEM2;
+	 = $in.0.SET7_ITEM3;
+	 = $in.0.SET7_ITEM4;
+	 = $in.0.Q4G_MOST;
+	 = $in.0.Q4G_LEAST;
+	 = $in.0.SET8_ITEM1;
+	 = $in.0.SET8_ITEM2;
+	 = $in.0.SET8_ITEM3;
+	 = $in.0.SET8_ITEM4;
+	 = $in.0.Q4H_MOST;
+	 = $in.0.Q4H_LEAST;
+	 = $in.0.SET9_ITEM1;
+	 = $in.0.SET9_ITEM2;
+	 = $in.0.SET9_ITEM3;
+	 = $in.0.SET9_ITEM4;
+	 = $in.0.Q4I_MOST;
+	 = $in.0.Q4I_LEAST;
+	 = $in.0.SET10_ITEM1;
+	 = $in.0.SET10_ITEM2;
+	 = $in.0.SET10_ITEM3;
+	 = $in.0.SET10_ITEM4;
+	 = $in.0.Q4J_MOST;
+	 = $in.0.Q4J_LEAST;
+	 = $in.0.SET11_ITEM1;
+	 = $in.0.SET11_ITEM2;
+	 = $in.0.SET11_ITEM3;
+	 = $in.0.SET11_ITEM4;
+	 = $in.0.Q4K_MOST;
+	 = $in.0.Q4K_LEAST;
+	 = $in.0.SET12_ITEM1;
+	 = $in.0.SET12_ITEM2;
+	 = $in.0.SET12_ITEM3;
+	 = $in.0.SET12_ITEM4;
+	 = $in.0.Q4L_MOST;
+	 = $in.0.Q4L_LEAST;
+	 = $in.0.SET13_ITEM1;
+	 = $in.0.SET13_ITEM2;
+	 = $in.0.SET13_ITEM3;
+	 = $in.0.SET13_ITEM4;
+	 = $in.0.Q4M_MOST;
+	 = $in.0.Q4M_LEAST;
+	 = $in.0.SET14_ITEM1;
+	 = $in.0.SET14_ITEM2;
+	 = $in.0.SET14_ITEM3;
+	 = $in.0.SET14_ITEM4;
+	 = $in.0.Q4N_MOST;
+	 = $in.0.Q4N_LEAST;
+	 = $in.0.GENDER;
+	 = $in.0.AGE7;
+	 = $in.0.RACETHNICITY;
+	 = $in.0.EDUC4;
+	 = $in.0.MARITAL;
+	 = $in.0.EMPLOY;
+	 = $in.0.INCOME;
+	 = $in.0.STATE;
+	 = $in.0.REGION4;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="/Users/LilyL/Desktop/JUST_Full_raw individual_logit estimates.xlsx" guiName="SpreadsheetDataReader" guiX="127" guiY="151" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" outPort="Port 0 (out)" toNode="GD_DATASET_WRITER:0"/>
+<Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+</Phase>
+</Graph>

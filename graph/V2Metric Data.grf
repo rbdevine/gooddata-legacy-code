@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Mon Sep 26 16:35:09 EDT 2016" guiVersion="3.4.4.P" id="1474922423475" licenseType="Commercial" modified="Wed Oct 12 13:29:18 EDT 2016" modifiedBy="LilyL" name="Metric Data.grf" revision="1.52" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Mon Sep 26 16:35:09 EDT 2016" guiVersion="3.4.4.P" id="1474922423475" licenseType="Commercial" modified="Mon Oct 31 11:22:24 EDT 2016" modifiedBy="LilyL" name="Metric Data.grf" revision="1.53" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata7" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Company" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n\\|\r\n" recordSize="-1" type="delimited">
@@ -100,9 +100,9 @@
 </Metadata>
 <Metadata id="Metadata8" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="V2_Sheet1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field format="" label="TICKER" name="TICKER" type="string"/>
-<Field format="" label="FIELD" name="FIELD" type="string"/>
-<Field format="" label="VALUE" name="VALUE" type="number"/>
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="FIELD" name="FIELD" type="string"/>
+<Field label="VALUE" name="VALUE" type="number"/>
 <Field name="Data_ID" type="string"/>
 <Field name="Data_Name" type="string"/>
 <Field name="Metric_ID" type="string"/>
@@ -307,5 +307,8 @@ function integer transform() {
 <Edge fromNode="REFORMAT:4" guiBendpoints="" guiRouter="Manhattan" id="Edge14" inPort="Port 0 (in)" metadata="Metadata7" outPort="Port 4 (out)" toNode="EXT_SORT1:0"/>
 <Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge18" inPort="Port 0 (in)" metadata="Metadata8" outPort="Port 0 (out)" toNode="EXT_SORT4:0"/>
 <Edge fromNode="SPREADSHEET_DATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata8" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/V3.5 Metric Data Hardcode.grf" guiName="RunGraph" guiX="202" guiY="210" id="RUN_GRAPH" type="RUN_GRAPH"/>
 </Phase>
 </Graph>
