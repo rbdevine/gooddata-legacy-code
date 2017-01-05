@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Fri Oct 07 12:10:07 EDT 2016" guiVersion="3.4.4.P" id="1475862530087" licenseType="Commercial" modified="Thu Jan 05 14:10:27 EST 2017" modifiedBy="LilyL" name="Metric Data V2" revision="1.12" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Fri Oct 07 12:10:07 EDT 2016" guiVersion="3.4.4.P" id="1475862530087" licenseType="Commercial" modified="Thu Jan 05 14:43:54 EST 2017" modifiedBy="LilyL" name="Metric Data V2" revision="1.14" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="gui_output_scores25_gui_output_scores25" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -158,7 +158,7 @@ return ALL;
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/glassdoor/salarydata/MetricData.csv" guiName="SpreadsheetDataReader" guiX="144" guiY="132" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" fileURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/glassdoor/salarydata/MetricData.xlsx" guiName="SpreadsheetDataReader" guiX="144" guiY="132" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
 <Edge fromNode="DEDUP_FIELD:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (unique)" toNode="GD_DATASET_WRITER1:0"/>
 <Edge fromNode="DEDUP_METRIC:0" guiBendpoints="" guiRouter="Manhattan" id="Edge9" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (unique)" toNode="GD_DATASET_WRITER3:0"/>
 <Edge fromNode="DEDUP_TICKER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (unique)" toNode="GD_DATASET_WRITER2:0"/>
