@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jan 11 15:40:33 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.42" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jan 11 15:54:25 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.44" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="NEW_COMPANY_DATA" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -11,8 +11,8 @@
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/FranchiseNewCompanies.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/franchisenewcompanieserror.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/FranchiseNewCompanies.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="STG_LIVING_WAGE_FRANCHISE_NEW_COMPANIES"/>
-<Property id="GraphParameter4" name="TMP_TABLENAME" value="TMP_LIVING_WAGE_FRANCHISE_NEW_COMPANY"/>
+<Property id="GraphParameter3" name="TABLENAME" value="LKP_LIVING_WAGE_FRANCHISE_COMPANIES"/>
+<Property id="GraphParameter4" name="TMP_TABLENAME" value="TMP_LIVING_WAGE_FRANCHISE_NEW_COMPANIES"/>
 <Property fileURL="workspace.prm" id="GraphParameter5"/>
 <Property id="GraphParameter20" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/franchisenewcompanies.txt"/>
 <Dictionary/>
