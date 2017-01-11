@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Mon Sep 26 16:35:09 EDT 2016" guiVersion="3.4.4.P" id="1474922423475" licenseType="Commercial" modified="Wed Jan 11 15:48:48 EST 2017" modifiedBy="LilyL" name="Metric Data.grf" revision="1.76" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Mon Sep 26 16:35:09 EDT 2016" guiVersion="3.4.4.P" id="1474922423475" licenseType="Commercial" modified="Wed Jan 11 15:49:30 EST 2017" modifiedBy="LilyL" name="Metric Data.grf" revision="1.77" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata7" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Company" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n\\|\r\n" recordSize="-1" type="delimited">
@@ -261,7 +261,7 @@ return ALL;
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/metrics/MetricData.xlsx" guiName="SpreadsheetDataReader" guiX="158" guiY="124" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" fileURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/metrics/MetricData.xlsx" guiName="SpreadsheetDataReader" guiX="147" guiY="124" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
 <Edge fromNode="DEDUP_COMPANY:0" guiBendpoints="" guiRouter="Manhattan" id="Edge10" inPort="Port 0 (in)" metadata="Metadata7" outPort="Port 0 (unique)" toNode="GD_DATASET_WRITER4:0"/>
 <Edge fromNode="DEDUP_COMPONENT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (unique)" toNode="GD_DATASET_WRITER2:0"/>
 <Edge fromNode="DEDUP_DRIVER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (unique)" toNode="GD_DATASET_WRITER1:0"/>
