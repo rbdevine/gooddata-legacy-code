@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jan 10 17:41:27 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.32" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="NEW_COMPANY_DATA" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="COMPANY" type="string"/>
+<Field name="TICKER" type="string"/>
+<Field name="INDUSTRY" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/FranchiseNewCompanies.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/franchisenewcompanieserror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/FranchiseNewCompanies.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="STG_LIVING_WAGE_FRANCHISE_NEW_COMPANIES"/>
+<Property id="GraphParameter20" name="TMP_TABLENAME" value="TMP_LIVING_WAGE_FRANCHISE_NEW_COMPANY"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter19" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/franchisenewcompanies.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="166" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="104" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="98" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="104" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.COMPANY = $in.0.COMPANY;
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.INDUSTRY = $in.0.INDUSTRY;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="6" guiY="198" id="DROP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+  COMPANY VARCHAR(64),
+  TICKER VARCHAR(64),
+  INDUSTRY VARCHAR(128)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+    COMPANY,
+    TICKER,
+    INDUSTRY
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Data" guiX="472" guiY="198" id="CLEANUP_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TABLENAME} where COMPANY is null;
+delete from ${TABLENAME} where TICKER is null;
+delete from ${TABLENAME} where INDUSTRY is null;
+update ${TABLENAME} set COMPANY = ltrim(rtrim(COMPANY));
+update ${TABLENAME} set TICKER = ltrim(rtrim(TICKER));
+update ${TABLENAME} set INDUSTRY = ltrim(rtrim(INDUSTRY));
+]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="18" guiY="516" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="516" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="325" guiY="516" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="83" guiY="279" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};
+CREATE TABLE ${TMP_TABLENAME} (
+  JUST_CO_ID VARCHAR(15),
+  TICKER VARCHAR(64),
+  COMPANY VARCHAR(64),
+  INDUSTRY VARCHAR(128)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="229" guiY="279" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLENAME}
+select
+  concat('JUST',right(concat('00000000000',f.r + m.maxid + 1),11)) new_id,  f.ticker, f.company, 'Consumer Services'
+from (
+  select rank() over (order by company) r, company, c.ticker
+  from lkp_living_wage_franchise_new_companies c
+  left join ( 
+    select ticker_trim ticker
+    from lkp_just_co_secty_master 
+    group by ticker_trim ) m on m.ticker = c.ticker
+  where m.ticker is null
+  group by company, c.ticker
+) f join (
+  select cast(right(just_co_id,11) as integer) maxid
+  from lkp_just_co_secty_master
+  order by cast(right(just_co_id,11) as integer) desc
+  limit 1
+) m on true
+]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Company Table" guiX="41" guiY="358" id="INSERT_INTO_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into lkp_just_co_secty_master (just_co_id, ticker_trim, co_long_name)
+select just_co_id, ticker, company from ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Industry Table" guiX="229" guiY="358" id="INSERT_INTO_INDUSTRY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into lkp_just_co_indy (just_co_id, just_indy)
+select just_co_id, industry from ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="10">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="166" guiY="438" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>
