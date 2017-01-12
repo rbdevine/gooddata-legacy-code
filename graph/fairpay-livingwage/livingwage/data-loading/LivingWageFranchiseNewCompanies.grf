@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jan 10 17:41:27 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.32" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jan 11 15:40:33 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.42" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="NEW_COMPANY_DATA" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -12,9 +12,9 @@
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/franchisenewcompanieserror.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/FranchiseNewCompanies.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="STG_LIVING_WAGE_FRANCHISE_NEW_COMPANIES"/>
-<Property id="GraphParameter20" name="TMP_TABLENAME" value="TMP_LIVING_WAGE_FRANCHISE_NEW_COMPANY"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter19" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/franchisenewcompanies.txt"/>
+<Property id="GraphParameter4" name="TMP_TABLENAME" value="TMP_LIVING_WAGE_FRANCHISE_NEW_COMPANY"/>
+<Property fileURL="workspace.prm" id="GraphParameter5"/>
+<Property id="GraphParameter20" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/franchisenewcompanies.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -63,7 +63,7 @@ function integer transform() {
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="151" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
   COMPANY VARCHAR(64),
   TICKER VARCHAR(64),
@@ -72,7 +72,7 @@ function integer transform() {
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="293" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
     COMPANY,
     TICKER,
@@ -84,7 +84,7 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Data" guiX="472" guiY="198" id="CLEANUP_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Data" guiX="435" guiY="198" id="CLEANUP_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TABLENAME} where COMPANY is null;
 delete from ${TABLENAME} where TICKER is null;
 delete from ${TABLENAME} where INDUSTRY is null;
@@ -95,27 +95,28 @@ update ${TABLENAME} set INDUSTRY = ltrim(rtrim(INDUSTRY));
 </Node>
 </Phase>
 <Phase number="6">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="18" guiY="516" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="516" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="325" guiY="516" id="CLEAN_WRITE" type="FILE_DELETE"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="83" guiY="279" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="24" guiY="598" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="172" guiY="598" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="331" guiY="598" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="101" guiY="274" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};
 CREATE TABLE ${TMP_TABLENAME} (
   JUST_CO_ID VARCHAR(15),
   TICKER VARCHAR(64),
   COMPANY VARCHAR(64),
-  INDUSTRY VARCHAR(128)
+  INDUSTRY VARCHAR(128),
+  EXISTING BOOLEAN
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="229" guiY="279" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="249" guiY="274" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLENAME}
 select
   concat('JUST',right(concat('00000000000',f.r + m.maxid + 1),11)) new_id,  f.ticker, f.company, 'Consumer Services'
 from (
   select rank() over (order by company) r, company, c.ticker
-  from lkp_living_wage_franchise_new_companies c
+  from ${TABLENAME} c
   left join ( 
     select ticker_trim ticker
     from lkp_just_co_secty_master 
@@ -132,19 +133,25 @@ from (
 </Node>
 </Phase>
 <Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Company Table" guiX="41" guiY="358" id="INSERT_INTO_COMPANY_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Company Table" guiX="47" guiY="359" id="INSERT_INTO_COMPANY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into lkp_just_co_secty_master (just_co_id, ticker_trim, co_long_name)
 select just_co_id, ticker, company from ${TMP_TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="9">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Industry Table" guiX="229" guiY="358" id="INSERT_INTO_INDUSTRY_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Industry Table" guiX="235" guiY="359" id="INSERT_INTO_INDUSTRY_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into lkp_just_co_indy (just_co_id, just_indy)
 select just_co_id, industry from ${TMP_TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="10">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="166" guiY="438" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into GD Company Map Table" guiX="125" guiY="441" id="INSERT_INTO_GD_COMPANY_MAP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into lkp_just_co_indy (just_co_id, just_indy)
+select just_co_id, industry from ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="11">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="172" guiY="520" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};]]></attr>
 </Node>
 </Phase>
