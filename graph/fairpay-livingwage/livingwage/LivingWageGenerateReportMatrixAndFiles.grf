@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Nov 14 12:39:26 EST 2016" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.225" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed Jan 18 16:39:23 EST 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.227" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -12,18 +12,18 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="ACTIVE_TICKERS_TABLENAME" value="LKP_LIVING_WAGE_ACTIVE"/>
-<Property id="GraphParameter2" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
-<Property id="GraphParameter3" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
-<Property id="GraphParameter4" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
-<Property id="GraphParameter5" name="HIGH_TOLERANCE" value="1.10"/>
-<Property id="GraphParameter6" name="HIGH_TOLERANCE_PROPORTION" value="1/3"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter7"/>
-<Property id="GraphParameter19" name="LOW_TOLERANCE" value=".9"/>
-<Property id="GraphParameter20" name="LOW_TOLERANCE_PROPORTION" value="1/3"/>
-<Property id="GraphParameter21" name="MID_TOLERANCE" value="1.0"/>
-<Property id="GraphParameter22" name="MID_TOLERANCE_PROPORTION" value="1/3"/>
-<Property id="GraphParameter23" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
-<Property fileURL="workspace.prm" id="GraphParameter24"/>
+<Property id="GraphParameter1" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
+<Property id="GraphParameter2" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
+<Property id="GraphParameter3" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
+<Property id="GraphParameter4" name="HIGH_TOLERANCE" value="1.10"/>
+<Property id="GraphParameter5" name="HIGH_TOLERANCE_PROPORTION" value="1/3"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter6"/>
+<Property id="GraphParameter18" name="LOW_TOLERANCE" value=".9"/>
+<Property id="GraphParameter19" name="LOW_TOLERANCE_PROPORTION" value="1/3"/>
+<Property id="GraphParameter20" name="MID_TOLERANCE" value="1.0"/>
+<Property id="GraphParameter21" name="MID_TOLERANCE_PROPORTION" value="1/3"/>
+<Property id="GraphParameter22" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
+<Property fileURL="workspace.prm" id="GraphParameter23"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -194,7 +194,59 @@ insert into ${ACTIVE_TICKERS_TABLENAME} values('WMT');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('COST');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('SYY');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('AN');
-insert into ${ACTIVE_TICKERS_TABLENAME} values('TSCO');]]></attr>
+insert into ${ACTIVE_TICKERS_TABLENAME} values('TSCO');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('MCD');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('7ELV');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('ARNS');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('ACEH');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('APBS');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('ARBY');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('AMPM');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('DNKNB');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('BWLD');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('BRKG');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('CHKR');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('CKFA');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('BRI');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('CHRC');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('CIRK');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('DRYQ');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('DNYS');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('DNKND');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('FHSB');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('FVGY');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('GLDC');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('GCLP');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('HRDS');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('HMIN');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('IHOP');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('ICGH');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('JBOX');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('JHWT');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('JFLB');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('JJHN');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('YUMK');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('KUMN');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('LAQT');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('LBTY');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('LTLC');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('LJSV');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('MDAS');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('MTL6');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('PAPJ');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('PAPM');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('YUMP');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('PLFT');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('PPYS');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('QDBA');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('QZNS');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('SONC');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('SUBW');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('SPRC');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('YUMT');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('UPST');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('TMHT');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('WTBR');]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Col Numbers" guiX="415" guiY="317" id="ADD_COL_NUMBERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COLUMN_NUMBERS_TABLENAME} values('1');

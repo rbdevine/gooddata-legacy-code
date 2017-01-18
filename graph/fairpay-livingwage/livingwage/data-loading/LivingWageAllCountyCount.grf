@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Nov 10 16:27:34 EST 2016" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.33" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Wed Jan 18 14:20:32 EST 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.34" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -147,8 +147,8 @@ function integer transform() {
 <Edge fromNode="REFORMAT_FIPS_MATCH:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_FIPS_MATCH:0"/>
 </Phase>
 <Phase number="2">
-<Node baseURL="${READFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Download" guiX="70" guiY="973" id="CLEAN_COUNTY_AVG_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${READFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Download" guiX="70" guiY="900" id="CLEAN_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Download" guiX="92" guiY="1076" id="CLEAN_COUNTY_AVG_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Download" guiX="92" guiY="1003" id="CLEAN_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Avg Table" guiX="363" guiY="359" id="POPULATE_COUNTY_AVG_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_COUNTYAVG} (
   TICKER,
@@ -176,10 +176,10 @@ EXCEPTIONS '${POPULATEERRORFILEPATH_FIPSMATCH}';
 </Node>
 </Phase>
 <Phase number="3">
-<Node baseURL="${POPULATEERRORFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Error" guiX="271" guiY="973" id="CLEAN_COUNTY_AVG_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Write" guiX="447" guiY="973" id="CLEAN_COUNTY_AVG_WRITE" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Error" guiX="274" guiY="900" id="CLEAN_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Write" guiX="450" guiY="900" id="CLEAN_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Error" guiX="293" guiY="1076" id="CLEAN_COUNTY_AVG_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Write" guiX="469" guiY="1076" id="CLEAN_COUNTY_AVG_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Error" guiX="296" guiY="1003" id="CLEAN_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Write" guiX="472" guiY="1003" id="CLEAN_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Trim County Avg Data" guiX="363" guiY="431" id="TRIM_COUNTY_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLENAME_COUNTYAVG} set ticker = ltrim(rtrim(ticker));
 update ${TABLENAME_COUNTYAVG} set subsidiary = ltrim(rtrim(subsidiary));
@@ -373,6 +373,7 @@ group by state_county_fips, ticker, subsidiary;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageCountyEmployeeCount.grf" guiName="Load Franchise Employee Counts" guiX="244" guiY="902" id="LOAD_FRANCHISE_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
 <Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageEmployeeCountByCountyOnly.grf" guiName="Load Other Employee Counts" guiX="255" guiY="800" id="LOAD_OTHER_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
 </Phase>
 </Graph>
