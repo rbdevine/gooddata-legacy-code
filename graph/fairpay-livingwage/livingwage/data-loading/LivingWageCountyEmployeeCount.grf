@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Tue Jan 17 18:08:34 EST 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.95" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Jan 19 15:44:10 EST 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.97" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -55,10 +55,10 @@
 <Property id="GraphParameter7" name="REPORTS_DIR" value="${DATA_DIR}/livingwage-reports"/>
 <Property id="GraphParameter8" name="TABLENAME_COUNTY_COUNTS" value="LKP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
 <Property id="GraphParameter9" name="TABLENAME_COUNTYCOUNT_FIPSMATCH" value="TMP_LIVING_WAGE_COUNTY_COUNT_FIPSMATCH"/>
-<Property id="GraphParameter11" name="TABLENAME_FIPSUPDATE" value="TMP_LIVING_WAGE_FIPSUPDATE"/>
-<Property fileURL="workspace.prm" id="GraphParameter12"/>
-<Property id="GraphParameter27" name="WRITEFILEPATH_COUNTYCOUNT_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycountfipsmatch.txt"/>
-<Property id="GraphParameter28" name="WRITEFILEPATH_FIPSUPDATE" value="${DATA_TRANSFORM_DIR}/fipsupdate.txt"/>
+<Property id="GraphParameter10" name="TABLENAME_FIPSUPDATE" value="TMP_LIVING_WAGE_FIPSUPDATE"/>
+<Property fileURL="workspace.prm" id="GraphParameter11"/>
+<Property id="GraphParameter26" name="WRITEFILEPATH_COUNTYCOUNT_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycountfipsmatch.txt"/>
+<Property id="GraphParameter27" name="WRITEFILEPATH_FIPSUPDATE" value="${DATA_TRANSFORM_DIR}/fipsupdate.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -244,7 +244,7 @@ update ${TABLENAME_COUNTYCOUNT_FIPSMATCH} set state_county_fips = ltrim(rtrim(st
 WHERE EXISTS (
   SELECT 1
   FROM (SELECT TICKER, SUBSIDIARY FROM ${TABLENAME_COUNTYCOUNT_FIPSMATCH} GROUP BY TICKER, SUBSIDIARY) f
-  WHERE f.ticker = ${TABLENAME_COUNTY_COUNTS}.ticker and f.subsidiary = ${TABLENAME_COUNTY_COUNTS}.subsidiary
+  WHERE f.ticker = ${TABLENAME_COUNTY_COUNTS}.ticker
 );]]></attr>
 </Node>
 </Phase>

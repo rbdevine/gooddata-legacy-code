@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed Jan 18 14:14:47 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.59" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Jan 19 11:34:11 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.60" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="CITY_FIPS_AVERAGES_TABLENAME" value="LKP_CITY_FIPS_AVG"/>
-<Property id="GraphParameter7" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
-<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter8"/>
-<Property id="GraphParameter10" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
-<Property fileURL="workspace.prm" id="GraphParameter11"/>
-<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter1"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter20"/>
+<Property id="GraphParameter1" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
+<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter2"/>
+<Property id="GraphParameter4" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
+<Property fileURL="workspace.prm" id="GraphParameter5"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -121,33 +121,6 @@ insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2014, 1.042);
 insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2015, 1.020);
 insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2016, 1.000);
 ]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Franchise GOC Special Cases" guiX="370" guiY="476" id="UPDATE_FRANCHISE_GOC_SPECIAL_CASES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  update ${SALARY_LOOKUP_TABLENAME} to change gocs for specific
-  franchises. The idea is to combine certain gocs for certain
-  tickers. (For example, for LBTY, we combined 'general manager'
-  and 'manager' under the goc 'general manager').
-*/
-update ${SALARY_LOOKUP_TABLENAME} s
-set goc = u.new_goc
-from ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} u
-where u.old_goc = s.goc and u.ticker = s.ticker;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Job Names" guiX="225" guiY="476" id="UPDATE_JOB_NAMES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  update ${SALARY_LOOKUP_TABLENAME} to modify goc for various
-  job titles. Basically, what we did was first generate a list
-  of all glassdoor entries that included the word software or
-  assistant. Then Andy S. and Rich D. went through all 4000+ entries 
-  and set appropriate goc for given job title, the idea being we should get
-  more job titles that way. Finally, created a Good Data graph to
-  upload that jobtitle->goc data into the table, LKP_GD_JOBTITLE_OVERRIDE_GOC
-*/
-update ${SALARY_LOOKUP_TABLENAME} s
-set goc = u.goc
-from LKP_GD_JOBTITLE_OVERRIDE_GOC u
-where u.jobtitle = s.jobtitle;]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
@@ -414,6 +387,33 @@ set
   state_county_fips = '51951',
   county_name = 'Spotsylvania + Fredericksburg'
 where city_name = 'DANVILLE' and state_abbreviation = 'VA';]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Franchise GOC Special Cases" guiX="370" guiY="476" id="UPDATE_FRANCHISE_GOC_SPECIAL_CASES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  update ${SALARY_LOOKUP_TABLENAME} to change gocs for specific
+  franchises. The idea is to combine certain gocs for certain
+  tickers. (For example, for LBTY, we combined 'general manager'
+  and 'manager' under the goc 'general manager').
+*/
+update ${SALARY_LOOKUP_TABLENAME} s
+set goc = u.new_goc
+from ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} u
+where u.old_goc = s.goc and u.ticker = s.ticker;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Job Names" guiX="225" guiY="476" id="UPDATE_JOB_NAMES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  update ${SALARY_LOOKUP_TABLENAME} to modify goc for various
+  job titles. Basically, what we did was first generate a list
+  of all glassdoor entries that included the word software or
+  assistant. Then Andy S. and Rich D. went through all 4000+ entries 
+  and set appropriate goc for given job title, the idea being we should get
+  more job titles that way. Finally, created a Good Data graph to
+  upload that jobtitle->goc data into the table, LKP_GD_JOBTITLE_OVERRIDE_GOC
+*/
+update ${SALARY_LOOKUP_TABLENAME} s
+set goc = u.goc
+from LKP_GD_JOBTITLE_OVERRIDE_GOC u
+where u.jobtitle = s.jobtitle;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed Jan 18 16:39:23 EST 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.227" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jan 19 12:27:50 EST 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.228" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -1125,7 +1125,7 @@ select
   i.just_indy, 'CO_SUBSIDIARY_COUNT_TOTAL', m.just_co_id, m.ticker_trim, g.subsidiary,
   'Score',
   cast(round(((lw_count/emp_count_tot)*100.0),1) as numeric(36,1)),
-  concat(concat(lw_count,' / '),emp_count_tot),
+  concat(concat(cast(round(lw_count,2) as numeric(36,2)),' / '),emp_count_tot),
   emp_count_tot,
   cast(round(lw_count,2) as numeric(18,2))
 from (
@@ -1310,7 +1310,7 @@ select
   i.just_indy, 'CO_TICKER_COUNT_TOTAL', m.just_co_id, m.ticker_trim,
   'Score',
   cast(round(((lw_count/emp_count_tot)*100.0),1) as numeric(18,1)),
-  concat(concat(lw_count,' / '),emp_count_tot),
+  concat(concat(cast(round(lw_count,2) as numeric(36,2)),' / '),emp_count_tot),
   emp_count_tot,
   cast(round(lw_count,2) as numeric(18,2))
 from (select just_co_id from ${GOC_ORDER_TABLENAME} group by just_co_id) g
@@ -1353,7 +1353,7 @@ select
   i.just_indy, 'CO_TICKER_COUNT_TOTAL', m.just_co_id, m.ticker_trim,
   'Score',
   cast(round(((lw_count/emp_count_tot)*100.0),1) as numeric(18,1)),
-  concat(concat(lw_count,' / '),emp_count_tot),
+  concat(concat(cast(round(lw_count,2) as numeric(36,2)),' / '),emp_count_tot),
   emp_count_tot,
   cast(round(lw_count,2) as numeric(18,2))
 from (select just_co_id from ${GOC_ORDER_TABLENAME} group by just_co_id) g
