@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat Sep 17 18:11:38 EDT 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.18" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jan 18 14:26:28 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.19" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="DIST_BY_GOC" recordDelimiter="\n" type="delimited">
@@ -14,7 +14,7 @@
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/DistributionsByGOC.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="LKP_LIVING_WAGE_GOC_DISTRIBUTIONS"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter25" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/distributionsbygoc.txt"/>
+<Property id="GraphParameter19" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/distributionsbygoc.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -59,7 +59,7 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="6" guiY="192" id="DROP_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="18" guiY="198" id="DROP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
