@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jan 19 23:39:50 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.65" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jan 20 14:58:45 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.68" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
