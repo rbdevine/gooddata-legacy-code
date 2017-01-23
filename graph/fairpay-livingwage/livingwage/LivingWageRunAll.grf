@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jan 20 14:58:45 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.68" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jan 23 18:02:37 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.70" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -100,7 +100,7 @@
 <Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageDistByGOC.grf" guiName="Load GOC Distribution Data" guiX="78" guiY="16" id="LOAD_GOC_DISTRIBUTION_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageAllCountyCount.grf" guiName="Load County Count Data" guiX="86" guiY="115" id="LOAD_COUNTY_COUNT_DATA" type="RUN_GRAPH"/>
+<Node enabled="disabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageAllCountyCount.grf" guiName="Load County Count Data" guiX="86" guiY="115" id="LOAD_COUNTY_COUNT_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="2">
 <Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageCountyEmployeeCount.grf" guiName="Load County Count sans FIPS Data" guiX="64" guiY="214" id="LOAD_COUNTY_COUNT_SANS_FIPS_DATA" type="RUN_GRAPH"/>

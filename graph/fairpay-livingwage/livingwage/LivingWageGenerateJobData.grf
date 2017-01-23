@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Fri Jan 20 12:00:53 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.36" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Mon Jan 23 12:23:02 EST 2017" modifiedBy="richdevine" name="FairPayGenerateJobData" revision="1.37" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
@@ -6,7 +6,7 @@
 <Property id="GraphParameter25" name="MIN_CO_PER_JOB" value="1"/>
 <Property id="GraphParameter26" name="MIN_DATA_POINTS_PER_CO" value="1"/>
 <Property id="GraphParameter27" name="MIN_IND_GOC_CO_COUNT" value="1"/>
-<Property id="GraphParameter28" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="10"/>
+<Property id="GraphParameter28" name="MIN_JOB_COUNT_PER_CO_SCORE_1" value="7"/>
 <Property id="GraphParameter29" name="MIN_JOB_COUNT_PER_CO_SCORE_2" value="100"/>
 <Property id="GraphParameter30" name="MIN_JOB_COUNT_PER_CO_SCORE_3" value="1000"/>
 <Property id="GraphParameter31" name="MIN_JOBS_PER_CO" value="1"/>
