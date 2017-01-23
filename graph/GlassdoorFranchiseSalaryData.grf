@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jan 03 13:16:05 EST 2017" modifiedBy="scalvillo" name="Complete County File" revision="1.228" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon Jan 23 12:51:07 EST 2017" modifiedBy="scalvillo" name="Complete County File" revision="1.239" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata1" previewAttachment="${DATA_TMP_DIR}/gdfranchisepay.txt" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," label="FRANCHISEPAY_READ" name="FRANCHISEPAY_READ" previewAttachment="${DATA_TMP_DIR}/gdfranchisepay.txt" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
+<Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/gdfranchisepay.txt" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="FRANCHISEPAY_READ" name="FRANCHISEPAY_READ" previewAttachment="/Users/scalvillo/Desktop/gdfranchisepay.txt" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
 <Field name="COMPANY" type="string"/>
 <Field name="AREA" type="string"/>
 <Field name="STATE" type="string"/>
@@ -130,6 +130,6 @@ ABORT ON ERROR;]]></attr>
 <Phase number="5">
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>
