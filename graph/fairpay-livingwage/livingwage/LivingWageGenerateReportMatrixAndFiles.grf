@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Fri Jan 20 14:30:03 EST 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.233" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Jan 24 16:35:29 EST 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.235" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -214,9 +214,7 @@ insert into ${ACTIVE_TICKERS_TABLENAME} values('GCLP');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('HRDS');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('HMIN');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('IHOP');
-insert into ${ACTIVE_TICKERS_TABLENAME} values('ICGHS');
-insert into ${ACTIVE_TICKERS_TABLENAME} values('ICGHM');
-insert into ${ACTIVE_TICKERS_TABLENAME} values('ICGHL');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('ICGH');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('JBOXJ');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('JHWT');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('JFLB');
@@ -255,8 +253,8 @@ insert into ${ACTIVE_TICKERS_TABLENAME} values('EAT');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('WYN');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('HRB');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('DPZ');
-insert into ${ACTIVE_TICKERS_TABLENAME} values('STAY');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('BWST');
+insert into ${ACTIVE_TICKERS_TABLENAME} values('CHH');
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Col Numbers" guiX="415" guiY="317" id="ADD_COL_NUMBERS" type="DB_EXECUTE">

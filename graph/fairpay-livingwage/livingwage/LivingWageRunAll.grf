@@ -97,21 +97,27 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageDistByGOC.grf" guiName="Load GOC Distribution Data" guiX="78" guiY="16" id="LOAD_GOC_DISTRIBUTION_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageFranchiseNewCompanies.grf" guiName="Add New Franchise Companies" guiX="69" guiY="3" id="ADD_NEW_FRANCHISE_COMPANIES" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="1">
 <Node enabled="disabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageAllCountyCount.grf" guiName="Load County Count Data" guiX="86" guiY="115" id="LOAD_COUNTY_COUNT_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="2">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageCountyEmployeeCount.grf" guiName="Load County Count sans FIPS Data" guiX="64" guiY="214" id="LOAD_COUNTY_COUNT_SANS_FIPS_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageDistByGOC.grf" guiName="Load GOC Distribution Data" guiX="78" guiY="214" id="LOAD_GOC_DISTRIBUTION_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="3">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateJobData.grf" guiName="Generate Job Data" guiX="108" guiY="315" id="GENERATE_JOB_DATA1" type="RUN_GRAPH"/>
+<Node enabled="disabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageAllCountyCount.grf" guiName="Load County Count Data" guiX="86" guiY="321" id="LOAD_COUNTY_COUNT_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="4">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateReportMatrixAndFiles.grf" guiName="Generate Reports" guiX="110" guiY="424" id="GENERATE_REPORTS1" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageCountyEmployeeCount.grf" guiName="Load County Count sans FIPS Data" guiX="64" guiY="429" id="LOAD_COUNTY_COUNT_SANS_FIPS_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="5">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageCleanUpMatrixData.grf" guiName="Clean Up Matrix Data" guiX="102" guiY="534" id="CLEAN_UP_MATRIX_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateJobData.grf" guiName="Generate Job Data" guiX="102" guiY="537" id="GENERATE_JOB_DATA1" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="6">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateReportMatrixAndFiles.grf" guiName="Generate Reports" guiX="104" guiY="646" id="GENERATE_REPORTS1" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="7">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageCleanUpMatrixData.grf" guiName="Clean Up Matrix Data" guiX="96" guiY="756" id="CLEAN_UP_MATRIX_DATA" type="RUN_GRAPH"/>
 </Phase>
 </Graph>
