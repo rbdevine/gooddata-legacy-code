@@ -1,16 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Jan 19 11:34:11 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.60" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed Jan 25 18:05:29 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.68" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="CITY_FIPS_AVERAGES_TABLENAME" value="LKP_CITY_FIPS_AVG"/>
-<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter20"/>
-<Property id="GraphParameter1" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
-<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter2"/>
-<Property id="GraphParameter4" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
-<Property fileURL="workspace.prm" id="GraphParameter5"/>
+<Property id="GraphParameter27" name="GOC_SALARY_ADJUSTMENTS_TABLENAME" value="LKP_GOC_SALARY_ADJUSTMENTS"/>
+<Property id="GraphParameter8" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
+<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter9"/>
+<Property id="GraphParameter11" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
+<Property fileURL="workspace.prm" id="GraphParameter12"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter1"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create FIPs Avgs Table" guiX="358" guiY="84" id="CREATE_FIPS_AVGS_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create FIPs Avgs Table" guiX="355" guiY="111" id="CREATE_FIPS_AVGS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${CITY_FIPS_AVERAGES_TABLENAME} 
   average cost os living index for city/state pairs that have 
@@ -24,7 +25,7 @@ create table ${CITY_FIPS_AVERAGES_TABLENAME} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Job Level Table" guiX="24" guiY="84" id="CREATE_JOB_LEVEL_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Job Level Table" guiX="21" guiY="111" id="CREATE_JOB_LEVEL_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${JOB_LEVEL_TABLENAME}
   Table to store level adjustments for goc.
@@ -41,7 +42,7 @@ create table ${JOB_LEVEL_TABLENAME} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Lookup Table" guiX="197" guiY="84" id="CREATE_LOOKUP_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Lookup Table" guiX="194" guiY="111" id="CREATE_LOOKUP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${SALARY_LOOKUP_TABLENAME}
   Data from glass door. DW stands for data warehouse. May eventually 
@@ -76,7 +77,7 @@ create table ${SALARY_LOOKUP_TABLENAME} (
   STATEABBREVIATION VARCHAR(255) NULL,
   COST_OF_LIVING_INDEX FLOAT NULL);]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Salary Yr Adj Table" guiX="182" guiY="10" id="CREATE_SALARY_YR_ADJ_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Salary Yr Adj Table" guiX="79" guiY="21" id="CREATE_SALARY_YR_ADJ_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${SALARY_YEAR_ADJUSTMENT_TABLENAME} 
   salary adjustments based on the year of the reported salary.  These 
@@ -91,9 +92,10 @@ create table ${SALARY_YEAR_ADJUSTMENT_TABLENAME} (
 );
 ]]></attr>
 </Node>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/data-loading/GOCSalaryAdjustments.grf" guiName="Load GOC Salary Adjustments" guiX="269" guiY="9" id="LOAD_GOC_SALARY_ADJUSTMENTS" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Avgs" guiX="354" guiY="159" id="POPULATE_FIPS_AVGS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Avgs" guiX="351" guiY="186" id="POPULATE_FIPS_AVGS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${CITY_FIPS_AVERAGES_TABLENAME}
 select distinct f.city_name, f.state_abbreviation , avg(p.cost_of_living_index)
 from lkp_city_fips f
@@ -101,7 +103,7 @@ join STG_REGIONALPURCHASINGPOWER p on f.state_county_fips = p.fips_code
 group by f.state_abbreviation, f.city_name;
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Job Levels" guiX="199" guiY="159" id="POPULATE_JOB_LEVELS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Job Levels" guiX="196" guiY="186" id="POPULATE_JOB_LEVELS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer < 3 years', null, 3);
 insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer 3 - 5 years', 3, 5);
 insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer 5 - 10 years', 5, 10);
@@ -112,7 +114,7 @@ insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa 5 - 10 yea
 insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa > 10 years', 10, null);
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Salary Yr Adj" guiX="36" guiY="159" id="POPULATE_SALARY_YR_ADJ" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Salary Yr Adj" guiX="33" guiY="186" id="POPULATE_SALARY_YR_ADJ" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2010, 1.127);
 insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2011, 1.105);
 insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2012, 1.083);
@@ -124,7 +126,7 @@ insert into ${SALARY_YEAR_ADJUSTMENT_TABLENAME} values(2016, 1.000);
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Glassdoor Data" guiX="135" guiY="238" id="POPULATE_LOOKUP_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Glassdoor Data" guiX="119" guiY="260" id="POPULATE_LOOKUP_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${SALARY_LOOKUP_TABLENAME}
 select distinct
   0,
@@ -163,7 +165,7 @@ where
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Enigma Data" guiX="142" guiY="315" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Enigma Data" guiX="126" guiY="337" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
 */
@@ -246,7 +248,7 @@ left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where ((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index) / 2000.0) <= 100.0 and t.wage_year > 2009 and t.wage_year < 2017
 order by m.ticker_trim, t.gd_goc, t.unadjustedbasesalary desc;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="142" guiY="397" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="126" guiY="419" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
 */
@@ -327,7 +329,7 @@ order by ticker, goc, unadjustedbasesalary desc;]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Clean up City FIPS Table" guiX="49" guiY="476" id="CLEAN_UP_CITY_FIPS_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Clean up City FIPS Table" guiX="171" guiY="496" id="CLEAN_UP_CITY_FIPS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   FIPS data for Virginia was off for some reason, so need to adjust. 
   Again, this should probably should be in a separate file as it does 
@@ -388,19 +390,7 @@ set
   county_name = 'Spotsylvania + Fredericksburg'
 where city_name = 'DANVILLE' and state_abbreviation = 'VA';]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Franchise GOC Special Cases" guiX="370" guiY="476" id="UPDATE_FRANCHISE_GOC_SPECIAL_CASES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  update ${SALARY_LOOKUP_TABLENAME} to change gocs for specific
-  franchises. The idea is to combine certain gocs for certain
-  tickers. (For example, for LBTY, we combined 'general manager'
-  and 'manager' under the goc 'general manager').
-*/
-update ${SALARY_LOOKUP_TABLENAME} s
-set goc = u.new_goc
-from ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} u
-where u.old_goc = s.goc and u.ticker = s.ticker;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Job Names" guiX="225" guiY="476" id="UPDATE_JOB_NAMES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Job Names" guiX="187" guiY="572" id="UPDATE_JOB_NAMES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   update ${SALARY_LOOKUP_TABLENAME} to modify goc for various
   job titles. Basically, what we did was first generate a list
@@ -417,7 +407,36 @@ where u.jobtitle = s.jobtitle;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Levels" guiX="119" guiY="554" id="ADD_JOB_LEVELS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Franchise GOC Special Cases" guiX="137" guiY="651" id="UPDATE_FRANCHISE_GOC_SPECIAL_CASES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  update ${SALARY_LOOKUP_TABLENAME} to change gocs for specific
+  franchises. The idea is to combine certain gocs for certain
+  tickers. (For example, for LBTY, we combined 'general manager'
+  and 'manager' under the goc 'general manager').
+*/
+update ${SALARY_LOOKUP_TABLENAME} s
+set goc = u.new_goc
+from ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} u
+where u.old_goc = s.goc and u.ticker = s.ticker;]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply GOC Salary Multipliers" guiX="151" guiY="726" id="APPLY_GOC_SALARY_MULTIPLIERS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${SALARY_LOOKUP_TABLENAME} s
+  set unadjustedbasesalary = multiplier * unadjustedbasesalary,
+    unadjustedtotalsalary = multiplier * unadjustedtotalsalary,
+    unadjustedbasesalary_cola = multiplier * unadjustedbasesalary_cola,
+    unadjustedtotalsalary_cola = multiplier * unadjustedtotalsalary_cola,
+    unadjustedbasehourly = multiplier * unadjustedbasehourly,
+    unadjustedtotalhourly = multiplier * unadjustedtotalhourly,
+    unadjustedbasehourly_cola = multiplier * unadjustedbasehourly_cola,
+    unadjustedtotalhourly_cola = multiplier * unadjustedtotalhourly_cola
+from ${GOC_SALARY_MULTIPLIERS_TABLENAME} m
+where m.goc = s.goc and m.ticker = s.ticker;]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Levels" guiX="101" guiY="800" id="ADD_JOB_LEVELS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   update ${SALARY_LOOKUP_TABLENAME} to modify goc by level, given years of experience,
   see above for further explanation.
@@ -434,8 +453,8 @@ where
 ]]></attr>
 </Node>
 </Phase>
-<Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update H1B Names" guiX="275" guiY="554" id="UPDATE_H1B_NAMES" type="DB_EXECUTE">
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update H1B Names" guiX="257" guiY="800" id="UPDATE_H1B_NAMES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 update ${SALARY_LOOKUP_TABLENAME}
