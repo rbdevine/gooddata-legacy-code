@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jan 25 13:12:33 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.72" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jan 30 16:42:36 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.73" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -97,7 +97,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/GenerateSalaryLookupTables.grf" guiName="Add New Franchise Companies" guiX="69" guiY="3" id="ADD_NEW_FRANCHISE_COMPANIES" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageFranchiseNewCompanies.grf" guiName="Add New Franchise Companies" guiX="69" guiY="3" id="ADD_NEW_FRANCHISE_COMPANIES" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="1">
 <Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/GenerateSalaryLookupTables.grf" guiName="Generate Salary LookupTables" guiX="69" guiY="106" id="GENERATE_SALARY_LOOKUP_TABLES" type="RUN_GRAPH"/>

@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed Jan 25 18:05:29 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.68" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Jan 30 12:16:35 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.69" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="CITY_FIPS_AVERAGES_TABLENAME" value="LKP_CITY_FIPS_AVG"/>
-<Property id="GraphParameter27" name="GOC_SALARY_ADJUSTMENTS_TABLENAME" value="LKP_GOC_SALARY_ADJUSTMENTS"/>
-<Property id="GraphParameter8" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
-<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter9"/>
-<Property id="GraphParameter11" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
-<Property fileURL="workspace.prm" id="GraphParameter12"/>
-<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter1"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter21"/>
+<Property id="GraphParameter1" name="GOC_SALARY_ADJUSTMENTS_TABLENAME" value="LKP_GOC_SALARY_ADJUSTMENTS"/>
+<Property id="GraphParameter2" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
+<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter3"/>
+<Property id="GraphParameter5" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
+<Property fileURL="workspace.prm" id="GraphParameter6"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -390,7 +390,23 @@ set
   county_name = 'Spotsylvania + Fredericksburg'
 where city_name = 'DANVILLE' and state_abbreviation = 'VA';]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Job Names" guiX="187" guiY="572" id="UPDATE_JOB_NAMES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Marriott Maintenance" guiX="164" guiY="575" id="UPDATE_MARRIOTT_MAINTENANCE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  Since Marriott data was included in the original
+  dataset, the franchise jobtitle/goc mappings were
+  not applied. For now, just makikng an exeception
+  for that case (specifically with maintenance titles). 
+  Perhaps in the future we can implement a more general case. 
+*/
+SET LOCALE to LEN_S1;
+update ${SALARY_LOOKUP_TABLENAME} s
+set goc = u.goc
+from ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} u
+where u.jobtitle = s.jobtitle and s.ticker = 'MAR' and u.jobtitle like 'main%';]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Job Names" guiX="187" guiY="651" id="UPDATE_JOB_NAMES1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   update ${SALARY_LOOKUP_TABLENAME} to modify goc for various
   job titles. Basically, what we did was first generate a list
@@ -406,8 +422,8 @@ from LKP_GD_JOBTITLE_OVERRIDE_GOC u
 where u.jobtitle = s.jobtitle;]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Franchise GOC Special Cases" guiX="137" guiY="651" id="UPDATE_FRANCHISE_GOC_SPECIAL_CASES" type="DB_EXECUTE">
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Franchise GOC Special Cases" guiX="137" guiY="725" id="UPDATE_FRANCHISE_GOC_SPECIAL_CASES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   update ${SALARY_LOOKUP_TABLENAME} to change gocs for specific
   franchises. The idea is to combine certain gocs for certain
@@ -420,8 +436,8 @@ from ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} u
 where u.old_goc = s.goc and u.ticker = s.ticker;]]></attr>
 </Node>
 </Phase>
-<Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply GOC Salary Multipliers" guiX="151" guiY="726" id="APPLY_GOC_SALARY_MULTIPLIERS" type="DB_EXECUTE">
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply GOC Salary Multipliers" guiX="151" guiY="800" id="APPLY_GOC_SALARY_MULTIPLIERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${SALARY_LOOKUP_TABLENAME} s
   set unadjustedbasesalary = multiplier * unadjustedbasesalary,
     unadjustedtotalsalary = multiplier * unadjustedtotalsalary,
@@ -435,8 +451,8 @@ from ${GOC_SALARY_MULTIPLIERS_TABLENAME} m
 where m.goc = s.goc and m.ticker = s.ticker;]]></attr>
 </Node>
 </Phase>
-<Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Levels" guiX="101" guiY="800" id="ADD_JOB_LEVELS" type="DB_EXECUTE">
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Levels" guiX="190" guiY="877" id="ADD_JOB_LEVELS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   update ${SALARY_LOOKUP_TABLENAME} to modify goc by level, given years of experience,
   see above for further explanation.
@@ -453,8 +469,8 @@ where
 ]]></attr>
 </Node>
 </Phase>
-<Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update H1B Names" guiX="257" guiY="800" id="UPDATE_H1B_NAMES" type="DB_EXECUTE">
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update H1B Names" guiX="185" guiY="952" id="UPDATE_H1B_NAMES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 update ${SALARY_LOOKUP_TABLENAME}
