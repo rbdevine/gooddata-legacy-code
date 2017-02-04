@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat Feb 04 01:21:55 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.39" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat Feb 04 01:31:32 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.42" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="MEDICAID_SUBSIDY_STATE_MIN" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="MEDICAID_SUBSIDY_STATE_MAX" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="STATE" type="string"/>
-<Field name="MINIMUM_WAGE_ANNUAL" type="number"/>
+<Field name="MAXIMUM_WAGE_ANNUAL" type="number"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/MEDICAIDSUBSIDYSTATEMIN.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/medicaidsubsidystateminerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/MedicaidSubsidyStateMin.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="${SUBSIDY_MEDICAID_STATE_MIN_TABLENAME}"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/MEDICAIDSUBSIDYSTATEMAX.xlsx"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter19"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/medicaidsubsidystatemaxerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/MedicaidSubsidyStateMax.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${SUBSIDY_MEDICAID_STATE_MAX_TABLENAME}"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter20"/>
-<Property id="GraphParameter19" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/MedicaidSubsidyStateMin.txt"/>
+<Property id="GraphParameter43" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/MedicaidSubsidyStateMax.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -28,7 +28,7 @@
 // Transforms input record into output record.
 function integer transform() {
 	$out.0.STATE = $in.0.STATE;
-	$out.0.MINIMUM_WAGE_ANNUAL = $in.0.MINIMUM_WAGE_ANNUAL;
+	$out.0.MAXIMUM_WAGE_ANNUAL = $in.0.MAXIMUM_WAGE_ANNUAL;
 	
 	return ALL;
 }
@@ -65,7 +65,7 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
   STATE VARCHAR(2) UNIQUE NOT NULL,
-  MINIMUM_WAGE_ANNUAL FLOAT NOT NULL
+  MAXIMUM_WAGE_ANNUAL FLOAT NOT NULL
 );]]></attr>
 </Node>
 </Phase>
@@ -73,7 +73,7 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
     STATE,
-    MINIMUM_WAGE_ANNUAL
+    MAXIMUM_WAGE_ANNUAL
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -82,7 +82,7 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Phase>
 <Phase number="5">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="472" guiY="198" id="CLEAN_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[UPDATE ${TABLENAME} SET MINIMUM_WAGE_ANNUAL = ROUND(MINIMUM_WAGE_ANNUAL,2);]]></attr>
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLENAME} SET MAXIMUM_WAGE_ANNUAL = ROUND(MAXIMUM_WAGE_ANNUAL,2);]]></attr>
 </Node>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="285" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="325" guiY="285" id="CLEAN_WRITE" type="FILE_DELETE"/>
