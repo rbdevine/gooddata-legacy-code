@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Feb 03 20:40:42 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.32" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Feb 03 21:49:58 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.33" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ACA_SUBSIDY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -8,13 +8,13 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/ACASUBSIDY.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/acasubsidyerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/ACASubsidy.xlsx"/>
-<Property id="GraphParameter38" name="TABLENAME" value="${SUBSIDY_ACA_TABLENAME}"/>
-<Property fileURL="workspace.prm" id="GraphParameter3"/>
-<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/ACASubsidy.txt"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter19"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/EITCSUBSIDY.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/eitcsubsidyerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/EITCSubsidy.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${SUBSIDY_EITC_TABLENAME}"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter20"/>
+<Property id="GraphParameter19" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/EITCSubsidy.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
