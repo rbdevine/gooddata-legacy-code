@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Feb 08 17:42:18 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.79" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="industry" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2">
+<Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
+<Field name="Name" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="SQL_Industry_Queue" recordDelimiter="\n" type="delimited">
+<Field name="sql" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="fairpay-parameters.prm" id="GraphParameter8"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter29"/>
+<Property fileURL="workspace.prm" id="GraphParameter14"/>
+<Dictionary/>
+</Global>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Accumulation" guiX="40" guiY="17" id="UPDATE_ACCUMULATION" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
+set employee_count_max_prev = ac.employee_count_max_prev, employee_count_max = ac.employee_count_max
+from (
+  select 
+    a1.id,
+    a1.state_county_fips,
+    a1.ticker,
+    a1.employee_count,
+    sum(a2.employee_count)-a1.employee_count employee_count_max_prev,
+    sum(a2.employee_count) employee_count_max
+  from (
+    select a.id, a.state_county_fips, a.ticker, a.employee_count 
+    from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a 
+    join (
+      select ticker 
+      from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} 
+      order by ticker 
+      limit 1
+    ) t on a.ticker = t.ticker
+  ) a1
+  join (
+    select a.id, a.state_county_fips, a.ticker, a.employee_count 
+    from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a 
+    join (
+      select ticker
+      from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} 
+      order by ticker 
+      limit 1
+    ) t on a.ticker = t.ticker
+  ) a2 on a1.state_county_fips = a2.state_county_fips and a1.ticker = a2.ticker and a1.id >= a2.id
+  group by a1.id, a1.state_county_fips, a1.ticker, a1.employee_count
+) ac
+where ac.id = a.id;]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Deque Ticker" guiX="50" guiY="94" id="DEQUE_TICKER" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME}
+where ticker in (
+  select ticker
+  from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME}
+  order by ticker
+  limit 1
+) t;]]></attr>
+</Node>
+</Phase>
+</Graph>
