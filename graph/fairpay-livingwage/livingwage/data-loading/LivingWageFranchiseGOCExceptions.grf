@@ -1,18 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jan 12 17:02:37 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.22" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jan 18 11:27:13 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.26" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="JOB_TITLE_TO_GOC" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="JOBTITLE" type="string"/>
-<Field name="GOC" type="string"/>
+<Record fieldDelimiter="|" name="GOC_EXCEPTIONS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="OLD_GOC" type="string"/>
+<Field name="NEW_GOC" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/FranchiseJobtitleToGOC.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/franchisejobtitletogocerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/FranchiseJobtitleToGOC.xlsx"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter19" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/franchisejobtitletogoc.txt"/>
-<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter20"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/FranchiseGOCExceptions.xlsx"/>
+<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter19"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/franchisegocexceptionserror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/FranchiseGOCExceptions.xlsx"/>
+<Property fileURL="workspace.prm" id="GraphParameter3"/>
+<Property id="GraphParameter18" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/franchisegocexceptions.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -26,8 +27,9 @@
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.JOBTITLE = $in.0.JOBTITLE;
-	$out.0.GOC = $in.0.GOC;
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.OLD_GOC = $in.0.OLD_GOC;
+	$out.0.NEW_GOC = $in.0.NEW_GOC;
 	
 	return ALL;
 }
@@ -55,23 +57,25 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="18" guiY="198" id="DROP_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME};]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="6" guiY="198" id="DROP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} (
-  JOBTITLE VARCHAR(64),
-  GOC VARCHAR(64)
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} (
+  TICKER VARCHAR(32),
+  OLD_GOC VARCHAR(255),
+  NEW_GOC VARCHAR(255)
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[COPY ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} (
-    JOBTITLE,
-    GOC
+<attr name="sqlQuery"><![CDATA[COPY ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} (
+	TICKER,
+    OLD_GOC,
+    NEW_GOC
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -80,10 +84,10 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Phase>
 <Phase number="5">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Data" guiX="472" guiY="198" id="CLEANUP_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[delete from ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} where JOBTITLE is null;
-delete from ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} where GOC is null;
-update ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} set JOBTITLE = ltrim(rtrim(JOBTITLE));
-update ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} set GOC = ltrim(rtrim(GOC));
+<attr name="sqlQuery"><![CDATA[delete from ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} where ticker is null;
+update ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} set TICKER = ltrim(rtrim(TICKER));
+update ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} set NEW_GOC = ltrim(rtrim(NEW_GOC));
+update ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} set OLD_GOC = ltrim(rtrim(OLD_GOC));
 ]]></attr>
 </Node>
 </Phase>

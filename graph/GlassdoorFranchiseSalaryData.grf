@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jan 03 13:16:05 EST 2017" modifiedBy="scalvillo" name="Complete County File" revision="1.228" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue Jan 31 16:16:37 EST 2017" modifiedBy="richdevine" name="Complete County File" revision="1.247" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata1" previewAttachment="${DATA_TMP_DIR}/gdfranchisepay.txt" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="," label="FRANCHISEPAY_READ" name="FRANCHISEPAY_READ" previewAttachment="${DATA_TMP_DIR}/gdfranchisepay.txt" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
+<Metadata id="Metadata1" previewAttachment="/Users/scalvillo/Desktop/gdfranchisepay.txt" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="FRANCHISEPAY_READ" name="FRANCHISEPAY_READ" previewAttachment="/Users/scalvillo/Desktop/gdfranchisepay.txt" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
 <Field name="COMPANY" type="string"/>
 <Field name="AREA" type="string"/>
 <Field name="STATE" type="string"/>
@@ -39,7 +39,7 @@
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="280" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="0" skipSourceRows="1" trim="true" type="DATA_READER" verbose="false"/>
+<Node dataPolicy="strict" enabled="enabled" fileURL="${READFILEPATH}" guiName="CSV Reader" guiX="63" guiY="129" id="CSV_READER" quotedStrings="true" skipRows="0" skipSourceRows="1" trim="true" type="DATA_READER" verbose="false"/>
 <Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="474" guiY="129" id="CSV_WRITER" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="Reformat" guiX="280" guiY="129" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
@@ -95,14 +95,14 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="280" guiY="245" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-	COMPANY VARCHAR(255),
-	AREA VARCHAR(255),
-	STATE VARCHAR(255),
-	JOBTITLE VARCHAR(255),
-	REVIEWCOUNT VARCHAR(255),
-	MIN VARCHAR(255),
-	MAX VARCHAR(255),
-    RANGE VARCHAR(255),
+	COMPANY VARCHAR(255) NOT NULL,
+	AREA VARCHAR(255) NOT NULL,
+	STATE VARCHAR(255) NOT NULL,
+	JOBTITLE VARCHAR(255) NOT NULL,
+	REVIEWCOUNT INT,
+	MIN FLOAT NOT NULL,
+	MAX FLOAT NOT NULL,
+    RANGE VARCHAR(255) NOT NULL,
 	UNIT VARCHAR(255)
 	
 );]]></attr>
@@ -123,13 +123,12 @@ function integer transform() {
 
 )
 FROM LOCAL '${WRITEFILEPATH}'
-EXCEPTIONS '${POPULATEERRORFILEPATH}'
-ABORT ON ERROR;]]></attr>
+EXCEPTIONS '${POPULATEERRORFILEPATH}';]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean download" guiX="63" guiY="334" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="280" guiY="334" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="disabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="474" guiY="334" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>

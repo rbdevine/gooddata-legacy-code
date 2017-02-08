@@ -1,18 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jan 12 17:02:37 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.22" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Feb 06 15:37:45 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.40" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="JOB_TITLE_TO_GOC" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="JOBTITLE" type="string"/>
-<Field name="GOC" type="string"/>
+<Record fieldDelimiter="|" name="MEDICAID_PARTICIPATION_BY_CODE_SUBSIDY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="CODE" type="integer"/>
+<Field name="ADULT_MEDICAID_PERCENTAGE" type="number"/>
+<Field name="CHILD_MEDICAID_PERCENTAGE" type="number"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/FranchiseJobtitleToGOC.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/franchisejobtitletogocerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/FranchiseJobtitleToGOC.xlsx"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter19" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/franchisejobtitletogoc.txt"/>
-<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter20"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/MEDICAIDPARTICIPATIONBYCODE.xlsx"/>
+<Property id="GraphParameter25" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/medicaidparticipationbycodeerror.txt"/>
+<Property id="GraphParameter26" name="READFILEPATH" value="${DATA_TMP_DIR}/MedicaidParticipationByCode.xlsx"/>
+<Property id="GraphParameter27" name="TABLENAME" value="${SUBSIDY_MEDICAID_PARTICIPATION_BY_CODE_TABLENAME}"/>
+<Property fileURL="workspace.prm" id="GraphParameter28"/>
+<Property id="GraphParameter43" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/MedicaidParticipationByCode.txt"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter1"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -26,8 +28,9 @@
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.JOBTITLE = $in.0.JOBTITLE;
-	$out.0.GOC = $in.0.GOC;
+	$out.0.CODE = $in.0.CODE;
+	$out.0.ADULT_MEDICAID_PERCENTAGE = $in.0.ADULT_MEDICAID_PERCENTAGE;
+	$out.0.CHILD_MEDICAID_PERCENTAGE = $in.0.CHILD_MEDICAID_PERCENTAGE;
 	
 	return ALL;
 }
@@ -55,23 +58,26 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="18" guiY="285" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="18" guiY="198" id="DROP_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME};]]></attr>
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} (
-  JOBTITLE VARCHAR(64),
-  GOC VARCHAR(64)
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+  CODE INTEGER UNIQUE NOT NULL,
+  ADULT_MEDICAID_PERCENTAGE FLOAT NOT NULL,
+  CHILD_MEDICAID_PERCENTAGE FLOAT NOT NULL
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[COPY ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} (
-    JOBTITLE,
-    GOC
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+    CODE,
+    ADULT_MEDICAID_PERCENTAGE,
+    CHILD_MEDICAID_PERCENTAGE
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -79,16 +85,6 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Data" guiX="472" guiY="198" id="CLEANUP_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[delete from ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} where JOBTITLE is null;
-delete from ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} where GOC is null;
-update ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} set JOBTITLE = ltrim(rtrim(JOBTITLE));
-update ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} set GOC = ltrim(rtrim(GOC));
-]]></attr>
-</Node>
-</Phase>
-<Phase number="6">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="18" guiY="285" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="285" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="325" guiY="285" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>

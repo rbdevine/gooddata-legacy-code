@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Oct 28 11:15:17 EDT 2016" guiVersion="3.4.4.P" id="1477673280633" licenseType="Commercial" modified="Wed Feb 08 12:00:59 EST 2017" modifiedBy="LilyL" name="Metric Data Setup Other Values.grf" revision="1.10" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Component" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field delimiter="|" name="Component_Name" type="string"/>
+<Field name="Component_Hyperlink" type="string"/>
+<Field name="Component_Sort" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Driver" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Driver_Name" type="string"/>
+<Field name="Driver_Hyperlink" type="string"/>
+<Field delimiter="\n" name="Driver_Sort" type="string"/>
+</Record>
+</Metadata>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/metrics/OtherDriverValues.txt" guiName="CSV Reader" guiX="382" guiY="359" id="CSV_READER" skipRows="1" type="DATA_READER"/>
+<Node enabled="enabled" fileURL="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/metrics/OtherComponentValues.txt" guiName="CSV Reader" guiX="382" guiY="481" id="CSV_READER1" skipRows="1" type="DATA_READER"/>
+<Node dataset="dataset.driver" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.driver&quot;,&quot;datasetTitle&quot;:&quot;Driver&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.driver.driverid&quot;,&quot;title&quot;:&quot;Driver Id&quot;,&quot;prettyId&quot;:&quot;attr_driver_driverid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driverid&quot;,&quot;title&quot;:&quot;Driver Id&quot;,&quot;prettyId&quot;:&quot;driverid&quot;,&quot;assignedMetadataField&quot;:&quot;Driver_Name&quot;,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:true}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driverid.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;driverid_drivername&quot;,&quot;assignedMetadataField&quot;:&quot;Driver_Sort&quot;,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[],&quot;dateFacts&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;entitiesWithoutValue&quot;:[],&quot;datesWithFactConflict&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="683" guiY="359" id="GD_DATASET_WRITER5" mode="INCREMENTAL" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node dataset="dataset.component" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.component&quot;,&quot;datasetTitle&quot;:&quot;Component&quot;,&quot;attributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.component.componentid&quot;,&quot;title&quot;:&quot;Component Id&quot;,&quot;prettyId&quot;:&quot;attr_component_componentid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.component.componentid&quot;,&quot;title&quot;:&quot;Component Id&quot;,&quot;prettyId&quot;:&quot;componentid&quot;,&quot;assignedMetadataField&quot;:&quot;Component_Name&quot;,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:true}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.component.componentid.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;componentid_componentname&quot;,&quot;assignedMetadataField&quot;:&quot;Component_Sort&quot;,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:null,&quot;selectedDisplayForm&quot;:null}}],&quot;referencedAttributes&quot;:[],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[],&quot;dateFacts&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;entitiesWithoutValue&quot;:[],&quot;datesWithFactConflict&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="683" guiY="481" id="GD_DATASET_WRITER6" mode="INCREMENTAL" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge8" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (output)" toNode="GD_DATASET_WRITER5:0"/>
+<Edge fromNode="CSV_READER1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge11" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="GD_DATASET_WRITER6:0"/>
+</Phase>
+</Graph>

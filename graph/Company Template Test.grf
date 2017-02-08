@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Wed Oct 12 09:55:30 EDT 2016" guiVersion="3.4.4.P" id="1476296764541" licenseType="Commercial" modified="Wed Feb 08 11:50:39 EST 2017" modifiedBy="LilyL" name="V3.5 Metric Data" revision="1.175" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata8" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Component" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Component_Hyperlink" type="string"/>
+<Field name="Component_Sort" type="string"/>
+<Field name="Component_Name" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata6" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Driver" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Driver_Name" type="string"/>
+<Field name="Driver_Hyperlink" type="string"/>
+<Field name="Driver_Sort" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachment="/users/LilyL/Desktop/gui_output_scores25.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="gui_output_scores25.csv" name="gui_output_scores25_csv" previewAttachment="/users/LilyL/Desktop/gui_output_scores25.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="FIELD" type="string"/>
+<Field eofAsDelimiter="false" name="VALUE" type="string"/>
+<Field name="Description" type="string"/>
+<Field name="Data_ID" type="string"/>
+<Field name="Hyperlink" type="string"/>
+<Field name="Sort" type="string"/>
+<Field name="Unit_Of_Measurement" type="string"/>
+<Field name="Component_Name" type="string"/>
+<Field name="Data_Source" type="string"/>
+<Field name="Driver_Name" type="string"/>
+<Field name="Metric_ID" type="string"/>
+<Field name="Data_Name" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3" previewAttachment="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/metrics/gui_output_scores25.csv" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="," label="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/metrics/gui_output_scores25.csv" name="https_AKIAIJF44KUAT6SGEJWA_I0lKNCl_2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX_justdata_s3_amazonaws_com_ranking_metrics_gui_output_scores25_csv" previewAttachment="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/metrics/gui_output_scores25.csv" previewAttachmentCharset="UTF-8" quoteChar="both" quotedStrings="false" recordDelimiter="\r\n" skipSourceRows="0" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="FIELD" type="string"/>
+<Field eofAsDelimiter="false" name="VALUE" type="string"/>
+<Field name="Driver_Name" type="string"/>
+<Field name="Component_Name" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata7" previewAttachment="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/gui_output_scores_20161116.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="RANKING_OUTPUT" name="RANKING_OUTPUT" previewAttachment="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/gui_output_scores_20161116.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\r\n" skipSourceRows="1" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="FIELD" type="string"/>
+<Field eofAsDelimiter="true" name="VALUE" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata4" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="recordName1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="FIELD" type="string"/>
+<Field name="VALUE" type="number"/>
+<Field name="Driver_ID" type="string"/>
+<Field name="Component_ID" type="string"/>
+<Field name="Description" type="string"/>
+<Field name="Data_ID" type="string"/>
+<Field name="Hyperlink" type="string"/>
+<Field name="Sort" type="string"/>
+<Field name="Unit_Of_Measurement" type="string"/>
+<Field name="Data_Name" type="string"/>
+<Field name="Data_Source" type="string"/>
+<Field name="Metric_ID" type="string"/>
+<Field name="Company_ID" type="string"/>
+<Field name="Industry" type="string"/>
+<Field delimiter="," name="Data_Code" type="string"/>
+<Field name="Weight" type="string"/>
+<Field name="Metric_Score" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata5" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="," name="recordName2" previewAttachmentCharset="UTF-8" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="FIELD" type="string"/>
+<Field name="VALUE" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="V2_Sheet1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="FIELD" name="FIELD" type="string"/>
+<Field label="VALUE" name="VALUE" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="V2_Sheet1" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field label="TICKER" name="TICKER" type="string"/>
+<Field label="FIELD" name="FIELD" type="string"/>
+<Field label="VALUE" name="VALUE" type="number"/>
+<Field name="Hyperlink" type="string"/>
+<Field name="Weight" type="string"/>
+<Field name="Data_ID" type="string"/>
+<Field name="Data_Name" type="string"/>
+<Field name="Description" type="string"/>
+<Field name="Metric_ID" type="string"/>
+<Field name="Industry" type="string"/>
+<Field name="Company_Name" type="string"/>
+<Field name="Data_Source" type="string"/>
+<Field name="Component_Name" type="string"/>
+<Field name="Driver_Name" type="string"/>
+<Field name="Unit_Of_Measurement" type="string"/>
+</Record>
+</Metadata>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node charset="ISO-8859-1" dataPolicy="strict" enabled="enabled" fileURL="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/gui_output_scores_20161116.csv" guiName="CSV Reader" guiX="121" guiY="255" id="CSV_READER" skipLeadingBlanks="true" skipTrailingBlanks="true" treatMultipleDelimitersAsOne="false" trim="false" type="DATA_READER" verbose="true"/>
+<Node dataset="dataset.metric" datasetFieldMappings="{&quot;gd_dataset&quot;:{&quot;datasetId&quot;:&quot;dataset.metric&quot;,&quot;datasetTitle&quot;:&quot;Score Fact&quot;,&quot;attributes&quot;:[],&quot;referencedAttributes&quot;:[{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.company.companyid&quot;,&quot;title&quot;:&quot;Company Id&quot;,&quot;prettyId&quot;:&quot;attr_company_companyid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.company.companyid&quot;,&quot;title&quot;:&quot;Company Id&quot;,&quot;prettyId&quot;:&quot;company__companyid&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.company.companyid.companyname&quot;,&quot;title&quot;:&quot;Company Name&quot;,&quot;prettyId&quot;:&quot;company__companyid_companyname&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Company_ID&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.company.companyid&quot;,&quot;title&quot;:&quot;Company Id&quot;,&quot;prettyId&quot;:&quot;company__companyid&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.component.componentid&quot;,&quot;title&quot;:&quot;Component Id&quot;,&quot;prettyId&quot;:&quot;attr_component_componentid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.component.componentid&quot;,&quot;title&quot;:&quot;Component Id&quot;,&quot;prettyId&quot;:&quot;component__componentid&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.component.componentid.componentname&quot;,&quot;title&quot;:&quot;Component Name&quot;,&quot;prettyId&quot;:&quot;component__componentid_componentname&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Component_ID&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.component.componentid&quot;,&quot;title&quot;:&quot;Component Id&quot;,&quot;prettyId&quot;:&quot;component__componentid&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source&quot;,&quot;prettyId&quot;:&quot;attr_datasource_datasourcename&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename.datasourcehyperlink&quot;,&quot;title&quot;:&quot;Data Source Hyperlink&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename_datasourcehyperlink&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename.datasourcesort&quot;,&quot;title&quot;:&quot;Data Source Sort&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename_datasourcesort&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Data_Source&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.datasource.datasourcename&quot;,&quot;title&quot;:&quot;Data Source&quot;,&quot;prettyId&quot;:&quot;datasource__datasourcename&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.driver.driverid&quot;,&quot;title&quot;:&quot;Driver Id&quot;,&quot;prettyId&quot;:&quot;attr_driver_driverid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driverid&quot;,&quot;title&quot;:&quot;Driver Id&quot;,&quot;prettyId&quot;:&quot;driver__driverid&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driverid.drivername&quot;,&quot;title&quot;:&quot;Driver Name&quot;,&quot;prettyId&quot;:&quot;driver__driverid_drivername&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Driver_ID&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.driver.driverid&quot;,&quot;title&quot;:&quot;Driver Id&quot;,&quot;prettyId&quot;:&quot;driver__driverid&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}}},{&quot;gd_dataset_attribute&quot;:{&quot;id&quot;:&quot;attr.metrics.metricid&quot;,&quot;title&quot;:&quot;Metric ID&quot;,&quot;prettyId&quot;:&quot;attr_metrics_metricid&quot;,&quot;displayForms&quot;:[{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metrics.metricid&quot;,&quot;title&quot;:&quot;Metric ID&quot;,&quot;prettyId&quot;:&quot;metrics__metricid&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}},{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metrics.metricid.metricname&quot;,&quot;title&quot;:&quot;Metric Name&quot;,&quot;prettyId&quot;:&quot;metrics__metricid_metricname&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}],&quot;assignedMetadataField&quot;:&quot;Metric_ID&quot;,&quot;selectedDisplayForm&quot;:{&quot;gd_dataset_attribute_display_form&quot;:{&quot;id&quot;:&quot;label.metrics.metricid&quot;,&quot;title&quot;:&quot;Metric ID&quot;,&quot;prettyId&quot;:&quot;metrics__metricid&quot;,&quot;assignedMetadataField&quot;:null,&quot;type&quot;:&quot;STRING&quot;,&quot;referenceKey&quot;:false}}}}],&quot;dateAttributes&quot;:[],&quot;simpleFacts&quot;:[{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.metric.componentweight&quot;,&quot;title&quot;:&quot;Component Weight&quot;,&quot;prettyId&quot;:&quot;componentweight&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;Weight&quot;}},{&quot;gd_dataset_fact&quot;:{&quot;id&quot;:&quot;fact.metric.metricscore&quot;,&quot;title&quot;:&quot;Metric Score&quot;,&quot;prettyId&quot;:&quot;metricscore&quot;,&quot;type&quot;:&quot;DECIMAL&quot;,&quot;assignedMetadataField&quot;:&quot;Metric_Score&quot;}}],&quot;dateFacts&quot;:[],&quot;unassigneddateFacts&quot;:[],&quot;fieldsWithMetadataConflict&quot;:[],&quot;entitiesWithoutMetadata&quot;:[],&quot;entitiesWithoutValue&quot;:[],&quot;datesWithFactConflict&quot;:[]}}" enabled="enabled" guiName="GD Dataset Writer" guiX="838" guiY="142" id="GD_DATASET_WRITER" mode="INCREMENTAL" retriesInterval="60" retriesNumber="5" type="GD_DATASET_WRITER"/>
+<Node charset="ISO-8859-1" enabled="enabled" guiName="Reformat" guiX="449" guiY="255" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.FIELD= $in.0.FIELD;
+	
+	//Ticker level FIELD inputs mapped to special 'Overall' Driver Name
+	if($in.0.FIELD == 'RANK'or $in.0.FIELD == 'WGTSCORE') {
+		$out.0.Driver_ID ='Overall';
+	}
+	//Driver level FIELD inputs mapped to Driver Name
+	else if($in.0.FIELD =='COMPONENT.PAY.LIVING'or $in.0.FIELD =='COMPONENT.PAY.PTO'or $in.0.FIELD =='COMPONENT.PAY.HEALTH'or $in.0.FIELD =='COMPONENT.PAY.RETIRE'or 
+	$in.0.FIELD =='COMPONENT.PAY.DISC'or $in.0.FIELD =='COMPONENT.PAY.CEO'or $in.0.FIELD == 'COMPONENT.PAY.FAIR' or $in.0.FIELD == 'DRIVER.PAY') {
+		 $out.0.Driver_ID = 'Worker Pay and Benefits';
+	}
+	else if($in.0.FIELD =='COMPONENT.TREAT.SAFE'or $in.0.FIELD =='COMPONENT.TREAT.WLB'or $in.0.FIELD =='COMPONENT.TREAT.EDU'or $in.0.FIELD =='COMPONENT.TREAT.DISC'or 
+	$in.0.FIELD =='COMPONENT.TREAT.LAYOFF'or $in.0.FIELD =='COMPONENT.TREAT.RESPECT'or $in.0.FIELD == 'DRIVER.TREAT') {
+		$out.0.Driver_ID ='Worker Treatment';
+	}
+	else if($in.0.FIELD =='COMPONENT.SUPPLY.ABUSE'or $in.0.FIELD =='COMPONENT.SUPPLY.CONFLICT'or $in.0.FIELD =='COMPONENT.SUPPLY.REPRESS'or $in.0.FIELD == 'DRIVER.SUPPLY'){
+	 	$out.0.Driver_ID = 'Supply Chain Impact';
+	}
+	else if($in.0.FIELD =='COMPONENT.COMM.RELS'or $in.0.FIELD =='COMPONENT.COMM.CHARITY'or $in.0.FIELD == 'DRIVER.COMM'){
+		 $out.0.Driver_ID ='Community Wellbeing';
+	}
+	else if($in.0.FIELD =='COMPONENT.JOBS.US'or $in.0.FIELD == 'DRIVER.JOBS'){
+		 $out.0.Driver_ID ='Domestic Job Creation';
+	}
+	else if($in.0.FIELD =='COMPONENT.PROD.BEN'or $in.0.FIELD =='COMPONENT.PROD.QUAL'or $in.0.FIELD == 'DRIVER.PROD'){
+		 $out.0.Driver_ID ='Product Attributes';
+	}
+	else if($in.0.FIELD =='COMPONENT.CUST.FAIR'or $in.0.FIELD =='COMPONENT.CUST.RELS'or $in.0.FIELD =='COMPONENT.CUST.DISC'or $in.0.FIELD =='COMPONENT.CUST.PRIV'or $in.0.FIELD == 'DRIVER.CUST'){
+		 $out.0.Driver_ID ='Customer Treatment';
+	}
+	else if($in.0.FIELD =='COMPONENT.LEAD.LAWS'or $in.0.FIELD =='COMPONENT.LEAD.INTEGRITY'or $in.0.FIELD =='COMPONENT.LEAD.TRUTH'or $in.0.FIELD =='COMPONENT.LEAD.TAX'or $in.0.FIELD =='COMPONENT.LEAD.POLITICS'or $in.0.FIELD == 'DRIVER.LEAD'){
+		 $out.0.Driver_ID ='Leadership & Ethics';
+	}
+	else if($in.0.FIELD =='COMPONENT.ENV.POLLUTION'or $in.0.FIELD =='COMPONENT.ENV.MGMT'or $in.0.FIELD =='COMPONENT.ENV.EFFICIENT'or $in.0.FIELD == 'DRIVER.ENV'){
+		 $out.0.Driver_ID ='Environmental Impact';
+	}
+	else if($in.0.FIELD =='COMPONENT.INVEST.ACCURATE'or $in.0.FIELD =='COMPONENT.INVEST.PROFIT'or $in.0.FIELD =='COMPONENT.INVEST.RETURN'or $in.0.FIELD == 'DRIVER.INVEST'){
+		 $out.0.Driver_ID ='Investor Alignment';
+	}
+
+	
+	//Ticker and Driver level FIELD inputs mapped to special 'Overall' Component Name
+	if ($in.0.FIELD == 'RANK'or $in.0.FIELD == 'WGTSCORE' or $in.0.FIELD == 'DRIVER.PAY' or $in.0.FIELD == 'DRIVER.TREAT' or $in.0.FIELD == 'DRIVER.SUPPLY' or $in.0.FIELD == 'DRIVER.COMM' or $in.0.FIELD == 'DRIVER.JOBS' or 
+	$in.0.FIELD == 'DRIVER.PROD' or $in.0.FIELD == 'DRIVER.CUST' or $in.0.FIELD == 'DRIVER.LEAD' or $in.0.FIELD == 'DRIVER.ENV' or $in.0.FIELD == 'DRIVER.INVEST') {
+		$out.0.Component_ID ='Overall';
+	}
+	//Component Level FIELD inputs mapped to Component Name
+	else if($in.0.FIELD == 'COMPONENT.PAY.LIVING') {$out.0.Component_ID=  'Pays a Living Wage'; }
+	else if($in.0.FIELD == 'COMPONENT.PAY.PTO') { $out.0.Component_ID=  'Provides Paid Time Off'; }
+	else if($in.0.FIELD == 'COMPONENT.PAY.HEALTH') { $out.0.Component_ID=  'Sponsors Health Insurance'; }
+	else if($in.0.FIELD == 'COMPONENT.PAY.FAIR') { $out.0.Component_ID=  'Pays a Fair Wage for the Industry and Job Level'; }
+	else if($in.0.FIELD == 'COMPONENT.PAY.RETIRE') { $out.0.Component_ID=  'Helps Workers Prepare for Retirement'; }
+	else if($in.0.FIELD == 'COMPONENT.PAY.DISC') { $out.0.Component_ID=  'Does Not Discriminate in Pay'; }
+	else if($in.0.FIELD == 'COMPONENT.PAY.CEO') { $out.0.Component_ID=  'Pays Workers Fairly Compared to CEO'; }
+	else if($in.0.FIELD == 'COMPONENT.TREAT.SAFE') { $out.0.Component_ID=  'Provides a Safe Workplace'; }
+	else if($in.0.FIELD == 'COMPONENT.TREAT.WLB') { $out.0.Component_ID=  'Promotes Work-Life Balance'; }
+	else if($in.0.FIELD == 'COMPONENT.TREAT.EDU') { $out.0.Component_ID=  'Provides Education and Training'; }
+	else if($in.0.FIELD == 'COMPONENT.TREAT.DISC') { $out.0.Component_ID=  'Does Not Discriminate in Hiring, Firing and Promotion Practices'; }
+	else if($in.0.FIELD == 'COMPONENT.TREAT.LAYOFF') { $out.0.Component_ID=  'Handles Grievances and Layoffs Fairly'; }
+	else if($in.0.FIELD == 'COMPONENT.TREAT.RESPECT') { $out.0.Component_ID=  'Respects Workers'; }
+	else if($in.0.FIELD == 'COMPONENT.SUPPLY.ABUSE') { $out.0.Component_ID=  'Does Not Have Suppliers With Abusive Conditions'; }
+	else if($in.0.FIELD == 'COMPONENT.SUPPLY.CONFLICT') { $out.0.Component_ID=  'Does Not Cause or Contribute to Conflict Abroad'; }
+	else if($in.0.FIELD == 'COMPONENT.SUPPLY.REPRESS') { $out.0.Component_ID=  'Does Not Do Business with Repressive Governments'; }
+	else if($in.0.FIELD == 'COMPONENT.COMM.RELS') { $out.0.Component_ID=  'Maintains Strong Relationships with Communities'; }
+	else if($in.0.FIELD == 'COMPONENT.COMM.CHARITY') { $out.0.Component_ID=  'Contributes to Charitable Causes'; }
+	else if($in.0.FIELD == 'COMPONENT.JOBS.US') { $out.0.Component_ID=  'Creates Jobs in the US'; }
+	else if($in.0.FIELD == 'COMPONENT.PROD.BEN') { $out.0.Component_ID=  'Makes Products That are Beneficial to Health, Environment, or Society'; }
+	else if($in.0.FIELD == 'COMPONENT.PROD.QUAL') { $out.0.Component_ID=  'Makes Quality Products'; }
+	else if($in.0.FIELD == 'COMPONENT.CUST.FAIR') { $out.0.Component_ID=  'Provides Fair Pricing and Sales Terms'; }
+	else if($in.0.FIELD == 'COMPONENT.CUST.RELS') { $out.0.Component_ID=  'Maintains Strong Relationships with Customers'; }
+	else if($in.0.FIELD == 'COMPONENT.CUST.DISC') { $out.0.Component_ID=  'Does Not Discriminate in Customer Treatment'; }
+	else if($in.0.FIELD == 'COMPONENT.CUST.PRIV') { $out.0.Component_ID=  'Protects Customer Privacy'; }
+	else if($in.0.FIELD == 'COMPONENT.LEAD.LAWS') { $out.0.Component_ID=  'Follows Laws and Regulations'; }
+	else if($in.0.FIELD == 'COMPONENT.LEAD.INTEGRITY') { $out.0.Component_ID=  'Has Leaders with Integrity'; }
+	else if($in.0.FIELD == 'COMPONENT.LEAD.TRUTH') { $out.0.Component_ID=  'Is Truthful in Advertising and Labelling'; }
+	else if($in.0.FIELD == 'COMPONENT.LEAD.TAX') { $out.0.Component_ID=  'Pays Fair Share of Taxes'; }
+	else if($in.0.FIELD == 'COMPONENT.LEAD.POLITICS') { $out.0.Component_ID=  'Minimizes Political Spending'; }
+	else if($in.0.FIELD == 'COMPONENT.ENV.POLLUTION') { $out.0.Component_ID=  'Minimizes Pollution'; }
+	else if($in.0.FIELD == 'COMPONENT.ENV.MGMT') { $out.0.Component_ID=  'Has Environmentally Responsible Management'; }
+	else if($in.0.FIELD == 'COMPONENT.ENV.EFFICIENT') { $out.0.Component_ID=  'Uses Resources Efficiently'; }
+	else if($in.0.FIELD == 'COMPONENT.INVEST.ACCURATE') { $out.0.Component_ID=  'Is Transparent & Accurate in Financial Reporting'; }
+	else if($in.0.FIELD == 'COMPONENT.INVEST.PROFIT') { $out.0.Component_ID=  'Is Profitable Over the Long Term'; }
+	else if($in.0.FIELD == 'COMPONENT.INVEST.RETURN') { $out.0.Component_ID=  'Provides Investor Return'; }
+	
+	if($in.0.FIELD == 'RANK') { $out.0.Data_Name = 'Rank'; }
+	else if($in.0.FIELD == 'WGTSCORE') { $out.0.Data_Name = 'Weighted Score'; }
+	else if($out.0.Component_ID == 'Overall') { $out.0.Data_Name =  'Overall Driver Score'; }
+	else{$out.0.Data_Name = 'Component Score';}
+	
+	if(isNumber($in.0.VALUE)) {
+		$out.0.VALUE = str2double($in.0.VALUE);
+		return ALL;
+	}
+	else {
+		return SKIP;
+	}
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="disabled" fileURL="https://AKIAIJF44KUAT6SGEJWA:I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX@justdata.s3.amazonaws.com/ranking/metrics/gui_output_scores25.xls" guiName="SpreadsheetDataReader" guiX="16" guiY="20" id="SPREADSHEET_DATA_READER" type="SPREADSHEET_READER"/>
+<Edge fromNode="CSV_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata7" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata4" outPort="Port 0 (out)" toNode="GD_DATASET_WRITER:0"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/AllDataOtherValues(Company Template Version).grf" guiName="RunGraph" guiX="541" guiY="430" id="RUN_GRAPH" sameInstance="true" type="RUN_GRAPH"/>
+</Phase>
+</Graph>

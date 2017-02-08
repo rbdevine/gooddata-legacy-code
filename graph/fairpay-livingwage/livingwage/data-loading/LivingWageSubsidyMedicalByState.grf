@@ -1,20 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jan 18 14:26:28 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.19" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Feb 06 16:41:49 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.55" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata0">
-<Record fieldDelimiter="|" name="DIST_BY_GOC" recordDelimiter="\n" type="delimited">
-<Field name="TICKER" type="string"/>
-<Field name="SUBSIDIARY" type="string"/>
-<Field name="GOC" type="string"/>
-<Field name="DISTRIBUTION" type="string"/>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="MEDICAID_SUBSIDY_STATE_MAX" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="STATE" type="string"/>
+<Field name="CHILD_MEDICAID_ANNUAL" type="number"/>
+<Field name="ADULT_MEDICAID_ANNUAL" type="number"/>
+<Field name="CHILD_MEDICAIDCHIPS_PERCENTAGE_MULTIPLIER" type="number"/>
+<Field name="CHILD_MEDICAID_PARTICIPATION_MULTIPLIER" type="number"/>
+<Field name="ADULT_MEDICAID_PARTICIPATION_MULTIPLIER" type="number"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/DistributionsByGOC.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/distributionsbygocerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/DistributionsByGOC.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="LKP_LIVING_WAGE_GOC_DISTRIBUTIONS"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter19" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/distributionsbygoc.txt"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/MEDICALSUBSIDYBYSTATE.xlsx"/>
+<Property id="GraphParameter25" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/medicalsubsidybystateerror.txt"/>
+<Property id="GraphParameter26" name="READFILEPATH" value="${DATA_TMP_DIR}/MedicalSubsidyByState.xlsx"/>
+<Property id="GraphParameter27" name="TABLENAME" value="${SUBSIDY_MEDICAL_BY_STATE_TABLENAME}"/>
+<Property fileURL="workspace.prm" id="GraphParameter28"/>
+<Property id="GraphParameter43" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/MedicalSubsidyByState.txt"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter1"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -28,10 +31,12 @@
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.TICKER = $in.0.TICKER;
-	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
-	$out.0.GOC = $in.0.GOC;
-	$out.0.DISTRIBUTION = $in.0.DISTRIBUTION;
+	$out.0.STATE = $in.0.STATE;
+	$out.0.CHILD_MEDICAID_ANNUAL = $in.0.CHILD_MEDICAID_ANNUAL;
+	$out.0.ADULT_MEDICAID_ANNUAL = $in.0.ADULT_MEDICAID_ANNUAL;
+	$out.0.CHILD_MEDICAIDCHIPS_PERCENTAGE_MULTIPLIER = $in.0.CHILD_MEDICAIDCHIPS_PERCENTAGE_MULTIPLIER;
+	$out.0.CHILD_MEDICAID_PARTICIPATION_MULTIPLIER = $in.0.CHILD_MEDICAID_PARTICIPATION_MULTIPLIER;
+	$out.0.ADULT_MEDICAID_PARTICIPATION_MULTIPLIER = $in.0.ADULT_MEDICAID_PARTICIPATION_MULTIPLIER;
 	
 	return ALL;
 }
@@ -59,6 +64,7 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="18" guiY="285" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="18" guiY="198" id="DROP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
 </Node>
@@ -66,20 +72,24 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-  TICKER VARCHAR(32),
-  SUBSIDIARY VARCHAR(255),
-  GOC VARCHAR(255),
-  DISTRIBUTION FLOAT
+  STATE VARCHAR(2) UNIQUE NOT NULL,
+  CHILD_MEDICAID_ANNUAL	FLOAT NOT NULL,
+  ADULT_MEDICAID_ANNUAL FLOAT NOT NULL,
+  CHILD_MEDICAIDCHIPS_PERCENTAGE_MULTIPLIER FLOAT NOT NULL,	
+  CHILD_MEDICAID_PARTICIPATION_MULTIPLIER FLOAT NOT NULL,
+  ADULT_MEDICAID_PARTICIPATION_MULTIPLIER FLOAT NOT NULL
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-	TICKER,
-    SUBSIDIARY,
-    GOC,
-    DISTRIBUTION
+    STATE,
+    CHILD_MEDICAID_ANNUAL,
+    ADULT_MEDICAID_ANNUAL,
+    CHILD_MEDICAIDCHIPS_PERCENTAGE_MULTIPLIER,
+    CHILD_MEDICAID_PARTICIPATION_MULTIPLIER,
+    ADULT_MEDICAID_PARTICIPATION_MULTIPLIER
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -87,16 +97,11 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Data" guiX="472" guiY="198" id="CLEANUP_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[delete from ${TABLENAME} where ticker is null;
-update ${TABLENAME} set TICKER = ltrim(rtrim(TICKER));
-update ${TABLENAME} set SUBSIDIARY = ltrim(rtrim(SUBSIDIARY));
-update ${TABLENAME} set GOC = ltrim(rtrim(GOC));
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="472" guiY="198" id="CLEAN_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLENAME} SET CHILD_MEDICAID_ANNUAL = ROUND(CHILD_MEDICAID_ANNUAL,2);
+UPDATE ${TABLENAME} SET ADULT_MEDICAID_ANNUAL = ROUND(ADULT_MEDICAID_ANNUAL,2);
 ]]></attr>
 </Node>
-</Phase>
-<Phase number="6">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="18" guiY="285" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="285" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="325" guiY="285" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>

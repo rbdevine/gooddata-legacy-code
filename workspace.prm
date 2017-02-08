@@ -6,7 +6,11 @@ PROJECT=.
 #Sun Oct 23 14:44:09 PDT 2016
 META_DIR=${PROJECT}/meta
 S3SECRETKEY=I0lKNCl%2BZQrh34DHFOT13XLbe6qRb5gZQ5aoBVvX
+<<<<<<< HEAD
 GDC_PROJECT_ID=gbjh7updh80vovsybn2r2f9j0hw8fxkr
+=======
+GDC_PROJECT_ID=iqo3e2y7ij0mgk4a6vkbzpubyzuzuhjy
+>>>>>>> branch 'master' of https://gitlab.com/just-capital/JCDP.git
 SQL_DIR=${PROJECT}/sql
 S3ACCESSKEY=AKIAIJF44KUAT6SGEJWA
 DATA_TMP_DIR=${PROJECT}/data/tmp
