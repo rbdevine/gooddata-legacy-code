@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Mon Sep 26 16:35:09 EDT 2016" guiVersion="3.4.4.P" id="1474922423475" licenseType="Commercial" modified="Wed Jan 11 16:41:41 EST 2017" modifiedBy="LilyL" name="Metric Data.grf" revision="1.80" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="LilyL" created="Mon Sep 26 16:35:09 EDT 2016" guiVersion="3.4.4.P" id="1474922423475" licenseType="Commercial" modified="Wed Jan 11 16:56:06 EST 2017" modifiedBy="LilyL" name="Metric Data.grf" revision="1.81" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata7" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Company" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n\\|\r\n" recordSize="-1" type="delimited">
