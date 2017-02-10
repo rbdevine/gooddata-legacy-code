@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jan 19 23:39:37 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.70" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Feb 10 17:11:57 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.77" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -87,13 +87,14 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="graph/local/local-parameters.prm" id="GraphParameter51"/>
 <Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
-<Property id="GraphParameter18" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
-<Property id="GraphParameter19" name="REPORTFILEPATH_LWAVG" value="${REPORTS_DIR}/LWAverages.csv"/>
-<Property id="GraphParameter20" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
-<Property id="GraphParameter21" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
-<Property id="GraphParameter22" name="REPORTS_DIR" value="${DATA_DIR}/livingwage-reports"/>
-<Property fileURL="workspace.prm" id="GraphParameter23"/>
+<Property id="GraphParameter28" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
+<Property id="GraphParameter29" name="REPORTFILEPATH_LWAVG" value="${REPORTS_DIR}/LWAverages.csv"/>
+<Property id="GraphParameter30" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
+<Property id="GraphParameter31" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
+<Property id="GraphParameter32" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}"/>
+<Property fileURL="workspace.prm" id="GraphParameter33"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
