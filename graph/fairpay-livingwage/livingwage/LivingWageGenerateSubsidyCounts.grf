@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Feb 08 22:21:27 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.83" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Feb 09 15:28:32 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.92" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -16,10 +16,8 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="fairpay-parameters.prm" id="GraphParameter8"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter32"/>
-<Property fileURL="workspace.prm" id="GraphParameter14"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="workspace.prm" id="GraphParameter28"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -80,8 +78,7 @@ join ${JOB_DISTRIBUTION_TABLENAME} d on
     or d.subsidiary = ec.subsidiary
   )
 join lkp_just_co_secty_master m on m.ticker_trim = ec.ticker
-join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc;
-]]></attr>
+join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Counts Table" guiX="123" guiY="82" id="POPULATE_SUBSIDY_COUNTS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${SUBSIDY_COUNTS_TABLENAME}
@@ -89,13 +86,12 @@ select
   ec.state_county_fips,
   ec.ticker,
   d.goc
-from 
-  lkp_living_wage_employee_count_by_county ec
-  join lkp_living_wage_goc_distributions d on 
-    d.ticker = ec.ticker and (
-      (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
-      or d.subsidiary = ec.subsidiary
-    )
+from ${COUNTY_COUNT_TABLENAME} ec
+join ${JOB_DISTRIBUTION_TABLENAME} d on 
+  d.ticker = ec.ticker and (
+    (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
+    or d.subsidiary = ec.subsidiary
+  )
 order by ec.ticker, ec.state_county_fips, d.goc;
 ]]></attr>
 </Node>
@@ -185,10 +181,10 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in regular mode: names of the graphs to be executed, otherwise nothing)" metadata="Metadata2" outPort="Port 0 (out)" toNode="UPDATE_ACCUMULATION:0"/>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Accumulation Table" guiX="160" guiY="387" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Accumulation Table" guiX="160" guiY="390" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Ticker Queue" guiX="344" guiY="387" id="DROP_TICKER_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Ticker Queue" guiX="344" guiY="390" id="DROP_TICKER_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME};]]></attr>
 </Node>
 </Phase>
