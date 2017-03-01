@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Feb 28 23:57:01 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.81" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="STATE_COUNTY_FIPS" type="string"/>
+<Field name="EMP_COUNT_TOTAL" type="string"/>
+<Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
+<Field name="SUBSIDY_TOTAL" type="string"/>
+<Field name="SUBSIDY_BY_EMP_TOTAL" type="string"/>
+<Field name="EMP_COUNT_EITC" type="string"/>
+<Field name="SUBSIDY_TOTAL_EITC" type="string"/>
+<Field name="SUBSIDY_BY_EMP_EITC" type="string"/>
+<Field name="EMP_COUNT_SNAP" type="string"/>
+<Field name="SUBSIDY_TOTAL_SNAP" type="string"/>
+<Field name="SUBSIDY_BY_EMP_SNAP" type="string"/>
+<Field name="EMP_COUNT_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_TOTAL_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_BY_EMP_ADULT_MEDICAID" type="string"/>
+<Field name="EMP_COUNT_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_TOTAL_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_BY_EMP_CHILD_MEDICAID" type="string"/>
+<Field name="EMP_COUNT_ACA" type="string"/>
+<Field name="SUBSIDY_TOTAL_ACA" type="string"/>
+<Field name="SUBSIDY_BY_EMP_ACA" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Ticker" type="string"/>
+<Field name="Subsidiary" type="string"/>
+<Field name="Avg_lw_unweighted" type="string"/>
+<Field name="Avg_lw_weighted" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Report_Details_County_Ticker" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="STATE_COUNTY_FIPS" type="string"/>
+<Field name="TICKER" type="string"/>
+<Field name="GOC" type="string"/>
+<Field name="HOURLY_WAGE_COLA" type="string"/>
+<Field name="LIVING_WAGE_AVG" type="string"/>
+<Field name="EMP_COUNT_TOTAL" type="string"/>
+<Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
+<Field name="SUBSIDY_TOTAL" type="string"/>
+<Field name="SUBSIDY_BY_EMP_TOTAL" type="string"/>
+<Field name="EMP_COUNT_EITC" type="string"/>
+<Field name="SUBSIDY_TOTAL_EITC" type="string"/>
+<Field name="SUBSIDY_BY_EMP_EITC" type="string"/>
+<Field name="EMP_COUNT_SNAP" type="string"/>
+<Field name="SUBSIDY_TOTAL_SNAP" type="string"/>
+<Field name="SUBSIDY_BY_EMP_SNAP" type="string"/>
+<Field name="EMP_COUNT_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_TOTAL_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_BY_EMP_ADULT_MEDICAID" type="string"/>
+<Field name="EMP_COUNT_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_TOTAL_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_BY_EMP_CHILD_MEDICAID" type="string"/>
+<Field name="EMP_COUNT_ACA" type="string"/>
+<Field name="SUBSIDY_TOTAL_ACA" type="string"/>
+<Field name="SUBSIDY_BY_EMP_ACA" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Report_Summary_Ticker" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="EMP_COUNT_TOTAL" type="string"/>
+<Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
+<Field name="SUBSIDY_TOTAL" type="string"/>
+<Field name="SUBSIDY_BY_EMP_TOTAL" type="string"/>
+<Field name="EMP_COUNT_EITC" type="string"/>
+<Field name="SUBSIDY_TOTAL_EITC" type="string"/>
+<Field name="SUBSIDY_BY_EMP_EITC" type="string"/>
+<Field name="EMP_COUNT_SNAP" type="string"/>
+<Field name="SUBSIDY_TOTAL_SNAP" type="string"/>
+<Field name="SUBSIDY_BY_EMP_SNAP" type="string"/>
+<Field name="EMP_COUNT_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_TOTAL_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_BY_EMP_ADULT_MEDICAID" type="string"/>
+<Field name="EMP_COUNT_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_TOTAL_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_BY_EMP_CHILD_MEDICAID" type="string"/>
+<Field name="EMP_COUNT_ACA" type="string"/>
+<Field name="SUBSIDY_TOTAL_ACA" type="string"/>
+<Field name="SUBSIDY_BY_EMP_ACA" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="graph/local/local-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter1"/>
+<Property id="GraphParameter32" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
+<Property id="GraphParameter34" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
+<Property id="GraphParameter33" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
+<Property id="GraphParameter36" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
+<Property fileURL="workspace.prm" id="GraphParameter37"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" guiName="Reformat" guiX="241" guiY="22" id="REFORMAT1" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="241" guiY="245" id="REFORMAT2" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="241" guiY="133" id="REFORMAT3" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details by County" guiX="26" guiY="133" id="SELECT_DETAILS_BY_COUNTY" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select
+  $STATE_COUNTY_FIPS:=STATE_COUNTY_FIPS,
+  $EMP_COUNT_TOTAL:=sum(EMP_COUNT_TOTAL) EMP_COUNT_TOTAL,
+  $EMP_COUNT_SUBSIDY_TOTAL:=sum(EMP_COUNT_SUBSIDY_TOTAL) EMP_COUNT_SUBSIDY_TOTAL,
+  $SUBSIDY_TOTAL:=sum(SUBSIDY_TOTAL) SUBSIDY_TOTAL,
+  $SUBSIDY_BY_EMP_TOTAL:=case
+    when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_TOTAL,
+  $EMP_COUNT_EITC:=sum(EMP_COUNT_EITC) EMP_COUNT_EITC,
+  $SUBSIDY_TOTAL_EITC:=sum(SUBSIDY_TOTAL_EITC) SUBSIDY_TOTAL_EITC,
+  $SUBSIDY_BY_EMP_EITC:=case
+    when sum(EMP_COUNT_EITC) > 0 then (sum(SUBSIDY_TOTAL_EITC)/sum(EMP_COUNT_EITC))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_EITC,
+  $EMP_COUNT_SNAP:=sum(EMP_COUNT_SNAP) EMP_COUNT_SNAP,
+  $SUBSIDY_TOTAL_SNAP:=sum(SUBSIDY_TOTAL_SNAP) SUBSIDY_TOTAL_SNAP,
+  $SUBSIDY_BY_EMP_SNAP:=case
+    when sum(EMP_COUNT_SNAP) > 0 then (sum(SUBSIDY_TOTAL_SNAP)/sum(EMP_COUNT_SNAP))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_SNAP,
+  $EMP_COUNT_ADULT_MEDICAID:=sum(EMP_COUNT_ADULT_MEDICAID) EMP_COUNT_ADULT_MEDICAID,
+  $SUBSIDY_TOTAL_ADULT_MEDICAID:=sum(SUBSIDY_TOTAL_ADULT_MEDICAID) SUBSIDY_TOTAL_ADULT_MEDICAID,
+  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=case
+    when sum(EMP_COUNT_ADULT_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_ADULT_MEDICAID)/sum(EMP_COUNT_ADULT_MEDICAID))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_ADULT_MEDICAID,
+  $EMP_COUNT_CHILD_MEDICAID:=sum(EMP_COUNT_CHILD_MEDICAID) EMP_COUNT_CHILD_MEDICAID,
+  $SUBSIDY_TOTAL_CHILD_MEDICAID:=sum(SUBSIDY_TOTAL_CHILD_MEDICAID) SUBSIDY_TOTAL_CHILD_MEDICAID,
+  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=case
+    when sum(EMP_COUNT_CHILD_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_CHILD_MEDICAID)/sum(EMP_COUNT_CHILD_MEDICAID))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_CHILD_MEDICAID,
+  $EMP_COUNT_ACA:=sum(EMP_COUNT_ACA) EMP_COUNT_ACA,
+  $SUBSIDY_TOTAL_ACA:=sum(SUBSIDY_TOTAL_ACA) SUBSIDY_TOTAL_ACA,
+  $SUBSIDY_BY_EMP_ACA:=case
+    when sum(EMP_COUNT_ACA) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_ACA))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_ACA
+from ${SUBSIDY_DETAILS_TABLENAME}
+group by state_county_fips 
+order by state_county_fips;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details by County, Ticker" guiX="1" guiY="245" id="SELECT_DETAILS_BY_COUNTY_TICKER" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select
+  $STATE_COUNTY_FIPS:=STATE_COUNTY_FIPS,
+  $TICKER:=TICKER,
+  $GOC:=GOC,
+  $HOURLY_WAGE_COLA:=HOURLY_WAGE_COLA,
+  $LIVING_WAGE_AVG:=LIVING_WAGE_AVG,
+  $EMP_COUNT_TOTAL:=EMP_COUNT_TOTAL,
+  $EMP_COUNT_SUBSIDY_TOTAL:=EMP_COUNT_SUBSIDY_TOTAL,
+  $SUBSIDY_TOTAL:=SUBSIDY_TOTAL,
+  $SUBSIDY_BY_EMP_TOTAL:=case
+    when emp_count_subsidy_total > 0 then (subsidy_total/emp_count_subsidy_total)/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_TOTAL,
+  $EMP_COUNT_EITC:=EMP_COUNT_EITC,
+  $SUBSIDY_TOTAL_EITC:=SUBSIDY_TOTAL_EITC,
+  $SUBSIDY_BY_EMP_EITC:=case
+    when emp_count_eitc > 0 then (subsidy_total_eitc/emp_count_eitc)/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_EITC,
+  $EMP_COUNT_SNAP:=EMP_COUNT_SNAP,
+  $SUBSIDY_TOTAL_SNAP:=SUBSIDY_TOTAL_SNAP,
+  $SUBSIDY_BY_EMP_SNAP:=case
+    when emp_count_snap > 0 then (subsidy_total_snap/emp_count_snap)/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_SNAP,
+  $EMP_COUNT_ADULT_MEDICAID:=EMP_COUNT_ADULT_MEDICAID,
+  $SUBSIDY_TOTAL_ADULT_MEDICAID:=SUBSIDY_TOTAL_ADULT_MEDICAID,
+  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=case
+    when emp_count_adult_medicaid > 0 then (subsidy_total_adult_medicaid/emp_count_adult_medicaid)/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_ADULT_MEDICAID,
+  $EMP_COUNT_CHILD_MEDICAID:=EMP_COUNT_CHILD_MEDICAID,
+  $SUBSIDY_TOTAL_CHILD_MEDICAID:=SUBSIDY_TOTAL_CHILD_MEDICAID,
+  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=case
+    when emp_count_child_medicaid > 0 then (subsidy_total_child_medicaid/emp_count_child_medicaid)/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_CHILD_MEDICAID,
+  $EMP_COUNT_ACA:=EMP_COUNT_ACA,
+  $SUBSIDY_TOTAL_ACA:=SUBSIDY_TOTAL_ACA,
+  $SUBSIDY_BY_EMP_ACA:=case
+    when EMP_COUNT_ACA > 0 then (SUBSIDY_TOTAL_ACA/EMP_COUNT_ACA)/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_ACA
+from ${SUBSIDY_DETAILS_TABLENAME}
+order by state_county_fips, hourly_wage_cola;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Summary by Ticker" guiX="26" guiY="22" id="SELECT_SUMMARY_BY_TICKER" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select
+  $TICKER:=TICKER,
+  $EMP_COUNT_TOTAL:=sum(EMP_COUNT_TOTAL) EMP_COUNT_TOTAL,
+  $EMP_COUNT_SUBSIDY_TOTAL:=sum(EMP_COUNT_SUBSIDY_TOTAL) EMP_COUNT_SUBSIDY_TOTAL,
+  $SUBSIDY_TOTAL:=sum(SUBSIDY_TOTAL) SUBSIDY_TOTAL,
+  $SUBSIDY_BY_EMP_TOTAL:=case
+    when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_TOTAL,
+  $EMP_COUNT_EITC:=sum(EMP_COUNT_EITC) EMP_COUNT_EITC,
+  $SUBSIDY_TOTAL_EITC:=sum(SUBSIDY_TOTAL_EITC) SUBSIDY_TOTAL_EITC,
+  $SUBSIDY_BY_EMP_EITC:=case
+    when sum(EMP_COUNT_EITC) > 0 then (sum(SUBSIDY_TOTAL_EITC)/sum(EMP_COUNT_EITC))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_EITC,
+  $EMP_COUNT_SNAP:=sum(EMP_COUNT_SNAP) EMP_COUNT_SNAP,
+  $SUBSIDY_TOTAL_SNAP:=sum(SUBSIDY_TOTAL_SNAP) SUBSIDY_TOTAL_SNAP,
+  $SUBSIDY_BY_EMP_SNAP:=case
+    when sum(EMP_COUNT_SNAP) > 0 then (sum(SUBSIDY_TOTAL_SNAP)/sum(EMP_COUNT_SNAP))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_SNAP,
+  $EMP_COUNT_ADULT_MEDICAID:=sum(EMP_COUNT_ADULT_MEDICAID) EMP_COUNT_ADULT_MEDICAID,
+  $SUBSIDY_TOTAL_ADULT_MEDICAID:=sum(SUBSIDY_TOTAL_ADULT_MEDICAID) SUBSIDY_TOTAL_ADULT_MEDICAID,
+  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=case
+    when sum(EMP_COUNT_ADULT_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_ADULT_MEDICAID)/sum(EMP_COUNT_ADULT_MEDICAID))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_ADULT_MEDICAID,
+  $EMP_COUNT_CHILD_MEDICAID:=sum(EMP_COUNT_CHILD_MEDICAID) EMP_COUNT_CHILD_MEDICAID,
+  $SUBSIDY_TOTAL_CHILD_MEDICAID:=sum(SUBSIDY_TOTAL_CHILD_MEDICAID) SUBSIDY_TOTAL_CHILD_MEDICAID,
+  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=case
+    when sum(EMP_COUNT_CHILD_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_CHILD_MEDICAID)/sum(EMP_COUNT_CHILD_MEDICAID))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_CHILD_MEDICAID,
+  $EMP_COUNT_ACA:=sum(EMP_COUNT_ACA) EMP_COUNT_ACA,
+  $SUBSIDY_TOTAL_ACA:=sum(SUBSIDY_TOTAL_ACA) SUBSIDY_TOTAL_ACA,
+  $SUBSIDY_BY_EMP_ACA:=case
+    when sum(EMP_COUNT_ACA) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_ACA))/1500.0
+    else 0.0
+  end SUBSIDY_BY_EMP_ACA
+from ${SUBSIDY_DETAILS_TABLENAME}
+group by ticker 
+order by ticker;]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_SUMMARY_TICKER}" guiName="Write Report" guiX="419" guiY="22" id="WRITE_REPORT" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS_COUNTY}" guiName="Write Report" guiX="419" guiY="133" id="WRITE_REPORT1" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS_COUNTY_TICKER}" guiName="Write Report" guiX="419" guiY="245" id="WRITE_REPORT2" outputFieldNames="true" type="DATA_WRITER"/>
+<Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge15" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_REPORT:0"/>
+<Edge fromNode="REFORMAT2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge19" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_REPORT2:0"/>
+<Edge fromNode="REFORMAT3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_REPORT1:0"/>
+<Edge fromNode="SELECT_DETAILS_BY_COUNTY:0" guiBendpoints="" guiRouter="Manhattan" id="Edge16" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT3:0"/>
+<Edge fromNode="SELECT_DETAILS_BY_COUNTY_TICKER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge18" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="REFORMAT2:0"/>
+<Edge fromNode="SELECT_SUMMARY_BY_TICKER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge14" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="REFORMAT1:0"/>
+</Phase>
+</Graph>

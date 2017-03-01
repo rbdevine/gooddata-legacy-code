@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon Feb 27 15:34:42 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.93" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Tue Feb 28 19:53:01 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.114" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,8 +16,8 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="workspace.prm" id="GraphParameter30"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter18"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="1">
@@ -58,7 +58,7 @@ where ac.id = a.id;]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Medical Totals" guiX="125" guiY="93" id="UPDATE_MEDICAL_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Medical Totals" guiX="125" guiY="92" id="UPDATE_MEDICAL_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${SUBSIDY_COUNTS_TABLENAME} a
 set 
   emp_count_adult_medicaid = ac.adult_county_medical_count, 
@@ -86,6 +86,12 @@ from (
     from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
     join ${COUNTY_COUNT_TABLENAME} ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
+    join (
+      select ticker
+      from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} 
+      order by ticker 
+      limit 1
+    ) t on a.ticker = t.ticker
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = a.ticker
     left join ${SUBSIDY_MEDICAID_PARTICIPATION_BY_CODE_TABLENAME} mc on mc.code = tc.code
     left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
@@ -96,7 +102,45 @@ where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update SNAP Totals" guiX="131" guiY="169" id="UPDATE_SNAP_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update ACA Boundaries" guiX="119" guiY="166" id="UPDATE_ACA_BOUNDARIES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
+set 
+  EMPLOYEE_COUNT_MAX_ACA = ac.EMPLOYEE_COUNT_MAX - ac.adult_medical_count_total, /*may mean max is negative, but that's okay*/
+  EMPLOYEE_COUNT_MAX_PREV_ACA = ac.EMPLOYEE_COUNT_MAX_PREV - ac.adult_medical_count_total /*may mean prev is negative, but that's okay*/
+from (
+  select
+    a.*,
+    case
+      when adult_medical_count > a.EMPLOYEE_COUNT_MAX then a.employee_count
+      when adult_medical_count > a.EMPLOYEE_COUNT_MAX_PREV then adult_medical_count - a.employee_count_max_prev
+      when adult_medical_count is null then 0.0  /*not sure if this is necessary, but doesn't hurt*/
+      else 0.0
+    end adult_county_medical_count,
+    adult_medical_count adult_medical_count_total
+  from (
+    select
+      a.*,
+      ec.employee_count * mc.adult_medicaid_percentage * ms.adult_medicaid_participation_multiplier adult_medical_count
+    from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
+    join ${COUNTY_COUNT_TABLENAME} ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
+    join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
+    join (
+      select ticker
+      from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} 
+      order by ticker 
+      limit 1
+    ) t on a.ticker = t.ticker
+    join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = a.ticker
+    left join ${SUBSIDY_MEDICAID_PARTICIPATION_BY_CODE_TABLENAME} mc on mc.code = tc.code
+    left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
+    where ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')
+  ) a
+) ac
+where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.goc = a.goc;]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update SNAP Totals" guiX="131" guiY="243" id="UPDATE_SNAP_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${SUBSIDY_COUNTS_TABLENAME} a
 set
   emp_count_snap = ac.snap_county_count
@@ -116,6 +160,12 @@ from (
     from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
     join ${COUNTY_COUNT_TABLENAME} ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
+    join (
+      select ticker
+      from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} 
+      order by ticker 
+      limit 1
+    ) t on a.ticker = t.ticker
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = a.ticker
     left join ${SUBSIDY_SNAP_PARTICIPATION_BY_CODE_TABLENAME} sc on sc.code = tc.code
     left join ${SUBSIDY_SNAP_STATE_PARTICIPATION_MULTIPLIER_TABLENAME} ss on ss.state = fs.state
@@ -125,8 +175,54 @@ from (
 where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.goc = a.goc;]]></attr>
 </Node>
 </Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Deque Ticker" guiX="137" guiY="252" id="DEQUE_TICKER" type="DB_EXECUTE">
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update ACA Totals" guiX="134" guiY="317" id="UPDATE_ACA_TOTALS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${SUBSIDY_COUNTS_TABLENAME} a
+set 
+  emp_count_aca = ac.county_aca_count
+from (
+  select
+    a.*,
+    case
+      when a.EMPLOYEE_COUNT_MAX_ACA <= 0 then 0.0
+      when emp_count_aca > a.EMPLOYEE_COUNT_MAX_ACA then (
+        case
+          when a.EMPLOYEE_COUNT_MAX_PREV_ACA < 0 then a.EMPLOYEE_COUNT_MAX_ACA
+          else a.EMPLOYEE_COUNT_MAX_ACA - a.EMPLOYEE_COUNT_MAX_PREV_ACA
+        end
+      )
+      when emp_count_aca > a.EMPLOYEE_COUNT_MAX_PREV_ACA then emp_count_aca - a.EMPLOYEE_COUNT_MAX_PREV_ACA
+      when emp_count_aca is null then 0.0  /*not sure if this is necessary, but doesn't hurt*/
+      else 0.0
+    end county_aca_count
+  from (
+    select
+      a.*,
+      (ec.employee_count - sc.emp_count_adult_medicaid) * am.multiplier emp_count_aca
+    from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
+    join ${COUNTY_COUNT_TABLENAME} ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
+    join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
+    join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = a.ticker
+    join (
+      select ticker
+      from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} 
+      order by ticker 
+      limit 1
+    ) t on a.ticker = t.ticker
+    join (
+      select state_county_fips, ticker, sum(emp_count_adult_medicaid) emp_count_adult_medicaid
+      from ${SUBSIDY_COUNTS_TABLENAME}
+      group by state_county_fips, ticker
+    ) sc on sc.state_county_fips = ec.state_county_fips and sc.ticker = ec.ticker
+    left join ${SUBSIDY_ACA_MULTIPLIER_TABLENAME} am on am.code = tc.code
+    where ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')
+  ) a
+) ac
+where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.goc = a.goc;]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Deque Ticker" guiX="137" guiY="388" id="DEQUE_TICKER" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME}
 where ticker in (
   select ticker
