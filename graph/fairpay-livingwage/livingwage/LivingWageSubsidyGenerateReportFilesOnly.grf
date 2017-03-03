@@ -7,21 +7,28 @@
 <Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_BY_EMP_TOTAL" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_TOT" type="string"/>
+<Field name="SUBSIDY_SUM_BY_EMP_TOT" type="string"/>
 <Field name="EMP_COUNT_EITC" type="string"/>
 <Field name="SUBSIDY_TOTAL_EITC" type="string"/>
 <Field name="SUBSIDY_BY_EMP_EITC" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_EITC" type="string"/>
 <Field name="EMP_COUNT_SNAP" type="string"/>
 <Field name="SUBSIDY_TOTAL_SNAP" type="string"/>
 <Field name="SUBSIDY_BY_EMP_SNAP" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_SNAP" type="string"/>
 <Field name="EMP_COUNT_ADULT_MEDICAID" type="string"/>
 <Field name="SUBSIDY_TOTAL_ADULT_MEDICAID" type="string"/>
 <Field name="SUBSIDY_BY_EMP_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID" type="string"/>
 <Field name="EMP_COUNT_CHILD_MEDICAID" type="string"/>
 <Field name="SUBSIDY_TOTAL_CHILD_MEDICAID" type="string"/>
 <Field name="SUBSIDY_BY_EMP_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID" type="string"/>
 <Field name="EMP_COUNT_ACA" type="string"/>
 <Field name="SUBSIDY_TOTAL_ACA" type="string"/>
 <Field name="SUBSIDY_BY_EMP_ACA" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_ACA" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
@@ -43,21 +50,28 @@
 <Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_BY_EMP_TOTAL" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_TOT" type="string"/>
+<Field name="SUBSIDY_SUM_BY_EMP_TOT" type="string"/>
 <Field name="EMP_COUNT_EITC" type="string"/>
 <Field name="SUBSIDY_TOTAL_EITC" type="string"/>
 <Field name="SUBSIDY_BY_EMP_EITC" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_EITC" type="string"/>
 <Field name="EMP_COUNT_SNAP" type="string"/>
 <Field name="SUBSIDY_TOTAL_SNAP" type="string"/>
 <Field name="SUBSIDY_BY_EMP_SNAP" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_SNAP" type="string"/>
 <Field name="EMP_COUNT_ADULT_MEDICAID" type="string"/>
 <Field name="SUBSIDY_TOTAL_ADULT_MEDICAID" type="string"/>
 <Field name="SUBSIDY_BY_EMP_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID" type="string"/>
 <Field name="EMP_COUNT_CHILD_MEDICAID" type="string"/>
 <Field name="SUBSIDY_TOTAL_CHILD_MEDICAID" type="string"/>
 <Field name="SUBSIDY_BY_EMP_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID" type="string"/>
 <Field name="EMP_COUNT_ACA" type="string"/>
 <Field name="SUBSIDY_TOTAL_ACA" type="string"/>
 <Field name="SUBSIDY_BY_EMP_ACA" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_ACA" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
@@ -67,21 +81,28 @@
 <Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_BY_EMP_TOTAL" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_TOT" type="string"/>
+<Field name="SUBSIDY_SUM_BY_EMP_TOT" type="string"/>
 <Field name="EMP_COUNT_EITC" type="string"/>
 <Field name="SUBSIDY_TOTAL_EITC" type="string"/>
 <Field name="SUBSIDY_BY_EMP_EITC" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_EITC" type="string"/>
 <Field name="EMP_COUNT_SNAP" type="string"/>
 <Field name="SUBSIDY_TOTAL_SNAP" type="string"/>
 <Field name="SUBSIDY_BY_EMP_SNAP" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_SNAP" type="string"/>
 <Field name="EMP_COUNT_ADULT_MEDICAID" type="string"/>
 <Field name="SUBSIDY_TOTAL_ADULT_MEDICAID" type="string"/>
 <Field name="SUBSIDY_BY_EMP_ADULT_MEDICAID" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID" type="string"/>
 <Field name="EMP_COUNT_CHILD_MEDICAID" type="string"/>
 <Field name="SUBSIDY_TOTAL_CHILD_MEDICAID" type="string"/>
 <Field name="SUBSIDY_BY_EMP_CHILD_MEDICAID" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID" type="string"/>
 <Field name="EMP_COUNT_ACA" type="string"/>
 <Field name="SUBSIDY_TOTAL_ACA" type="string"/>
 <Field name="SUBSIDY_BY_EMP_ACA" type="string"/>
+<Field name="SUBSIDY_ABS_BY_EMP_ACA" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -131,116 +152,127 @@ select
   living_wage_avg,
   emp_count_total,
   emp_count_subsidy_total,
-  subsidy_total,
+  eitc_subsidy_total + snap_subsidy_total + adult_medicaid_subsidy_total + child_medicaid_subsidy_total + aca_subsidy_total subsidy_total,
   emp_count_eitc,
-  eitc_subsidy_total/2.0, 
+  eitc_subsidy_total, 
   emp_count_snap,
-  snap_subsidy_total/2.0,
+  snap_subsidy_total,
   emp_count_adult_medicaid,
   adult_medicaid_subsidy_total,
   emp_count_child_medicaid,
-  child_medicaid_subsidy_total/2.0,
+  child_medicaid_subsidy_total,
   emp_count_aca,
-  aca_subsidy_total/2.0
+  aca_subsidy_total
 from (
-  select 
-    sc.state_county_fips,
-    sc.ticker,
-    sc.goc,
-    cjcd.unadjusted_rate,
-    lwa.living_wage_avg,
-    ec.employee_count * d.distribution emp_count_total,
-    case 
-      when cjcd.unadjusted_rate < lwa.living_wage_avg then ec.employee_count * d.distribution
-      else 0.0
-    end emp_count_below_lw,
-    case
-      when 
-        sc.emp_count_eitc > sc.emp_count_snap and
-        sc.emp_count_eitc > sc.emp_count_adult_medicaid and
-        sc.emp_count_eitc > sc.emp_count_child_medicaid and
-        sc.emp_count_eitc > sc.emp_count_aca
-      then sc.emp_count_eitc
-      when
-        sc.emp_count_snap > sc.emp_count_eitc and
-        sc.emp_count_snap > sc.emp_count_adult_medicaid and
-        sc.emp_count_snap > sc.emp_count_child_medicaid and
-        sc.emp_count_snap > sc.emp_count_aca
-      then sc.emp_count_snap
-      when
-        sc.emp_count_adult_medicaid > sc.emp_count_eitc and
-        sc.emp_count_adult_medicaid > sc.emp_count_snap and
-        sc.emp_count_adult_medicaid > sc.emp_count_child_medicaid and
-        sc.emp_count_adult_medicaid > sc.emp_count_aca
-      then sc.emp_count_adult_medicaid
-      when
-        sc.emp_count_child_medicaid > sc.emp_count_eitc and
-        sc.emp_count_child_medicaid > sc.emp_count_snap and
-        sc.emp_count_child_medicaid > sc.emp_count_adult_medicaid and
-        sc.emp_count_child_medicaid > sc.emp_count_aca
-      then emp_count_child_medicaid
-      when 
-        sc.emp_count_aca > sc.emp_count_eitc and
-        sc.emp_count_aca > sc.emp_count_snap and
-        sc.emp_count_aca > sc.emp_count_adult_medicaid and
-        sc.emp_count_aca > sc.emp_count_child_medicaid
-      then sc.emp_count_aca
-      else
-        emp_count_eitc
-    end emp_count_subsidy_total,
-    sc.emp_count_eitc * isnull(eitc.subsidy_annual,0.0) +
-      sc.emp_count_snap * isnull(snap.subsidy_annual,0.0) +
-      sc.emp_count_adult_medicaid * isnull(ms.adult_medicaid_annual,0.0) +
-      sc.emp_count_child_medicaid * isnull(ms.child_medicaid_annual,0.0) +
+  select
+    state_county_fips,
+    ticker,
+    goc,
+    isnull(unadjusted_rate,0.0) unadjusted_rate,
+    isnull(living_wage_avg,0.0) living_wage_avg,
+    isnull(emp_count_total,0.0) emp_count_total, 
+    isnull(emp_count_subsidy_total,0.0) emp_count_subsidy_total,
+    isnull(emp_count_eitc,0.0) emp_count_eitc,
+    isnull(eitc_subsidy_total/2.0,0.0) eitc_subsidy_total, 
+    isnull(emp_count_snap,0.0) emp_count_snap,
+    isnull(snap_subsidy_total/2.0,0.0) snap_subsidy_total,
+    isnull(emp_count_adult_medicaid,0.0) emp_count_adult_medicaid,
+    isnull(adult_medicaid_subsidy_total,0.0) adult_medicaid_subsidy_total,
+    isnull(emp_count_child_medicaid,0.0) emp_count_child_medicaid,
+    isnull(child_medicaid_subsidy_total/2.0,0.0) child_medicaid_subsidy_total,
+    isnull(emp_count_aca,0.0) emp_count_aca,
+    isnull(aca_subsidy_total/2.0,0.0) aca_subsidy_total
+  from (
+    select 
+      sc.state_county_fips,
+      sc.ticker,
+      sc.goc,
+      cjcd.unadjusted_rate,
+      lwa.living_wage_avg,
+      ec.employee_count * d.distribution emp_count_total,
+      case 
+        when cjcd.unadjusted_rate < lwa.living_wage_avg then ec.employee_count * d.distribution
+        else 0.0
+      end emp_count_below_lw,
+      case
+        when 
+          sc.emp_count_eitc > sc.emp_count_snap and
+          sc.emp_count_eitc > sc.emp_count_adult_medicaid and
+          sc.emp_count_eitc > sc.emp_count_child_medicaid and
+          sc.emp_count_eitc > sc.emp_count_aca
+        then sc.emp_count_eitc
+        when
+          sc.emp_count_snap > sc.emp_count_eitc and
+          sc.emp_count_snap > sc.emp_count_adult_medicaid and
+          sc.emp_count_snap > sc.emp_count_child_medicaid and
+          sc.emp_count_snap > sc.emp_count_aca
+        then sc.emp_count_snap
+        when
+          sc.emp_count_adult_medicaid > sc.emp_count_eitc and
+          sc.emp_count_adult_medicaid > sc.emp_count_snap and
+          sc.emp_count_adult_medicaid > sc.emp_count_child_medicaid and
+          sc.emp_count_adult_medicaid > sc.emp_count_aca
+        then sc.emp_count_adult_medicaid
+        when
+          sc.emp_count_child_medicaid > sc.emp_count_eitc and
+          sc.emp_count_child_medicaid > sc.emp_count_snap and
+          sc.emp_count_child_medicaid > sc.emp_count_adult_medicaid and
+          sc.emp_count_child_medicaid > sc.emp_count_aca
+        then emp_count_child_medicaid
+        when 
+          sc.emp_count_aca > sc.emp_count_eitc and
+          sc.emp_count_aca > sc.emp_count_snap and
+          sc.emp_count_aca > sc.emp_count_adult_medicaid and
+          sc.emp_count_aca > sc.emp_count_child_medicaid
+        then sc.emp_count_aca
+        else
+          emp_count_eitc
+      end emp_count_subsidy_total,
+      sc.emp_count_eitc,
+      sc.emp_count_eitc * isnull(eitc.subsidy_annual,0.0) eitc_subsidy_total,
+      sc.emp_count_snap,
+      snap.subsidy_annual,
+      sc.emp_count_snap * isnull(snap.subsidy_annual,0.0) snap_subsidy_total,
+      sc.emp_count_adult_medicaid,
+      sc.emp_count_adult_medicaid * isnull(ms.adult_medicaid_annual,0.0) adult_medicaid_subsidy_total,
+      sc.emp_count_child_medicaid,
+      sc.emp_count_child_medicaid * isnull(ms.child_medicaid_annual,0.0) child_medicaid_subsidy_total,
+      case
+        when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
+        else sc.emp_count_aca
+      end emp_count_aca,
       (case
-      when aca_lw.subsidy_annual is null then isnull(aca_base.subsidy_annual,0.0)
-      when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
-      else aca_lw.subsidy_annual - isnull(aca_base.subsidy_annual,0.0)
-      end) subsidy_total,
-    sc.emp_count_eitc,
-    sc.emp_count_eitc * isnull(eitc.subsidy_annual,0.0) eitc_subsidy_total,
-    sc.emp_count_snap,
-    snap.subsidy_annual,
-    sc.emp_count_snap * isnull(snap.subsidy_annual,0.0) snap_subsidy_total,
-    sc.emp_count_adult_medicaid,
-    sc.emp_count_adult_medicaid * isnull(ms.adult_medicaid_annual,0.0) adult_medicaid_subsidy_total,
-    sc.emp_count_child_medicaid,
-    sc.emp_count_child_medicaid * isnull(ms.child_medicaid_annual,0.0) child_medicaid_subsidy_total,
-    case
-      when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
-      else sc.emp_count_aca
-    end emp_count_aca,
-    (case
-      when aca_lw.subsidy_annual is null then isnull(aca_base.subsidy_annual,0.0)
-      when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
-      else aca_lw.subsidy_annual - isnull(aca_base.subsidy_annual,0.0)
-    end) * sc.emp_count_aca aca_subsidy_total
-  from ${SUBSIDY_COUNTS_TABLENAME} sc 
-  join ${COUNTY_COUNT_TABLENAME} ec on 
-    ec.state_county_fips = sc.state_county_fips and 
-    ec.ticker = sc.ticker /*and (
-      ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')
-    )*/
-  join ${JOB_DISTRIBUTION_TABLENAME} d on 
-    d.ticker = ec.ticker and (
-      (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
-      or d.subsidiary = ec.subsidiary
-    ) and d.goc = sc.goc
-  join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
-  join lkp_living_wage_company_job_county_data cjcd on cjcd.just_co_id = m.just_co_id and cjcd.state_county_fips = ec.state_county_fips and cjcd.goc = d.goc and (
-      (cjcd.subsidiary is not null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
-      or cjcd.subsidiary is null
-    )
-  /*join lkp_living_wage_company_job_data cjd on d.goc = cjd.job and m.just_co_id = cjd.just_co_id */
-  join lkp_living_wage_averages lwa on lwa.state_county_fips = sc.state_county_fips
-  join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(ec.state_county_fips,2)
-  join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = ec.ticker
-  left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
-  left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= eitc.maximum_wage
-  left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= snap.maximum_wage
-  left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= aca_base.maximum_wage
-  left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_avg and lwa.living_wage_avg <= aca_lw.maximum_wage
-  where /*sc.ticker = 'YUMP' and*/ cjcd.tolerance_type = 1
+        when aca_lw.subsidy_annual is null then isnull(aca_base.subsidy_annual,0.0)
+        when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
+        else aca_lw.subsidy_annual - isnull(aca_base.subsidy_annual,0.0)
+      end) * sc.emp_count_aca aca_subsidy_total
+    from ${SUBSIDY_COUNTS_TABLENAME} sc 
+    join ${COUNTY_COUNT_TABLENAME} ec on 
+      ec.state_county_fips = sc.state_county_fips and 
+      ec.ticker = sc.ticker and (
+        ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')
+      )
+    join ${JOB_DISTRIBUTION_TABLENAME} d on 
+      d.ticker = ec.ticker and (
+        (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
+        or d.subsidiary = ec.subsidiary
+      ) and d.goc = sc.goc
+    join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
+    join lkp_living_wage_company_job_county_data cjcd on cjcd.just_co_id = m.just_co_id and cjcd.state_county_fips = ec.state_county_fips and cjcd.goc = d.goc and (
+        (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
+        or cjcd.subsidiary = ec.subsidiary
+      )
+    /*join lkp_living_wage_company_job_data cjd on d.goc = cjd.job and m.just_co_id = cjd.just_co_id */
+    join lkp_living_wage_averages lwa on lwa.state_county_fips = sc.state_county_fips
+    join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(ec.state_county_fips,2)
+    join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = ec.ticker
+    left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
+    left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= eitc.maximum_wage
+    left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= snap.maximum_wage
+    left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= aca_base.maximum_wage
+    left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_avg and lwa.living_wage_avg <= aca_lw.maximum_wage
+    where /*sc.ticker = 'YUMP' and*/ cjcd.tolerance_type = 1
+  ) t
 ) t
 order by 
   state_county_fips, 
@@ -339,45 +371,103 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details by County" guiX="27" guiY="312" id="SELECT_DETAILS_BY_COUNTY" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select
   $STATE_COUNTY_FIPS:=STATE_COUNTY_FIPS,
-  $EMP_COUNT_TOTAL:=cast(round(sum(EMP_COUNT_TOTAL),3) as numeric(16,3)) EMP_COUNT_TOTAL,
-  $EMP_COUNT_SUBSIDY_TOTAL:=cast(round(sum(EMP_COUNT_SUBSIDY_TOTAL),3) as numeric(16,3)) EMP_COUNT_SUBSIDY_TOTAL,
-  $SUBSIDY_TOTAL:=concat('$',cast(round(sum(SUBSIDY_TOTAL),2) as numeric(16,2))) SUBSIDY_TOTAL,
-  $SUBSIDY_BY_EMP_TOTAL:=concat('$',cast(round(case
-    when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_TOTAL,
-  $EMP_COUNT_EITC:=cast(round(sum(EMP_COUNT_EITC),3) as numeric(16,3)) EMP_COUNT_EITC,
-  $SUBSIDY_TOTAL_EITC:=concat('$',cast(round(sum(SUBSIDY_TOTAL_EITC),2) as numeric(16,2))) SUBSIDY_TOTAL_EITC,
-  $SUBSIDY_BY_EMP_EITC:=concat('$',cast(round(case
-    when sum(EMP_COUNT_EITC) > 0 then (sum(SUBSIDY_TOTAL_EITC)/sum(EMP_COUNT_EITC))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_EITC,
-  $EMP_COUNT_SNAP:=cast(round(sum(EMP_COUNT_SNAP),3) as numeric(16,3)) EMP_COUNT_SNAP,
-  $SUBSIDY_TOTAL_SNAP:=concat('$',cast(round(sum(SUBSIDY_TOTAL_SNAP),2) as numeric(16,2))) SUBSIDY_TOTAL_SNAP,
-  $SUBSIDY_BY_EMP_SNAP:=concat('$',cast(round(case
-    when sum(EMP_COUNT_SNAP) > 0 then (sum(SUBSIDY_TOTAL_SNAP)/sum(EMP_COUNT_SNAP))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_SNAP,
-  $EMP_COUNT_ADULT_MEDICAID:=cast(round(sum(EMP_COUNT_ADULT_MEDICAID),3) as numeric(16,3)) EMP_COUNT_ADULT_MEDICAID,
-  $SUBSIDY_TOTAL_ADULT_MEDICAID:=concat('$',cast(round(sum(SUBSIDY_TOTAL_ADULT_MEDICAID),2) as numeric(16,2))) SUBSIDY_TOTAL_ADULT_MEDICAID,
-  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(case
-    when sum(EMP_COUNT_ADULT_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_ADULT_MEDICAID)/sum(EMP_COUNT_ADULT_MEDICAID))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_ADULT_MEDICAID,
-  $EMP_COUNT_CHILD_MEDICAID:=cast(round(sum(EMP_COUNT_CHILD_MEDICAID),3) as numeric(16,3)) EMP_COUNT_CHILD_MEDICAID,
-  $SUBSIDY_TOTAL_CHILD_MEDICAID:=concat('$',cast(round(sum(SUBSIDY_TOTAL_CHILD_MEDICAID),2) as numeric(16,2))) SUBSIDY_TOTAL_CHILD_MEDICAID,
-  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(case
-    when sum(EMP_COUNT_CHILD_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_CHILD_MEDICAID)/sum(EMP_COUNT_CHILD_MEDICAID))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_CHILD_MEDICAID,
-  $EMP_COUNT_ACA:=cast(round(sum(EMP_COUNT_ACA),3) as numeric(16,3)) EMP_COUNT_ACA,
-  $SUBSIDY_TOTAL_ACA:=concat('$',cast(round(sum(SUBSIDY_TOTAL_ACA),2) as numeric(16,2))) SUBSIDY_TOTAL_ACA,
-  $SUBSIDY_BY_EMP_ACA:=concat('$',cast(round(case
-    when sum(EMP_COUNT_ACA) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_ACA))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_ACA
-from ${SUBSIDY_DETAILS_TABLENAME}
-group by state_county_fips 
+  $EMP_COUNT_TOTAL:=cast(round(EMP_COUNT_TOTAL,3) as numeric(16,3)),
+  $EMP_COUNT_SUBSIDY_TOTAL:=cast(round(EMP_COUNT_SUBSIDY_TOTAL,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL:=concat('$',cast(round(SUBSIDY_TOTAL,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_TOTAL:=concat('$',cast(round(SUBSIDY_BY_EMP_TOTAL,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_TOT:=concat('$',cast(round((SUBSIDY_ABS_BY_EMP_EITC + 
+    SUBSIDY_ABS_BY_EMP_SNAP + 
+    SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID + 
+    SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID + 
+    SUBSIDY_ABS_BY_EMP_ACA),2) as numeric(16,2))) SUBSIDY_ABS_BY_EMP_TOT,
+  $SUBSIDY_SUM_BY_EMP_TOT:=concat('$',cast(round((SUBSIDY_BY_EMP_EITC + 
+    SUBSIDY_BY_EMP_SNAP + 
+    SUBSIDY_BY_EMP_ADULT_MEDICAID + 
+    SUBSIDY_BY_EMP_CHILD_MEDICAID + 
+    SUBSIDY_BY_EMP_ACA),2) as numeric(16,2))) SUBSIDY_SUM_BY_EMP_TOT,
+  $EMP_COUNT_EITC:=cast(round(EMP_COUNT_EITC,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_EITC:=concat('$',cast(round(SUBSIDY_TOTAL_EITC,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_EITC:=concat('$',cast(round(SUBSIDY_BY_EMP_EITC,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_EITC:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_EITC,2) as numeric(16,2))),
+  $EMP_COUNT_SNAP:=cast(round(EMP_COUNT_SNAP,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_SNAP:=concat('$',cast(round(SUBSIDY_TOTAL_SNAP,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_SNAP:=concat('$',cast(round(SUBSIDY_BY_EMP_SNAP,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_SNAP:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_SNAP,2) as numeric(16,2))),
+  $EMP_COUNT_ADULT_MEDICAID:=cast(round(EMP_COUNT_ADULT_MEDICAID,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_TOTAL_ADULT_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_BY_EMP_ADULT_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID,2) as numeric(16,2))),
+  $EMP_COUNT_CHILD_MEDICAID:=cast(round(EMP_COUNT_CHILD_MEDICAID,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_TOTAL_CHILD_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_BY_EMP_CHILD_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID,2) as numeric(16,2))),
+  $EMP_COUNT_ACA:=cast(round(EMP_COUNT_ACA,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_ACA:=concat('$',cast(round(SUBSIDY_TOTAL_ACA,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_ACA:=concat('$',cast(round(SUBSIDY_BY_EMP_ACA,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_ACA:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_ACA,2) as numeric(16,2)))
+from (
+  select
+    STATE_COUNTY_FIPS,
+    sum(EMP_COUNT_TOTAL) EMP_COUNT_TOTAL,
+    sum(EMP_COUNT_SUBSIDY_TOTAL) EMP_COUNT_SUBSIDY_TOTAL,
+    sum(SUBSIDY_TOTAL) SUBSIDY_TOTAL,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_TOTAL,
+    sum(EMP_COUNT_EITC) EMP_COUNT_EITC,
+    sum(SUBSIDY_TOTAL_EITC) SUBSIDY_TOTAL_EITC,
+    case
+      when sum(EMP_COUNT_EITC) > 0 then (sum(SUBSIDY_TOTAL_EITC)/sum(EMP_COUNT_EITC))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_EITC,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_EITC)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_EITC,
+    sum(EMP_COUNT_SNAP) EMP_COUNT_SNAP,
+    sum(SUBSIDY_TOTAL_SNAP) SUBSIDY_TOTAL_SNAP,
+    case
+      when sum(EMP_COUNT_SNAP) > 0 then (sum(SUBSIDY_TOTAL_SNAP)/sum(EMP_COUNT_SNAP))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_SNAP,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_SNAP)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_SNAP,
+    sum(EMP_COUNT_ADULT_MEDICAID) EMP_COUNT_ADULT_MEDICAID,
+    sum(SUBSIDY_TOTAL_ADULT_MEDICAID) SUBSIDY_TOTAL_ADULT_MEDICAID,
+    case
+      when sum(EMP_COUNT_ADULT_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_ADULT_MEDICAID)/sum(EMP_COUNT_ADULT_MEDICAID))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_ADULT_MEDICAID,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_ADULT_MEDICAID)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID,
+    sum(EMP_COUNT_CHILD_MEDICAID) EMP_COUNT_CHILD_MEDICAID,
+    sum(SUBSIDY_TOTAL_CHILD_MEDICAID) SUBSIDY_TOTAL_CHILD_MEDICAID,
+    case
+      when sum(EMP_COUNT_CHILD_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_CHILD_MEDICAID)/sum(EMP_COUNT_CHILD_MEDICAID))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_CHILD_MEDICAID,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_CHILD_MEDICAID)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID,
+    sum(EMP_COUNT_ACA) EMP_COUNT_ACA,
+    sum(SUBSIDY_TOTAL_ACA) SUBSIDY_TOTAL_ACA,
+    case
+      when sum(EMP_COUNT_ACA) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_ACA))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_ACA,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_ACA
+  from ${SUBSIDY_DETAILS_TABLENAME}
+  group by state_county_fips
+) t
 order by state_county_fips;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details by County, Ticker" guiX="2" guiY="424" id="SELECT_DETAILS_BY_COUNTY_TICKER" type="DB_INPUT_TABLE">
@@ -390,85 +480,205 @@ order by state_county_fips;]]></attr>
   $EMP_COUNT_TOTAL:=cast(round(EMP_COUNT_TOTAL,3) as numeric(16,3)),
   $EMP_COUNT_SUBSIDY_TOTAL:=cast(round(EMP_COUNT_SUBSIDY_TOTAL,3) as numeric(16,3)),
   $SUBSIDY_TOTAL:=concat('$',cast(round(SUBSIDY_TOTAL,2) as numeric(16,2))),
-  $SUBSIDY_BY_EMP_TOTAL:=concat('$',cast(round(case
-    when emp_count_subsidy_total > 0 then (subsidy_total/emp_count_subsidy_total)/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_TOTAL,
+  $SUBSIDY_BY_EMP_TOTAL:=concat('$',cast(round(SUBSIDY_BY_EMP_TOTAL,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_TOT:=concat('$',cast(round((SUBSIDY_ABS_BY_EMP_EITC + 
+    SUBSIDY_ABS_BY_EMP_SNAP + 
+    SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID + 
+    SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID + 
+    SUBSIDY_ABS_BY_EMP_ACA),2) as numeric(16,2))) SUBSIDY_ABS_BY_EMP_TOT,
+  $SUBSIDY_SUM_BY_EMP_TOT:=concat('$',cast(round((SUBSIDY_BY_EMP_EITC + 
+    SUBSIDY_BY_EMP_SNAP + 
+    SUBSIDY_BY_EMP_ADULT_MEDICAID + 
+    SUBSIDY_BY_EMP_CHILD_MEDICAID + 
+    SUBSIDY_BY_EMP_ACA),2) as numeric(16,2))) SUBSIDY_SUM_BY_EMP_TOT,
   $EMP_COUNT_EITC:=cast(round(EMP_COUNT_EITC,3) as numeric(16,3)),
   $SUBSIDY_TOTAL_EITC:=concat('$',cast(round(SUBSIDY_TOTAL_EITC,2) as numeric(16,2))),
-  $SUBSIDY_BY_EMP_EITC:=concat('$',cast(round(case
-    when emp_count_eitc > 0 then (subsidy_total_eitc/emp_count_eitc)/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_EITC,
+  $SUBSIDY_BY_EMP_EITC:=concat('$',cast(round(SUBSIDY_BY_EMP_EITC,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_EITC:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_EITC,2) as numeric(16,2))),
   $EMP_COUNT_SNAP:=cast(round(EMP_COUNT_SNAP,3) as numeric(16,3)),
   $SUBSIDY_TOTAL_SNAP:=concat('$',cast(round(SUBSIDY_TOTAL_SNAP,2) as numeric(16,2))),
-  $SUBSIDY_BY_EMP_SNAP:=concat('$',cast(round(case
-    when emp_count_snap > 0 then (subsidy_total_snap/emp_count_snap)/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_SNAP,
+  $SUBSIDY_BY_EMP_SNAP:=concat('$',cast(round(SUBSIDY_BY_EMP_SNAP,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_SNAP:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_SNAP,2) as numeric(16,2))),
   $EMP_COUNT_ADULT_MEDICAID:=cast(round(EMP_COUNT_ADULT_MEDICAID,3) as numeric(16,3)),
   $SUBSIDY_TOTAL_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_TOTAL_ADULT_MEDICAID,2) as numeric(16,2))),
-  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(case
-    when emp_count_adult_medicaid > 0 then (subsidy_total_adult_medicaid/emp_count_adult_medicaid)/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_ADULT_MEDICAID,
+  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_BY_EMP_ADULT_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID,2) as numeric(16,2))),
   $EMP_COUNT_CHILD_MEDICAID:=cast(round(EMP_COUNT_CHILD_MEDICAID,3) as numeric(16,3)),
   $SUBSIDY_TOTAL_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_TOTAL_CHILD_MEDICAID,2) as numeric(16,2))),
-  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(case
-    when emp_count_child_medicaid > 0 then (subsidy_total_child_medicaid/emp_count_child_medicaid)/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_CHILD_MEDICAID,
+  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_BY_EMP_CHILD_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID,2) as numeric(16,2))),
   $EMP_COUNT_ACA:=cast(round(EMP_COUNT_ACA,3) as numeric(16,3)),
   $SUBSIDY_TOTAL_ACA:=concat('$',cast(round(SUBSIDY_TOTAL_ACA,2) as numeric(16,2))),
-  $SUBSIDY_BY_EMP_ACA:=concat('$',cast(round(case
-    when EMP_COUNT_ACA > 0 then (SUBSIDY_TOTAL_ACA/EMP_COUNT_ACA)/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_ACA
-from ${SUBSIDY_DETAILS_TABLENAME}
+  $SUBSIDY_BY_EMP_ACA:=concat('$',cast(round(SUBSIDY_BY_EMP_ACA,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_ACA:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_ACA,2) as numeric(16,2)))
+from (
+  select
+    STATE_COUNTY_FIPS,
+    TICKER,
+    GOC,
+    HOURLY_WAGE_COLA,
+    LIVING_WAGE_AVG,
+    EMP_COUNT_TOTAL,
+    EMP_COUNT_SUBSIDY_TOTAL,
+    SUBSIDY_TOTAL,
+    case
+      when emp_count_subsidy_total > 0 then (subsidy_total/emp_count_subsidy_total)/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_TOTAL,
+    EMP_COUNT_EITC,
+    SUBSIDY_TOTAL_EITC,
+    case
+      when emp_count_eitc > 0 then (subsidy_total_eitc/emp_count_eitc)/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_EITC,
+    case
+      when EMP_COUNT_SUBSIDY_TOTAL > 0 then (SUBSIDY_TOTAL_EITC/EMP_COUNT_SUBSIDY_TOTAL)/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_EITC,
+    EMP_COUNT_SNAP,
+    SUBSIDY_TOTAL_SNAP,
+    case
+      when emp_count_snap > 0 then (subsidy_total_snap/emp_count_snap)/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_SNAP,
+    case
+      when EMP_COUNT_SUBSIDY_TOTAL > 0 then (SUBSIDY_TOTAL_SNAP/EMP_COUNT_SUBSIDY_TOTAL)/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_SNAP,
+    EMP_COUNT_ADULT_MEDICAID,
+    SUBSIDY_TOTAL_ADULT_MEDICAID,
+    case
+      when emp_count_adult_medicaid > 0 then (subsidy_total_adult_medicaid/emp_count_adult_medicaid)/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_ADULT_MEDICAID,
+    case
+      when EMP_COUNT_SUBSIDY_TOTAL > 0 then (SUBSIDY_TOTAL_ADULT_MEDICAID/EMP_COUNT_SUBSIDY_TOTAL)/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID,
+    EMP_COUNT_CHILD_MEDICAID,
+    SUBSIDY_TOTAL_CHILD_MEDICAID,
+    case
+      when emp_count_child_medicaid > 0 then (subsidy_total_child_medicaid/emp_count_child_medicaid)/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_CHILD_MEDICAID,
+    case
+      when EMP_COUNT_SUBSIDY_TOTAL > 0 then (SUBSIDY_TOTAL_CHILD_MEDICAID/EMP_COUNT_SUBSIDY_TOTAL)/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID,
+    EMP_COUNT_ACA,
+    SUBSIDY_TOTAL_ACA,
+    case
+      when EMP_COUNT_ACA > 0 then (SUBSIDY_TOTAL_ACA/EMP_COUNT_ACA)/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_ACA,
+    case
+      when EMP_COUNT_SUBSIDY_TOTAL > 0 then (SUBSIDY_TOTAL_ACA/EMP_COUNT_SUBSIDY_TOTAL)/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_ACA
+  from LKP_SUBSIDY_DETAILS
+) t
 order by state_county_fips, hourly_wage_cola;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Summary by Ticker" guiX="27" guiY="201" id="SELECT_SUMMARY_BY_TICKER" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select
   $TICKER:=TICKER,
-  $EMP_COUNT_TOTAL:=cast(round(sum(EMP_COUNT_TOTAL),3) as numeric(16,3)) EMP_COUNT_TOTAL,
-  $EMP_COUNT_SUBSIDY_TOTAL:=cast(round(sum(EMP_COUNT_SUBSIDY_TOTAL),3) as numeric(16,3)) EMP_COUNT_SUBSIDY_TOTAL,
-  $SUBSIDY_TOTAL:=concat('$',cast(round(sum(SUBSIDY_TOTAL),2) as numeric(16,2))) SUBSIDY_TOTAL,
-  $SUBSIDY_BY_EMP_TOTAL:=concat('$',cast(round(case
-    when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_TOTAL,
-  $EMP_COUNT_EITC:=cast(round(sum(EMP_COUNT_EITC),3) as numeric(16,3)) EMP_COUNT_EITC,
-  $SUBSIDY_TOTAL_EITC:=concat('$',cast(round(sum(SUBSIDY_TOTAL_EITC),2) as numeric(16,2))) SUBSIDY_TOTAL_EITC,
-  $SUBSIDY_BY_EMP_EITC:=concat('$',cast(round(case
-    when sum(EMP_COUNT_EITC) > 0 then (sum(SUBSIDY_TOTAL_EITC)/sum(EMP_COUNT_EITC))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_EITC,
-  $EMP_COUNT_SNAP:=cast(round(sum(EMP_COUNT_SNAP),3) as numeric(16,3)) EMP_COUNT_SNAP,
-  $SUBSIDY_TOTAL_SNAP:=concat('$',cast(round(sum(SUBSIDY_TOTAL_SNAP),2) as numeric(16,2))) SUBSIDY_TOTAL_SNAP,
-  $SUBSIDY_BY_EMP_SNAP:=concat('$',cast(round(case
-    when sum(EMP_COUNT_SNAP) > 0 then (sum(SUBSIDY_TOTAL_SNAP)/sum(EMP_COUNT_SNAP))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_SNAP,
-  $EMP_COUNT_ADULT_MEDICAID:=cast(round(sum(EMP_COUNT_ADULT_MEDICAID),3) as numeric(16,3)) EMP_COUNT_ADULT_MEDICAID,
-  $SUBSIDY_TOTAL_ADULT_MEDICAID:=concat('$',cast(round(sum(SUBSIDY_TOTAL_ADULT_MEDICAID),2) as numeric(16,2))) SUBSIDY_TOTAL_ADULT_MEDICAID,
-  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(case
-    when sum(EMP_COUNT_ADULT_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_ADULT_MEDICAID)/sum(EMP_COUNT_ADULT_MEDICAID))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_ADULT_MEDICAID,
-  $EMP_COUNT_CHILD_MEDICAID:=cast(round(sum(EMP_COUNT_CHILD_MEDICAID),3) as numeric(16,3)) EMP_COUNT_CHILD_MEDICAID,
-  $SUBSIDY_TOTAL_CHILD_MEDICAID:=concat('$',cast(round(sum(SUBSIDY_TOTAL_CHILD_MEDICAID),2) as numeric(16,2))) SUBSIDY_TOTAL_CHILD_MEDICAID,
-  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(case
-    when sum(EMP_COUNT_CHILD_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_CHILD_MEDICAID)/sum(EMP_COUNT_CHILD_MEDICAID))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_CHILD_MEDICAID,
-  $EMP_COUNT_ACA:=cast(round(sum(EMP_COUNT_ACA),3) as numeric(16,3)) EMP_COUNT_ACA,
-  $SUBSIDY_TOTAL_ACA:=concat('$',cast(round(sum(SUBSIDY_TOTAL_ACA),2) as numeric(16,2))) SUBSIDY_TOTAL_ACA,
-  $SUBSIDY_BY_EMP_ACA:=concat('$',cast(round(case
-    when sum(EMP_COUNT_ACA) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_ACA))/1500.0
-    else 0.0
-  end,2) as numeric(16,2))) SUBSIDY_BY_EMP_ACA
-from ${SUBSIDY_DETAILS_TABLENAME}
-group by ticker 
+  $EMP_COUNT_TOTAL:=cast(round(EMP_COUNT_TOTAL,3) as numeric(16,3)),
+  $EMP_COUNT_SUBSIDY_TOTAL:=cast(round(EMP_COUNT_SUBSIDY_TOTAL,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL:=concat('$',cast(round(SUBSIDY_TOTAL,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_TOTAL:=concat('$',cast(round(SUBSIDY_BY_EMP_TOTAL,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_TOT:=concat('$',cast(round((SUBSIDY_ABS_BY_EMP_EITC + 
+    SUBSIDY_ABS_BY_EMP_SNAP + 
+    SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID + 
+    SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID + 
+    SUBSIDY_ABS_BY_EMP_ACA),2) as numeric(16,2))) SUBSIDY_ABS_BY_EMP_TOT,
+  $SUBSIDY_SUM_BY_EMP_TOT:=concat('$',cast(round((SUBSIDY_BY_EMP_EITC + 
+    SUBSIDY_BY_EMP_SNAP + 
+    SUBSIDY_BY_EMP_ADULT_MEDICAID + 
+    SUBSIDY_BY_EMP_CHILD_MEDICAID + 
+    SUBSIDY_BY_EMP_ACA),2) as numeric(16,2))) SUBSIDY_SUM_BY_EMP_TOT,
+  $EMP_COUNT_EITC:=cast(round(EMP_COUNT_EITC,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_EITC:=concat('$',cast(round(SUBSIDY_TOTAL_EITC,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_EITC:=concat('$',cast(round(SUBSIDY_BY_EMP_EITC,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_EITC:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_EITC,2) as numeric(16,2))),
+  $EMP_COUNT_SNAP:=cast(round(EMP_COUNT_SNAP,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_SNAP:=concat('$',cast(round(SUBSIDY_TOTAL_SNAP,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_SNAP:=concat('$',cast(round(SUBSIDY_BY_EMP_SNAP,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_SNAP:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_SNAP,2) as numeric(16,2))),
+  $EMP_COUNT_ADULT_MEDICAID:=cast(round(EMP_COUNT_ADULT_MEDICAID,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_TOTAL_ADULT_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_BY_EMP_ADULT_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID,2) as numeric(16,2))),
+  $EMP_COUNT_CHILD_MEDICAID:=cast(round(EMP_COUNT_CHILD_MEDICAID,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_TOTAL_CHILD_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_BY_EMP_CHILD_MEDICAID,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID,2) as numeric(16,2))),
+  $EMP_COUNT_ACA:=cast(round(EMP_COUNT_ACA,3) as numeric(16,3)),
+  $SUBSIDY_TOTAL_ACA:=concat('$',cast(round(SUBSIDY_TOTAL_ACA,2) as numeric(16,2))),
+  $SUBSIDY_BY_EMP_ACA:=concat('$',cast(round(SUBSIDY_BY_EMP_ACA,2) as numeric(16,2))),
+  $SUBSIDY_ABS_BY_EMP_ACA:=concat('$',cast(round(SUBSIDY_ABS_BY_EMP_ACA,2) as numeric(16,2)))
+from (
+  select
+    TICKER,
+    sum(EMP_COUNT_TOTAL) EMP_COUNT_TOTAL,
+    sum(EMP_COUNT_SUBSIDY_TOTAL) EMP_COUNT_SUBSIDY_TOTAL,
+    sum(SUBSIDY_TOTAL) SUBSIDY_TOTAL,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_TOTAL,
+    sum(EMP_COUNT_EITC) EMP_COUNT_EITC,
+    sum(SUBSIDY_TOTAL_EITC) SUBSIDY_TOTAL_EITC,
+    case
+      when sum(EMP_COUNT_EITC) > 0 then (sum(SUBSIDY_TOTAL_EITC)/sum(EMP_COUNT_EITC))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_EITC,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_EITC)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_EITC,
+    sum(EMP_COUNT_SNAP) EMP_COUNT_SNAP,
+    sum(SUBSIDY_TOTAL_SNAP) SUBSIDY_TOTAL_SNAP,
+    case
+      when sum(EMP_COUNT_SNAP) > 0 then (sum(SUBSIDY_TOTAL_SNAP)/sum(EMP_COUNT_SNAP))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_SNAP,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_SNAP)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_SNAP,
+    sum(EMP_COUNT_ADULT_MEDICAID) EMP_COUNT_ADULT_MEDICAID,
+    sum(SUBSIDY_TOTAL_ADULT_MEDICAID) SUBSIDY_TOTAL_ADULT_MEDICAID,
+    case
+      when sum(EMP_COUNT_ADULT_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_ADULT_MEDICAID)/sum(EMP_COUNT_ADULT_MEDICAID))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_ADULT_MEDICAID,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_ADULT_MEDICAID)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_ADULT_MEDICAID,
+    sum(EMP_COUNT_CHILD_MEDICAID) EMP_COUNT_CHILD_MEDICAID,
+    sum(SUBSIDY_TOTAL_CHILD_MEDICAID) SUBSIDY_TOTAL_CHILD_MEDICAID,
+    case
+      when sum(EMP_COUNT_CHILD_MEDICAID) > 0 then (sum(SUBSIDY_TOTAL_CHILD_MEDICAID)/sum(EMP_COUNT_CHILD_MEDICAID))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_CHILD_MEDICAID,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_CHILD_MEDICAID)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_CHILD_MEDICAID,
+    sum(EMP_COUNT_ACA) EMP_COUNT_ACA,
+    sum(SUBSIDY_TOTAL_ACA) SUBSIDY_TOTAL_ACA,
+    case
+      when sum(EMP_COUNT_ACA) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_ACA))/1500.0
+      else 0.0
+    end SUBSIDY_BY_EMP_ACA,
+    case
+      when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
+      else 0.0
+    end SUBSIDY_ABS_BY_EMP_ACA
+  from ${SUBSIDY_DETAILS_TABLENAME}
+  group by ticker
+) t
 order by ticker;]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SUMMARY_TICKER}" guiName="Write Report" guiX="420" guiY="201" id="WRITE_REPORT" outputFieldNames="true" type="DATA_WRITER"/>
