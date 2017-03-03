@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Mar 02 16:26:20 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.90" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Mar 03 11:43:12 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.92" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -249,9 +249,9 @@ from (
     from ${SUBSIDY_COUNTS_TABLENAME} sc 
     join ${COUNTY_COUNT_TABLENAME} ec on 
       ec.state_county_fips = sc.state_county_fips and 
-      ec.ticker = sc.ticker and (
+      ec.ticker = sc.ticker /*and (
         ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')
-      )
+      )*/
     join ${JOB_DISTRIBUTION_TABLENAME} d on 
       d.ticker = ec.ticker and (
         (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
@@ -575,7 +575,7 @@ from (
       when EMP_COUNT_SUBSIDY_TOTAL > 0 then (SUBSIDY_TOTAL_ACA/EMP_COUNT_SUBSIDY_TOTAL)/1500.0
       else 0.0
     end SUBSIDY_ABS_BY_EMP_ACA
-  from LKP_SUBSIDY_DETAILS
+  from ${SUBSIDY_DETAILS_TABLENAME}
 ) t
 order by state_county_fips, hourly_wage_cola;]]></attr>
 </Node>
