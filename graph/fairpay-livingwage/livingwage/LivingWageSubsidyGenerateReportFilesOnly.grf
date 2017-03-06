@@ -296,6 +296,24 @@ from (
     /*where *//*sc.ticker = 'YUMP' and*//* cjcd.tolerance_type = 1*/
   ) t
 ) t
+group by
+  state_county_fips,
+  ticker,
+  goc,
+  unadjusted_rate,
+  living_wage_avg,
+  emp_count_total,
+  emp_count_subsidy_total,
+  emp_count_eitc,
+  eitc_subsidy_total, 
+  emp_count_snap,
+  snap_subsidy_total,
+  emp_count_adult_medicaid,
+  adult_medicaid_subsidy_total,
+  emp_count_child_medicaid,
+  child_medicaid_subsidy_total,
+  emp_count_aca,
+  aca_subsidy_total
 order by 
   state_county_fips, 
   unadjusted_rate;
