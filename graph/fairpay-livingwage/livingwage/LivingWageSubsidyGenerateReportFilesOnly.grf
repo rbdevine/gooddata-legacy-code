@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Mar 06 17:31:12 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.93" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Mar 07 21:08:38 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.95" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -617,7 +617,7 @@ from (
     end SUBSIDY_ABS_BY_EMP_ACA
   from ${SUBSIDY_DETAILS_TABLENAME}
 ) t
-order by state_county_fips, hourly_wage_cola;]]></attr>
+order by state_county_fips, ticker, hourly_wage_cola;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Summary by Ticker" guiX="27" guiY="201" id="SELECT_SUMMARY_BY_TICKER" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select
