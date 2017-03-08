@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Tue Mar 07 16:49:45 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.117" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Mar 08 11:45:47 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.131" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -16,12 +16,12 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
 <Property fileURL="workspace.prm" id="GraphParameter31"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Accumulation Table" guiX="366" guiY="10" id="CREATE_ACCUMULATION_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Accumulation Table" guiX="49" guiY="90" id="CREATE_ACCUMULATION_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME};
 create table if not exists ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} (
   ID INTEGER NOT NULL UNIQUE,
@@ -36,7 +36,7 @@ create table if not exists ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} (
   EMPLOYEE_COUNT_MAX_ACA FLOAT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Subsidy Counts Table" guiX="7" guiY="10" id="CREATE_SUBSIDY_COUNTS_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Subsidy Counts Table" guiX="48" guiY="16" id="CREATE_SUBSIDY_COUNTS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${SUBSIDY_COUNTS_TABLENAME};
 create table if not exists ${SUBSIDY_COUNTS_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
@@ -50,7 +50,16 @@ create table if not exists ${SUBSIDY_COUNTS_TABLENAME} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Ticker Queue" guiX="208" guiY="10" id="CREATE_TICKER_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Subsidy Rate Table" guiX="233" guiY="90" id="CREATE_SUBSIDY_RATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME};
+create table if not exists ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} (
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL, 
+  TICKER VARCHAR(32) NOT NULL,
+  GOC VARCHAR(128) NOT NULL,
+  RATE_COLA FLOAT NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Ticker Queue" guiX="249" guiY="16" id="CREATE_TICKER_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME};
 create table if not exists ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} (
   TICKER VARCHAR(32) UNIQUE NOT NULL
@@ -58,7 +67,70 @@ create table if not exists ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Accumulation Table" guiX="258" guiY="83" id="POPULATE_INDUSTRY_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Rate Table" guiX="141" guiY="168" id="POPULATE_SUBSIDY_RATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME}
+select 
+  cjcd.state_county_fips,
+  cjcd.ticker,
+  cjcd.goc, 
+  AVG(cjcd.rate_cola) rate_cola 
+from ${COUNTY_COUNT_TABLENAME} ec
+join ${JOB_DISTRIBUTION_TABLENAME} d on 
+  d.ticker = ec.ticker and (
+    (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
+    or d.subsidiary = ec.subsidiary
+  )
+/*
+join lkp_just_co_secty_master m on m.ticker_trim = ec.ticker
+*/
+join (
+  select 
+    state_county_fips, 
+    ticker_trim ticker, 
+    subsidiary, 
+    goc, 
+    unadjusted_rate rate_cola
+  from lkp_living_wage_company_job_county_data cjcd
+  join lkp_just_co_secty_master m on m.just_co_id = cjcd.just_co_id
+  where 
+    tolerance_type = 1 and (
+      (ticker_trim in ('BBY','ICGH','KR','TGT','WMT') and subsidiary is null) or 
+      (ticker_trim not in ('BBY','ICGH','KR','TGT','WMT'))
+    )
+  group by 
+    cjcd.state_county_fips, 
+    m.ticker_trim, 
+    cjcd.subsidiary, 
+    cjcd.goc, 
+    cjcd.unadjusted_rate
+) cjcd on 
+    cjcd.state_county_fips = ec.state_county_fips and 
+    cjcd.ticker = ec.ticker and 
+    cjcd.goc = d.goc
+group by 
+  cjcd.state_county_fips, 
+  cjcd.ticker,
+  cjcd.goc;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Filter to Specific Tickers (disable to run for all tickers)" guiX="71" guiY="244" id="FILTER_TO_SPECIFIC_TICKERS_DISABLE_TO_RUN_FOR_ALL_TICKERS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME}
+where ticker not in ('WMT');]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Ticker Queue" guiX="158" guiY="322" id="POPULATE_TICKER_QUEUE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME}
+select ticker
+from ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME}
+group by ticker;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Accumulation Table" guiX="249" guiY="401" id="POPULATE_INDUSTRY_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} (
   ID,
   STATE_COUNTY_FIPS,
@@ -68,11 +140,13 @@ create table if not exists ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} (
   EMPLOYEE_COUNT
 )
 select 
-  rank() over (order by ec.ticker, ec.state_county_fips, unadjusted_rate) id, 
+  /*rank() over (order by ec.ticker, ec.state_county_fips, unadjusted_rate) id,*/
+  rank() over (order by ec.ticker, ec.state_county_fips, cjcd.rate_cola) id, 
   ec.state_county_fips, 
   m.ticker_trim ticker, 
-  d.goc, 
-  unadjusted_rate,
+  d.goc,
+  /*unadjusted_rate*/
+  cjcd.rate_cola,
   ec.employee_count * d.distribution employee_count
 from ${COUNTY_COUNT_TABLENAME} ec
 join ${JOB_DISTRIBUTION_TABLENAME} d on 
@@ -84,6 +158,7 @@ join lkp_just_co_secty_master m on m.ticker_trim = ec.ticker
 /*
 join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc
 */
+/*
 join (
   select state_county_fips, ticker_trim ticker, subsidiary, goc, unadjusted_rate 
   from lkp_living_wage_company_job_county_data cjcd
@@ -91,22 +166,46 @@ join (
   where tolerance_type = 1 and ((ticker_trim in ('BBY','ICGH','KR','TGT','WMT') and subsidiary is null) or (ticker_trim not in ('BBY','ICGH','KR','TGT','WMT')))
   group by state_county_fips, ticker_trim, subsidiary, goc, unadjusted_rate
 ) cjcd on cjcd.state_county_fips = ec.state_county_fips and cjcd.ticker = ec.ticker and cjcd.goc = d.goc
+*/
+join ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} cjcd on 
+  cjcd.state_county_fips = ec.state_county_fips and 
+  cjcd.ticker = ec.ticker and 
+  cjcd.goc = d.goc
 ;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Counts Table" guiX="43" guiY="83" id="POPULATE_SUBSIDY_COUNTS_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${SUBSIDY_COUNTS_TABLENAME} (state_county_fips, ticker, goc)
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Counts Table" guiX="34" guiY="401" id="POPULATE_SUBSIDY_COUNTS_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${SUBSIDY_COUNTS_TABLENAME} (
+  state_county_fips, 
+  ticker,
+  goc
+)
 select 
   state_county_fips,
   ec.ticker,
   goc
-from lkp_living_wage_employee_count_by_county ec
-join lkp_living_wage_goc_distributions d on d.ticker = ec.ticker and ((ec.ticker in ('BBY','ICGH','KR','TGT','WMT') and d.subsidiary = ec.subsidiary) or (ec.ticker not in ('BBY','ICGH','KR','TGT','WMT') and ec.subsidiary is null))
-group by state_county_fips, ec.ticker, goc
-order by state_county_fips, ec.ticker, goc;]]></attr>
+from ${COUNTY_COUNT_TABLENAME} ec
+join ${JOB_DISTRIBUTION_TABLENAME} d on 
+  d.ticker = ec.ticker and (
+    (ec.ticker in ('BBY','ICGH','KR','TGT','WMT') and 
+      d.subsidiary = ec.subsidiary
+    ) or 
+    (ec.ticker not in ('BBY','ICGH','KR','TGT','WMT') and 
+      ec.subsidiary is null
+    )
+  )
+join ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} q on q.ticker = ec.ticker
+group by 
+  state_county_fips, 
+  ec.ticker, 
+  goc
+order by 
+  state_county_fips, 
+  ec.ticker, 
+  goc;]]></attr>
 </Node>
 </Phase>
-<Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add EITC Counts" guiX="122" guiY="160" id="ADD_EITC_COUNTS" type="DB_EXECUTE">
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add EITC Counts" guiX="173" guiY="478" id="ADD_EITC_COUNTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${SUBSIDY_COUNTS_TABLENAME} sc
 set EMP_COUNT_EITC = ec.employee_count
 from (
@@ -129,6 +228,7 @@ from (
     )
   */
   join lkp_just_co_secty_master m on m.ticker_trim = ec.ticker
+  /*
   join (
     select state_county_fips, ticker_trim ticker, subsidiary, goc, unadjusted_rate 
     from lkp_living_wage_company_job_county_data cjcd
@@ -137,6 +237,12 @@ from (
     group by state_county_fips, ticker_trim, subsidiary, goc, unadjusted_rate
   ) cjcd on cjcd.state_county_fips = ec.state_county_fips and cjcd.ticker = ec.ticker and cjcd.goc = ec.goc
   left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= eitc.maximum_wage
+  */
+  join ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} cjcd on 
+    cjcd.state_county_fips = ec.state_county_fips and 
+    cjcd.ticker = ec.ticker and 
+    cjcd.goc = ec.goc
+  left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= eitc.maximum_wage
   /*
   join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = ec.goc
   left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjd.rate and cjd.rate <= eitc.maximum_wage
@@ -144,14 +250,9 @@ from (
   where eitc.subsidy_annual is not null
 ) ec where sc.state_county_fips = ec.state_county_fips and sc.ticker = ec.ticker and sc.goc = ec.goc;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Ticker Queue" guiX="258" guiY="160" id="POPULATE_TICKER_QUEUE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME}
-select ticker from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} /*where ticker = 'YUMP'*/ group by ticker;
-]]></attr>
-</Node>
 </Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add SNAP Counts" guiX="180" guiY="236" id="ADD_SNAP_COUNTS" type="DB_EXECUTE">
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add SNAP Counts" guiX="171" guiY="551" id="ADD_SNAP_COUNTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${SUBSIDY_COUNTS_TABLENAME} sc
 set EMP_COUNT_SNAP = ec.employee_count
 from (
@@ -170,15 +271,15 @@ from (
 ) ec where sc.state_county_fips = ec.state_county_fips and sc.ticker = ec.ticker and sc.goc = ec.goc;]]></attr>
 </Node>
 </Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Read Tickers" guiX="15" guiY="311" id="READ_TICKERS" type="DB_INPUT_TABLE">
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Read Tickers" guiX="15" guiY="624" id="READ_TICKERS" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select distinct $Ticker:= ticker
 from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME}
 /*where ticker = 'YUMP'*/
 group by ticker
 order by ticker;]]></attr>
 </Node>
-<Node enabled="enabled" guiName="Reformat" guiX="171" guiY="311" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" guiName="Reformat" guiX="171" guiY="624" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -207,17 +308,17 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" guiName="Update Accumulation" guiX="325" guiY="311" id="UPDATE_ACCUMULATION" passThroughInputPort="0" type="RUN_GRAPH"/>
+<Node enabled="enabled" guiName="Update Accumulation" guiX="325" guiY="624" id="UPDATE_ACCUMULATION" passThroughInputPort="0" type="RUN_GRAPH"/>
 <Edge fromNode="READ_TICKERS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT:0"/>
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in regular mode: names of the graphs to be executed, otherwise nothing)" metadata="Metadata2" outPort="Port 0 (out)" toNode="UPDATE_ACCUMULATION:0"/>
 </Phase>
-<Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Accumulation Table" guiX="60" guiY="490" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Accumulation Table" guiX="60" guiY="803" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Ticker Queue" guiX="244" guiY="490" id="DROP_TICKER_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Ticker Queue" guiX="244" guiY="803" id="DROP_TICKER_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME};]]></attr>
 </Node>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageSubsidyGenerateReportFilesOnly.grf" guiName="Run Reports" guiX="171" guiY="388" id="RUN_REPORTS" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageSubsidyGenerateReportFilesOnly.grf" guiName="Run Reports" guiX="171" guiY="701" id="RUN_REPORTS" type="RUN_GRAPH"/>
 </Phase>
 </Graph>

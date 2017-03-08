@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Mar 07 21:08:38 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.95" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Mar 08 11:56:06 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.98" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -107,12 +107,12 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="graph/local/local-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter1"/>
-<Property id="GraphParameter32" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
-<Property id="GraphParameter33" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
-<Property id="GraphParameter34" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
-<Property id="GraphParameter35" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
-<Property fileURL="workspace.prm" id="GraphParameter36"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter23"/>
+<Property id="GraphParameter1" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
+<Property id="GraphParameter2" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
+<Property id="GraphParameter3" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
+<Property id="GraphParameter4" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
+<Property fileURL="workspace.prm" id="GraphParameter5"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -148,7 +148,7 @@ select
   state_county_fips,
   ticker,
   goc,
-  unadjusted_rate,
+  rate_cola,
   living_wage_avg,
   emp_count_total,
   emp_count_subsidy_total,
@@ -168,7 +168,7 @@ from (
     state_county_fips,
     ticker,
     goc,
-    isnull(unadjusted_rate,0.0) unadjusted_rate,
+    isnull(rate_cola,0.0) rate_cola,
     isnull(living_wage_avg,0.0) living_wage_avg,
     isnull(emp_count_total,0.0) emp_count_total, 
     isnull(emp_count_subsidy_total,0.0) emp_count_subsidy_total,
@@ -187,12 +187,12 @@ from (
       sc.state_county_fips,
       sc.ticker,
       sc.goc,
-      cjcd.unadjusted_rate,
+      cjcd.rate_cola,
       lwa.living_wage_avg,
       /*ec.employee_count * d.distribution emp_count_total,*/
       ec.employee_count emp_count_total,
       case 
-        when cjcd.unadjusted_rate < lwa.living_wage_avg then ec.employee_count
+        when cjcd.rate_cola < lwa.living_wage_avg then ec.employee_count
         else 0.0
       end emp_count_below_lw,
       case
@@ -270,6 +270,7 @@ from (
         or d.subsidiary = ec.subsidiary
       ) and d.goc = sc.goc
     */
+    /*
     join (
       select state_county_fips, ticker_trim ticker, subsidiary, goc, unadjusted_rate 
       from lkp_living_wage_company_job_county_data cjcd
@@ -277,6 +278,11 @@ from (
       where tolerance_type = 1 and ((ticker_trim in ('BBY','ICGH','KR','TGT','WMT') and subsidiary is null) or (ticker_trim not in ('BBY','ICGH','KR','TGT','WMT')))
       group by state_county_fips, ticker_trim, subsidiary, goc, unadjusted_rate
     ) cjcd on cjcd.state_county_fips = ec.state_county_fips and cjcd.ticker = ec.ticker and cjcd.goc = ec.goc
+    */
+    join ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} cjcd on 
+      cjcd.state_county_fips = ec.state_county_fips and 
+      cjcd.ticker = ec.ticker and 
+      cjcd.goc = ec.goc   
     /*
     join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
     join lkp_living_wage_company_job_county_data cjcd on cjcd.just_co_id = m.just_co_id and cjcd.state_county_fips = ec.state_county_fips and cjcd.goc = ec.goc and (
@@ -289,9 +295,14 @@ from (
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(ec.state_county_fips,2)
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = ec.ticker
     left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
+    left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= eitc.maximum_wage
+    left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= snap.maximum_wage
+    left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= aca_base.maximum_wage
+    /*
     left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= eitc.maximum_wage
     left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= snap.maximum_wage
     left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= aca_base.maximum_wage
+    */
     left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_avg and lwa.living_wage_avg <= aca_lw.maximum_wage
     /*where *//*sc.ticker = 'YUMP' and*//* cjcd.tolerance_type = 1*/
   ) t
@@ -300,7 +311,7 @@ group by
   state_county_fips,
   ticker,
   goc,
-  unadjusted_rate,
+  rate_cola,
   living_wage_avg,
   emp_count_total,
   emp_count_subsidy_total,
@@ -316,7 +327,7 @@ group by
   aca_subsidy_total
 order by 
   state_county_fips, 
-  unadjusted_rate;
+  rate_cola;
 ]]></attr>
 </Node>
 </Phase>
