@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Mar 08 11:56:06 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.98" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Mar 08 15:26:23 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.99" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -107,12 +107,12 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="graph/local/local-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter23"/>
-<Property id="GraphParameter1" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
-<Property id="GraphParameter2" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
-<Property id="GraphParameter3" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
-<Property id="GraphParameter4" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
-<Property fileURL="workspace.prm" id="GraphParameter5"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter1"/>
+<Property id="GraphParameter33" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
+<Property id="GraphParameter34" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
+<Property id="GraphParameter35" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
+<Property id="GraphParameter36" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
+<Property fileURL="workspace.prm" id="GraphParameter37"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -189,7 +189,6 @@ from (
       sc.goc,
       cjcd.rate_cola,
       lwa.living_wage_avg,
-      /*ec.employee_count * d.distribution emp_count_total,*/
       ec.employee_count emp_count_total,
       case 
         when cjcd.rate_cola < lwa.living_wage_avg then ec.employee_count
@@ -257,40 +256,10 @@ from (
       ) t
       group by state_county_fips, ticker, goc
     ) ec on ec.state_county_fips = sc.state_county_fips and ec.ticker = sc.ticker and ec.goc = sc.goc
-    /*
-    join ${COUNTY_COUNT_TABLENAME} ec on 
-      ec.state_county_fips = sc.state_county_fips and 
-      ec.ticker = sc.ticker*/ /*and (
-        ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')
-      )*/
-    /*
-    join ${JOB_DISTRIBUTION_TABLENAME} d on 
-      d.ticker = ec.ticker and (
-        (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
-        or d.subsidiary = ec.subsidiary
-      ) and d.goc = sc.goc
-    */
-    /*
-    join (
-      select state_county_fips, ticker_trim ticker, subsidiary, goc, unadjusted_rate 
-      from lkp_living_wage_company_job_county_data cjcd
-      join lkp_just_co_secty_master m on m.just_co_id = cjcd.just_co_id
-      where tolerance_type = 1 and ((ticker_trim in ('BBY','ICGH','KR','TGT','WMT') and subsidiary is null) or (ticker_trim not in ('BBY','ICGH','KR','TGT','WMT')))
-      group by state_county_fips, ticker_trim, subsidiary, goc, unadjusted_rate
-    ) cjcd on cjcd.state_county_fips = ec.state_county_fips and cjcd.ticker = ec.ticker and cjcd.goc = ec.goc
-    */
     join ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} cjcd on 
       cjcd.state_county_fips = ec.state_county_fips and 
       cjcd.ticker = ec.ticker and 
       cjcd.goc = ec.goc   
-    /*
-    join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
-    join lkp_living_wage_company_job_county_data cjcd on cjcd.just_co_id = m.just_co_id and cjcd.state_county_fips = ec.state_county_fips and cjcd.goc = ec.goc and (
-        (ec.subsidiary is null and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT'))
-        or cjcd.subsidiary = ec.subsidiary
-      )
-    */
-    /*join lkp_living_wage_company_job_data cjd on d.goc = cjd.job and m.just_co_id = cjd.just_co_id */
     join lkp_living_wage_averages lwa on lwa.state_county_fips = sc.state_county_fips
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(ec.state_county_fips,2)
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = ec.ticker
@@ -298,13 +267,7 @@ from (
     left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= eitc.maximum_wage
     left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= snap.maximum_wage
     left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= aca_base.maximum_wage
-    /*
-    left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= eitc.maximum_wage
-    left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= snap.maximum_wage
-    left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= cjcd.unadjusted_rate and cjcd.unadjusted_rate <= aca_base.maximum_wage
-    */
     left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_avg and lwa.living_wage_avg <= aca_lw.maximum_wage
-    /*where *//*sc.ticker = 'YUMP' and*//* cjcd.tolerance_type = 1*/
   ) t
 ) t
 group by

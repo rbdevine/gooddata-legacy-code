@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon Mar 06 22:42:33 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.124" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Mar 08 15:24:03 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.125" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -17,7 +17,7 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="workspace.prm" id="GraphParameter31"/>
+<Property fileURL="workspace.prm" id="GraphParameter32"/>
 <Dictionary/>
 </Global>
 <Phase number="1">
@@ -100,7 +100,6 @@ from (
         group by state_county_fips, ticker
       ) jc
     ) ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
-    /*join ${COUNTY_COUNT_TABLENAME} ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker*/
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
     join (
       select ticker
@@ -111,7 +110,6 @@ from (
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = a.ticker
     left join ${SUBSIDY_MEDICAID_PARTICIPATION_BY_CODE_TABLENAME} mc on mc.code = tc.code
     left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
-    /*where ec.subsidiary is null*/ /*and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')*/
   ) a
 ) ac
 where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.goc = a.goc;]]></attr>
@@ -154,7 +152,6 @@ from (
         group by state_county_fips, ticker
       ) jc
     ) ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
-    /*join ${COUNTY_COUNT_TABLENAME} ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker*/
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
     join (
       select ticker
@@ -165,7 +162,6 @@ from (
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = a.ticker
     left join ${SUBSIDY_MEDICAID_PARTICIPATION_BY_CODE_TABLENAME} mc on mc.code = tc.code
     left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
-    /*where ec.subsidiary is null*/ /*and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')*/
   ) a
 ) ac
 where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.goc = a.goc;]]></attr>
@@ -206,7 +202,6 @@ from (
         group by state_county_fips, ticker
       ) jc
     ) ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
-    /*join ${COUNTY_COUNT_TABLENAME} ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker*/
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
     join (
       select ticker
@@ -217,7 +212,6 @@ from (
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = a.ticker
     left join ${SUBSIDY_SNAP_PARTICIPATION_BY_CODE_TABLENAME} sc on sc.code = tc.code
     left join ${SUBSIDY_SNAP_STATE_PARTICIPATION_MULTIPLIER_TABLENAME} ss on ss.state = fs.state
-    /*where ec.subsidiary is null*/ /*and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')*/
   ) a
 ) ac
 where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.goc = a.goc;]]></attr>
@@ -264,7 +258,6 @@ from (
         group by state_county_fips, ticker
       ) jc
     ) ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
-    /*join ${COUNTY_COUNT_TABLENAME} ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker*/
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = a.ticker
     join (
@@ -279,7 +272,6 @@ from (
       group by state_county_fips, ticker
     ) sc on sc.state_county_fips = ec.state_county_fips and sc.ticker = ec.ticker
     left join ${SUBSIDY_ACA_MULTIPLIER_TABLENAME} am on am.code = tc.code
-    /*where ec.subsidiary is null*/ /*and ec.ticker not in ('BBY','ICGH','KR','TGT','WMT')*/
   ) a
 ) ac
 where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.goc = a.goc;]]></attr>
