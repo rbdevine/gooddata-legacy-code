@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Mar 08 18:14:15 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.141" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Mar 09 10:38:01 EST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.144" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -16,8 +16,8 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="workspace.prm" id="GraphParameter31"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter18"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -56,6 +56,7 @@ create table if not exists ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL, 
   TICKER VARCHAR(32) NOT NULL,
   GOC VARCHAR(128) NOT NULL,
+  EMPLOYEE_COUNT FLOAT NOT NULL,
   RATE_COLA FLOAT NOT NULL
 );]]></attr>
 </Node>
@@ -72,7 +73,8 @@ create table if not exists ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME} (
 select 
   cjcd.state_county_fips,
   cjcd.ticker,
-  cjcd.goc, 
+  cjcd.goc,
+  SUM(ec.employee_count * d.distribution) employee_count,
   AVG(cjcd.rate_cola) rate_cola 
 from ${COUNTY_COUNT_TABLENAME} ec
 join ${JOB_DISTRIBUTION_TABLENAME} d on 
@@ -115,7 +117,8 @@ group by
 select 
   ec.state_county_fips,
   ec.ticker,
-  d.goc, 
+  d.goc,
+  SUM(ec.employee_count * d.distribution) employee_count,
   AVG(cjd.rate) rate_cola 
 from ${COUNTY_COUNT_TABLENAME} ec
 join ${JOB_DISTRIBUTION_TABLENAME} d on 
