@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Mar 09 16:53:14 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.134" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Mar 10 14:41:42 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.135" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -79,29 +79,6 @@ from (
       else 0.0
     end child_county_medical_count
   from (
-/*    
-    select
-      a.*,
-      ec.employee_count * mc.adult_medicaid_percentage * ms.adult_medicaid_participation_multiplier adult_medical_count,
-      ec.employee_count * mc.child_medicaid_percentage * ms.child_medicaidchips_percentage_multiplier * child_medicaid_participation_multiplier child_medical_count
-    from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
-    join (
-      select jc.state_county_fips, jc.ticker, cast(cast(round(jc.employee_count,0) as numeric(16,0)) as integer) employee_count
-      from (
-        select state_county_fips, ticker, sum(employee_count) employee_count
-        from ( 
-          select state_county_fips, ticker, goc, sum(job_employee_count) employee_count
-          from (
-            select state_county_fips, ec.ticker, goc, d.distribution * ec.employee_count job_employee_count
-            from ${COUNTY_COUNT_TABLENAME} ec
-            join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = ec.ticker and ((ec.ticker in ('BBY','ICGH','KR','TGT','WMT') and d.subsidiary = ec.subsidiary) or (ec.ticker not in ('BBY','ICGH','KR','TGT','WMT') and ec.subsidiary is null))
-          ) t
-          group by state_county_fips, ticker, goc
-        ) t
-        group by state_county_fips, ticker
-      ) jc
-    ) ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
-*/
     select
       a.*,
       gc.employee_count * mc.adult_medicaid_percentage * ms.adult_medicaid_participation_multiplier adult_medical_count,
@@ -149,28 +126,6 @@ from (
     end adult_county_medical_count,
     adult_medical_count adult_medical_count_total
   from (
-/*
-    select
-      a.*,
-      ec.employee_count * mc.adult_medicaid_percentage * ms.adult_medicaid_participation_multiplier adult_medical_count
-    from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
-    join (
-      select jc.state_county_fips, jc.ticker, cast(cast(round(jc.employee_count,0) as numeric(16,0)) as integer) employee_count
-      from (
-        select state_county_fips, ticker, sum(employee_count) employee_count
-        from ( 
-          select state_county_fips, ticker, goc, sum(job_employee_count) employee_count
-          from (
-            select state_county_fips, ec.ticker, goc, d.distribution * ec.employee_count job_employee_count
-            from ${COUNTY_COUNT_TABLENAME} ec
-            join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = ec.ticker and ((ec.ticker in ('BBY','ICGH','KR','TGT','WMT') and d.subsidiary = ec.subsidiary) or (ec.ticker not in ('BBY','ICGH','KR','TGT','WMT') and ec.subsidiary is null))
-          ) t
-          group by state_county_fips, ticker, goc
-        ) t
-        group by state_county_fips, ticker
-      ) jc
-    ) ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
-*/
     select
       a.*,
       gc.employee_count * mc.adult_medicaid_percentage * ms.adult_medicaid_participation_multiplier adult_medical_count
@@ -215,28 +170,6 @@ from (
       else 0.0
     end snap_county_count
   from (
-/*
-    select
-      a.*,
-      ec.employee_count * (sc.participation_rate/100.0) * ss.participation_multiplier snap_count
-    from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
-    join (
-      select jc.state_county_fips, jc.ticker, cast(cast(round(jc.employee_count,0) as numeric(16,0)) as integer) employee_count
-      from (
-        select state_county_fips, ticker, sum(employee_count) employee_count
-        from ( 
-          select state_county_fips, ticker, goc, sum(job_employee_count) employee_count
-          from (
-            select state_county_fips, ec.ticker, goc, d.distribution * ec.employee_count job_employee_count
-            from ${COUNTY_COUNT_TABLENAME} ec
-            join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = ec.ticker and ((ec.ticker in ('BBY','ICGH','KR','TGT','WMT') and d.subsidiary = ec.subsidiary) or (ec.ticker not in ('BBY','ICGH','KR','TGT','WMT') and ec.subsidiary is null))
-          ) t
-          group by state_county_fips, ticker, goc
-        ) t
-        group by state_county_fips, ticker
-      ) jc
-    ) ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
-*/
     select
       a.*,
       gc.employee_count * (sc.participation_rate/100.0) * ss.participation_multiplier snap_count
@@ -289,26 +222,6 @@ from (
   from (
     select
       a.*,
-/*
-      (ec.employee_count - sc.emp_count_adult_medicaid) * am.multiplier emp_count_aca
-    from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
-    join (
-      select jc.state_county_fips, jc.ticker, cast(cast(round(jc.employee_count,0) as numeric(16,0)) as integer) employee_count
-      from (
-        select state_county_fips, ticker, sum(employee_count) employee_count
-        from ( 
-          select state_county_fips, ticker, goc, sum(job_employee_count) employee_count
-          from (
-            select state_county_fips, ec.ticker, goc, d.distribution * ec.employee_count job_employee_count
-            from ${COUNTY_COUNT_TABLENAME} ec
-            join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = ec.ticker and ((ec.ticker in ('BBY','ICGH','KR','TGT','WMT') and d.subsidiary = ec.subsidiary) or (ec.ticker not in ('BBY','ICGH','KR','TGT','WMT') and ec.subsidiary is null))
-          ) t
-          group by state_county_fips, ticker, goc
-        ) t
-        group by state_county_fips, ticker
-      ) jc
-    ) ec on ec.state_county_fips = a.state_county_fips and ec.ticker = a.ticker
-*/
       (gc.employee_count - sc.emp_count_adult_medicaid) * am.multiplier emp_count_aca
     from ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
     join (

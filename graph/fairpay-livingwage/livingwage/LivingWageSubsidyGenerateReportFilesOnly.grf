@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Mar 09 16:33:22 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.101" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Mar 10 14:42:35 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.102" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -187,13 +187,10 @@ from (
       sc.state_county_fips,
       sc.ticker,
       sc.goc,
-      /*cjcd.rate_cola,*/
       gc.rate_cola,
       lwa.living_wage_avg,
-      /*ec.employee_count emp_count_total,*/
       gc.employee_count emp_count_total,
       case 
-        /*when cjcd.rate_cola < lwa.living_wage_avg then ec.employee_count*/
         when gc.rate_cola < lwa.living_wage_avg then gc.employee_count
         else 0.0
       end emp_count_below_lw,
@@ -250,21 +247,6 @@ from (
         else aca_lw.subsidy_annual - isnull(aca_base.subsidy_annual,0.0)
       end) * sc.emp_count_aca aca_subsidy_total
     from ${SUBSIDY_COUNTS_TABLENAME} sc
-/*
-    join (
-      select state_county_fips, ticker, goc, sum(job_employee_count) employee_count
-      from (
-        select state_county_fips, ec.ticker, ec.subsidiary, goc, d.distribution * ec.employee_count job_employee_count
-        from ${COUNTY_COUNT_TABLENAME} ec
-        join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = ec.ticker and ((ec.ticker in ('BBY','ICGH','KR','TGT','WMT') and d.subsidiary = ec.subsidiary) or (ec.ticker not in ('BBY','ICGH','KR','TGT','WMT') and ec.subsidiary is null))
-      ) t
-      group by state_county_fips, ticker, goc
-    ) ec on ec.state_county_fips = sc.state_county_fips and ec.ticker = sc.ticker and ec.goc = sc.goc
-    join ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} cjcd on 
-      cjcd.state_county_fips = ec.state_county_fips and 
-      cjcd.ticker = ec.ticker and 
-      cjcd.goc = ec.goc   
-*/
     join ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} gc on 
       gc.state_county_fips = sc.state_county_fips and 
       gc.ticker = sc.ticker and 
@@ -276,11 +258,6 @@ from (
     left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= gc.rate_cola and gc.rate_cola <= eitc.maximum_wage
     left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= gc.rate_cola and gc.rate_cola <= snap.maximum_wage
     left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= gc.rate_cola and gc.rate_cola <= aca_base.maximum_wage
-/*
-    left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= eitc.maximum_wage
-    left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= snap.maximum_wage
-    left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= cjcd.rate_cola and cjcd.rate_cola <= aca_base.maximum_wage
-*/
     left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_avg and lwa.living_wage_avg <= aca_lw.maximum_wage
 
   ) t
