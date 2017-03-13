@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Mar 10 14:40:18 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.153" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Mar 10 16:56:32 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.155" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -116,7 +116,7 @@ group by
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Filter to Specific Tickers (disable to run for all tickers)" guiX="71" guiY="244" id="FILTER_TO_SPECIFIC_TICKERS_DISABLE_TO_RUN_FOR_ALL_TICKERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME}
-where ticker not in ('WMT');]]></attr>
+where ticker not in ('WMT', 'SYY');]]></attr>
 </Node>
 </Phase>
 <Phase number="3">

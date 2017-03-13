@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Mar 10 14:41:42 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.135" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Mar 10 16:50:01 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.138" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -110,7 +110,7 @@ where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update ACA Boundaries" guiX="119" guiY="166" id="UPDATE_ACA_BOUNDARIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update ACA Boundaries" guiX="119" guiY="167" id="UPDATE_ACA_BOUNDARIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} a
 set 
   EMPLOYEE_COUNT_MAX_ACA = ac.EMPLOYEE_COUNT_MAX - ac.adult_medical_count_total, /*may mean max is negative, but that's okay*/
@@ -156,7 +156,7 @@ where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update SNAP Totals" guiX="131" guiY="243" id="UPDATE_SNAP_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update SNAP Totals" guiX="137" guiY="242" id="UPDATE_SNAP_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${SUBSIDY_COUNTS_TABLENAME} a
 set
   emp_count_snap = ac.snap_county_count
@@ -200,7 +200,7 @@ where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Update ACA Totals" guiX="134" guiY="317" id="UPDATE_ACA_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update ACA Totals" guiX="140" guiY="315" id="UPDATE_ACA_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${SUBSIDY_COUNTS_TABLENAME} a
 set 
   emp_count_aca = ac.county_aca_count
@@ -254,7 +254,19 @@ where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Deque Ticker" guiX="137" guiY="388" id="DEQUE_TICKER" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Zero Living Wage Counts" guiX="122" guiY="388" id="ZERO_LIVING_WAGE_COUNTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${SUBSIDY_COUNTS_TABLENAME} a
+set 
+  emp_count_adult_medicaid = 0.0,
+  emp_count_child_medicaid = 0.0,
+  emp_count_snap = 0.0
+from ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} gr
+join lkp_living_wage_averages lwa on lwa.state_county_fips = gr.state_county_fips and gr.rate_cola >= lwa.living_wage_avg
+where gr.state_county_fips = a.state_county_fips and gr.ticker = a.ticker and gr.goc = a.goc;]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Deque Ticker" guiX="143" guiY="460" id="DEQUE_TICKER" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TMP_SUBSIDY_TICKER_QUEUE_TABLENAME}
 where ticker in (
   select ticker
