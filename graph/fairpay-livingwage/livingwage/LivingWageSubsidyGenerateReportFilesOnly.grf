@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Mar 10 14:42:35 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.102" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Mar 15 19:11:36 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.106" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="STATE_COUNTY_FIPS" type="string"/>
+<Field name="STATE_COUNTY_FIPS" size="5" type="string"/>
 <Field name="EMP_COUNT_TOTAL" type="string"/>
 <Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_TOTAL" type="string"/>
