@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Jan 31 17:58:48 EST 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.237" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Apr 04 11:19:12 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.239" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -15,9 +15,9 @@
 <Property id="GraphParameter1" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
 <Property id="GraphParameter2" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
 <Property id="GraphParameter3" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
+<Property id="GraphParameter36" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
+<Property fileURL="workspace.prm" id="GraphParameter37"/>
 <Property fileURL="livingwage-parameters.prm" id="GraphParameter4"/>
-<Property id="GraphParameter22" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
-<Property fileURL="workspace.prm" id="GraphParameter23"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
