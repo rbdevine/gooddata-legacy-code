@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Mar 15 19:11:36 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.106" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Apr 04 17:21:30 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.107" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -44,7 +44,7 @@
 <Field name="STATE_COUNTY_FIPS" type="string"/>
 <Field name="TICKER" type="string"/>
 <Field name="GOC" type="string"/>
-<Field name="HOURLY_WAGE_COLA" type="string"/>
+<Field name="HOURLY_WAGE_RAW" type="string"/>
 <Field name="LIVING_WAGE_AVG" type="string"/>
 <Field name="EMP_COUNT_TOTAL" type="string"/>
 <Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
@@ -108,11 +108,11 @@
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="graph/local/local-parameters.prm" id="GraphParameter0"/>
 <Property fileURL="livingwage-parameters.prm" id="GraphParameter1"/>
-<Property id="GraphParameter33" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
-<Property id="GraphParameter34" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
-<Property id="GraphParameter35" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
-<Property id="GraphParameter36" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
-<Property fileURL="workspace.prm" id="GraphParameter37"/>
+<Property id="GraphParameter34" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
+<Property id="GraphParameter35" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
+<Property id="GraphParameter36" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
+<Property id="GraphParameter37" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
+<Property fileURL="workspace.prm" id="GraphParameter38"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -122,7 +122,7 @@ CREATE TABLE ${SUBSIDY_DETAILS_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(32) NOT NULL,
   GOC VARCHAR(128) NOT NULL,
-  HOURLY_WAGE_COLA FLOAT NOT NULL,
+  HOURLY_WAGE_RAW FLOAT NOT NULL,
   LIVING_WAGE_AVG FLOAT NOT NULL,
   EMP_COUNT_TOTAL FLOAT NOT NULL,
   EMP_COUNT_SUBSIDY_TOTAL FLOAT NOT NULL,
@@ -148,7 +148,7 @@ select
   state_county_fips,
   ticker,
   goc,
-  rate_cola,
+  rate_raw,
   living_wage_avg,
   emp_count_total,
   emp_count_subsidy_total,
@@ -168,7 +168,7 @@ from (
     state_county_fips,
     ticker,
     goc,
-    isnull(rate_cola,0.0) rate_cola,
+    isnull(rate_raw,0.0) rate_raw,
     isnull(living_wage_avg,0.0) living_wage_avg,
     isnull(emp_count_total,0.0) emp_count_total, 
     isnull(emp_count_subsidy_total,0.0) emp_count_subsidy_total,
@@ -187,11 +187,11 @@ from (
       sc.state_county_fips,
       sc.ticker,
       sc.goc,
-      gc.rate_cola,
+      gc.rate_raw,
       lwa.living_wage_avg,
       gc.employee_count emp_count_total,
       case 
-        when gc.rate_cola < lwa.living_wage_avg then gc.employee_count
+        when gc.rate_raw < lwa.living_wage_avg then gc.employee_count
         else 0.0
       end emp_count_below_lw,
       case
@@ -255,9 +255,9 @@ from (
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(sc.state_county_fips,2)
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = sc.ticker
     left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
-    left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= gc.rate_cola and gc.rate_cola <= eitc.maximum_wage
-    left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= gc.rate_cola and gc.rate_cola <= snap.maximum_wage
-    left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= gc.rate_cola and gc.rate_cola <= aca_base.maximum_wage
+    left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= gc.rate_raw and gc.rate_raw <= eitc.maximum_wage
+    left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= gc.rate_raw and gc.rate_raw <= snap.maximum_wage
+    left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= gc.rate_raw and gc.rate_raw <= aca_base.maximum_wage
     left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_avg and lwa.living_wage_avg <= aca_lw.maximum_wage
 
   ) t
@@ -266,7 +266,7 @@ group by
   state_county_fips,
   ticker,
   goc,
-  rate_cola,
+  rate_raw,
   living_wage_avg,
   emp_count_total,
   emp_count_subsidy_total,
@@ -282,7 +282,7 @@ group by
   aca_subsidy_total
 order by 
   state_county_fips, 
-  rate_cola;
+  rate_raw;
 ]]></attr>
 </Node>
 </Phase>
@@ -481,7 +481,7 @@ order by state_county_fips;]]></attr>
   $STATE_COUNTY_FIPS:=STATE_COUNTY_FIPS,
   $TICKER:=TICKER,
   $GOC:=GOC,
-  $HOURLY_WAGE_COLA:=concat('$',cast(round(HOURLY_WAGE_COLA,2) as numeric(16,2))),
+  $HOURLY_WAGE_RAW:=concat('$',cast(round(HOURLY_WAGE_RAW,2) as numeric(16,2))),
   $LIVING_WAGE_AVG:=concat('$',cast(round(LIVING_WAGE_AVG,2) as numeric(16,2))),
   $EMP_COUNT_TOTAL:=cast(round(EMP_COUNT_TOTAL,3) as numeric(16,3)),
   $EMP_COUNT_SUBSIDY_TOTAL:=cast(round(EMP_COUNT_SUBSIDY_TOTAL,3) as numeric(16,3)),
@@ -522,7 +522,7 @@ from (
     STATE_COUNTY_FIPS,
     TICKER,
     GOC,
-    HOURLY_WAGE_COLA,
+    HOURLY_WAGE_RAW,
     LIVING_WAGE_AVG,
     EMP_COUNT_TOTAL,
     EMP_COUNT_SUBSIDY_TOTAL,
@@ -583,7 +583,7 @@ from (
     end SUBSIDY_ABS_BY_EMP_ACA
   from ${SUBSIDY_DETAILS_TABLENAME}
 ) t
-order by state_county_fips, ticker, hourly_wage_cola;]]></attr>
+order by state_county_fips, ticker, hourly_wage_raw;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Summary by Ticker" guiX="27" guiY="201" id="SELECT_SUMMARY_BY_TICKER" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select

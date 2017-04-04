@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Apr 04 11:19:12 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.239" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Apr 04 17:08:29 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.240" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -15,9 +15,9 @@
 <Property id="GraphParameter1" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
 <Property id="GraphParameter2" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
 <Property id="GraphParameter3" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
-<Property id="GraphParameter36" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
-<Property fileURL="workspace.prm" id="GraphParameter37"/>
 <Property fileURL="livingwage-parameters.prm" id="GraphParameter4"/>
+<Property id="GraphParameter37" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
+<Property fileURL="workspace.prm" id="GraphParameter38"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -43,7 +43,7 @@ create table ${COMPANY_JOB_COUNTY_DATA_TABLENAME} (
   SUBSIDIARY VARCHAR(255),
   TOLERANCE_TYPE INTEGER,
   GOC VARCHAR(255),
-  UNADJUSTED_RATE FLOAT,
+  RATE_RAW FLOAT,
   EMPLOYEES_AT_LIVING_WAGE DECIMAL
 );]]></attr>
 </Node>
@@ -941,7 +941,7 @@ join (
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add All Job County Data Tickers (subs)" guiX="254" guiY="1365" id="ADD_ALL_JOB_COUNTY_DATA_TICKERS_SUBS" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Adds subidiary data to get parent ticker data, therefore depends on the subidiary data already being input into the table in previous phase.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
-select state_county_fips, just_co_id, max(company_count), null, tolerance_type, goc, avg(unadjusted_rate), sum(employees_at_living_wage)
+select state_county_fips, just_co_id, max(company_count), null, tolerance_type, goc, avg(rate_raw), sum(employees_at_living_wage)
 from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
 where company_count > 1
 group by just_co_id, state_county_fips, tolerance_type, goc;]]></attr>
@@ -1500,7 +1500,7 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = concat(concat(concat(";
 	sql = sql + "  cast(round(d.employees_at_living_wage,2) as numeric(18,2)),' ('),";
-	sql = sql + "  concat('$',cast(cast(round(d.unadjusted_rate,2) as numeric(36,2)) as varchar(8)))";
+	sql = sql + "  concat('$',cast(cast(round(d.rate_raw,2) as numeric(36,2)) as varchar(8)))";
 	sql = sql + "),')') ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
 	sql = sql + "join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d on d.just_co_id = g.just_co_id and d.goc = g.goc and d.subsidiary = g.subsidiary ";
@@ -1554,7 +1554,7 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = concat(concat(concat(";
 	sql = sql + "  cast(round(d.employees_at_living_wage,2) as numeric(18,2)),' ('),";
-	sql = sql + "  concat('$',cast(cast(round(d.unadjusted_rate,2) as numeric(36,2)) as varchar(8)))";
+	sql = sql + "  concat('$',cast(cast(round(d.rate_raw,2) as numeric(36,2)) as varchar(8)))";
 	sql = sql + "),')') ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
 	sql = sql + "join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d on d.just_co_id = g.just_co_id and d.goc = g.goc and ((d.company_count = 1) or (d.company_count > 1 and d.subsidiary is null and g.subsidiary is null)) ";

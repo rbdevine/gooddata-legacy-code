@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Mar 10 16:56:32 EST 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.155" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Tue Apr 04 17:17:19 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.158" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -17,7 +17,7 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="workspace.prm" id="GraphParameter32"/>
+<Property fileURL="workspace.prm" id="GraphParameter33"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -28,7 +28,7 @@ create table if not exists ${TMP_SUBSIDY_ACCUMULATED_COUNTS_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(32) NOT NULL,
   GOC VARCHAR(128) NOT NULL,
-  RATE_COLA FLOAT NOT NULL,
+  RATE_RAW FLOAT NOT NULL,
   EMPLOYEE_COUNT FLOAT NOT NULL,
   EMPLOYEE_COUNT_MAX_PREV FLOAT NULL,
   EMPLOYEE_COUNT_MAX FLOAT NULL,
@@ -57,7 +57,7 @@ create table if not exists ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} (
   TICKER VARCHAR(32) NOT NULL,
   GOC VARCHAR(128) NOT NULL,
   EMPLOYEE_COUNT FLOAT NOT NULL,
-  RATE_COLA FLOAT NOT NULL
+  RATE_RAW FLOAT NOT NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Ticker Queue" guiX="249" guiY="16" id="CREATE_TICKER_QUEUE" type="DB_EXECUTE">
@@ -75,7 +75,7 @@ select
   cjcd.ticker,
   cjcd.goc,
   SUM(ec.employee_count * d.distribution) employee_count,
-  AVG(cjcd.rate_cola) rate_cola 
+  AVG(cjcd.rate_raw) rate_raw 
 from ${COUNTY_COUNT_TABLENAME} ec
 join ${JOB_DISTRIBUTION_TABLENAME} d on 
   d.ticker = ec.ticker and (
@@ -88,7 +88,7 @@ join (
     ticker_trim ticker, 
     subsidiary, 
     goc, 
-    unadjusted_rate rate_cola
+    rate_raw
   from lkp_living_wage_company_job_county_data cjcd
   join lkp_just_co_secty_master m on m.just_co_id = cjcd.just_co_id
   where 
@@ -101,7 +101,7 @@ join (
     m.ticker_trim, 
     cjcd.subsidiary, 
     cjcd.goc, 
-    cjcd.unadjusted_rate
+    cjcd.rate_raw
 ) cjcd on 
     cjcd.state_county_fips = ec.state_county_fips and 
     cjcd.ticker = ec.ticker and 
@@ -135,15 +135,15 @@ group by ticker;
   STATE_COUNTY_FIPS,
   TICKER,
   GOC,
-  RATE_COLA,
+  RATE_RAW,
   EMPLOYEE_COUNT
 )
 select 
-  rank() over (order by ticker, state_county_fips, rate_cola, goc) id, 
+  rank() over (order by ticker, state_county_fips, rate_raw, goc) id, 
   state_county_fips,
   ticker, 
   goc,
-  rate_cola,
+  rate_raw,
   employee_count
 from ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME};]]></attr>
 </Node>
@@ -176,7 +176,7 @@ set EMP_COUNT_EITC = gc.employee_count
 from (
   select gc.state_county_fips, gc.ticker, gc.goc, gc.employee_count
   from ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} gc
-  left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= gc.rate_cola and gc.rate_cola <= eitc.maximum_wage
+  left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= gc.rate_raw and gc.rate_raw <= eitc.maximum_wage
   where eitc.subsidy_annual is not null
 ) gc where sc.state_county_fips = gc.state_county_fips and sc.ticker = gc.ticker and sc.goc = gc.goc;]]></attr>
 </Node>
