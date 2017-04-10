@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Apr 06 11:33:32 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.265" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Apr 10 17:05:38 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.276" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -15,11 +15,12 @@
 <Property id="GraphParameter1" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
 <Property id="GraphParameter2" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
 <Property id="GraphParameter3" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter25"/>
-<Property id="GraphParameter4" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
-<Property id="GraphParameter5" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
-<Property id="GraphParameter6" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
-<Property fileURL="workspace.prm" id="GraphParameter7"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter4"/>
+<Property id="GraphParameter38" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
+<Property id="GraphParameter39" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
+<Property id="GraphParameter40" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
+<Property id="GraphParameter41" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
+<Property fileURL="workspace.prm" id="GraphParameter42"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -867,7 +868,7 @@ from (
 ) offsets
 join lkp_just_co_secty_master m on m.ticker_trim = offsets.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Low Job County Data Subsidiaries" guiX="1" guiY="1183" id="ADD_LOW_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Low Job County Data Subsidiaries" guiX="1" guiY="1183" id="ADD_LOW_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
@@ -907,7 +908,7 @@ join (
   ) d group by ticker
 ) cc on cc.ticker = d.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Low Job County Data Tickers (no subs)" guiX="-13" guiY="1283" id="ADD_LOW_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Low Job County Data Tickers (no subs)" guiX="-13" guiY="1283" id="ADD_LOW_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
   c.state_county_fips, 
@@ -985,7 +986,7 @@ order by t.state;]]></attr>
 </Node>
 </Phase>
 <Phase number="14">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Living Wage Count Adjustments" guiX="277" guiY="1619" id="LIVING_WAGE_COUNT_ADJUSTMENTS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Living Wage Count Adjustments" guiX="277" guiY="1618" id="LIVING_WAGE_COUNT_ADJUSTMENTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
 set RATE_RAW_MIN_WAGE_ADJ = (
   case
@@ -1013,9 +1014,9 @@ where left(cjd.state_county_fips,2) = fs.state_fips and cjd.state_county_fips = 
 <attr name="sqlQuery"><![CDATA[update ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
 set RATE_RAW_MIN_WAGE_ADJ = (
   case
-    when (rate_raw < lwa.living_wage_avg and 
-           mrs.min_avg_rate_raw < w.minimum_wage
-       ) then rate_raw + (w.minimum_wage - mrs.min_avg_rate_raw)
+    when (rate_raw < lwa.living_wage_avg 
+          and mrs.min_avg_rate_raw < (w.minimum_wage + ${MINIMUM_WAGE_CUSHION})
+       ) then rate_raw + (w.minimum_wage - mrs.min_avg_rate_raw) + ${MINIMUM_WAGE_CUSHION}
     else rate_raw
   end
 )
@@ -1035,6 +1036,36 @@ where left(cjd.state_county_fips,2) = fs.state_fips and cjd.state_county_fips = 
 </Node>
 </Phase>
 <Phase number="15">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Minimum Wage Clean Up Bottom" guiX="275" guiY="1693" id="MINIMUM_WAGE_CLEAN_UP_BOTTOM" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
+set RATE_RAW_MIN_WAGE_ADJ = (t.minimum_wage + ${MINIMUM_WAGE_CUSHION})
+from (
+  select cjd.*, w.minimum_wage
+  from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
+  join (
+    select 
+      state_fips, 
+      state_abbreviation state 
+    from lkp_city_fips 
+    group by 
+      state_fips, 
+      state_abbreviation
+  ) fs on fs.state_fips = left(cjd.state_county_fips,2)
+  join ${STATE_MIN_AVG_SALARIES_TABLENAME} mrs on fs.state = mrs.state
+  join ${MINIMUM_WAGE_BY_STATE_TABLENAME} w on w.state = mrs.state
+  join ${LIVING_WAGE_AVERAGES_TABLENAME} lwa on cjd.state_county_fips = lwa.state_county_fips
+  where RATE_RAW_MIN_WAGE_ADJ < (w.minimum_wage + ${MINIMUM_WAGE_CUSHION})
+) t
+where 
+  cjd.state_county_fips = t.state_county_fips 
+  and cjd.just_co_id = t.just_co_id
+  and ((cjd.subsidiary is null and t.subsidiary is null) or (cjd.subsidiary = t.subsidiary))
+  and cjd.goc = t.goc
+  and cjd.tolerance_type = t.tolerance_type
+  and cjd.rate_raw = t.rate_raw;]]></attr>
+</Node>
+</Phase>
+<Phase number="16">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Blank Top" guiX="101" guiY="2007" id="ADD_CO_HEADER_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
   industry, row_type, just_co_id, ticker
@@ -1540,7 +1571,7 @@ join (
 ) e on e.ticker = m.ticker_trim;]]></attr>
 </Node>
 </Phase>
-<Phase number="16">
+<Phase number="17">
 <Node enabled="enabled" guiName="Create Update Dist Header SQL" guiX="196" guiY="2561" id="CREATE_UPDATE_DIST_HEADER_SQL" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
@@ -1716,10 +1747,10 @@ order by column_number;]]></attr>
 <Edge fromNode="READ_COLUMNS:5" guiBendpoints="" guiRouter="Manhattan" id="Edge10" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 5 (out)" toNode="CREATE_UPDATE_SUBSIDIARY_GOC_HEADERS_SQL:0"/>
 <Edge fromNode="READ_COLUMNS:6" guiBendpoints="" guiRouter="Manhattan" id="Edge12" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 6 (out)" toNode="CREATE_UPDATE_SUBSIDIARY_DATA_SQL:0"/>
 </Phase>
-<Phase number="17">
+<Phase number="18">
 <Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateReportFilesOnly.grf" guiName="Generate Reports" guiX="316" guiY="3092" id="GENERATE_REPORTS" type="RUN_GRAPH"/>
 </Phase>
-<Phase number="18">
+<Phase number="19">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Count Table" guiX="290" guiY="3193" id="DROP_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${EMP_COUNT_TOTALS_TABLENAME};]]></attr>
 </Node>
