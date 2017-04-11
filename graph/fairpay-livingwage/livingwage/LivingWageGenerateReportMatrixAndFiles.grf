@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Apr 10 17:05:38 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.276" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Apr 11 11:31:10 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.277" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -15,12 +15,12 @@
 <Property id="GraphParameter1" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
 <Property id="GraphParameter2" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
 <Property id="GraphParameter3" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter4"/>
 <Property id="GraphParameter38" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
 <Property id="GraphParameter39" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter40" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
 <Property id="GraphParameter41" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
 <Property fileURL="workspace.prm" id="GraphParameter42"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter4"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -739,7 +739,7 @@ select state_county_fips, just_co_id, subsidiary, sum(employees_at_living_wage) 
 from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} 
 group by state_county_fips, just_co_id, subsidiary;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add High Job County Data Subsidiaries" guiX="510" guiY="1183" id="ADD_HIGH_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Subsidiaries" guiX="510" guiY="1183" id="ADD_HIGH_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
@@ -779,7 +779,7 @@ join (
   ) d group by ticker
 ) cc on cc.ticker = d.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add High Job County Data Tickers (no subs)" guiX="550" guiY="1283" id="ADD_HIGH_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Tickers (no subs)" guiX="550" guiY="1283" id="ADD_HIGH_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
   c.state_county_fips, 
