@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Jan 19 15:44:10 EST 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.97" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Apr 13 12:57:05 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.110" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -56,9 +56,10 @@
 <Property id="GraphParameter8" name="TABLENAME_COUNTY_COUNTS" value="LKP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
 <Property id="GraphParameter9" name="TABLENAME_COUNTYCOUNT_FIPSMATCH" value="TMP_LIVING_WAGE_COUNTY_COUNT_FIPSMATCH"/>
 <Property id="GraphParameter10" name="TABLENAME_FIPSUPDATE" value="TMP_LIVING_WAGE_FIPSUPDATE"/>
+<Property id="GraphParameter31" name="TABLENAME_TEMP_COUNTY_COUNTS" value="TMP_COUNTY_COUNTS"/>
 <Property fileURL="workspace.prm" id="GraphParameter11"/>
-<Property id="GraphParameter26" name="WRITEFILEPATH_COUNTYCOUNT_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycountfipsmatch.txt"/>
-<Property id="GraphParameter27" name="WRITEFILEPATH_FIPSUPDATE" value="${DATA_TRANSFORM_DIR}/fipsupdate.txt"/>
+<Property id="GraphParameter29" name="WRITEFILEPATH_COUNTYCOUNT_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycountfipsmatch.txt"/>
+<Property id="GraphParameter30" name="WRITEFILEPATH_FIPSUPDATE" value="${DATA_TRANSFORM_DIR}/fipsupdate.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -82,6 +83,15 @@ CREATE TABLE ${TABLENAME_COUNTYCOUNT_FIPSMATCH} (
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Count Table" guiX="462" guiY="83" id="CREATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME_COUNTY_COUNTS} (
+  STATE_COUNTY_FIPS VARCHAR(5),
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  EMPLOYEE_COUNT INTEGER
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp County Count Table" guiX="659" guiY="83" id="CREATE_TEMP_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_TEMP_COUNTY_COUNTS};
+CREATE TABLE IF NOT EXISTS ${TABLENAME_TEMP_COUNTY_COUNTS} (
   STATE_COUNTY_FIPS VARCHAR(5),
   TICKER VARCHAR(32),
   SUBSIDIARY VARCHAR(255),
@@ -184,8 +194,8 @@ function integer transform() {
 <Edge fromNode="REFORMAT_FIPS_UPDATE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge9" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="WRITE_FIPS_UPDATE:0"/>
 </Phase>
 <Phase number="2">
-<Node baseURL="${READFILEPATH_COUNTYCOUNT_FIPSMATCH}" enabled="enabled" guiName="Clean County Count Fips Match Download" guiX="10" guiY="1157" id="CLEAN_COUNTY_COUNT_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${READFILEPATH_FIPSUPDATE}" enabled="enabled" guiName="Clean FIPS Update Download" guiX="90" guiY="1230" id="CLEAN_FIPS_UPDATE_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH_COUNTYCOUNT_FIPSMATCH}" enabled="enabled" guiName="Clean County Count Fips Match Download" guiX="3" guiY="1377" id="CLEAN_COUNTY_COUNT_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH_FIPSUPDATE}" enabled="enabled" guiName="Clean FIPS Update Download" guiX="83" guiY="1450" id="CLEAN_FIPS_UPDATE_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Count Fips Match Table" guiX="123" guiY="364" id="POPULATE_COUNTY_COUNT_FIPS_MATCH_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_COUNTYCOUNT_FIPSMATCH} (
   TICKER,
@@ -219,10 +229,10 @@ EXCEPTIONS '${POPULATEERRORFILEPATH_FIPSUPDATE}';
 </Node>
 </Phase>
 <Phase number="3">
-<Node baseURL="${POPULATEERRORFILEPATH_COUNTYCOUNT_FIPSMATCH}" enabled="enabled" guiName="Clean County Count Fips Match Error" guiX="283" guiY="1157" id="CLEAN_COUNTY_COUNT_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH_COUNTYCOUNT_FIPSMATCH}" enabled="enabled" guiName="Clean County Count Fips Match Write" guiX="529" guiY="1157" id="CLEAN_COUNTY_COUNT_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH_FIPSUPDATE}" enabled="enabled" guiName="Clean FIPS Update Error" guiX="291" guiY="1230" id="CLEAN_FIPS_UPDATE_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH_FIPSUPDATE}" enabled="enabled" guiName="Clean FIPS Update Write" guiX="466" guiY="1230" id="CLEAN_FIPS_UPDATE_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH_COUNTYCOUNT_FIPSMATCH}" enabled="enabled" guiName="Clean County Count Fips Match Error" guiX="276" guiY="1377" id="CLEAN_COUNTY_COUNT_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_COUNTYCOUNT_FIPSMATCH}" enabled="enabled" guiName="Clean County Count Fips Match Write" guiX="522" guiY="1377" id="CLEAN_COUNTY_COUNT_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH_FIPSUPDATE}" enabled="enabled" guiName="Clean FIPS Update Error" guiX="284" guiY="1450" id="CLEAN_FIPS_UPDATE_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_FIPSUPDATE}" enabled="enabled" guiName="Clean FIPS Update Write" guiX="459" guiY="1450" id="CLEAN_FIPS_UPDATE_WRITE" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Trim County Count Fips Match Data" guiX="256" guiY="436" id="TRIM_COUNTY_COUNT_FIPS_MATCH_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLENAME_COUNTYCOUNT_FIPSMATCH} set ticker = ltrim(rtrim(ticker));
 update ${TABLENAME_COUNTYCOUNT_FIPSMATCH} set subsidiary = ltrim(rtrim(subsidiary));
@@ -419,7 +429,46 @@ GROUP BY TICKER, SUBSIDIARY, STATE_COUNTY_FIPS
 </Node>
 </Phase>
 <Phase number="10">
-<Node enabled="enabled" guiName="Reformat Missing FIPS" guiX="298" guiY="981" id="REFORMAT_MISSING_FIPS" type="REFORMAT">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Consolidate Ticker No-Sub Exceptions into Temp County Count Table" guiX="179" guiY="979" id="CONSOLIDATE_TICKER_NO_SUB_EXCEPTIONS_INTO_TEMP_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+/* 
+  CHH has subsidiaries, but we want to treat all as one company,
+  so need to sum up their tickers.
+*/
+INSERT INTO ${TABLENAME_TEMP_COUNTY_COUNTS}
+SELECT
+  state_county_fips,
+  ticker,
+  '',
+  cast(round(sum(employee_count),0) as int)
+FROM ${TABLENAME_COUNTY_COUNTS}
+WHERE state_county_fips is not null and TICKER in ('CHH')
+GROUP BY TICKER, STATE_COUNTY_FIPS;]]></attr>
+</Node>
+</Phase>
+<Phase number="11">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Ticker No-Subs Exceptions from County Count Table" guiX="186" guiY="1052" id="REMOVE_TICKER_NO_SUBS_EXCEPTIONS_FROM_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+DELETE FROM ${TABLENAME_COUNTY_COUNTS}
+WHERE TICKER IN ('CHH');]]></attr>
+</Node>
+</Phase>
+<Phase number="12">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Repopulate County Count Table with Summed Ticker No-Subs Exceptions" guiX="184" guiY="1126" id="REPOPULATE_COUNTY_COUNT_TABLE_WITH_SUMMED_TICKER_NO_SUBS_EXCEPTIONS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+INSERT INTO ${TABLENAME_COUNTY_COUNTS}
+SELECT
+  state_county_fips,
+  ticker,
+  subsidiary,
+  employee_count
+FROM ${TABLENAME_TEMP_COUNTY_COUNTS};]]></attr>
+</Node>
+</Phase>
+<Phase number="13">
+<Node enabled="enabled" guiName="Reformat Missing FIPS" guiX="291" guiY="1209" id="REFORMAT_MISSING_FIPS" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -448,7 +497,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Missing FIPS" guiX="112" guiY="981" id="SELECT_MISSING_FIPS" type="DB_INPUT_TABLE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Missing FIPS" guiX="105" guiY="1209" id="SELECT_MISSING_FIPS" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[SELECT
   $CITY:=CITY,
   $STATE:=STATE,
@@ -460,16 +509,19 @@ WHERE state_county_fips is null
 GROUP BY city, state, county, country
 ORDER BY COUNTRY, STATE, CITY, COUNTY]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${REPORTFILEPATH_MISSING_FIPS}" guiName="Write Missing FIPS Report" guiX="482" guiY="981" id="WRITE_MISSING_FIPS_REPORT" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_MISSING_FIPS}" guiName="Write Missing FIPS Report" guiX="475" guiY="1209" id="WRITE_MISSING_FIPS_REPORT" outputFieldNames="true" type="DATA_WRITER"/>
 <Edge fromNode="REFORMAT_MISSING_FIPS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge7" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="WRITE_MISSING_FIPS_REPORT:0"/>
 <Edge fromNode="SELECT_MISSING_FIPS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="REFORMAT_MISSING_FIPS:0"/>
 </Phase>
-<Phase number="11">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop County Count Fips Match Table" guiX="129" guiY="1084" id="DROP_COUNTY_COUNT_FIPS_MATCH_TABLE" type="DB_EXECUTE">
+<Phase number="14">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop County Count Fips Match Table" guiX="26" guiY="1304" id="DROP_COUNTY_COUNT_FIPS_MATCH_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLENAME_COUNTYCOUNT_FIPSMATCH};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Fips Update Table" guiX="373" guiY="1084" id="DROP_FIPS_UPDATE_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Fips Update Table" guiX="270" guiY="1304" id="DROP_FIPS_UPDATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLENAME_FIPSUPDATE};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp County Counts Table" guiX="436" guiY="1304" id="DROP_TEMP_COUNTY_COUNTS_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLENAME_TEMP_COUNTY_COUNTS};]]></attr>
 </Node>
 </Phase>
 </Graph>

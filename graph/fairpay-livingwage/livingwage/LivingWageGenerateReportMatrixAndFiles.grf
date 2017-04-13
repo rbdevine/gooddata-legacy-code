@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Apr 11 11:31:10 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.277" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Apr 13 16:12:02 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.285" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -15,12 +15,12 @@
 <Property id="GraphParameter1" name="COLUMN_NUMBERS_TABLENAME" value="TMP_LIVING_WAGE_REPORT_COLUMN_NUMBERS"/>
 <Property id="GraphParameter2" name="EMP_COUNT_TOTALS_TABLENAME" value="TMP_LIVING_WAGE_EMP_COUNT_TOTALS"/>
 <Property id="GraphParameter3" name="GOC_ORDER_TABLENAME" value="TMP_LIVING_WAGE_GOC_ORDER"/>
-<Property id="GraphParameter38" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
-<Property id="GraphParameter39" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
-<Property id="GraphParameter40" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
-<Property id="GraphParameter41" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
-<Property fileURL="workspace.prm" id="GraphParameter42"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter4"/>
+<Property id="GraphParameter4" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
+<Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
+<Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
+<Property id="GraphParameter7" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
+<Property fileURL="workspace.prm" id="GraphParameter8"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter26"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -57,6 +57,16 @@ create table ${WAGE_AVERAGES_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL UNIQUE,
   LIVING_WAGE_AVG FLOAT NOT NULL
 );]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Living Wage Avgs By Company" guiX="649" guiY="10" id="TABLE_LIVING_WAGE_AVGS_BY_COMPANY1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME};
+CREATE TABLE ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME} (
+  TICKER VARCHAR(32) NOT NULL,
+  COMPANY VARCHAR(64) NOT NULL,
+  AVG_LW_UNWEIGHTED FLOAT NOT NULL,
+  AVG_LW_WEIGHTED FLOAT NOT NULL
+);
+]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Living Wage Totals" guiX="499" guiY="161" id="TABLE_LIVING_WAGE_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TOTALS_TABLENAME};
@@ -101,6 +111,17 @@ create table ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (
   ROW_SECTION INT NOT NULL,  /*0 industry header, 1 companies 2 industry footer*/
   DISPLAY_ORDER INT NOT NULL
 );]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Score Quality By Company" guiX="677" guiY="161" id="TABLE_SCORE_QUALITY_BY_COMPANY1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${SCORE_QUALITY_BY_COMPANY_TABLENAME};
+CREATE TABLE ${SCORE_QUALITY_BY_COMPANY_TABLENAME} (
+  TICKER VARCHAR(32) NOT NULL,
+  COMPANY VARCHAR(64) NOT NULL,
+  GOC VARCHAR(64) NOT NULL,
+  AVG_RATE_PROPORTION_UNWEIGHTED FLOAT NOT NULL,
+  AVG_RATE_PROPORTION_WEIGHTED FLOAT NOT NULL
+);
+]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: State Avg Min Salaries" guiX="116" guiY="85" id="TABLE_STATE_AVG_MIN_SALARIES1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${STATE_MIN_AVG_SALARIES_TABLENAME};
@@ -779,7 +800,7 @@ join (
   ) d group by ticker
 ) cc on cc.ticker = d.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Tickers (no subs)" guiX="550" guiY="1283" id="ADD_HIGH_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Tickers (no subs)" guiX="548" guiY="1283" id="ADD_HIGH_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
   c.state_county_fips, 
@@ -1748,16 +1769,188 @@ order by column_number;]]></attr>
 <Edge fromNode="READ_COLUMNS:6" guiBendpoints="" guiRouter="Manhattan" id="Edge12" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 6 (out)" toNode="CREATE_UPDATE_SUBSIDIARY_DATA_SQL:0"/>
 </Phase>
 <Phase number="18">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateReportFilesOnly.grf" guiName="Generate Reports" guiX="316" guiY="3092" id="GENERATE_REPORTS" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Living Wage Avgs By Company" guiX="150" guiY="3106" id="POPULATE_LIVING_WAGE_AVGS_BY_COMPANY" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME}
+select 
+  ticker, 
+  company, 
+  avg_lw_unweighted, 
+  avg_lw_weighted
+from (
+  select 
+    ticker,
+    subsidiary company,
+    cast(round(avg(_2a1pt1c_hourly),3) as numeric(36,3)) avg_lw_unweighted,
+    cast(round(sum(lw_hourly_weighted),3) as numeric(36,3)) avg_lw_weighted
+  from (
+    select 
+      m.ticker_trim ticker,
+      c.subsidiary,
+      d.goc,
+      mit._2a1pt1c_hourly _2a1pt1c_hourly,
+      mit._2a1pt1c_hourly * (c.employee_count / t.emp_count_tot) * (
+    case
+       when cjd.tolerance_type = 0 then 0.0
+       when cjd.tolerance_type = 1 then 1.0
+       when cjd.tolerance_type = 2 then 0.0
+       else 1.0
+    end) lw_hourly_weighted
+    from ${SUBSIDIARY_INFO_TABLENAME} s
+    join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
+    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
+    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.subsidiary = c.subsidiary
+    join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id and t.subsidiary = c.subsidiary
+    join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
+      cjd.just_co_id = s.just_co_id 
+      and cjd.subsidiary = c.subsidiary
+      and cjd.state_county_fips = c.state_county_fips
+      and cjd.goc = d.goc
+    join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+    where c.subsidiary is not null
+  ) t
+  group by ticker, subsidiary, goc
+  union all
+  select 
+    ticker,
+    company,
+    cast(round(avg(_2a1pt1c_hourly),3) as numeric(36,3)) avg_lw_unweighted,
+    cast(round(sum(lw_hourly_weighted),3) as numeric(36,3)) avg_lw_weighted
+  from (
+    select 
+      m.ticker_trim ticker,
+      s.alt_company_name company,
+      d.goc,
+      mit._2a1pt1c_hourly _2a1pt1c_hourly,
+      mit._2a1pt1c_hourly * (c.employee_count / t.emp_count_tot) * (
+      case
+        when cjd.tolerance_type = 0 then 0.0
+         when cjd.tolerance_type = 1 then 1.0
+         when cjd.tolerance_type = 2 then 0.0
+         else 1.0
+      end) lw_hourly_weighted
+    from ${SUBSIDIARY_INFO_TABLENAME} s
+    join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
+    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
+    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim
+    join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id
+    join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
+      cjd.just_co_id = s.just_co_id 
+      and cjd.state_county_fips = c.state_county_fips
+      and cjd.goc = d.goc
+    join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+    where c.subsidiary is null and m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')
+  ) t
+  group by ticker, company, goc
+  order by ticker, company
+) t
+group by ticker, company, avg_lw_unweighted, avg_lw_weighted
+order by ticker, company;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Score Quality By Company" guiX="414" guiY="3106" id="POPULATE_SCORE_QUALITY_BY_COMPANY" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${SCORE_QUALITY_BY_COMPANY_TABLENAME}
+select 
+  ticker,
+  company,
+  goc,
+  avg_rate_proportion_unweighted,
+  avg_rate_proportion_weighted
+from (
+select 
+  ticker,
+  subsidiary company,
+  goc,
+  cast(round(avg(rate_proportion),3) as numeric(36,3)) avg_rate_proportion_unweighted,
+  cast(round(sum(rate_proportion_weighted),3) as numeric(36,3)) avg_rate_proportion_weighted
+from (
+  select 
+    s.just_co_id,
+    m.ticker_trim ticker,
+    c.subsidiary,
+    c.state_county_fips,
+    c.employee_count,
+    d.goc,
+    mit._2a1pt1c_hourly,
+    cjd.rate_raw,
+    cjd.rate_raw / mit._2a1pt1c_hourly rate_proportion,
+    (cjd.rate_raw / mit._2a1pt1c_hourly) * (c.employee_count / t.emp_count_tot) * (
+    case
+       when cjd.tolerance_type = 0 then 0.0
+       when cjd.tolerance_type = 1 then 1.0
+       when cjd.tolerance_type = 2 then 0.0
+       else 1.0
+    end) rate_proportion_weighted,
+    c.employee_count / t.emp_count_tot count_ratio
+  from ${SUBSIDIARY_INFO_TABLENAME} s
+  join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
+  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
+  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.subsidiary = c.subsidiary
+  join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id and t.subsidiary = c.subsidiary
+  join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
+    cjd.just_co_id = s.just_co_id 
+    and cjd.subsidiary = c.subsidiary
+    and cjd.state_county_fips = c.state_county_fips
+    and cjd.goc = d.goc
+  join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+  where c.subsidiary is not null /*m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')*//* and d.goc = 'assistant manager'*/
+  order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
+) t
+group by ticker, subsidiary, goc
+union all
+select 
+  ticker,
+  company,
+  goc,
+  cast(round(avg(rate_proportion),3) as numeric(36,3)) avg_rate_proportion_unweighted,
+  cast(round(sum(rate_proportion_weighted),3) as numeric(36,3)) avg_rate_proportion_weighted
+from (
+  select 
+    s.just_co_id,
+    m.ticker_trim ticker,
+    s.alt_company_name company,
+    c.state_county_fips,
+    c.employee_count,
+    d.goc,
+    mit._2a1pt1c_hourly,
+    cjd.rate_raw,
+    cjd.rate_raw / mit._2a1pt1c_hourly rate_proportion,
+    (cjd.rate_raw / mit._2a1pt1c_hourly) * (c.employee_count / t.emp_count_tot) * (
+    case
+       when cjd.tolerance_type = 0 then 0.0
+       when cjd.tolerance_type = 1 then 1.0
+       when cjd.tolerance_type = 2 then 0.0
+       else 1.0
+    end) rate_proportion_weighted,
+    c.employee_count / t.emp_count_tot count_ratio
+  from ${SUBSIDIARY_INFO_TABLENAME} s
+  join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
+  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
+  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim
+  join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id
+  join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
+    cjd.just_co_id = s.just_co_id 
+    and cjd.state_county_fips = c.state_county_fips
+    and cjd.goc = d.goc
+  join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+  where c.subsidiary is null and m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')/* and d.goc = 'assistant manager'*/  
+  order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
+) t
+group by ticker, company, goc
+order by ticker, company, goc
+) t
+order by ticker, company, goc;]]></attr>
+</Node>
 </Phase>
 <Phase number="19">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Count Table" guiX="290" guiY="3193" id="DROP_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateReportFilesOnly.grf" guiName="Generate Reports" guiX="312" guiY="3182" id="GENERATE_REPORTS" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="20">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Count Table" guiX="286" guiY="3283" id="DROP_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${EMP_COUNT_TOTALS_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Numbers Table" guiX="484" guiY="3193" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Numbers Table" guiX="480" guiY="3283" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COLUMN_NUMBERS_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp GOC Order Table" guiX="84" guiY="3193" id="DROP_TEMP_GOC_ORDER_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp GOC Order Table" guiX="80" guiY="3283" id="DROP_TEMP_GOC_ORDER_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${GOC_ORDER_TABLENAME};]]></attr>
 </Node>
 </Phase>
