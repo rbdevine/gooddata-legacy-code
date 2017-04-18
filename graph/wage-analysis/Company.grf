@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Apr 18 14:59:41 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.61" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="COMPANY_NAME" type="string"/>
+<Field name="INDUSTRY" type="string"/>
+<Field name="ALT_COMPANY_NAME" type="string"/>
+<Field name="INCLUDE_IN_LIVING_WAGE" type="string"/>
+<Field name="SUBSIDY_CODE" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/Company.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/company_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Company.xlsx"/>
+<Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
+<Property fileURL="wage-analysis.prm" id="GraphParameter4"/>
+<Property fileURL="workspace.prm" id="GraphParameter5"/>
+<Property id="GraphParameter23" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Main Table" guiX="415" guiY="16" id="CREATE_MAIN_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY};
+CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY} (
+  TICKER VARCHAR(16) UNIQUE NOT NULL,
+  COMPANY_NAME VARCHAR(64) UNIQUE NOT NULL,
+  INDUSTRY VARCHAR(128) NOT NULL,
+  ALT_COMPANY_NAME VARCHAR(64) UNIQUE NULL,
+  INCLUDE_IN_LIVING_WAGE BOOLEAN NOT NULL,
+  SUBSIDY_CODE INTEGER NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="268" guiY="16" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TMP_TABLENAME} (
+  TICKER VARCHAR(16),
+  COMPANY_NAME VARCHAR(64),
+  INDUSTRY VARCHAR(128),
+  ALT_COMPANY_NAME VARCHAR(64),
+  INCLUDE_IN_LIVING_WAGE VARCHAR(8),
+  SUBSIDY_CODE VARCHAR(8)
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="12" guiY="16" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="104" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="98" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="104" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="52" guiY="195" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="335" guiY="195" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TMP_TABLENAME} (
+    TICKER,
+    COMPANY_NAME,
+    INDUSTRY,
+    ALT_COMPANY_NAME,
+    INCLUDE_IN_LIVING_WAGE,
+    SUBSIDY_CODE
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="0" guiY="273" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Temp Data" guiX="344" guiY="273" id="CLEAN_TEMP_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[UPDATE ${TMP_TABLENAME} SET TICKER = TRIM(TICKER);
+UPDATE ${TMP_TABLENAME} SET COMPANY_NAME = TRIM(COMPANY_NAME);
+UPDATE ${TMP_TABLENAME} SET INDUSTRY = TRIM(INDUSTRY);
+UPDATE ${TMP_TABLENAME} SET ALT_COMPANY_NAME = TRIM(ALT_COMPANY_NAME);
+UPDATE ${TMP_TABLENAME} SET ALT_COMPANY_NAME = NULL WHERE ALT_COMPANY_NAME = '';]]></attr>
+</Node>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="141" guiY="273" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Main Table" guiX="337" guiY="349" id="POPULATE_MAIN_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY}
+SELECT
+    TICKER,
+    COMPANY_NAME,
+    INDUSTRY,
+    ALT_COMPANY_NAME,
+    CASE
+      WHEN INCLUDE_IN_LIVING_WAGE IS NULL THEN FALSE
+      WHEN INCLUDE_IN_LIVING_WAGE = '0' THEN FALSE
+      ELSE TRUE
+    END,
+    CASE
+      WHEN SUBSIDY_CODE IS NOT NULL THEN CAST(SUBSIDY_CODE AS INTEGER)
+      ELSE NULL
+    END
+FROM ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="344" guiY="423" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>
