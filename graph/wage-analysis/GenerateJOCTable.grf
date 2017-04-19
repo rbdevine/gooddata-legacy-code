@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed Apr 19 12:20:00 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.82" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="CITY_FIPS_AVERAGES_TABLENAME" value="LKP_CITY_FIPS_AVG"/>
+<Property id="GraphParameter1" name="GOC_SALARY_ADJUSTMENTS_TABLENAME" value="LKP_GOC_SALARY_ADJUSTMENTS"/>
+<Property id="GraphParameter2" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
+<Property id="GraphParameter3" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
+<Property fileURL="workspace.prm" id="GraphParameter6"/>
+<Property fileURL="wage-analysis.prm" id="GraphParameter4"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/H1BVisaEnigma.grf" guiName="Load Staging Data: Enigma" guiX="464" guiY="6" id="LOAD_STAGING_DATA_ENIGMA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/GlassdoorSalaryData.grf" guiName="Load Staging Data: Glassdoor" guiX="1" guiY="6" id="LOAD_STAGING_DATA_GLASSDOOR" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/GlassdoorFranchiseSalaryData.grf" guiName="Load Staging Data: Glassdoor Franchise" guiX="204" guiY="6" id="LOAD_STAGING_DATA_GLASSDOOR_FRANCHISE" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Job Level" guiX="112" guiY="112" id="TABLE_JOB_LEVEL" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  ${JOB_LEVEL_TABLENAME}
+  Table to store level adjustments for goc.
+  For example, software engineer with 0-3 years
+  experience becomes software engineer 1
+  again we may want to include this in a good data graph
+*/
+drop table if exists ${JOB_LEVEL_TABLENAME};
+create table ${JOB_LEVEL_TABLENAME} (
+  GOC VARCHAR(255) NOT NULL,
+  GOC_WITH_LEVEL VARCHAR(255) NOT NULL,
+  MIN_YEARS_EXPERIENCE INT NULL,
+  MAX_YEARS_EXPERIENCE INT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: JOC" guiX="260" guiY="112" id="TABLE_JOC" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_JOC};
+create table ${TABLE_JOC} (
+  DATA_SOURCE_ID INTEGER NOT NULL,
+  JOC VARCHAR(32) NOT NULL,
+  DESCRIPTION VARCHAR(128) NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Job Levels" guiX="112" guiY="187" id="POPULATE_JOB_LEVELS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer < 3 years', null, 3);
+insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer 3 - 5 years', 3, 5);
+insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer 5 - 10 years', 5, 10);
+insert into ${JOB_LEVEL_TABLENAME} values('software engineer', 'software engineer > 10 years', 10, null);
+insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa < 3 years', null, 3);
+insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa 3 - 5 years', 3, 5);
+insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa 5 - 10 years', 5, 10);
+insert into ${JOB_LEVEL_TABLENAME} values('software qa', 'software qa > 10 years', 10, null);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Glassdoor Data" guiX="120" guiY="270" id="POPULATE_LOOKUP_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${SALARY_LOOKUP_TABLENAME}
+select distinct
+  0,
+  g.just_company_id, 
+  g.glassdoor_employer_name, 
+  m.ticker_trim, 
+  i.just_indy, 
+  s.goc,
+  s.mgoc, 
+  s.jobtitle,
+  s.onet_code,
+  s.UNADJUSTEDBASESALARY,
+  s.UNADJUSTEDTOTALSALARY,
+  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDBASESALARY*100/isnull(f.avg_cost_of_living_index,'100')) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDTOTALSALARY*100/isnull(f.avg_cost_of_living_index,'100')) as numeric(36,2)),
+  s.UNADJUSTEDBASESALARY/2000,
+  s.UNADJUSTEDTOTALSALARY/2000,
+  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDBASESALARY*100/(2000*isnull(f.avg_cost_of_living_index,'100'))) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDTOTALSALARY*100/(2000*isnull(f.avg_cost_of_living_index,'100'))) as numeric(36,2)),
+  cast(s.YEAROFSALARY as int),
+  cast(s.YEARSOFRELEVANTEXPNUMBER as int),
+  s.cityname, 
+  s.stateabbreviation, 
+  f.avg_cost_of_living_index
+from lkp_glassdoor_company g
+join lkp_just_co_secty_master m on g.just_company_id = m.just_co_id
+join stg_glassdoorsalary s on s.fk_employerid = g.glassdoor_employer_id
+join ${SALARY_YEAR_ADJUSTMENT_TABLENAME} ya on ya.year = cast(s.YEAROFSALARY as int)
+left join ${CITY_FIPS_AVERAGES_TABLENAME} f on f.state = s.stateabbreviation and f.city = s.cityname
+/*left join lkp_city_fips f on f.state_abbreviation = s.stateabbreviation and f.city_name = s.cityname
+left join stg_regionalpurchasingpower pp on pp.fips_code = f.state_county_fips*/
+left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+where 
+  s.YEAROFSALARY > 2009
+  and s.YEAROFSALARY < 2017;]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Enigma Data" guiX="127" guiY="424" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
+*/
+
+insert into ${SALARY_LOOKUP_TABLENAME}
+select 
+  1,
+  t.just_co_id,
+  t.employer_name,
+  m.ticker_trim,
+  i.just_indy,
+  gd_goc,
+  null,
+  t.job_title,
+  t.soc_code,
+  cast(round(t.UNADJUSTEDBASESALARY,2) as numeric(36,2)) UNADJUSTEDBASESALARY,
+  null,
+  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index),2) as numeric(36,2)) UNADJUSTEDBASESALARY_COLA,
+  null,
+  cast(round((t.UNADJUSTEDBASESALARY / 2000.0),2) as numeric(36,2)) UNADJUSTEDBASEHOURLY,
+  null,
+  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index) / 2000.0,2) as numeric(36,2)) UNADJUSTEDBASEHOURLY_COLA,
+  null,
+  wage_year,
+  null,
+  t.city, 
+  t.state, 
+  t.avg_cost_of_living_index
+from (
+  select
+    just_co_id,
+    employer_name,
+    gd_goc,
+    job_title,
+    soc_code,
+    case 
+      when wage_rate_of_pay = 'Hour' then UNADJUSTEDBASESALARY * 2000.0
+      when wage_rate_of_pay = 'Bi-Weekly' then UNADJUSTEDBASESALARY * 26.0
+      when wage_rate_of_pay = 'Week' then UNADJUSTEDBASESALARY * 52.0
+      when wage_rate_of_pay = 'Month' then UNADJUSTEDBASESALARY * 12.0
+      else UNADJUSTEDBASESALARY
+    end UNADJUSTEDBASESALARY,
+    cast(isnull(f.avg_cost_of_living_index,'100.0') as float) avg_cost_of_living_index, 
+    t.city,
+    t.state,
+    wage_year
+  from (
+    select
+        e.just_co_id,
+        h.employer_name,
+        sg.gd_goc,
+        h.job_title,
+        h.soc_code,
+        wage_rate_of_pay,
+        case 
+          when (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) and (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0) then (wage_rate_of_pay_from + wage_rate_of_pay_to)/2
+          when (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) then cast(wage_rate_of_pay_from as numeric(36,2))
+          else cast(wage_rate_of_pay_to as numeric(36,2)) 
+        end UNADJUSTEDBASESALARY,
+        case
+          when h.worksite_city is null or h.worksite_state is null then h.employer_city
+          else h.worksite_city
+        end city,
+        case
+          when h.worksite_city is null or h.worksite_state is null then h.employer_state
+          else h.worksite_state
+        end state,
+        cast(isnull(left(EMPLOYMENT_START_DATE,4),isnull(pw_wage_source_year,'2016')) as int) wage_year
+    from lkp_enigma_company e
+    join stg_enigmah1bvisa h on h.employer_name = e.enigma_employer_name
+    join lkp_soc_goc sg on sg.enigma_soc_code = h.soc_code
+    where 
+      (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) or 
+      (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0)
+  ) t
+  left join lkp_city_fips_avg f on f.city = t.city and f.state = t.state
+) t
+join lkp_just_co_secty_master m on m.just_co_id = t.just_co_id
+left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+where ((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index) / 2000.0) <= 100.0 and t.wage_year > 2009 and t.wage_year < 2017
+order by m.ticker_trim, t.gd_goc, t.unadjustedbasesalary desc;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="120" guiY="348" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
+*/
+SET LOCALE to LEN_S1;
+
+insert into ${SALARY_LOOKUP_TABLENAME}
+select
+  2,
+  just_co_id,
+  company,
+  ticker,
+  indy,
+  goc,
+  null,
+  jobtitle,
+  null,
+  cast(round(t.UNADJUSTEDBASESALARY,2) as numeric(36,2)) UNADJUSTEDBASESALARY,
+  null,
+  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index),2) as numeric(36,2)) UNADJUSTEDBASESALARY_COLA,
+  null,
+  cast(round((t.UNADJUSTEDBASESALARY / 2000.0),2) as numeric(36,2)) UNADJUSTEDBASEHOURLY,
+  null,
+  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index) / 2000.0,2) as numeric(36,2)) UNADJUSTEDBASEHOURLY_COLA,
+  null,  
+  2016,
+  null,
+  city, 
+  state, 
+  avg_cost_of_living_index
+from (
+  select 
+    just_co_id,
+    company,
+    ticker,
+    indy,
+    goc,
+    jobtitle,
+    (case
+      when unit = 'hourly' then 2000.0 
+      when unit = 'monthly' then 12.0
+      else 1.0
+    end) * ((min+max)/2) unadjustedbasesalary,
+    city,
+    state, 
+    isnull(avg_cost_of_living_index,100.0) avg_cost_of_living_index
+  from (
+      select
+        m.just_co_id,
+        g.company,
+        m.ticker_trim ticker,
+        i.just_indy indy,
+        goc,
+        g.jobtitle,
+        area city,
+        g.state,
+        unit,
+        (case 
+          when regexp_instr(range,'.*k.*k') > 0 then 1000.0
+          else 1
+        end)*min min,
+        (case
+          when regexp_instr(range,'.*k.*k') > 0 then 1000.0
+          when regexp_instr(range,'.*k') > 0 then 1000.0
+          else 1.0
+        end)*max max,
+        avg_cost_of_living_index
+      from stg_glassdoorfranchisepay g
+      join ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} j on g.jobtitle = j.jobtitle
+      join ${FRANCHISE_COMPANY_TABLENAME} c on c.company = g.company
+      join (select just_co_id, ticker_trim from lkp_just_co_secty_master group by just_co_id, ticker_trim) m on m.just_co_id = c.just_co_id
+      join (select just_co_id, just_indy from lkp_just_co_indy group by just_co_id, just_indy) i on i.just_co_id = m.just_co_id
+      left join lkp_city_fips_avg f on f.city = g.area and f.state = g.state
+      where c.not_in_original_just_list
+    ) t
+) t
+where unadjustedbasesalary >= 10000 and unadjustedbasesalary <= 200000
+order by ticker, goc, unadjustedbasesalary desc;]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Marriott Maintenance" guiX="158" guiY="500" id="UPDATE_MARRIOTT_MAINTENANCE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  Since Marriott data was included in the original
+  dataset, the franchise jobtitle/goc mappings were
+  not applied. For now, just makikng an exeception
+  for that case (specifically with maintenance titles). 
+  Perhaps in the future we can implement a more general case. 
+*/
+SET LOCALE to LEN_S1;
+update ${SALARY_LOOKUP_TABLENAME} s
+set goc = u.goc
+from ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} u
+where u.jobtitle = s.jobtitle and s.ticker = 'MAR' and u.jobtitle like 'main%';]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Job Names" guiX="181" guiY="576" id="UPDATE_JOB_NAMES1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  update ${SALARY_LOOKUP_TABLENAME} to modify goc for various
+  job titles. Basically, what we did was first generate a list
+  of all glassdoor entries that included the word software or
+  assistant. Then Andy S. and Rich D. went through all 4000+ entries 
+  and set appropriate goc for given job title, the idea being we should get
+  more job titles that way. Finally, created a Good Data graph to
+  upload that jobtitle->goc data into the table, LKP_GD_JOBTITLE_OVERRIDE_GOC
+*/
+update ${SALARY_LOOKUP_TABLENAME} s
+set goc = u.goc
+from LKP_GD_JOBTITLE_OVERRIDE_GOC u
+where u.jobtitle = s.jobtitle;]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Franchise GOC Special Cases" guiX="138" guiY="650" id="UPDATE_FRANCHISE_GOC_SPECIAL_CASES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  update ${SALARY_LOOKUP_TABLENAME} to change gocs for specific
+  franchises. The idea is to combine certain gocs for certain
+  tickers. (For example, for LBTY, we combined 'general manager'
+  and 'manager' under the goc 'general manager').
+*/
+update ${SALARY_LOOKUP_TABLENAME} s
+set goc = u.new_goc
+from ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} u
+where u.old_goc = s.goc and u.ticker = s.ticker;]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Levels" guiX="190" guiY="724" id="ADD_JOB_LEVELS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  update ${SALARY_LOOKUP_TABLENAME} to modify goc by level, given years of experience,
+  see above for further explanation.
+*/
+update ${SALARY_LOOKUP_TABLENAME} s
+set goc = l.goc_with_level
+from ${JOB_LEVEL_TABLENAME} l
+where
+  s.goc = l.goc and (
+    (MIN_YEARS_EXPERIENCE is null and MAX_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER <= MAX_YEARS_EXPERIENCE) or
+    (MIN_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER > MIN_YEARS_EXPERIENCE and MAX_YEARS_EXPERIENCE is null) or
+    (MIN_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER > MIN_YEARS_EXPERIENCE and MAX_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER <= MAX_YEARS_EXPERIENCE)
+  );
+]]></attr>
+</Node>
+</Phase>
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update H1B Names" guiX="186" guiY="795" id="UPDATE_H1B_NAMES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+update ${SALARY_LOOKUP_TABLENAME}
+set goc = 'software engineer h1b'
+where goc = 'software engineer' and data_type_id = 1;]]></attr>
+</Node>
+</Phase>
+</Graph>
