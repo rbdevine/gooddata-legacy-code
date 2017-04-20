@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Apr 20 12:32:55 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.120" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Apr 20 16:46:42 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.121" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="STG_TABLE_GOC_SALARY_ADJUSTMENT" value="STG_WAGE_GOC_SALARY_ADJUSTMENT"/>
 <Property id="GraphParameter1" name="STG_TABLE_JOB_LEVEL" value="STG_WAGE_JOB_LEVEL"/>
 <Property id="GraphParameter2" name="STG_TABLE_PPI_AVG" value="STG_WAGE_PPI_AVG"/>
 <Property id="GraphParameter3" name="STG_TABLE_SALARY_ADJ_BY_YEAR" value="STG_WAGE_SALARY_ADJ_BY_YEAR"/>
-<Property fileURL="workspace.prm" id="GraphParameter11"/>
-<Property fileURL="wage-analysis.prm" id="GraphParameter4"/>
+<Property fileURL="wage-analysis.prm" id="GraphParameter22"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -88,6 +88,7 @@ create table ${STG_TABLE_SALARY_ADJ_BY_YEAR} (
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_WAGE};
 create table ${TABLE_WAGE} (
   DATA_SOURCE_ID INT NOT NULL,
+  RECORD_ID VARCHAR(255) NULL,
   STATE_COUNTY_FIPS VARCHAR(5) NULL,
   TICKER VARCHAR(16) NULL,
   JOC VARCHAR(128) NULL,
@@ -150,6 +151,7 @@ insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2016, 1.000);
 insert into ${TABLE_WAGE}
 select distinct
   ds.data_source_id,
+  g.fk_reviewid,
   '00000'/*state_county_fips*/, 
   tg.ticker, 
   g.goc, 
