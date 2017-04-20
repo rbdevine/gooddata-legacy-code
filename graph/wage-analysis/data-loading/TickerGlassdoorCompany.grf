@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Apr 19 16:21:07 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.67" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Apr 20 14:51:27 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.71" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="TICKER" type="string"/>
+<Field name="GLASSDOOR_EMPLOYER_ID" type="string"/>
 <Field name="GLASSDOOR_COMPANY" type="string"/>
 </Record>
 </Metadata>
@@ -11,9 +12,9 @@
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/ticker_glassdoor_company_error.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/TickerGlassdoorCompany.xlsx"/>
 <Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
-<Property fileURL="wage-analysis.prm" id="GraphParameter4"/>
 <Property fileURL="workspace.prm" id="GraphParameter9"/>
 <Property id="GraphParameter27" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/TickerGlassdoorCompany.txt"/>
+<Property fileURL="wage-analysis.prm" id="GraphParameter4"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -21,6 +22,7 @@
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${STG_TABLE_TICKER_GLASSDOOR_COMPANY};
 CREATE TABLE IF NOT EXISTS ${STG_TABLE_TICKER_GLASSDOOR_COMPANY} (
   TICKER VARCHAR(16) NOT NULL,
+  GLASSDOOR_EMPLOYER_ID VARCHAR(32) NOT NULL,
   GLASSDOOR_COMPANY VARCHAR(64) UNIQUE NOT NULL
 );]]></attr>
 </Node>
@@ -66,6 +68,7 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="195" id="POPULATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${STG_TABLE_TICKER_GLASSDOOR_COMPANY} (
     TICKER,
+    GLASSDOOR_EMPLOYER_ID,
     GLASSDOOR_COMPANY
 )
 FROM LOCAL '${WRITEFILEPATH}'
@@ -76,6 +79,7 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="325" guiY="273" id="CLEAN_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[UPDATE ${STG_TABLE_TICKER_GLASSDOOR_COMPANY} SET TICKER = TRIM(TICKER);
+UPDATE ${STG_TABLE_TICKER_GLASSDOOR_COMPANY} SET GLASSDOOR_EMPLOYER_ID = TRIM(GLASSDOOR_EMPLOYER_ID);
 UPDATE ${STG_TABLE_TICKER_GLASSDOOR_COMPANY} SET GLASSDOOR_COMPANY = TRIM(GLASSDOOR_COMPANY);]]></attr>
 </Node>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="0" guiY="273" id="CLEAN_ERROR" type="FILE_DELETE"/>
