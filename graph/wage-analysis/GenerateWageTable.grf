@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Apr 20 16:46:42 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.121" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Fri Apr 21 14:06:45 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.136" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="STG_TABLE_GOC_SALARY_ADJUSTMENT" value="STG_WAGE_GOC_SALARY_ADJUSTMENT"/>
 <Property id="GraphParameter1" name="STG_TABLE_JOB_LEVEL" value="STG_WAGE_JOB_LEVEL"/>
-<Property id="GraphParameter2" name="STG_TABLE_PPI_AVG" value="STG_WAGE_PPI_AVG"/>
 <Property id="GraphParameter3" name="STG_TABLE_SALARY_ADJ_BY_YEAR" value="STG_WAGE_SALARY_ADJ_BY_YEAR"/>
-<Property fileURL="wage-analysis.prm" id="GraphParameter22"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property fileURL="workspace.prm" id="GraphParameter14"/>
+<Property fileURL="wage-analysis.prm" id="GraphParameter4"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -15,14 +14,14 @@
 <Node enabled="disabled" graphName="${GRAPH_DIR}/GlassdoorFranchiseSalaryData.grf" guiName="Load Staging Data: Glassdoor Franchise" guiX="204" guiY="6" id="LOAD_STAGING_DATA_GLASSDOOR_FRANCHISE" type="RUN_GRAPH"/>
 <Node enabled="disabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/data-loading/GOCSalaryAdjustments.grf" guiName="Load Staging Data: GOC Salary Adjustments" guiX="192" guiY="102" id="LOAD_STAGING_DATA_GOC_SALARY_ADJUSTMENTS" type="RUN_GRAPH"/>
 <Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/TickerGlassdoorCompany.grf" guiName="Load Staging Data: Ticker Glassdoor Company" guiX="657" guiY="6" id="LOAD_STAGING_DATA_TICKER_GLASSDOOR_COMPANY" type="RUN_GRAPH"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: Data Source" guiX="562" guiY="201" id="STAGING_TABLE_DATA_SOURCE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Staging Table: Data Source" guiX="562" guiY="201" id="STAGING_TABLE_DATA_SOURCE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${STG_TABLE_WAGE_DATA_SOURCE};
 create table ${STG_TABLE_WAGE_DATA_SOURCE} (
   DATA_SOURCE_ID INTEGER UNIQUE NOT NULL,
   DATA_SOURCE VARCHAR(255) NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: Job Level" guiX="17" guiY="201" id="STAGING_TABLE_JOB_LEVEL" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Staging Table: Job Level" guiX="17" guiY="201" id="STAGING_TABLE_JOB_LEVEL" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${STG_TABLE_JOB_LEVEL}
   Table to store level adjustments for goc.
@@ -39,7 +38,7 @@ create table ${STG_TABLE_JOB_LEVEL} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: JOC Adjustment" guiX="681" guiY="114" id="STAGING_TABLE_JOC_ADJUSTMENT" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Staging Table: JOC Adjustment" guiX="681" guiY="114" id="STAGING_TABLE_JOC_ADJUSTMENT" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${STG_TABLE_JOC_ADJUSTMENT};
 create table ${STG_TABLE_JOC_ADJUSTMENT} (
   JOC VARCHAR(64) NULL,
@@ -47,7 +46,7 @@ create table ${STG_TABLE_JOC_ADJUSTMENT} (
   REASON_CODE INTEGER NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: JOC Adjustment Reason" guiX="749" guiY="201" id="STAGING_TABLE_JOC_ADJUSTMENT_REASON" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Staging Table: JOC Adjustment Reason" guiX="749" guiY="201" id="STAGING_TABLE_JOC_ADJUSTMENT_REASON" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${STG_TABLE_JOC_ADJUSTMENT_REASON};
 create table ${STG_TABLE_JOC_ADJUSTMENT_REASON} (
   REASON_CODE INTEGER UNIQUE NOT NULL,
@@ -55,21 +54,7 @@ create table ${STG_TABLE_JOC_ADJUSTMENT_REASON} (
   REASON_LONG VARCHAR(255) NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: PPI Avgs" guiX="387" guiY="201" id="STAGING_TABLE_PPI_AVGS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  ${STG_TABLE_PPI_AVG} 
-  average cost os living index for city/state pairs that have 
-  more than one county (e.g., NEW YORK, NY has 5 counties)
-*/
-drop table if exists ${STG_TABLE_PPI_AVG};
-create table ${STG_TABLE_PPI_AVG} (
-  CITY VARCHAR(255) NOT NULL,
-  STATE VARCHAR(255) NOT NULL,
-  AVG_COST_OF_LIVING_INDEX FLOAT NOT NULL
-);
-]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: Salary Yr Adj " guiX="190" guiY="201" id="STAGING_TABLE_SALARY_YR_ADJ" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Staging Table: Salary Yr Adj " guiX="190" guiY="201" id="STAGING_TABLE_SALARY_YR_ADJ" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${STG_TABLE_SALARY_ADJ_BY_YEAR} 
   salary adjustments based on the year of the reported salary.  These 
@@ -84,7 +69,25 @@ create table ${STG_TABLE_SALARY_ADJ_BY_YEAR} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Wage" guiX="545" guiY="114" id="TABLE_WAGE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: PPI Avgs" guiX="402" guiY="201" id="TABLE_PPI_AVGS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  ${TABLE_PPI_AVG} 
+  average cost os living index for city/state pairs.
+  For counties (most) that have only one city/state pair, value will be for
+  just that county. 
+  For others (e.g., NEW YORK< NY with 5 counties) the average is taken and 
+  assigned to each state_county_fips with that city/state pair (e.g., 
+  the 5 counties for NEW YORK, NY would have 5 entries in this table, each 
+  with the same average cost of living index).
+*/
+drop table if exists ${TABLE_PPI_AVG};
+create table ${TABLE_PPI_AVG} (
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  AVG_COST_OF_LIVING_INDEX FLOAT NOT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Wage" guiX="545" guiY="114" id="TABLE_WAGE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_WAGE};
 create table ${TABLE_WAGE} (
   DATA_SOURCE_ID INT NOT NULL,
@@ -100,13 +103,13 @@ create table ${TABLE_WAGE} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Data Source" guiX="562" guiY="279" id="POPULATE_DATA_SOURCE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Data Source" guiX="562" guiY="279" id="POPULATE_DATA_SOURCE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_WAGE_DATA_SOURCE} values(0, 'Glassdoor');
 insert into ${STG_TABLE_WAGE_DATA_SOURCE} values(1, 'EnigmaHB1');
 insert into ${STG_TABLE_WAGE_DATA_SOURCE} values(2, 'Franchise');
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Job Levels" guiX="38" guiY="279" id="POPULATE_JOB_LEVELS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Job Levels" guiX="38" guiY="279" id="POPULATE_JOB_LEVELS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_JOB_LEVEL} values('software engineer', 'software engineer < 3 years', null, 3);
 insert into ${STG_TABLE_JOB_LEVEL} values('software engineer', 'software engineer 3 - 5 years', 3, 5);
 insert into ${STG_TABLE_JOB_LEVEL} values('software engineer', 'software engineer 5 - 10 years', 5, 10);
@@ -117,7 +120,7 @@ insert into ${STG_TABLE_JOB_LEVEL} values('software qa', 'software qa 5 - 10 yea
 insert into ${STG_TABLE_JOB_LEVEL} values('software qa', 'software qa > 10 years', 10, null);
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate JOC Adjustment Reason" guiX="749" guiY="279" id="POPULATE_JOC_ADJUSTMENT_REASON" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate JOC Adjustment Reason" guiX="749" guiY="279" id="POPULATE_JOC_ADJUSTMENT_REASON" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_JOC_ADJUSTMENT_REASON} values (0,'MARRIOTT','Marriott franchise data had a special case for maintenence workers.');
 insert into ${STG_TABLE_JOC_ADJUSTMENT_REASON} values (1,'JOBTITLE','Override based on job titles specified in ${}. ${} wes populated from a manually created excel file.');
 insert into ${STG_TABLE_JOC_ADJUSTMENT_REASON} values (2,'GOCOVERRIDE','Override based on tickers specified in ${}. ${} wes populated from a manually created excel file.');
@@ -126,14 +129,23 @@ insert into ${STG_TABLE_JOC_ADJUSTMENT_REASON} values (4,'H1BOVERRIDE','Append .
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate PPI Avgs" guiX="401" guiY="279" id="POPULATE_PPI_AVGS1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_PPI_AVG}
-select distinct f.city_name, f.state_abbreviation , avg(p.cost_of_living_index)
-from ${LKP_TABLE_CITY_FIPS} f
-join ${STG_TABLE_REGIONAL_PURCHASING_POWER} p on f.state_county_fips = p.fips_code
-group by f.state_abbreviation, f.city_name;
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_PPI_AVG}
+select 
+  f.state_county_fips, cast(round(avg(a.avg_cost_of_living_index),1) as numeric(16,1)) avg_cost_of_living_index
+from (
+  select state_county_fips, city_name city, state_abbreviation state
+  from  ${TABLE_CITY_FIPS} f
+  group by state_county_fips, city_name, state_abbreviation
+) f join (
+  select f.city_name city, f.state_abbreviation state, avg(p.cost_of_living_index) avg_cost_of_living_index
+  from ${TABLE_CITY_FIPS} f
+  join ${STG_TABLE_REGIONAL_PURCHASING_POWER} p on f.state_county_fips = p.fips_code
+  group by f.state_abbreviation, f.city_name
+) a on f.city = a.city and f.state = a.state
+group by f.state_county_fips;
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Salary Yr Adj" guiX="206" guiY="279" id="POPULATE_SALARY_YR_ADJ" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Salary Yr Adj" guiX="206" guiY="279" id="POPULATE_SALARY_YR_ADJ" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2010, 1.127);
 insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2011, 1.105);
 insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2012, 1.083);
@@ -152,7 +164,7 @@ insert into ${TABLE_WAGE}
 select distinct
   ds.data_source_id,
   g.fk_reviewid,
-  '00000'/*state_county_fips*/, 
+  p.state_county_fips, 
   tg.ticker, 
   g.goc, 
   g.jobtitle,
@@ -163,7 +175,16 @@ from ${STG_TABLE_TICKER_GLASSDOOR_COMPANY} tg
 join ${STG_TABLE_GLASSDOOR_WAGE} g on g.employer = tg.glassdoor_company
 join ${STG_TABLE_SALARY_ADJ_BY_YEAR} ya on ya.year = cast(g.YEAROFSALARY as int)
 join ${STG_TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = 'glassdoor'
-left join ${STG_TABLE_PPI_AVG} p on p.state = g.stateabbreviation and p.city = g.cityname
+left join (
+  select 
+    max(f.state_county_fips) state_county_fips,
+    f.city_name city, 
+    f.state_abbreviation state, 
+    max(p.avg_cost_of_living_index) avg_cost_of_living_index
+  from ${TABLE_CITY_FIPS} f
+  join ${TABLE_PPI_AVG} p on p.state_county_fips = f.state_county_fips
+  group by f.city_name, f.state_abbreviation
+) p on p.city = g.cityname and p.state = g.statename
 where 
   g.YEAROFSALARY > 2009
   and g.YEAROFSALARY < 2017;]]></attr>
