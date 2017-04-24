@@ -1,31 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat Apr 22 21:43:38 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.164" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Apr 24 16:41:10 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.176" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="STG_TABLE_GOC_SALARY_ADJUSTMENT" value="STG_WAGE_GOC_SALARY_ADJUSTMENT"/>
 <Property id="GraphParameter1" name="STG_TABLE_JOB_LEVEL" value="STG_WAGE_JOB_LEVEL"/>
 <Property id="GraphParameter2" name="STG_TABLE_SALARY_ADJ_BY_YEAR" value="STG_WAGE_SALARY_ADJ_BY_YEAR"/>
-<Property id="GraphParameter34" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="TMP_WAGE_CENSUS_MAPPED_FIPS"/>
-<Property id="GraphParameter32" name="TMP_TABLE_FIPS_MAP" value="TMP_WAGE_FIPS_MAP"/>
-<Property fileURL="workspace.prm" id="GraphParameter14"/>
-<Property fileURL="wage-analysis.prm" id="GraphParameter3"/>
+<Property id="GraphParameter3" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="TMP_WAGE_CENSUS_MAPPED_FIPS"/>
+<Property id="GraphParameter4" name="TMP_TABLE_FIPS_MAP" value="TMP_WAGE_FIPS_MAP"/>
+<Property fileURL="wage-analysis.prm" id="GraphParameter5"/>
+<Property fileURL="workspace.prm" id="GraphParameter17"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/Census2010FIPS.grf" guiName="Load Staging Data: Census 2010 FIPS" guiX="1" guiY="6" id="LOAD_STAGING_DATA_CENSUS_2010_FIPS" type="RUN_GRAPH"/>
 <Node enabled="disabled" graphName="${GRAPH_DIR}/RegionalPurchasingPower.grf" guiName="Load Staging Data: Cost of Living Index" guiX="255" guiY="12" id="LOAD_STAGING_DATA_COST_OF_LIVING_INDEX" type="RUN_GRAPH"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: COLI Avgs" guiX="100" guiY="115" id="TABLE_COLI_AVGS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
+<attr name="sqlQuery"><![CDATA[/********************************************************************************
   ${TABLE_COLI_AVG} 
-  average cost os living index for city_fips/state pairs.
+  average cost os living index for city_fips
   For counties (most) that have only one city_fips/state pair, value will be for
   just that county.
   For others (e.g., NEW YORK< NY with 5 counties) the average is taken and 
   assigned to the city_fips/state.
-*/
+*********************************************************************************/
 drop table if exists ${TABLE_COLI_AVG};
 create table ${TABLE_COLI_AVG} (
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  CITY_FIPS VARCHAR(5) UNIQUE NOT NULL,
   STATE VARCHAR(2) NOT NULL,
-  CITY_FIPS VARCHAR(5) NOT NULL,
+  CITY VARCHAR(128) NOT NULL,
   AVG_COST_OF_LIVING_INDEX FLOAT NOT NULL
 );
 ]]></attr>
@@ -37,9 +39,10 @@ create table ${TABLE_COLI_AVG} (
 */
 drop table if exists ${TMP_TABLE_CENSUS_MAPPED_FIPS};
 create table ${TMP_TABLE_CENSUS_MAPPED_FIPS} (
-  STATE VARCHAR(2) NOT NULL,
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  STATE_COUNTY_FIPS_COLI VARCHAR(5) NOT NULL,
   ENTITY_FIPS VARCHAR(5) NOT NULL,
+  STATE VARCHAR(2) NOT NULL,
   ENTITY_NAME VARCHAR(64) NOT NULL,
   ENTITY_DESCRIPTION VARCHAR(64) NOT NULL
 );
@@ -122,30 +125,76 @@ set
   county_name = 'Spotsylvania + Fredericksburg'
 where city_name = 'DANVILLE' and state_abbreviation = 'VA';]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Map" guiX="400" guiY="192" id="POPULATE_FIPS_MAP" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_FIPS_MAP} values ('51680','51911');
-insert into ${TMP_TABLE_FIPS_MAP} values ('51775','51944');
-insert into ${TMP_TABLE_FIPS_MAP} values ('51770','51944');
-insert into ${TMP_TABLE_FIPS_MAP} values ('51630','51951');
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Map" guiX="388" guiY="189" id="POPULATE_FIPS_MAP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_FIPS_MAP} values ('30077','30023');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51003','51901');
 insert into ${TMP_TABLE_FIPS_MAP} values ('51540','51901');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51005','51903');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51580','51903');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51015','51907');
 insert into ${TMP_TABLE_FIPS_MAP} values ('51790','51907');
 insert into ${TMP_TABLE_FIPS_MAP} values ('51820','51907');
-insert into ${TMP_TABLE_FIPS_MAP} values ('51690','51929');
-insert into ${TMP_TABLE_FIPS_MAP} values ('51750','51933');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51019','51909'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51515','51909');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51031','51911');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51680','51911');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51035','51913');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51640','51913');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51053','51918');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51570','51918');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51730','51918');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51059','51919'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51600','51919');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51610','51919');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51069','51921'); 
 insert into ${TMP_TABLE_FIPS_MAP} values ('51840','51921');
-insert into ${TMP_TABLE_FIPS_MAP} values ('51660','51947');]]></attr>
+insert into ${TMP_TABLE_FIPS_MAP} values ('51081','51923'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51595','51923');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51089','51929');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51690','51929');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51095','51931');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51830','51931');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51121','51933');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51750','51933');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51143','51939');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51590','51939');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51149','51941');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51670','51941');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51153','51942');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51683','51942');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51685','51942');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51161','51944');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51770','51944');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51775','51944');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51163','51945');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51530','51945');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51678','51945');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51165','51947');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51660','51947');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51175','51949');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51620','51949');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51177','51951');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51630','51951');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51191','51953');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51520','51953');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51195','51955');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51720','51955');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51199','51958'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51735','51958');
+]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Census Mapped FIPS" guiX="368" guiY="266" id="POPULATE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Census Mapped FIPS" guiX="356" guiY="263" id="POPULATE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_CENSUS_MAPPED_FIPS}
-select 
-  f.state, 
+select
+  f.state_county_fips,
   case
     when m.state_county_fips_coli is null then f.state_county_fips
     else m.state_county_fips_coli
-  end state_county_fips,
+  end state_county_fips_coli,
   f.entity_fips,
+  f.state, 
   f.entity_name,
   f.entity_description
 from ${TABLE_CENSUS_FIPS} f
@@ -160,57 +209,128 @@ left join ${TMP_TABLE_FIPS_MAP} m on m.state_county_fips_census = f.state_county
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Drop FIPS Map" guiX="158" guiY="517" id="DROP_FIPS_MAP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_FIPS_MAP};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate COLI Avgs By City" guiX="375" guiY="344" id="POPULATE_COLI_AVGS_BY_CITY" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate COLI Avgs By City" guiX="363" guiY="341" id="POPULATE_COLI_AVGS_BY_CITY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_COLI_AVG}
-select census.state, census.entity_fips, cast(round(avg(cola.cost_of_living_index),1) as numeric(16,1)) avg_cost_of_living_index
-from ${TMP_TABLE_CENSUS_MAPPED_FIPS} census
-join ${STG_TABLE_REGIONAL_PURCHASING_POWER} cola on cola.fips_code = census.state_county_fips
-where entity_description = 'city'
-group by census.state, census.entity_fips;]]></attr>
+/***********************************************************
+  avg cost of living per unique state/city_fips
+  since cities sometimes span multiple counties,
+  there are cases where a state_county_fips has multiple
+  cost of living. This would happen if one city spans 2
+  or more counties and one of those counties also has other
+  cities in it.
+************************************************************/
+select
+  details.state_county_fips,
+  avgs.city_fips,
+  avgs.state,
+  details.city,
+  avgs.avg_cost_of_living_index
+from (
+  /********************************************************
+    average per unique city_fips/state pair of type 'city'
+  *********************************************************/
+  select
+    census.entity_fips city_fips,
+    census.state,
+    cast(round(avg(cola.cost_of_living_index),1) as numeric(16,1)) avg_cost_of_living_index
+  from ${TMP_TABLE_CENSUS_MAPPED_FIPS} census
+  join ${STG_TABLE_REGIONAL_PURCHASING_POWER} cola on cola.fips_code = census.state_county_fips_coli
+  where entity_description = 'city'
+  group by census.state, census.entity_fips
+) avgs
+join (
+  /***************************************************************
+    unique state_county_fips/city_fips/state/city sets
+    note: some cities will have multiple state_count_fips. 
+    (e.g., New York, NY has one state_county_fips per borough, 
+    but many cities span multiple counties, so not unque to nyc.)
+  ****************************************************************/
+  select
+    state_county_fips,
+    entity_fips city_fips,
+    state,
+    entity_name city
+  from ${TMP_TABLE_CENSUS_MAPPED_FIPS}
+  group by state_county_fips, entity_fips, state, entity_name
+) details on details.state = avgs.state and details.city_fips = avgs.city_fips;]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add COLI Avgs By Unique Non-City" guiX="354" guiY="418" id="ADD_COLI_AVGS_BY_UNIQUE_NON_CITY" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add COLI Avgs By Unique Non-City/Non-County" guiX="306" guiY="418" id="ADD_COLI_AVGS_BY_UNIQUE_NON_CITY_NON_COUNTY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_COLI_AVG}
 select
-  f.state, f.city_fips, p.cost_of_living_index
+  f.state_county_fips, 
+  f.city_fips, 
+  f.state, 
+  f.city, 
+  p.cost_of_living_index
 from (
+  /*****************************************************************************
+    filter out lines with multiple state_county_fips, valid cases of that would
+    be cities that span multiple counties and those cases would have the same
+    city_fips and be identified with description of 'city', thus were already
+    picked up in the first round.
+  ******************************************************************************/
   select 
     city, state
   from (
+    /*************************************************************************************************
+      census city/state matches with missing data
+      this will pick up census data whose description is not 'city' ('munipality', 'township', etc.), 
+      which was specified as critia for first pass at averages.
+      in this case, ignore all but county types.
+      group with state_county_fips, so multiple state_county_fips entries can be identified.
+    **************************************************************************************************/
     select 
       f.state_county_fips, missing.*
-    from ( 
+    from (
+      /******************************************************
+        glass door city/state not yet put in averages table
+      *******************************************************/
       select g.*
       from (
+        /***************************
+          city/state from glassdoor
+        ****************************/
         select cityname city, stateabbreviation state
         from ${STG_TABLE_GLASSDOOR_WAGE}
         group by cityname, stateabbreviation
       ) g
       left join (
-        select c.state, f.entity_name city
+        /*****************************************
+          city/state we already have averages for
+        *******************************************/
+        select c.state, c.city
         from ${TABLE_COLI_AVG} c
-        join ${TABLE_CENSUS_FIPS} f on f.state = c.state and f.entity_fips = c.city_fips
-        where f.entity_description = 'city'
+        group by c.state, c.city
       ) f on f.state = g.state and f.city = g.city
       where f.state is null
     ) missing
-    join ${TMP_TABLE_CENSUS_MAPPED_FIPS} f on f.state = missing.state and f.entity_name = missing.city
+    join ${TABLE_CENSUS_FIPS} f on f.state = missing.state and f.entity_name = missing.city
+    where f.entity_description <> 'county'
     group by f.state_county_fips, missing.state, missing.city
   ) t
   group by state, city
   having count(state_county_fips) = 1
 ) t
 join (
-  select state_county_fips, entity_name city, state, entity_fips city_fips
+  /*************************************************************************
+    sets of unique state_county_fips/city_fips/state/city from census table
+  **************************************************************************/
+  select 
+    state_county_fips,
+    state_county_fips_coli, 
+    entity_fips city_fips,
+    state, 
+    entity_name city
   from ${TMP_TABLE_CENSUS_MAPPED_FIPS}
-  group by state_county_fips, entity_name, state, entity_fips
+  group by state_county_fips, state_county_fips_coli, entity_fips, state, entity_name
 ) f on f.state = t.state and f.city = t.city
-join ${STG_TABLE_REGIONAL_PURCHASING_POWER} p on p.fips_code = f.state_county_fips;
+join ${STG_TABLE_REGIONAL_PURCHASING_POWER} p on p.fips_code = f.state_county_fips_coli;
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Update Marriott Maintenance" guiX="232" guiY="669" id="UPDATE_MARRIOTT_MAINTENANCE" type="DB_EXECUTE">
