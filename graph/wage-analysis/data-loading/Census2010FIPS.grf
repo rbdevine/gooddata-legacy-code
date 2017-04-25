@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat Apr 22 18:27:32 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.79" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Apr 24 20:42:37 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.80" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CENSUSFIPS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -14,15 +14,15 @@
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/Census2010FIPS.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/census_2010_fips.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Census2010FIPS.xlsx"/>
-<Property fileURL="workspace.prm" id="GraphParameter15"/>
-<Property id="GraphParameter33" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Census2010FIPS.txt"/>
-<Property fileURL="wage-analysis.prm" id="GraphParameter4"/>
+<Property fileURL="wage-analysis.prm" id="GraphParameter22"/>
+<Property fileURL="workspace.prm" id="GraphParameter3"/>
+<Property id="GraphParameter21" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Census2010FIPS.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="324" guiY="16" id="CREATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_CENSUS_FIPS};
-CREATE TABLE IF NOT EXISTS ${TABLE_CENSUS_FIPS} (
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${STG_TABLE_CENSUS_FIPS};
+CREATE TABLE IF NOT EXISTS ${STG_TABLE_CENSUS_FIPS} (
   STATE VARCHAR(2) NOT NULL,
   STATE_FIPS VARCHAR(2) NOT NULL,
   COUNTY_FIPS VARCHAR(3) NOT NULL,
@@ -72,7 +72,7 @@ function integer transform() {
 <Phase number="2">
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="52" guiY="195" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="195" id="POPULATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[COPY ${TABLE_CENSUS_FIPS} (
+<attr name="sqlQuery"><![CDATA[COPY ${STG_TABLE_CENSUS_FIPS} (
     STATE,
     STATE_FIPS,
     COUNTY_FIPS,
@@ -87,9 +87,9 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Phase>
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="325" guiY="273" id="CLEAN_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[UPDATE ${TABLE_CENSUS_FIPS} SET STATE_COUNTY_FIPS = CONCAT(STATE_FIPS,COUNTY_FIPS);
-UPDATE ${TABLE_CENSUS_FIPS} SET ENTITY_NAME = TRIM(ENTITY_NAME);
-UPDATE ${TABLE_CENSUS_FIPS} SET ENTITY_DESCRIPTION = TRIM(ENTITY_DESCRIPTION);]]></attr>
+<attr name="sqlQuery"><![CDATA[UPDATE ${STG_TABLE_CENSUS_FIPS} SET STATE_COUNTY_FIPS = CONCAT(STATE_FIPS,COUNTY_FIPS);
+UPDATE ${STG_TABLE_CENSUS_FIPS} SET ENTITY_NAME = TRIM(ENTITY_NAME);
+UPDATE ${STG_TABLE_CENSUS_FIPS} SET ENTITY_DESCRIPTION = TRIM(ENTITY_DESCRIPTION);]]></attr>
 </Node>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="0" guiY="273" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="141" guiY="273" id="CLEAN_WRITE" type="FILE_DELETE"/>

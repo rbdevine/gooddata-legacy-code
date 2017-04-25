@@ -1,19 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Apr 24 16:41:10 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.176" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Apr 24 20:50:29 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.193" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="STG_TABLE_GOC_SALARY_ADJUSTMENT" value="STG_WAGE_GOC_SALARY_ADJUSTMENT"/>
 <Property id="GraphParameter1" name="STG_TABLE_JOB_LEVEL" value="STG_WAGE_JOB_LEVEL"/>
 <Property id="GraphParameter2" name="STG_TABLE_SALARY_ADJ_BY_YEAR" value="STG_WAGE_SALARY_ADJ_BY_YEAR"/>
 <Property id="GraphParameter3" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="TMP_WAGE_CENSUS_MAPPED_FIPS"/>
-<Property id="GraphParameter4" name="TMP_TABLE_FIPS_MAP" value="TMP_WAGE_FIPS_MAP"/>
-<Property fileURL="wage-analysis.prm" id="GraphParameter5"/>
-<Property fileURL="workspace.prm" id="GraphParameter17"/>
+<Property id="GraphParameter4" name="TMP_TABLE_CITY_NAME_OVERRIDE" value="TMP_WAGE_CITY_NAME_OVERRIDE"/>
+<Property id="GraphParameter5" name="TMP_TABLE_FIPS_MAP" value="TMP_WAGE_FIPS_MAP"/>
+<Property fileURL="workspace.prm" id="GraphParameter6"/>
+<Property fileURL="wage-analysis.prm" id="GraphParameter24"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/Census2010FIPS.grf" guiName="Load Staging Data: Census 2010 FIPS" guiX="1" guiY="6" id="LOAD_STAGING_DATA_CENSUS_2010_FIPS" type="RUN_GRAPH"/>
 <Node enabled="disabled" graphName="${GRAPH_DIR}/RegionalPurchasingPower.grf" guiName="Load Staging Data: Cost of Living Index" guiX="255" guiY="12" id="LOAD_STAGING_DATA_COST_OF_LIVING_INDEX" type="RUN_GRAPH"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: COLI Avgs" guiX="100" guiY="115" id="TABLE_COLI_AVGS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: COLI Avgs" guiX="31" guiY="108" id="TABLE_COLI_AVGS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************************
   ${TABLE_COLI_AVG} 
   average cost os living index for city_fips
@@ -32,7 +33,7 @@ create table ${TABLE_COLI_AVG} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Census Mapped FIPS" guiX="457" guiY="115" id="TEMP_TABLE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Census Mapped FIPS" guiX="184" guiY="108" id="TEMP_TABLE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${TMP_TABLE_CENSUS_MAPPED_FIPS} 
   Convenience table to have state_county_fips code mapped to matching coli data.
@@ -48,7 +49,20 @@ create table ${TMP_TABLE_CENSUS_MAPPED_FIPS} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: FIPS Map" guiX="293" guiY="115" id="TEMP_TABLE_FIPS_MAP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: CIty Name Override" guiX="23" guiY="182" id="TEMP_TABLE_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  ${TMP_TABLE_CITY_NAME_OVERRIDE} 
+*/
+drop table if exists ${TMP_TABLE_CITY_NAME_OVERRIDE};
+create table ${TMP_TABLE_CITY_NAME_OVERRIDE} (
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  CITY_FIPS VARCHAR(5) NOT NULL,
+  STATE VARCHAR(2) NOT NULL,
+  CITY VARCHAR(64) NOT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: FIPS Map" guiX="246" guiY="182" id="TEMP_TABLE_FIPS_MAP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${TMP_TABLE_FIPS_MAP} 
   Virginia had some exceptions for some virginia cities. They seemed to have made
@@ -64,68 +78,29 @@ create table ${TMP_TABLE_FIPS_MAP} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Clean up City FIPS Table" guiX="48" guiY="280" id="CLEAN_UP_CITY_FIPS_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  FIPS data for Virginia was off for some reason, so need to adjust. 
-  Again, this should probably should be in a separate file as it does 
-  not need to be run every time we get new glass door data.
-*/
-update lkp_city_fips
-set 
-  county_fips = '944',
-  state_county_fips = '51944',
-  county_name = 'Roanoke + Salem'
-where city_name = 'ROANOKE' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '933',
-  state_county_fips = '51933',
-  county_name = 'Montgomery + Radford'
-where city_name = 'BLACKSBURG' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '901',
-  state_county_fips = '51901',
-  county_name = 'Albemarle + Charlottesville'
-where city_name = 'CHARLOTTESVILLE' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '911',
-  state_county_fips = '51911',
-  county_name = 'Campbell + Lynchburg'
-where city_name = 'LYNCHBURG' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '929',
-  state_county_fips = '51929',
-  county_name = 'Henry + Martinsville'
-where city_name = 'MARTINSVILLE' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '947',
-  state_county_fips = '51947',
-  county_name = 'Rockingham + Harrisonburg'
-where city_name = 'HARRISONBURG' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '907',
-  state_county_fips = '51907',
-  county_name = 'Augusta, Staunton + Waynesboro'
-where city_name = 'STAUNTON' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '921',
-  state_county_fips = '51921',
-  county_name = 'Frederick + Winchester'
-where city_name = 'WINCHESTER' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '951',
-  state_county_fips = '51951',
-  county_name = 'Spotsylvania + Fredericksburg'
-where city_name = 'DANVILLE' and state_abbreviation = 'VA';]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate City Name Override" guiX="33" guiY="262" id="POPULATE_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('05107','31190','AR','WEST HELENA');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('06109','56870','CA','PHOENIX LAKE');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('08043','11810','CO','CAÑON CITY');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('08037','23300','CO','EDWARDS');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('09015','85810','CT','WILLIMANTIC');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('12017','32400','FL','HOMOSASSA SPRINGS');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('12083','71625','FL','THE VILLAGES');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('12119','71625','FL','THE VILLAGES');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('13059','03440','GA','ATHENS');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('13245','04204','GA','AUGUSTA');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('15003','71550','HI','HONOLULU');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('16001','08830','ID','BOISE');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('21067','46027','KY','LEXINGTON');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('21111','48006','KY','LOUISVILLE');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('22115','26746','LA','FORT POLK NORTH');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('22007','60075','LA','PIERRE PART');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('29169','25264','MO','FORT LEONARD WOOD');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('30093','11397','MT','BUTTE');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('32510','09700','NV','CARSON CITY');
+insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('47037','52006','TN','NASHVILLE');]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Map" guiX="388" guiY="189" id="POPULATE_FIPS_MAP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Map" guiX="255" guiY="262" id="POPULATE_FIPS_MAP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_FIPS_MAP} values ('30077','30023');
 insert into ${TMP_TABLE_FIPS_MAP} values ('51003','51901');
 insert into ${TMP_TABLE_FIPS_MAP} values ('51540','51901');
@@ -185,7 +160,7 @@ insert into ${TMP_TABLE_FIPS_MAP} values ('51735','51958');
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Census Mapped FIPS" guiX="356" guiY="263" id="POPULATE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Census Mapped FIPS" guiX="109" guiY="348" id="POPULATE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_CENSUS_MAPPED_FIPS}
 select
   f.state_county_fips,
@@ -197,19 +172,13 @@ select
   f.state, 
   f.entity_name,
   f.entity_description
-from ${TABLE_CENSUS_FIPS} f
+from ${STG_TABLE_CENSUS_FIPS} f
 left join ${TMP_TABLE_FIPS_MAP} m on m.state_county_fips_census = f.state_county_fips
 ]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Census Mapped FIPS" guiX="305" guiY="517" id="DROP_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_CENSUS_MAPPED_FIPS};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop FIPS Map" guiX="158" guiY="517" id="DROP_FIPS_MAP" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_FIPS_MAP};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate COLI Avgs By City" guiX="363" guiY="341" id="POPULATE_COLI_AVGS_BY_CITY" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate COLI Avgs By City" guiX="116" guiY="426" id="POPULATE_COLI_AVGS_BY_CITY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_COLI_AVG}
@@ -258,7 +227,7 @@ join (
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add COLI Avgs By Unique Non-City/Non-County" guiX="306" guiY="418" id="ADD_COLI_AVGS_BY_UNIQUE_NON_CITY_NON_COUNTY" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add COLI Avgs By Unique Non-City/Non-County" guiX="59" guiY="503" id="ADD_COLI_AVGS_BY_UNIQUE_NON_CITY_NON_COUNTY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_COLI_AVG}
@@ -310,7 +279,7 @@ from (
       ) f on f.state = g.state and f.city = g.city
       where f.state is null
     ) missing
-    join ${TABLE_CENSUS_FIPS} f on f.state = missing.state and f.entity_name = missing.city
+    join ${STG_TABLE_CENSUS_FIPS} f on f.state = missing.state and f.entity_name = missing.city
     where f.entity_description <> 'county'
     group by f.state_county_fips, missing.state, missing.city
   ) t
@@ -333,92 +302,42 @@ join (
 join ${STG_TABLE_REGIONAL_PURCHASING_POWER} p on p.fips_code = f.state_county_fips_coli;
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Update Marriott Maintenance" guiX="232" guiY="669" id="UPDATE_MARRIOTT_MAINTENANCE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  Since Marriott data was included in the original
-  dataset, the franchise jobtitle/goc mappings were
-  not applied. For now, just makikng an exeception
-  for that case (specifically with maintenance titles). 
-  Perhaps in the future we can implement a more general case. 
-*/
-SET LOCALE to LEN_S1;
-update ${SALARY_LOOKUP_TABLENAME} s
-set goc = u.goc
-from ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} u
-where u.jobtitle = s.jobtitle and s.ticker = 'MAR' and u.jobtitle like 'main%';]]></attr>
-</Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Update Job Names" guiX="255" guiY="745" id="UPDATE_JOB_NAMES1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  update ${SALARY_LOOKUP_TABLENAME} to modify goc for various
-  job titles. Basically, what we did was first generate a list
-  of all glassdoor entries that included the word software or
-  assistant. Then Andy S. and Rich D. went through all 4000+ entries 
-  and set appropriate goc for given job title, the idea being we should get
-  more job titles that way. Finally, created a Good Data graph to
-  upload that jobtitle->goc data into the table, LKP_GD_JOBTITLE_OVERRIDE_GOC
-*/
-update ${SALARY_LOOKUP_TABLENAME} s
-set goc = u.goc
-from LKP_GD_JOBTITLE_OVERRIDE_GOC u
-where u.jobtitle = s.jobtitle;]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add City Name Overrides" guiX="130" guiY="577" id="ADD_CITY_NAME_OVERRIDES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+insert into ${TABLE_COLI_AVG}
+/********************************************************************
+  some city/state pairs did not match values in ${STG_TABLE_CENSUS_FIPS}
+*********************************************************************/
+select
+  override.state_county_fips,
+  override.city_fips,
+  override.state,
+  override.city,
+  coli.avg_cost_of_living_index
+from ${TMP_TABLE_CITY_NAME_OVERRIDE} override
+join (
+  select
+    o.state,
+    o.city_fips,
+    cast(round(avg(c.cost_of_living_index),1) as numeric(16,1)) avg_cost_of_living_index
+  from ${TMP_TABLE_CITY_NAME_OVERRIDE} o
+  join ${STG_TABLE_REGIONAL_PURCHASING_POWER} c on c.fips_code = o.state_county_fips
+  group by o.state, o.city_fips
+) coli on coli.state = override.state and coli.city_fips = override.city_fips;]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Update Franchise GOC Special Cases" guiX="212" guiY="821" id="UPDATE_FRANCHISE_GOC_SPECIAL_CASES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  update ${SALARY_LOOKUP_TABLENAME} to change gocs for specific
-  franchises. The idea is to combine certain gocs for certain
-  tickers. (For example, for LBTY, we combined 'general manager'
-  and 'manager' under the goc 'general manager').
-*/
-update ${SALARY_LOOKUP_TABLENAME} s
-set goc = u.new_goc
-from ${FRANCHISE_GOC_EXCEPTIONS_TABLENAME} u
-where u.old_goc = s.goc and u.ticker = s.ticker;]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Census Mapped FIPS" guiX="122" guiY="656" id="DROP_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_CENSUS_MAPPED_FIPS};]]></attr>
 </Node>
-</Phase>
-<Phase number="7">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Apply GOC Salary Multipliers" guiX="234" guiY="899" id="APPLY_GOC_SALARY_MULTIPLIERS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[update ${SALARY_LOOKUP_TABLENAME} s
-  set unadjustedbasesalary = multiplier * unadjustedbasesalary,
-    unadjustedtotalsalary = multiplier * unadjustedtotalsalary,
-    unadjustedbasesalary_cola = multiplier * unadjustedbasesalary_cola,
-    unadjustedtotalsalary_cola = multiplier * unadjustedtotalsalary_cola,
-    unadjustedbasehourly = multiplier * unadjustedbasehourly,
-    unadjustedtotalhourly = multiplier * unadjustedtotalhourly,
-    unadjustedbasehourly_cola = multiplier * unadjustedbasehourly_cola,
-    unadjustedtotalhourly_cola = multiplier * unadjustedtotalhourly_cola
-from ${GOC_SALARY_MULTIPLIERS_TABLENAME} m
-where m.goc = s.goc and m.ticker = s.ticker;]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop City Name Override" guiX="306" guiY="656" id="DROP_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_CITY_NAME_OVERRIDE};]]></attr>
 </Node>
-</Phase>
-<Phase number="8">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Job Levels" guiX="273" guiY="976" id="ADD_JOB_LEVELS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  update ${SALARY_LOOKUP_TABLENAME} to modify goc by level, given years of experience,
-  see above for further explanation.
-*/
-update ${SALARY_LOOKUP_TABLENAME} s
-set goc = l.goc_with_level
-from ${STG_TABLE_JOB_LEVEL} l
-where
-  s.goc = l.goc and (
-    (MIN_YEARS_EXPERIENCE is null and MAX_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER <= MAX_YEARS_EXPERIENCE) or
-    (MIN_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER > MIN_YEARS_EXPERIENCE and MAX_YEARS_EXPERIENCE is null) or
-    (MIN_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER > MIN_YEARS_EXPERIENCE and MAX_YEARS_EXPERIENCE is not null and s.YEARSOFRELEVANTEXPNUMBER <= MAX_YEARS_EXPERIENCE)
-  );
-]]></attr>
-</Node>
-</Phase>
-<Phase number="9">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Update H1B Names" guiX="268" guiY="1051" id="UPDATE_H1B_NAMES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
-
-update ${SALARY_LOOKUP_TABLENAME}
-set goc = 'software engineer h1b'
-where goc = 'software engineer' and data_type_id = 1;]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop FIPS Map" guiX="-19" guiY="656" id="DROP_FIPS_MAP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_FIPS_MAP};]]></attr>
 </Node>
 </Phase>
 </Graph>
