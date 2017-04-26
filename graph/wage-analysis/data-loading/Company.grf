@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Apr 18 14:59:41 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.61" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Apr 26 13:34:49 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.62" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -15,9 +15,9 @@
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/company_error.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Company.xlsx"/>
 <Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
-<Property fileURL="wage-analysis.prm" id="GraphParameter4"/>
-<Property fileURL="workspace.prm" id="GraphParameter5"/>
-<Property id="GraphParameter23" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter35"/>
+<Property fileURL="workspace.prm" id="GraphParameter16"/>
+<Property id="GraphParameter34" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">

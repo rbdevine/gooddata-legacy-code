@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Apr 26 16:50:03 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.89" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="TICKER_COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="DATA_SOURCE" type="string"/>
+<Field name="DATA_SOURCE_COMPANY_ID" type="string"/>
+<Field name="DATA_SOURCE_COMPANY_NAME" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/TickerDataSourceCompany.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/ticker_data_source_company_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/TickerDataSourceCompany.xlsx"/>
+<Property id="GraphParameter3" name="TMP_TABLE" value="TMP_WAGE_DATA_SOURCE_COMPANY"/>
+<Property fileURL="workspace.prm" id="GraphParameter23"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter9"/>
+<Property fileURL="wage.prm" id="GraphParameter4"/>
+<Property id="GraphParameter41" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/TickerDataSourceCompany.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="324" guiY="16" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_TICKER_DATA_SOURCE_COMPANY};
+CREATE TABLE IF NOT EXISTS ${TABLE_TICKER_DATA_SOURCE_COMPANY} (
+  TICKER VARCHAR(16) NOT NULL,
+  DATA_SOURCE_ID INT NOT NULL,
+  DATA_SOURCE_COMPANY_ID VARCHAR(255) NULL,
+  DATA_SOURCE_COMPANY_NAME VARCHAR(255) NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="467" guiY="16" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE};
+CREATE TABLE IF NOT EXISTS ${TMP_TABLE} (
+  TICKER VARCHAR(16) NOT NULL,
+  DATA_SOURCE INT NOT NULL,
+  DATA_SOURCE_COMPANY_ID VARCHAR(255) NULL,
+  DATA_SOURCE_COMPANY_NAME VARCHAR(255) NOT NULL
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="12" guiY="16" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="104" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="98" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="104" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="52" guiY="195" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="315" guiY="195" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TMP_TABLENAME} (
+    TICKER,
+    DATA_SOURCE
+    DATA_SOURCE_COMPANY_ID,
+    DATA_SOURCE_COMPANY_NAME
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="0" guiY="273" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="141" guiY="273" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="273" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+INSERT INTO ${TABLE_TICKER_DATA_SOURCE_COMPANY}
+SELECT
+  t.TICKER,
+  d.DATA_SOURCE_ID,
+  t.DATA_SOURCE_COMPANY_ID,
+  t.DATA_SOURCE_COMPANY_NAME
+FROM ${TMP_TABLE} t
+JOIN ${TABLE_DATA_SOURCE} d on d.DATA_SOURCE = t.DATA_SOURCE;]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="324" guiY="350" id="CLEAN_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLE_TICKER_DATA_SOURCE_COMPANY} SET TICKER = TRIM(TICKER);
+UPDATE ${TABLE_TICKER_DATA_SOURCE_COMPANY} SET DATA_SOURCE_COMPANY_ID = TRIM(DATA_SOURCE_COMPANY_ID);
+UPDATE ${TABLE_TICKER_DATA_SOURCE_COMPANY} SET DATA_SOURCE_COMPANY_NAME = TRIM(DATA_SOURCE_COMPANY_NAME);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="467" guiY="350" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};
+]]></attr>
+</Node>
+</Phase>
+</Graph>
