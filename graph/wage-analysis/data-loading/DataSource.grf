@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Apr 27 00:14:11 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.64" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="COMPANY_NAME" type="string"/>
+<Field name="INDUSTRY" type="string"/>
+<Field name="ALT_COMPANY_NAME" type="string"/>
+<Field name="INCLUDE_IN_LIVING_WAGE" type="string"/>
+<Field name="SUBSIDY_CODE" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/Company.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/company_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Company.xlsx"/>
+<Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
+<Property fileURL="workspace.prm" id="GraphParameter11"/>
+<Property id="GraphParameter29" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter4"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Data Source" guiX="44" guiY="13" id="TABLE_DATA_SOURCE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_WAGE_DATA_SOURCE};
+create table ${TABLE_WAGE_DATA_SOURCE} (
+  DATA_SOURCE_ID INTEGER UNIQUE NOT NULL,
+  DATA_SOURCE VARCHAR(32) NOT NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Data Source" guiX="36" guiY="87" id="POPULATE_DATA_SOURCE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_WAGE_DATA_SOURCE} values(0, 'Glassdoor');
+insert into ${TABLE_WAGE_DATA_SOURCE} values(1, 'EnigmaHB1');
+insert into ${TABLE_WAGE_DATA_SOURCE} values(2, 'Franchise');
+]]></attr>
+</Node>
+</Phase>
+</Graph>

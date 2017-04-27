@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Apr 26 16:50:03 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.89" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Apr 27 00:15:48 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.96" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="TICKER_COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -13,10 +13,10 @@
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/ticker_data_source_company_error.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/TickerDataSourceCompany.xlsx"/>
 <Property id="GraphParameter3" name="TMP_TABLE" value="TMP_WAGE_DATA_SOURCE_COMPANY"/>
-<Property fileURL="workspace.prm" id="GraphParameter23"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter9"/>
-<Property fileURL="wage.prm" id="GraphParameter4"/>
-<Property id="GraphParameter41" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/TickerDataSourceCompany.txt"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter43" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/TickerDataSourceCompany.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter36"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter22"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -24,7 +24,7 @@
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_TICKER_DATA_SOURCE_COMPANY};
 CREATE TABLE IF NOT EXISTS ${TABLE_TICKER_DATA_SOURCE_COMPANY} (
   TICKER VARCHAR(16) NOT NULL,
-  DATA_SOURCE_ID INT NOT NULL,
+  DATA_SOURCE_ID INTEGER NOT NULL,
   DATA_SOURCE_COMPANY_ID VARCHAR(255) NULL,
   DATA_SOURCE_COMPANY_NAME VARCHAR(255) NOT NULL
 );]]></attr>
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS ${TABLE_TICKER_DATA_SOURCE_COMPANY} (
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE};
 CREATE TABLE IF NOT EXISTS ${TMP_TABLE} (
   TICKER VARCHAR(16) NOT NULL,
-  DATA_SOURCE INT NOT NULL,
+  DATA_SOURCE VARCHAR(32) NOT NULL,
   DATA_SOURCE_COMPANY_ID VARCHAR(255) NULL,
   DATA_SOURCE_COMPANY_NAME VARCHAR(255) NOT NULL
 );]]></attr>
@@ -78,9 +78,9 @@ function integer transform() {
 <Phase number="2">
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="52" guiY="195" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="315" guiY="195" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[COPY ${TMP_TABLENAME} (
+<attr name="sqlQuery"><![CDATA[COPY ${TMP_TABLE} (
     TICKER,
-    DATA_SOURCE
+    DATA_SOURCE,
     DATA_SOURCE_COMPANY_ID,
     DATA_SOURCE_COMPANY_NAME
 )
@@ -111,7 +111,7 @@ UPDATE ${TABLE_TICKER_DATA_SOURCE_COMPANY} SET DATA_SOURCE_COMPANY_ID = TRIM(DAT
 UPDATE ${TABLE_TICKER_DATA_SOURCE_COMPANY} SET DATA_SOURCE_COMPANY_NAME = TRIM(DATA_SOURCE_COMPANY_NAME);]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="467" guiY="350" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE};
 ]]></attr>
 </Node>
 </Phase>
