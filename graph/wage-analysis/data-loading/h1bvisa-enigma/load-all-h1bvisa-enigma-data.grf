@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue May 02 16:23:56 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.320" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata3" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" name="enigma_h1b_2014_read" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="lca_case_number" type="string"/>
+<Field name="status" type="string"/>
+<Field name="lca_case_submit" type="string"/>
+<Field name="decision_date" type="string"/>
+<Field name="visa_class" type="string"/>
+<Field name="lca_case_employment_start_date" type="string"/>
+<Field name="lca_case_employment_end_date" type="string"/>
+<Field name="lca_case_employer_name" type="string"/>
+<Field name="lca_case_employer_address" type="string"/>
+<Field name="lca_case_employer_city" type="string"/>
+<Field name="lca_case_employer_state" type="string"/>
+<Field name="lca_case_employer_postal_code" type="string"/>
+<Field name="lca_case_soc_code" type="string"/>
+<Field name="lca_case_soc_name" type="string"/>
+<Field name="lca_case_job_title" type="string"/>
+<Field name="lca_case_wage_rate_from" type="string"/>
+<Field name="lca_case_wage_rate_to" type="string"/>
+<Field name="lca_case_wage_rate_unit" type="string"/>
+<Field name="full_time_pos" type="string"/>
+<Field name="total_workers" type="string"/>
+<Field name="lca_case_workloc1_city" type="string"/>
+<Field name="lca_case_workloc1_state" type="string"/>
+<Field name="pw_1" type="string"/>
+<Field name="pw_unit_1" type="string"/>
+<Field name="pw_source_1" type="string"/>
+<Field name="other_wage_source_1" type="string"/>
+<Field name="yr_source_pub_1" type="string"/>
+<Field name="lca_case_workloc2_city" type="string"/>
+<Field name="lca_case_workloc2_state" type="string"/>
+<Field name="pw_2" type="string"/>
+<Field name="pw_unit_2" type="string"/>
+<Field name="pw_source_2" type="string"/>
+<Field name="other_wage_source_2" type="string"/>
+<Field name="yr_source_pub_2" type="string"/>
+<Field name="lca_case_naics_code" type="string"/>
+<Field eofAsDelimiter="false" name="serialid" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2015-1de8f4426080254cb7e8e66b24fdf21b.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="enigma_h1b_2015_read" name="enigma_h1b_2015_read" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2015-1de8f4426080254cb7e8e66b24fdf21b.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="case_number" type="string"/>
+<Field name="case_status" type="string"/>
+<Field name="case_submitted" type="string"/>
+<Field name="decision_date" type="string"/>
+<Field name="visa_class" type="string"/>
+<Field name="employment_start_date" type="string"/>
+<Field name="employment_end_date" type="string"/>
+<Field name="employer_name" type="string"/>
+<Field name="employer_address1" type="string"/>
+<Field name="employer_address2" type="string"/>
+<Field name="employer_city" type="string"/>
+<Field name="employer_state" type="string"/>
+<Field name="employer_postal_code" type="string"/>
+<Field name="employer_country" type="string"/>
+<Field name="employer_province" nullValue="N/A" type="string"/>
+<Field name="employer_phone" type="string"/>
+<Field name="employer_phone_ext" type="string"/>
+<Field name="agent_attorney_name" type="string"/>
+<Field name="agent_attorney_city" type="string"/>
+<Field name="agent_attorney_state" type="string"/>
+<Field name="job_title" type="string"/>
+<Field name="soc_code" type="string"/>
+<Field name="soc_name" type="string"/>
+<Field name="naic_code" type="string"/>
+<Field name="total_workers" type="string"/>
+<Field name="full_time_position" type="string"/>
+<Field name="prevailing_wage" type="string"/>
+<Field name="pw_unit_of_pay" type="string"/>
+<Field name="pw_wage_level" type="string"/>
+<Field name="pw_source" type="string"/>
+<Field name="pw_wage_source_year" type="string"/>
+<Field name="pw_source_other" type="string"/>
+<Field name="wage_rate_of_pay" type="string"/>
+<Field name="wage_unit_of_pay" type="string"/>
+<Field name="h1b_dependent" type="string"/>
+<Field name="willful_violator" type="string"/>
+<Field name="worksite_city" type="string"/>
+<Field name="worksite_county" type="string"/>
+<Field name="worksite_state" type="string"/>
+<Field name="worksite_postal_code" type="string"/>
+<Field eofAsDelimiter="false" name="serialid" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2016-678dc110773e3d904d73641a47105e72.csv" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="," label="enigma_h1b_2016_read" name="enigma_h1b_2016_read" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2016-678dc110773e3d904d73641a47105e72.csv" previewAttachmentCharset="UTF-8" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="case_number" type="string"/>
+<Field name="case_status" type="string"/>
+<Field name="case_submitted" type="string"/>
+<Field name="decision_date" type="string"/>
+<Field name="visa_class" type="string"/>
+<Field name="employment_start_date" type="string"/>
+<Field name="employment_end_date" type="string"/>
+<Field name="employer_name" type="string"/>
+<Field name="employer_address" type="string"/>
+<Field name="employer_city" type="string"/>
+<Field name="employer_state" type="string"/>
+<Field name="employer_postal_code" type="string"/>
+<Field name="employer_country" type="string"/>
+<Field name="employer_province" nullValue="&quot;N/A&quot;,&quot;N|A&quot;" type="string"/>
+<Field name="employer_phone" type="string"/>
+<Field name="employer_phone_ext" type="string"/>
+<Field name="agent_attorney_name" type="string"/>
+<Field name="agent_attorney_city" type="string"/>
+<Field name="agent_attorney_state" type="string"/>
+<Field name="job_title" type="string"/>
+<Field name="soc_code" type="string"/>
+<Field name="soc_name" type="string"/>
+<Field name="naic_code" type="string"/>
+<Field name="total_workers" type="string"/>
+<Field name="full_time_position" type="string"/>
+<Field name="prevailing_wage" type="string"/>
+<Field name="pw_unit_of_pay" type="string"/>
+<Field name="pw_wage_source" type="string"/>
+<Field name="pw_wage_source_year" type="string"/>
+<Field name="pw_wage_source_other" type="string"/>
+<Field name="wage_rate_of_pay_from" type="string"/>
+<Field name="wage_rate_of_pay_to" type="string"/>
+<Field name="wage_unit_of_pay" type="string"/>
+<Field name="h1b_dependent" type="string"/>
+<Field name="willful_violator" type="string"/>
+<Field name="worksite_city" type="string"/>
+<Field name="worksite_county" type="string"/>
+<Field name="worksite_state" type="string"/>
+<Field name="worksite_postal_code" type="string"/>
+<Field name="original_cert_date" type="string"/>
+<Field name="blank_column" type="string"/>
+<Field eofAsDelimiter="false" name="serialid" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="|" label="enigma_h1b_combined_write" name="enigma_h1b_combined_write" previewAttachmentCharset="UTF-8" quotedStrings="false" recordDelimiter="\n" recordSize="-1" skipSourceRows="1" type="delimited">
+<Field eofAsDelimiter="false" name="case_number" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="case_status" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="case_submitted" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="decision_date" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="visa_class" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employment_start_date" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employment_end_date" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_name" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_address" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_address2" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_city" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_state" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_postal_code" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_country" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_province" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_phone" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_phone_ext" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="agent_attorney_name" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="agent_attorney_city" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="agent_attorney_state" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="job_title" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="soc_code" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="soc_name" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="naic_code" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="total_workers" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="full_time_position" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="prevailing_wage" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="pw_unit_of_pay" nullable="true" shift="0" size="0" type="string"/>
+<Field name="pw_wage_level" type="string"/>
+<Field eofAsDelimiter="false" name="pw_wage_source" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="pw_wage_source_year" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="pw_wage_source_other" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="wage_rate_of_pay_from" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="wage_rate_of_pay_to" nullable="true" shift="0" size="0" type="string"/>
+<Field name="wage_rate_of_pay" type="string"/>
+<Field eofAsDelimiter="false" name="wage_unit_of_pay" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="h1b_dependent" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="willful_violator" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="worksite_city" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="worksite_county" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="worksite_state" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="worksite_postal_code" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="original_cert_date" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="serialid" nullable="true" shift="0" size="0" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="TABLENAME" value="TMP_WAGE_ENIGMAH1BVISA"/>
+<Property fileURL="workspace.prm" id="GraphParameter1"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="64" guiY="25" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};
+CREATE TABLE ${TABLENAME} (
+
+CASE_NUMBER VARCHAR(255),
+CASE_STATUS VARCHAR(255),
+CASE_SUBMITTED VARCHAR(255),
+DECISION_DATE VARCHAR(255),
+VISA_CLASS VARCHAR(255),
+EMPLOYMENT_START_DATE VARCHAR(255),
+EMPLOYMENT_END_DATE VARCHAR(255),
+EMPLOYER_NAME VARCHAR(255),
+EMPLOYER_ADDRESS VARCHAR(255),
+EMPLOYER_ADDRESS2 VARCHAR(255),
+EMPLOYER_CITY VARCHAR(255),
+EMPLOYER_STATE VARCHAR(255),
+EMPLOYER_POSTAL_CODE VARCHAR(255),
+EMPLOYER_COUNTRY VARCHAR(255),
+EMPLOYER_PROVINCE VARCHAR(255),
+EMPLOYER_PHONE VARCHAR(255),
+EMPLOYER_PHONE_EXT VARCHAR(255),
+AGENT_ATTORNEY_NAME VARCHAR(255),
+AGENT_ATTORNEY_CITY VARCHAR(255),
+AGENT_ATTORNEY_STATE VARCHAR(255),
+JOB_TITLE VARCHAR(255),
+SOC_CODE VARCHAR(255),
+SOC_NAME VARCHAR(255),
+NAIC_CODE VARCHAR(255),
+TOTAL_WORKERS VARCHAR(255),
+FULL_TIME_POSITION VARCHAR(255),
+PREVAILING_WAGE VARCHAR(255),
+PW_UNIT_OF_PAY VARCHAR(255),
+PW_WAGE_LEVEL VARCHAR(255),
+PW_WAGE_SOURCE VARCHAR(255),
+PW_WAGE_SOURCE_YEAR VARCHAR(255),
+PW_WAGE_SOURCE_OTHER VARCHAR(255),
+WAGE_RATE_OF_PAY_FROM VARCHAR(255),
+WAGE_RATE_OF_PAY_TO VARCHAR(255),
+WAGE_UNIT_OF_PAY VARCHAR(255),
+WAGE_RATE_OF_PAY VARCHAR(255),
+H1B_DEPENDENT VARCHAR(255),
+WILLFUL_VIOLATOR VARCHAR(255),
+WORKSITE_CITY VARCHAR(255),
+WORKSITE_COUNTY VARCHAR(255),
+WORKSITE_STATE VARCHAR(255),
+WORKSITE_POSTAL_CODE VARCHAR(255),
+ORIGINAL_CERT_DATE VARCHAR(255),
+SERIALID VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/h1bvisa-enigma/h1bvisa-enigma-2012.grf" guiName="HB1Visa Enigma 2012" guiX="50" guiY="99" id="HB1VISA_ENIGMA_2012" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="2">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/h1bvisa-enigma/h1bvisa-enigma-2013.grf" guiName="HB1Visa Enigma 2013" guiX="50" guiY="198" id="HB1VISA_ENIGMA_1" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="3">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/h1bvisa-enigma/h1bvisa-enigma-2014.grf" guiName="HB1Visa Enigma 2014" guiX="50" guiY="298" id="HB1VISA_ENIGMA_2" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="4">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/h1bvisa-enigma/h1bvisa-enigma-2015.grf" guiName="HB1Visa Enigma 2015" guiX="50" guiY="398" id="HB1VISA_ENIGMA_3" type="RUN_GRAPH"/>
+</Phase>
+</Graph>

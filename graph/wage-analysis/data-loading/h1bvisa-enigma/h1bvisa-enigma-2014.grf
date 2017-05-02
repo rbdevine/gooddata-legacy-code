@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue May 02 16:23:27 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.318" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata3" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," label="enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" name="enigma_h1b_2014_read" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
+<Field name="lca_case_number" type="string"/>
+<Field name="status" type="string"/>
+<Field name="lca_case_submit" type="string"/>
+<Field name="decision_date" type="string"/>
+<Field name="visa_class" type="string"/>
+<Field name="lca_case_employment_start_date" type="string"/>
+<Field name="lca_case_employment_end_date" type="string"/>
+<Field name="lca_case_employer_name" type="string"/>
+<Field name="lca_case_employer_address" type="string"/>
+<Field name="lca_case_employer_city" type="string"/>
+<Field name="lca_case_employer_state" type="string"/>
+<Field name="lca_case_employer_postal_code" type="string"/>
+<Field name="lca_case_soc_code" type="string"/>
+<Field name="lca_case_soc_name" type="string"/>
+<Field name="lca_case_job_title" type="string"/>
+<Field name="lca_case_wage_rate_from" type="string"/>
+<Field name="lca_case_wage_rate_to" type="string"/>
+<Field name="lca_case_wage_rate_unit" type="string"/>
+<Field name="full_time_pos" type="string"/>
+<Field name="total_workers" type="string"/>
+<Field name="lca_case_workloc1_city" type="string"/>
+<Field name="lca_case_workloc1_state" type="string"/>
+<Field name="pw_1" type="string"/>
+<Field name="pw_unit_1" type="string"/>
+<Field name="pw_source_1" type="string"/>
+<Field name="other_wage_source_1" type="string"/>
+<Field name="yr_source_pub_1" type="string"/>
+<Field name="lca_case_workloc2_city" type="string"/>
+<Field name="lca_case_workloc2_state" type="string"/>
+<Field name="pw_2" type="string"/>
+<Field name="pw_unit_2" type="string"/>
+<Field name="pw_source_2" type="string"/>
+<Field name="other_wage_source_2" type="string"/>
+<Field name="yr_source_pub_2" type="string"/>
+<Field name="lca_case_naics_code" type="string"/>
+<Field eofAsDelimiter="false" name="serialid" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2" previewAttachmentCharset="UTF-8">
+<Record fieldDelimiter="|" label="enigma_h1b_combined_write" name="enigma_h1b_combined_write" previewAttachmentCharset="UTF-8" quotedStrings="false" recordDelimiter="\n" recordSize="-1" skipSourceRows="1" type="delimited">
+<Field eofAsDelimiter="false" name="case_number" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="case_status" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="case_submitted" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="decision_date" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="visa_class" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employment_start_date" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employment_end_date" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_name" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_address" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_address2" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_city" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_state" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_postal_code" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_country" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_province" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_phone" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="employer_phone_ext" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="agent_attorney_name" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="agent_attorney_city" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="agent_attorney_state" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="job_title" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="soc_code" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="soc_name" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="naic_code" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="total_workers" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="full_time_position" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="prevailing_wage" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="pw_unit_of_pay" nullable="true" shift="0" size="0" type="string"/>
+<Field name="pw_wage_level" type="string"/>
+<Field eofAsDelimiter="false" name="pw_wage_source" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="pw_wage_source_year" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="pw_wage_source_other" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="wage_rate_of_pay_from" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="wage_rate_of_pay_to" nullable="true" shift="0" size="0" type="string"/>
+<Field name="wage_rate_of_pay" type="string"/>
+<Field eofAsDelimiter="false" name="wage_unit_of_pay" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="h1b_dependent" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="willful_violator" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="worksite_city" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="worksite_county" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="worksite_state" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="worksite_postal_code" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="original_cert_date" nullable="true" shift="0" size="0" type="string"/>
+<Field eofAsDelimiter="false" name="serialid" nullable="true" shift="0" size="0" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/h1b-enigma/H1B-enigma-2014.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/enigmah1bvisaerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/H1B-enigma-2014.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="TMP_WAGE_ENIGMAH1BVISA"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisawrite.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="Download H1B Enigma File" guiX="237" guiY="-81" id="DOWNLOAD_H1B_ENIGMA_FILE1" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read Enigma File" guiX="57" guiY="4" id="READ_ENIGMA_FILE" type="SPREADSHEET_READER"/>
+<Node append="false" enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write Data" guiX="417" guiY="4" id="WRITE_3" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="Transform Enigma File" guiX="235" guiY="4" id="_4" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.case_number = $in.0.lca_case_number;
+	$out.0.case_status = $in.0.status;
+	$out.0.case_submitted = $in.0.lca_case_submit;
+	$out.0.decision_date = $in.0.decision_date;
+	$out.0.visa_class = $in.0.visa_class;
+	$out.0.employment_start_date = $in.0.lca_case_employment_start_date;
+	$out.0.employment_end_date = $in.0.lca_case_employment_end_date;
+	$out.0.employer_name = ($in.0.lca_case_employer_name == null) ? $in.0.lca_case_employer_name : replace($in.0.lca_case_employer_name,"[|]",";");
+	$out.0.employer_address = $out.0.employer_address = ($in.0.lca_case_employer_address == null) ? $in.0.lca_case_employer_address : replace($in.0.lca_case_employer_address,"[|]",";");
+	$out.0.employer_city = ($in.0.lca_case_employer_city == null) ? $in.0.lca_case_employer_city : replace($in.0.lca_case_employer_city,"[\\\\]","");
+	$out.0.employer_state = $in.0.lca_case_employer_state;
+	$out.0.employer_postal_code = $in.0.lca_case_employer_postal_code;
+	string title = $in.0.lca_case_job_title;
+	if(title != null) {
+		if(indexOf(title,"|") > 0) {
+			title = replace(title,"[|]",";");
+		}
+		if(indexOf(title,"\\") > 0) {
+			title = replace(title,"[\\\\]","");
+		}
+	}
+	$out.0.job_title = title;
+	//$out.0.job_title = ($in.0.lca_case_job_title == null) ? $in.0.lca_case_job_title : replace($in.0.lca_case_job_title,"[|]",";");
+	$out.0.soc_code = $in.0.lca_case_soc_code;
+	$out.0.soc_name = $in.0.lca_case_soc_name;
+	$out.0.naic_code = $in.0.lca_case_naics_code;
+	$out.0.total_workers = $in.0.total_workers;
+	$out.0.full_time_position = $in.0.full_time_pos;
+	$out.0.prevailing_wage = $in.0.pw_1;
+	$out.0.pw_unit_of_pay = $in.0.pw_unit_1;
+	$out.0.pw_wage_source = $in.0.pw_source_1;
+	$out.0.pw_wage_source_year = $in.0.yr_source_pub_1;
+	$out.0.pw_wage_source_other = ($in.0.other_wage_source_1 == null) ? $in.0.other_wage_source_1 : replace(replace($in.0.other_wage_source_1,"[\\\\]",""),"[|]","-");
+	$out.0.wage_rate_of_pay_from = $in.0.lca_case_wage_rate_from;
+	$out.0.wage_rate_of_pay_to = $in.0.lca_case_wage_rate_to;
+	$out.0.wage_unit_of_pay = $in.0.lca_case_wage_rate_unit;
+	$out.0.worksite_city = 	$out.0.worksite_city = ($in.0.lca_case_workloc1_city == null) ? $in.0.lca_case_workloc1_city : replace($in.0.lca_case_workloc1_city,"[\\\\]","");
+	$out.0.worksite_state = $in.0.lca_case_workloc1_state;
+	$out.0.serialid = $in.0.serialid;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_ENIGMA_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="_4:0"/>
+<Edge fromNode="_4:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_3:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="184" guiY="102" id="CLEAN_4" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="POPULATE TABLE" guiX="329" guiY="102" id="POPULATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+CASE_NUMBER,
+CASE_STATUS,
+CASE_SUBMITTED,
+DECISION_DATE,
+VISA_CLASS,
+EMPLOYMENT_START_DATE,
+EMPLOYMENT_END_DATE,
+EMPLOYER_NAME,
+EMPLOYER_ADDRESS,
+EMPLOYER_ADDRESS2,
+EMPLOYER_CITY,
+EMPLOYER_STATE,
+EMPLOYER_POSTAL_CODE,
+EMPLOYER_COUNTRY,
+EMPLOYER_PROVINCE,
+EMPLOYER_PHONE,
+EMPLOYER_PHONE_EXT,
+AGENT_ATTORNEY_NAME,
+AGENT_ATTORNEY_CITY,
+AGENT_ATTORNEY_STATE,
+JOB_TITLE,
+SOC_CODE,
+SOC_NAME,
+NAIC_CODE,
+TOTAL_WORKERS,
+FULL_TIME_POSITION,
+PREVAILING_WAGE,
+PW_UNIT_OF_PAY,
+PW_WAGE_LEVEL,
+PW_WAGE_SOURCE,
+PW_WAGE_SOURCE_YEAR,
+PW_WAGE_SOURCE_OTHER,
+WAGE_RATE_OF_PAY_FROM,
+WAGE_RATE_OF_PAY_TO,
+WAGE_UNIT_OF_PAY,
+WAGE_RATE_OF_PAY,
+H1B_DEPENDENT,
+WILLFUL_VIOLATOR,
+WORKSITE_CITY,
+WORKSITE_COUNTY,
+WORKSITE_STATE,
+WORKSITE_POSTAL_CODE,
+ORIGINAL_CERT_DATE,
+SERIALID
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="184" guiY="197" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="330" guiY="197" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>

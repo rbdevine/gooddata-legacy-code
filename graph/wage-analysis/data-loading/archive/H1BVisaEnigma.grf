@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Mon May 01 17:02:10 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.286" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue May 02 15:17:30 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.311" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," label="enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" name="enigma_h1b_2014_read" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
@@ -180,24 +180,24 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/enigma/h1b/*.csv"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/h1b-enigma/*.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/enigmah1bvisaerror.txt"/>
-<Property id="GraphParameter25" name="READFILEPATH2012" value="${DATA_TMP_DIR}/H1B-enigma-2012.csv"/>
-<Property id="GraphParameter4" name="READFILEPATH2013" value="${DATA_TMP_DIR}/H1B-enigma-2013.csv"/>
-<Property id="GraphParameter2" name="READFILEPATH2014" value="${DATA_TMP_DIR}/H1B-enigma-2014.csv"/>
-<Property id="GraphParameter3" name="READFILEPATH2015" value="${DATA_TMP_DIR}/H1B-enigma-2015.csv"/>
-<Property id="GraphParameter5" name="TABLENAME" value="STG_ENIGMAH1BVISA"/>
-<Property fileURL="workspace.prm" id="GraphParameter6"/>
-<Property id="GraphParameter24" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisawrite.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH2012" value="${DATA_TMP_DIR}/H1B-enigma-2012.xlsx"/>
+<Property id="GraphParameter3" name="READFILEPATH2013" value="${DATA_TMP_DIR}/H1B-enigma-2013.xlsx"/>
+<Property id="GraphParameter4" name="READFILEPATH2014" value="${DATA_TMP_DIR}/H1B-enigma-2014.xlsx"/>
+<Property id="GraphParameter5" name="READFILEPATH2015" value="${DATA_TMP_DIR}/H1B-enigma-2015.xlsx"/>
+<Property id="GraphParameter6" name="TABLENAME" value="TMP_WAGE_ENIGMAH1BVISA"/>
+<Property fileURL="workspace.prm" id="GraphParameter7"/>
+<Property id="GraphParameter25" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisawrite.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="283" guiY="-93" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="disabled" guiName="Download All Files" guiX="335" guiY="-92" id="DOWNLOAD_ALL_FILES" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${READFILEPATH2012}" guiName="Read 2012" guiX="57" guiY="3" id="READ_3" type="DATA_READER" verbose="true"/>
-<Node append="false" enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write 2012" guiX="418" guiY="3" id="WRITE_2" quotedStrings="false" type="DATA_WRITER"/>
-<Node enabled="enabled" guiName="2012" guiX="235" guiY="3" id="_2" type="REFORMAT">
+<Node enabled="enabled" fileURL="${READFILEPATH2012}" guiName="Read 2012" guiX="57" guiY="4" id="READ_2012" type="SPREADSHEET_READER"/>
+<Node append="false" enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write 2012" guiX="417" guiY="4" id="WRITE_3" quotedStrings="false" type="DATA_WRITER"/>
+<Node enabled="enabled" guiName="2012" guiX="235" guiY="4" id="_4" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -264,56 +264,55 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="READ_3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge4" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="_2:0"/>
-<Edge fromNode="_2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_2:0"/>
+<Edge fromNode="READ_2012:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="_4:0"/>
+<Edge fromNode="_4:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_3:0"/>
 </Phase>
 <Phase number="2">
-<Node baseURL="${READFILEPATH2012}" enabled="enabled" guiName="Clean 2012" guiX="581" guiY="3" id="CLEAN_2" type="FILE_DELETE"/>
-<Node enabled="enabled" fileURL="${READFILEPATH2013}" guiName="Read 2013" guiX="57" guiY="107" id="READ_4" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" fileURL="${READFILEPATH2013}" guiName="Read 2013" guiX="57" guiY="107" id="READ_2013" type="XLS_READER"/>
 <Node append="true" enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Wriite 2013" guiX="418" guiY="107" id="WRIITE_1" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="2013" guiX="235" guiY="107" id="_3" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.case_number = $in.0.case_number;
-	$out.0.case_status = $in.0.case_status;
-	$out.0.case_submitted = $in.0.case_submitted;
+	$out.0.case_number = $in.0.lca_case_number;
+	$out.0.case_status = $in.0.status;
+	$out.0.case_submitted = $in.0.lca_case_submit;
 	$out.0.decision_date = $in.0.decision_date;
 	$out.0.visa_class = $in.0.visa_class;
-	$out.0.employment_start_date = $in.0.employment_start_date;
-	$out.0.employment_end_date = $in.0.employment_end_date;
-	$out.0.employer_name = ($in.0.employer_name == null) ? $in.0.employer_name : replace($in.0.employer_name,"[|]",";");
-	$out.0.employer_address = ($in.0.employer_address1 == null) ? $in.0.employer_address1 : replace($in.0.employer_address1,"[|]",";");
-	$out.0.employer_address2 = ($in.0.employer_address2 == null) ? $in.0.employer_address2 : replace($in.0.employer_address2,"[|]",";");
-	$out.0.employer_city = $in.0.employer_city;
-	$out.0.employer_state = $in.0.employer_state;
-	$out.0.employer_postal_code = $in.0.employer_postal_code;
-	$out.0.employer_country = $in.0.employer_country;
-	$out.0.employer_province = ($in.0.employer_province == null) ? $in.0.employer_province : replace($in.0.employer_province,"[N|A]",";");
-	$out.0.employer_phone = $in.0.employer_phone;
-	$out.0.employer_phone_ext = $in.0.employer_phone_ext;
-	$out.0.agent_attorney_name = $in.0.agent_attorney_name;
-	$out.0.agent_attorney_city = $in.0.agent_attorney_city;
-	$out.0.agent_attorney_state = $in.0.agent_attorney_state;
-	$out.0.job_title = ($in.0.job_title == null) ? $in.0.job_title : replace($in.0.job_title,"[|]",";");
-	$out.0.soc_code = $in.0.soc_code;
-	$out.0.soc_name = $in.0.soc_name;
-	$out.0.naic_code = $in.0.naic_code;
+	$out.0.employment_start_date = $in.0.lca_case_employment_start_date;
+	$out.0.employment_end_date = $in.0.lca_case_employment_end_date;
+	$out.0.employer_name = ($in.0.lca_case_employer_name == null) ? $in.0.lca_case_employer_name : replace($in.0.lca_case_employer_name,"[|]",";");
+	$out.0.employer_address = $out.0.employer_address = ($in.0.lca_case_employer_address == null) ? $in.0.lca_case_employer_address : replace($in.0.lca_case_employer_address,"[|]",";");
+	$out.0.employer_city = ($in.0.lca_case_employer_city == null) ? $in.0.lca_case_employer_city : replace($in.0.lca_case_employer_city,"[\\\\]","");
+	$out.0.employer_state = $in.0.lca_case_employer_state;
+	$out.0.employer_postal_code = $in.0.lca_case_employer_postal_code;
+	string title = $in.0.lca_case_job_title;
+	if(title != null) {
+		if(indexOf(title,"|") > 0) {
+			title = replace(title,"[|]",";");
+		}
+		if(indexOf(title,"\\") > 0) {
+			title = replace(title,"[\\\\]","");
+		}
+	}
+	$out.0.job_title = title;
+	//$out.0.job_title = ($in.0.lca_case_job_title == null) ? $in.0.lca_case_job_title : replace($in.0.lca_case_job_title,"[|]",";");
+	$out.0.soc_code = $in.0.lca_case_soc_code;
+	$out.0.soc_name = $in.0.lca_case_soc_name;
+	$out.0.naic_code = $in.0.lca_case_naics_code;
 	$out.0.total_workers = $in.0.total_workers;
-	$out.0.full_time_position = $in.0.full_time_position;
-	$out.0.prevailing_wage = $in.0.prevailing_wage;
-	$out.0.pw_unit_of_pay = $in.0.pw_unit_of_pay;
-	$out.0.pw_wage_level = $in.0.pw_wage_level;
-	$out.0.pw_wage_source_year = $in.0.pw_wage_source_year;
-	$out.0.wage_rate_of_pay = $in.0.wage_rate_of_pay;
-	$out.0.wage_unit_of_pay = $in.0.wage_unit_of_pay;
-	$out.0.h1b_dependent = $in.0.h1b_dependent;
-	$out.0.willful_violator = $in.0.willful_violator;
-	$out.0.worksite_city = ($in.0.worksite_city == null) ? $in.0.worksite_city : replace($in.0.worksite_city,"[\\\\]","");
-	$out.0.worksite_county = ($in.0.worksite_county == null) ? $in.0.worksite_county : replace($in.0.worksite_county,"[\\\\]","");
-	$out.0.worksite_state = $in.0.worksite_state;
-	$out.0.worksite_postal_code = $in.0.worksite_postal_code;
+	$out.0.full_time_position = $in.0.full_time_pos;
+	$out.0.prevailing_wage = $in.0.pw_1;
+	$out.0.pw_unit_of_pay = $in.0.pw_unit_1;
+	$out.0.pw_wage_source = $in.0.pw_source_1;
+	$out.0.pw_wage_source_year = $in.0.yr_source_pub_1;
+	$out.0.pw_wage_source_other = ($in.0.other_wage_source_1 == null) ? $in.0.other_wage_source_1 : replace(replace($in.0.other_wage_source_1,"[\\\\]",""),"[|]","-");
+	$out.0.wage_rate_of_pay_from = $in.0.lca_case_wage_rate_from;
+	$out.0.wage_rate_of_pay_to = $in.0.lca_case_wage_rate_to;
+	$out.0.wage_unit_of_pay = $in.0.lca_case_wage_rate_unit;
+	$out.0.worksite_city = 	$out.0.worksite_city = ($in.0.lca_case_workloc1_city == null) ? $in.0.lca_case_workloc1_city : replace($in.0.lca_case_workloc1_city,"[\\\\]","");
+	$out.0.worksite_state = $in.0.lca_case_workloc1_state;
 	$out.0.serialid = $in.0.serialid;
 
 	return ALL;
@@ -338,12 +337,11 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="READ_4:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="_3:0"/>
+<Edge fromNode="READ_2013:0" guiBendpoints="" guiRouter="Manhattan" id="Edge7" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="_3:0"/>
 <Edge fromNode="_3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge10" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRIITE_1:0"/>
 </Phase>
 <Phase number="3">
-<Node baseURL="${READFILEPATH2013}" enabled="enabled" guiName="Clean 2013" guiX="581" guiY="113" id="CLEAN_3" type="FILE_DELETE"/>
-<Node enabled="enabled" fileURL="${READFILEPATH2014}" guiName="Read 2014" guiX="57" guiY="210" id="READ_2" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" fileURL="${READFILEPATH2014}" guiName="Read 2014" guiX="57" guiY="210" id="READ_2014" type="XLS_READER"/>
 <Node append="true" enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Write 2014" guiX="418" guiY="210" id="WRITE_1" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="2014" guiX="235" guiY="210" id="_1" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
@@ -412,12 +410,11 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="READ_2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge9" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (output)" toNode="_1:0"/>
+<Edge fromNode="READ_2014:0" guiBendpoints="" guiRouter="Manhattan" id="Edge11" inPort="Port 0 (in)" metadata="Metadata3" outPort="Port 0 (out)" toNode="_1:0"/>
 <Edge fromNode="_1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge8" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_1:0"/>
 </Phase>
 <Phase number="4">
-<Node baseURL="${READFILEPATH2014}" enabled="enabled" guiName="Clean 2014" guiX="581" guiY="216" id="CLEAN_2014" type="FILE_DELETE"/>
-<Node enabled="enabled" fileURL="${READFILEPATH2015}" guiName="Read 2015" guiX="57" guiY="314" id="READ_2015" type="DATA_READER" verbose="true"/>
+<Node enabled="enabled" fileURL="${READPATH2015}" guiName="Read 2015" guiX="57" guiY="314" id="READ_1" type="XLS_READER"/>
 <Node append="true" enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="Wriite 2015" guiX="418" guiY="314" id="WRIITE_2015" quotedStrings="false" type="DATA_WRITER"/>
 <Node enabled="enabled" guiName="2015" guiX="235" guiY="314" id="_2015" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
@@ -486,11 +483,10 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Edge fromNode="READ_2015:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="_2015:0"/>
+<Edge fromNode="READ_1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge12" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="_2015:0"/>
 <Edge fromNode="_2015:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRIITE_2015:0"/>
 </Phase>
 <Phase number="5">
-<Node baseURL="${READFILEPATH2015}" enabled="enabled" guiName="Clean 2015" guiX="581" guiY="320" id="CLEAN_1" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="CREATE TABLE" guiX="235" guiY="419" id="CREATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};
 CREATE TABLE ${TABLENAME} (
@@ -596,6 +592,10 @@ ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
 <Phase number="7">
+<Node baseURL="${READFILEPATH2015}" enabled="enabled" guiName="Clean 2015" guiX="581" guiY="320" id="CLEAN_1" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH2014}" enabled="enabled" guiName="Clean 2014" guiX="581" guiY="216" id="CLEAN_2014" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH2013}" enabled="enabled" guiName="Clean 2013" guiX="581" guiY="113" id="CLEAN_3" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH2012}" enabled="enabled" guiName="Clean 2012" guiX="581" guiY="10" id="CLEAN_4" type="FILE_DELETE"/>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean error" guiX="235" guiY="502" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean write" guiX="418" guiY="502" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
