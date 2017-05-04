@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon May 01 15:20:17 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.176" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 04 17:20:09 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.186" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="STG_TABLE_FRANCHISE_WAGE" value="STG_GLASSDOORFRANCHISEPAY"/>
 <Property id="GraphParameter1" name="STG_TABLE_GLASSDOOR_WAGE" value="STG_GLASSDOORSALARY"/>
 <Property id="GraphParameter2" name="STG_TABLE_GOC_SALARY_ADJUSTMENT" value="${STG_BASE}GOC_SALARY_ADJUSTMENT"/>
 <Property id="GraphParameter3" name="STG_TABLE_JOB_LEVEL" value="${STG_BASE}JOB_LEVEL"/>
-<Property fileURL="wage.prm" id="GraphParameter5"/>
-<Property fileURL="workspace.prm" id="GraphParameter26"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter4"/>
+<Property fileURL="wage.prm" id="GraphParameter4"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter30"/>
+<Property fileURL="workspace.prm" id="GraphParameter12"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -204,7 +204,7 @@ where
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Lookup Table with Enigma Data" guiX="201" guiY="673" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Enigma Data" guiX="201" guiY="673" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
 */
@@ -287,7 +287,7 @@ left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where ((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index) / 2000.0) <= 100.0 and t.wage_year > 2009 and t.wage_year < 2017
 order by m.ticker_trim, t.gd_goc, t.unadjustedbasesalary desc;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="194" guiY="597" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Lookup Table with Franchise Data" guiX="194" guiY="597" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
 */
@@ -297,18 +297,17 @@ insert into ${TABLE_WAGE}
 select
   ds.data_source_id,
   null reviewid,
-  fd.city,
-  fd.state, 
-  tc.ticker,
-  g.goc joc,
-  g.jobtitle,
+  t.city,
+  t.state, 
+  t.ticker,
+  t.goc joc,
+  t.jobtitle,
   cast(round((t.UNADJUSTEDBASESALARY / 2000.0),2) as numeric(36,2)) UNADJUSTEDBASEHOURLY,
-  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / avg_cost_of_living_index) / 2000.0,2) as numeric(36,2)) UNADJUSTEDBASEHOURLY_COLA,
+  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / t.avg_cost_of_living_index) / 2000.0,2) as numeric(36,2)) UNADJUSTEDBASEHOURLY_COLA,
   null,
   null
 from (
   select 
-    just_co_id,
     company,
     ticker,
     indy,
@@ -324,12 +323,12 @@ from (
     isnull(avg_cost_of_living_index,100.0) avg_cost_of_living_index
   from (
       select
-        m.just_co_id,
         g.company,
-        g.ticker,
+        c.ticker,
+        c.industry indy,
         goc,
         g.jobtitle,
-        area city,
+        g.area city,
         g.state,
         unit,
         (case 
@@ -341,17 +340,22 @@ from (
           when regexp_instr(range,'.*k') > 0 then 1000.0
           else 1.0
         end)*max max,
-        avg_cost_of_living_index
+        f.avg_cost_of_living_index
       from ${STG_TABLE_FRANCHISE_WAGE} g
       join ${STG_TABLE_FRANCHISE_JOBTITLE_TO_GOC} j on g.jobtitle = j.jobtitle
-      join ${TABLE_TICKER_DATA_SOURCE_COMPANY} c on c.data_source_company_name = g.company
-      left join ${TABLE_WAGE} w on w.ticker = c.ticker
-      where c.ticker is null
+      join ${TABLE_TICKER_DATA_SOURCE_COMPANY} tc on tc.data_source_company_name = g.company
+      join (
+        select c.ticker, c.industry 
+        from ${TABLE_COMPANY} c
+        left join (select ticker from ${TABLE_WAGE} group by ticker) w on w.ticker = c.ticker
+        where w.ticker is null) c on c.ticker = tc.ticker
+      join ${TABLE_FIPS_DATA} f on f.city = g.area and f.state = g.state
     ) t
 ) t
-join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = 'Franchise'
+join LKP_WAGE_DATA_SOURCE /*${TABLE_WAGE_DATA_SOURCE}*/ ds on ds.data_source = 'Franchise'
 where unadjustedbasesalary >= 10000 and unadjustedbasesalary <= 200000
-order by ticker, goc, unadjustedbasesalary desc;]]></attr>
+order by ticker, goc, unadjustedbasesalary desc;
+]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
