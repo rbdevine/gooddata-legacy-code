@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Tue May 02 16:23:27 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.318" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri May 05 16:27:45 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.320" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," label="enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" name="enigma_h1b_2014_read" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
@@ -92,7 +92,8 @@
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/h1b-enigma/H1B-enigma-2014.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/enigmah1bvisaerror.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/H1B-enigma-2014.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="TMP_WAGE_ENIGMAH1BVISA"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${STG_ENIGMA_H1BVISA}"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisawrite.txt"/>
 <Dictionary/>
