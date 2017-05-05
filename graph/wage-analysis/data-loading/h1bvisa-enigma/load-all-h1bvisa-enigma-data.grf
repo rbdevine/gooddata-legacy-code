@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri May 05 16:27:06 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.321" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri May 05 16:43:48 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.322" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," label="enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" name="enigma_h1b_2014_read" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
@@ -180,9 +180,9 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="TABLENAME" value="${STG_ENIGMA_H1BVISA}"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter19"/>
-<Property fileURL="workspace.prm" id="GraphParameter1"/>
+<Property id="GraphParameter0" name="TABLENAME" value="${STG_TABLE_ENIGMA_H1BVISA}"/>
+<Property fileURL="workspace.prm" id="GraphParameter15"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter1"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
