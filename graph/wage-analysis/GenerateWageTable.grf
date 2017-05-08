@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Fri May 05 22:10:39 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.193" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon May 08 10:30:13 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.196" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="STG_TABLE_FRANCHISE_WAGE" value="STG_GLASSDOORFRANCHISEPAY"/>
 <Property id="GraphParameter1" name="STG_TABLE_GLASSDOOR_WAGE" value="STG_GLASSDOORSALARY"/>
 <Property id="GraphParameter2" name="STG_TABLE_GOC_SALARY_ADJUSTMENT" value="${STG_BASE}GOC_SALARY_ADJUSTMENT"/>
 <Property id="GraphParameter3" name="STG_TABLE_JOB_LEVEL" value="${STG_BASE}JOB_LEVEL"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter30"/>
-<Property fileURL="workspace.prm" id="GraphParameter12"/>
-<Property fileURL="wage.prm" id="GraphParameter4"/>
+<Property fileURL="wage.prm" id="GraphParameter36"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter4"/>
+<Property fileURL="workspace.prm" id="GraphParameter18"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -206,10 +206,10 @@ where
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Enigma Data" guiX="201" guiY="673" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
-  insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
+  insert enigma h1b visa data into ${TABLE_WAGE}
 */
 
-insert into ${SALARY_LOOKUP_TABLENAME}
+insert into ${TABLE_WAGE}
 select 
   ds.data_source_id,
   null reviewid,
@@ -263,8 +263,8 @@ from (
         end state,
         cast(isnull(left(EMPLOYMENT_START_DATE,4),isnull(pw_wage_source_year,'2016')) as int) wage_year
     from ${TABLE_TICKER_DATA_SOURCE_COMPANY} e
-    join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = e.data_source_id
-    join ${TABLE_ENIGMA_H1BVISA} h on h.employer_name = e.data_source_company_name
+    join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source_id = e.data_source_id
+    join ${STG_TABLE_ENIGMA_H1BVISA} h on h.employer_name = e.data_source_company_name
     join ${TABLE_SOC_GOC} sg on sg.enigma_soc_code = h.soc_code
     where
       ds.data_source = 'EnigmaH1BVisa'
