@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Fri May 05 16:11:37 EDT 2017" modifiedBy="richdevine" name="H1BVisaSOCCodeToGDGOC" revision="1.5" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Tue May 09 12:40:20 EDT 2017" modifiedBy="richdevine" name="H1BVisaSOCCodeToGDGOC" revision="1.18" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="SOC_GOC_Map_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -17,17 +17,40 @@
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/socgocmap.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/soc-goc-map.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="LKP_SOC_GOC"/>
+<Property id="GraphParameter24" name="TMP_REJECTS_TABLENAME" value="TMP_SOC_GOC_REJECTS"/>
+<Property id="GraphParameter23" name="TMP_TABLENAME" value="TMP_SOC_GOC"/>
 <Property fileURL="workspace.prm" id="GraphParameter4"/>
 <Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/socgocmap.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="276" guiY="35" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Rejects Table" guiX="692" guiY="7" id="CREATE_REJECTS_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_REJECTS_TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TMP_REJECTS_TABLENAME} (
+  ENIGMA_SOC_CODE VARCHAR(255),
+  GD_GOC VARCHAR(255)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="386" guiY="7" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+  ENIGMA_SOC_CODE VARCHAR(255),
+  GD_GOC VARCHAR(255)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="543" guiY="7" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TMP_TABLENAME} (
+  ENIGMA_SOC_CODE VARCHAR(255),
+  GD_GOC VARCHAR(255)
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="209" guiY="7" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="453" guiY="129" id="CSV_WRITER" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="91" guiY="129" id="READ_FILE" type="SPREADSHEET_READER"/>
-<Node enabled="enabled" guiName="Reformat" guiX="276" guiY="129" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="386" guiY="87" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="24" guiY="87" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="209" guiY="87" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -61,21 +84,9 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="91" guiY="223" id="DROP_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
-</Node>
-</Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="276" guiY="223" id="CREATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-  ENIGMA_SOC_CODE VARCHAR(255),
-  GD_GOC VARCHAR(255)
-);]]></attr>
-</Node>
-</Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="453" guiY="223" id="POPULATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="24" guiY="175" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="377" guiY="175" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TMP_TABLENAME} (
 	ENIGMA_SOC_CODE,
 	GD_GOC
 )
@@ -84,14 +95,42 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}'
 ABORT ON ERROR;]]></attr>
 </Node>
 </Phase>
+<Phase number="3">
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="24" guiY="251" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="209" guiY="251" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Blanks and Nulls" guiX="366" guiY="251" id="REMOVE_BLANKS_AND_NULLS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DELETE FROM ${TMP_TABLENAME} WHERE ISNULL(ENIGMA_SOC_CODE,'') = '' OR ISNULL(GD_GOC,'') = '';]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="386" guiY="328" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLENAME}
+SELECT ENIGMA_SOC_CODE, GD_GOC
+FROM ${TMP_TABLENAME}
+GROUP BY ENIGMA_SOC_CODE, GD_GOC;]]></attr>
+</Node>
+</Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Up Data" guiX="604" guiY="223" id="CLEAN_UP_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DELETE FROM ${TABLENAME} WHERE ENIGMA_SOC_CODE IS NULL OR GD_GOC IS NULL;]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Rejects" guiX="386" guiY="408" id="POPULATE_REJECTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TMP_REJECTS_TABLENAME}
+SELECT t.ENIGMA_SOC_CODE, t.GD_GOC
+FROM ${TABLENAME} t
+JOIN (
+  SELECT ENIGMA_SOC_CODE
+  FROM ${TABLENAME} 
+  GROUP BY ENIGMA_SOC_CODE
+  HAVING COUNT('x') > 1
+) r on r.ENIGMA_SOC_CODE = t.ENIGMA_SOC_CODE;]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="91" guiY="310" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="276" guiY="310" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="453" guiY="310" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Rejects" guiX="385" guiY="491" id="REMOVE_REJECTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DELETE FROM ${TABLENAME} WHERE ENIGMA_SOC_CODE IN (SELECT ENIGMA_SOC_CODE FROM ${TMP_REJECTS_TABLENAME} GROUP BY ENIGMA_SOC_CODE);]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="386" guiY="569" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE ${TMP_TABLENAME};]]></attr>
+</Node>
 </Phase>
 </Graph>
