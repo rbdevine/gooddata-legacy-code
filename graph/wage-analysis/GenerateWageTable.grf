@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon May 08 10:30:13 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.196" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Tue May 09 00:04:29 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.217" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="STG_TABLE_FRANCHISE_WAGE" value="STG_GLASSDOORFRANCHISEPAY"/>
 <Property id="GraphParameter1" name="STG_TABLE_GLASSDOOR_WAGE" value="STG_GLASSDOORSALARY"/>
 <Property id="GraphParameter2" name="STG_TABLE_GOC_SALARY_ADJUSTMENT" value="${STG_BASE}GOC_SALARY_ADJUSTMENT"/>
 <Property id="GraphParameter3" name="STG_TABLE_JOB_LEVEL" value="${STG_BASE}JOB_LEVEL"/>
-<Property fileURL="wage.prm" id="GraphParameter36"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter4"/>
-<Property fileURL="workspace.prm" id="GraphParameter18"/>
+<Property id="GraphParameter4" name="TMP_TABLE_TICKER_COMPANY_NAME" value="${TMP_BASE}_TICKER_COMPANY_NAME"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter5"/>
+<Property fileURL="workspace.prm" id="GraphParameter19"/>
+<Property fileURL="wage.prm" id="GraphParameter37"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -90,7 +91,7 @@ create table ${TABLE_PPI_AVG} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Wage" guiX="273" guiY="206" id="TABLE_WAGE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Wage" guiX="335" guiY="206" id="TABLE_WAGE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_WAGE};
 create table ${TABLE_WAGE} (
   DATA_SOURCE_ID INT NOT NULL,
@@ -105,6 +106,18 @@ create table ${TABLE_WAGE} (
   WAGE_YEAR INT NULL,
   YEARS_OF_EXPERIENCE INT NULL
 );]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Ticker Company Name" guiX="68" guiY="206" id="TEMP_TABLE_TICKER_COMPANY_NAME1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  ${TMP_TABLE_TICKER_COMPANY_NAME} 
+  union of all company tickers and mapped names
+*/
+drop table if exists ${TMP_TABLE_TICKER_COMPANY_NAME};
+create table ${TMP_TABLE_TICKER_COMPANY_NAME} (
+  TICKER VARCHAR(16) NOT NULL,
+  COMPANY_NAME VARCHAR(255) NOT NULL
+);
+]]></attr>
 </Node>
 </Phase>
 <Phase number="1">
@@ -160,6 +173,16 @@ insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2015, 1.020);
 insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2016, 1.000);
 ]]></attr>
 </Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Ticker Company Name" guiX="79" guiY="284" id="POPULATE_TICKER_COMPANY_NAME" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_TICKER_COMPANY_NAME}
+select ticker, company_name
+from ${TABLE_TICKER_COMPANY_NAME} tc
+union all
+select ticker, company_name
+from ${TABLE_COMPANY} c;
+
+]]></attr>
+</Node>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Wage Table with Glassdoor Data" guiX="199" guiY="519" id="POPULATE_WAGE_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
@@ -174,14 +197,14 @@ select distinct
   tc.ticker,
   g.goc,
   g.jobtitle,
-  cast(round(ya.ADJUSTMENT_FACTOR*g.UNADJUSTEDBASESALARY/(${CONST_GLASSDOOR_HOURS_PER_YEAR})) as numeric(36,2)),
-  cast(round(ya.ADJUSTMENT_FACTOR*g.UNADJUSTEDBASESALARY*100/(${CONST_GLASSDOOR_HOURS_PER_YEAR}*isnull(fd.avg_cost_of_living_index,'100'))) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*g.UNADJUSTEDBASESALARY/(${CONST_HOURS_PER_YEAR})) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*g.UNADJUSTEDBASESALARY*100/(${CONST_HOURS_PER_YEAR}*isnull(fd.avg_cost_of_living_index,'100'))) as numeric(36,2)),
   cast(g.YEAROFSALARY as int),
   cast(g.YEARSOFRELEVANTEXPNUMBER as int)
-from ${TABLE_TICKER_DATA_SOURCE_COMPANY} tc
-join ${STG_TABLE_GLASSDOOR_WAGE} g on g.employer = tc.data_source_company_name
+from ${TMP_TABLE_TICKER_COMPANY_NAME} tc
+join ${STG_TABLE_GLASSDOOR_WAGE} g on g.employer = tc.company_name
 join ${STG_TABLE_SALARY_ADJ_BY_YEAR} ya on ya.year = cast(g.YEAROFSALARY as int)
-join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = 'glassdoor'
+join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_GLASSDOOR}
 join ${TABLE_FIPS_DATA} fd on fd.city = g.cityname and fd.state = g.stateabbreviation
 /*
 left join (
@@ -198,9 +221,7 @@ left join (
 where
   g.goc is not null and
   g.jobtitle is not null and
-  g.unadjustedbasesalary is not null and
-  g.YEAROFSALARY > 2009 and
-  g.YEAROFSALARY < 2017;]]></attr>
+  g.unadjustedbasesalary is not null;]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
@@ -216,66 +237,88 @@ select
   t.city,
   t.state, 
   t.ticker,
-  t.goc joc,
+  t.joc,
   t.jobtitle,
-  cast(round((t.UNADJUSTEDBASESALARY / 2000.0),2) as numeric(36,2)) UNADJUSTEDBASEHOURLY,
-  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / t.avg_cost_of_living_index) / 2000.0,2) as numeric(36,2)) UNADJUSTEDBASEHOURLY_COLA,
-  wage_year,
-  null
+  cast(round((t.wage / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) wage,
+  cast(round((t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)) wage_cola,
+  t.wage_year,
+  null years_of_experience
 from (
   select
     ticker,
-    employer_name,
-    gd_goc,
-    job_title,
-    soc_code,
+    joc,
+    jobtitle,
     case 
-      when wage_rate_of_pay = 'Hour' then UNADJUSTEDBASESALARY * 2000.0
-      when wage_rate_of_pay = 'Bi-Weekly' then UNADJUSTEDBASESALARY * 26.0
-      when wage_rate_of_pay = 'Week' then UNADJUSTEDBASESALARY * 52.0
-      when wage_rate_of_pay = 'Month' then UNADJUSTEDBASESALARY * 12.0
-      else UNADJUSTEDBASESALARY
-    end UNADJUSTEDBASESALARY,
-    cast(isnull(f.avg_cost_of_living_index,'100.0') as float) avg_cost_of_living_index, 
-    t.city,
-    t.state,
+      when wage_unit = 'Hour' then wage * ${CONST_HOURS_PER_YEAR}
+      when wage_unit = 'Bi-Weekly' then wage * 26.0
+      when wage_unit = 'Week' then wage * 52.0
+      when wage_unit = 'Month' then wage * 12.0
+      else wage
+    end wage,
+    city,
+    state,
     wage_year
   from (
     select
-        e.ticker,
-        h.employer_name,
-        sg.gd_goc,
-        h.job_title,
-        h.soc_code,
+      c.ticker,
+      sg.gd_goc joc,
+      e.job_title jobtitle,
+      cast(round(
+        case
+          when e.wage_rate_of_pay_from > 0.0 and e.wage_rate_of_pay_to > 0.0
+          then (e.wage_rate_of_pay_from + e.wage_rate_of_pay_to)/2.0
+          when e.wage_rate_of_pay_from > 0.0
+          then e.wage_rate_of_pay_from
+          else e.wage_rate_of_pay_to
+        end
+      ,2) as numeric(16,2)) wage,
+      e.wage_rate_of_pay wage_unit,
+      case
+        when e.worksite_city is null or e.worksite_state is null then employer_city
+        else e.worksite_city
+      end city,
+      case
+        when e.worksite_city is null or e.worksite_state is null then employer_state
+        else e.worksite_state
+      end state,
+      cast(isnull(concat('20',right(e.employment_start_date,2)),isnull(e.pw_wage_source_year,cast(EXTRACT(YEAR FROM CURRENT_DATE) as varchar(4)))) as int) wage_year
+    from (
+      select
+        employer_name,
+        soc_code,
+        job_title,
         wage_rate_of_pay,
+        worksite_city,
+        employer_city,
+        worksite_state,
+        employer_state,
+        pw_wage_source_year,
+        employment_start_date,
         case 
-          when (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) and (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0) then (wage_rate_of_pay_from + wage_rate_of_pay_to)/2
-          when (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) then cast(wage_rate_of_pay_from as numeric(36,2))
-          else cast(wage_rate_of_pay_to as numeric(36,2)) 
-        end UNADJUSTEDBASESALARY,
-        case
-          when h.worksite_city is null or h.worksite_state is null then h.employer_city
-          else h.worksite_city
-        end city,
-        case
-          when h.worksite_city is null or h.worksite_state is null then h.employer_state
-          else h.worksite_state
-        end state,
-        cast(isnull(left(EMPLOYMENT_START_DATE,4),isnull(pw_wage_source_year,'2016')) as int) wage_year
-    from ${TABLE_TICKER_DATA_SOURCE_COMPANY} e
-    join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source_id = e.data_source_id
-    join ${STG_TABLE_ENIGMA_H1BVISA} h on h.employer_name = e.data_source_company_name
-    join ${TABLE_SOC_GOC} sg on sg.enigma_soc_code = h.soc_code
+          when wage_rate_of_pay_from is null or not regexp_like(wage_rate_of_pay_from,'^[0-9.]+$') then 0.0
+          else cast(wage_rate_of_pay_from as float)
+        end wage_rate_of_pay_from,
+        case 
+          when wage_rate_of_pay_to is null or not regexp_like(wage_rate_of_pay_to,'^[0-9.]+$') then 0.0
+          else cast(wage_rate_of_pay_to as float)
+        end wage_rate_of_pay_to
+      from ${STG_TABLE_ENIGMA_H1BVISA}
+    ) e
+    join ${TMP_TABLE_TICKER_COMPANY_NAME} c on c.company_name = e.employer_name
+    join ${TABLE_SOC_GOC} sg on sg.enigma_soc_code = e.soc_code
     where
-      ds.data_source = 'EnigmaH1BVisa'
-      (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) or 
-      (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0)
+      (wage_rate_of_pay_from> 0.0 or wage_rate_of_pay_to > 0.0) and ( 
+        (not (wage_rate_of_pay_from > 0.0 and wage_rate_of_pay_to > 0.0)) or 
+        (wage_rate_of_pay_to >= wage_rate_of_pay_from)
+      )
   ) t
-  join ${TABLE_FIPS_DATA} f on f.city = t.city and f.state = t.state
 ) t
-join ${TABLE_COMPANY} c on c.ticker = t.ticker
-where ((t.UNADJUSTEDBASESALARY * 100.0 / t.avg_cost_of_living_index) / 2000.0) <= 100.0 and t.wage_year > 2009 and t.wage_year < 2018
-order by c.ticker, t.gd_goc, t.unadjustedbasesalary desc;]]></attr>
+join ${TABLE_FIPS_DATA} f on f.city = t.city and f.state = t.state
+join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_ENIGMAH1B}
+join ${STG_TABLE_SALARY_ADJ_BY_YEAR} adj on adj.year = t.wage_year
+where
+  ((t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR}) <= ${CONST_ENIGMA_H1BVISA_MAX_HOURLY_WAGE}
+order by t.ticker, t.joc, t.wage desc;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Lookup Table with Franchise Data" guiX="194" guiY="597" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
@@ -292,8 +335,8 @@ select
   t.ticker,
   t.goc joc,
   t.jobtitle,
-  cast(round((t.UNADJUSTEDBASESALARY / 2000.0),2) as numeric(36,2)) UNADJUSTEDBASEHOURLY,
-  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / t.avg_cost_of_living_index) / 2000.0,2) as numeric(36,2)) UNADJUSTEDBASEHOURLY_COLA,
+  cast(round((t.UNADJUSTEDBASESALARY / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) UNADJUSTEDBASEHOURLY,
+  cast(round((t.UNADJUSTEDBASESALARY * 100.0 / t.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)) UNADJUSTEDBASEHOURLY_COLA,
   null,
   null
 from (
@@ -304,7 +347,7 @@ from (
     goc,
     jobtitle,
     (case
-      when unit = 'hourly' then 2000.0 
+      when unit = 'hourly' then ${CONST_HOURS_PER_YEAR} 
       when unit = 'monthly' then 12.0
       else 1.0
     end) * ((min+max)/2) unadjustedbasesalary,
@@ -333,7 +376,7 @@ from (
         f.avg_cost_of_living_index
       from ${STG_TABLE_FRANCHISE_WAGE} g
       join ${STG_TABLE_FRANCHISE_JOBTITLE_TO_GOC} j on g.jobtitle = j.jobtitle
-      join ${TABLE_TICKER_DATA_SOURCE_COMPANY} tc on tc.data_source_company_name = g.company
+      join ${TMP_TABLE_TICKER_COMPANY_NAME} tc on tc.company_name = g.company
       join (
         select c.ticker, c.industry 
         from ${TABLE_COMPANY} c
@@ -342,8 +385,8 @@ from (
       join ${TABLE_FIPS_DATA} f on f.city = g.area and f.state = g.state
     ) t
 ) t
-join LKP_WAGE_DATA_SOURCE /*${TABLE_WAGE_DATA_SOURCE}*/ ds on ds.data_source = 'Franchise'
-where unadjustedbasesalary >= 10000 and unadjustedbasesalary <= 200000
+join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_FRANCHISE}
+where unadjustedbasesalary >= ${CONST_FRANCHISE_MIN_YEARLY_SALARY} and unadjustedbasesalary <= ${CONST_FRANCHISE_MAX_YEARLY_SALARY}
 order by ticker, goc, unadjustedbasesalary desc;
 ]]></attr>
 </Node>
@@ -490,6 +533,9 @@ where
 </Node>
 </Phase>
 <Phase number="9">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Ticker Company Name" guiX="430" guiY="1209" id="DROP_TEMP_TICKER_COMPANY_NAME" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE_TICKER_COMPANY_NAME}]]></attr>
+</Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Update H1B Names" guiX="268" guiY="1209" id="UPDATE_H1B_NAMES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 

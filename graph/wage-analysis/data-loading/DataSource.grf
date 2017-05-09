@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri May 05 17:54:36 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.65" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon May 08 21:23:04 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.68" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -15,9 +15,9 @@
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/company_error.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Company.xlsx"/>
 <Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
-<Property fileURL="wage.prm" id="GraphParameter23"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Property fileURL="workspace.prm" id="GraphParameter17"/>
+<Property id="GraphParameter35" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter4"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -31,9 +31,9 @@ create table ${TABLE_WAGE_DATA_SOURCE} (
 </Phase>
 <Phase number="1">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Data Source" guiX="36" guiY="87" id="POPULATE_DATA_SOURCE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_WAGE_DATA_SOURCE} values(0, 'Glassdoor');
-insert into ${TABLE_WAGE_DATA_SOURCE} values(1, 'EnigmaH1BVisa');
-insert into ${TABLE_WAGE_DATA_SOURCE} values(2, 'Franchise');
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_WAGE_DATA_SOURCE} values(0, ${CONST_DATA_SOURCE_NAME_GLASSDOOR});
+insert into ${TABLE_WAGE_DATA_SOURCE} values(1, ${CONST_DATA_SOURCE_NAME_ENIGMAH1B});
+insert into ${TABLE_WAGE_DATA_SOURCE} values(2, ${CONST_DATA_SOURCE_NAME_FRANCHISE});
 ]]></attr>
 </Node>
 </Phase>
