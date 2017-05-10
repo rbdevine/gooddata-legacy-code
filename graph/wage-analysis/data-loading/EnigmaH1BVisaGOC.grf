@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Wed May 10 00:07:17 EDT 2017" modifiedBy="hankmobley" name="H1BVisaSOCCodeToGDGOC" revision="1.40" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="ENIGMAH1BVISA_GOC" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="ENIGMA_SOC_CODE" type="string"/>
+<Field name="ENIGMA_SOC_NAME" type="string"/>
+<Field name="ENIGMA_JOB_TITLE" type="string"/>
+<Field name="GD_GOC" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/enigma-h1bvisa-goc.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/enigmah1bvisagoc.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/enigma-h1bvisa-goc.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${STG_ENIGMA_H1BVISA_GOC}"/>
+<Property id="GraphParameter4" name="TMP_REJECTS_TABLENAME" value="TMP_ENIGMAH1BVISA_GOC_REJECTS"/>
+<Property id="GraphParameter5" name="TMP_TABLENAME" value="TMP_SOC_GOC"/>
+<Property fileURL="wage.prm" id="GraphParameter25"/>
+<Property fileURL="workspace.prm" id="GraphParameter6"/>
+<Property id="GraphParameter24" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisagoc.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter43"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Rejects Table" guiX="692" guiY="7" id="CREATE_REJECTS_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_REJECTS_TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TMP_REJECTS_TABLENAME} (
+  ENIGMA_SOC_CODE VARCHAR(7),
+  ENIGMA_SOC_NAME VARCHAR(255),
+  ENIGMA_JOB_TITLE VARCHAR(255),
+  GD_GOC VARCHAR(255)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="386" guiY="7" id="CREATE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+  ENIGMA_SOC_CODE VARCHAR(7),
+  ENIGMA_SOC_NAME VARCHAR(255),
+  ENIGMA_JOB_TITLE VARCHAR(255),
+  GD_GOC VARCHAR(255)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="543" guiY="7" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TMP_TABLENAME} (
+  ENIGMA_SOC_CODE VARCHAR(7),
+  ENIGMA_SOC_NAME VARCHAR(255),
+  ENIGMA_JOB_TITLE VARCHAR(255),
+  GD_GOC VARCHAR(255)
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="209" guiY="7" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="386" guiY="87" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="24" guiY="87" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="209" guiY="87" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="24" guiY="175" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="377" guiY="175" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TMP_TABLENAME} (
+	ENIGMA_SOC_CODE,
+    ENIGMA_SOC_NAME,
+    ENIGMA_JOB_TITLE,
+	GD_GOC
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}'
+ABORT ON ERROR;]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="24" guiY="251" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="209" guiY="251" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Blanks and Nulls" guiX="366" guiY="251" id="REMOVE_BLANKS_AND_NULLS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DELETE FROM ${TMP_TABLENAME} 
+WHERE 
+  ISNULL(ENIGMA_SOC_CODE,'') = ''
+  OR ISNULL(ENIGMA_SOC_NAME, '') = ''
+  OR ISNULL(ENIGMA_JOB_TITLE, '') = '' 
+  OR ISNULL(GD_GOC,'') = '';]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Invalid SOCs" guiX="376" guiY="328" id="REMOVE_INVALID_SOCS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DELETE FROM ${TMP_TABLENAME} 
+WHERE not regexp_like(enigma_soc_code,'^[0-9][0-9]\-[0-9][0-9][0-9][0-9]$');]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Rejects" guiX="385" guiY="405" id="POPULATE_REJECTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TMP_REJECTS_TABLENAME}
+SELECT t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.GD_GOC
+FROM ${TMP_TABLENAME} t
+JOIN (
+  SELECT ENIGMA_SOC_CODE, ENIGMA_SOC_NAME, ENIGMA_JOB_TITLE
+  FROM ${TMP_TABLENAME} 
+  GROUP BY ENIGMA_SOC_CODE, ENIGMA_SOC_NAME, ENIGMA_JOB_TITLE
+  HAVING COUNT('x') > 1
+) r on 
+  r.ENIGMA_SOC_CODE = t.ENIGMA_SOC_CODE 
+  and r.ENIGMA_SOC_NAME = t.ENIGMA_SOC_NAME
+  and r.ENIGMA_JOB_TITLE = t.ENIGMA_JOB_TITLE;]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="386" guiY="488" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLENAME}
+SELECT t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.GD_GOC
+FROM ${TMP_TABLENAME} t
+LEFT JOIN ${TMP_REJECTS_TABLENAME} r on 
+  r.enigma_soc_code = t.enigma_soc_code
+  and r.enigma_soc_name = t.enigma_soc_name
+  and r.enigma_job_title = t.enigma_job_title
+where r.enigma_soc_code is null
+GROUP BY t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.GD_GOC;]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Rejects" guiX="385" guiY="572" id="REMOVE_REJECTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DELETE FROM ${TABLENAME}
+WHERE EXISTS (
+  SELECT 1
+  FROM ${TMP_REJECTS_TABLENAME} r
+  WHERE 
+    r.ENIGMA_SOC_CODE = ENIGMA_SOC_CODE
+    and r.ENIGMA_SOC_NAME = ENIGMA_SOC_CODE
+    and r.ENIGMA_JOB_TITLE = ENIGMA_JOB_TITLE
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="386" guiY="650" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE ${TMP_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>
