@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 11 23:03:36 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.251" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Fri May 12 10:32:21 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.253" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_FIPS_DATA_VALID_COLI" value="${TMP_BASE}_FIPS_DATA_VALID_COLI"/>
 <Property id="GraphParameter1" name="TMP_TABLE_TICKER_COMPANY_NAME" value="${TMP_BASE}_TICKER_COMPANY_NAME"/>
 <Property fileURL="wage.prm" id="GraphParameter2"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter38"/>
-<Property fileURL="workspace.prm" id="GraphParameter20"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter20"/>
+<Property fileURL="workspace.prm" id="GraphParameter35"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -247,6 +247,145 @@ where
 </Node>
 </Phase>
 <Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="194" guiY="597" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
+*/
+SET LOCALE to LEN_S1;
+
+insert into ${TABLE_WAGE}
+select
+  ds.data_source_id,
+  null reviewid,
+  t.city,
+  t.state, 
+  t.ticker,
+  t.goc joc,
+  t.jobtitle,
+  cast(round((t.wage / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)),
+  cast(round((t.wage * 100.0 / t.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)),
+  null,
+  null
+from (
+  select 
+    company,
+    ticker,
+    indy,
+    goc,
+    jobtitle,
+    (case
+      when unit = 'hourly' then ${CONST_HOURS_PER_YEAR} 
+      when unit = 'monthly' then 12.0
+      else 1.0
+    end) * ((min+max)/2) wage,
+    city,
+    state, 
+    isnull(avg_cost_of_living_index,100.0) avg_cost_of_living_index
+  from (
+      select
+        g.company,
+        c.ticker,
+        c.industry indy,
+        goc,
+        g.jobtitle,
+        g.area city,
+        g.state,
+        unit,
+        (case 
+          when regexp_instr(range,'.*k.*k') > 0 then 1000.0
+          else 1
+        end)*min min,
+        (case
+          when regexp_instr(range,'.*k.*k') > 0 then 1000.0
+          when regexp_instr(range,'.*k') > 0 then 1000.0
+          else 1.0
+        end)*max max,
+        f.avg_cost_of_living_index
+      from ${STG_TABLE_FRANCHISE_WAGE} g
+      join ${STG_TABLE_FRANCHISE_JOBTITLE_TO_GOC} j on g.jobtitle = j.jobtitle
+      join ${TMP_TABLE_TICKER_COMPANY_NAME} tc on tc.company_name = g.company
+      join (
+        select c.ticker, c.industry 
+        from ${TABLE_COMPANY} c
+        left join (
+          select ticker 
+          from ${TABLE_WAGE} w 
+          join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id 
+          where data_source = ${CONST_DATA_SOURCE_NAME_GLASSDOOR}
+          group by ticker
+        ) w on w.ticker = c.ticker
+        where w.ticker is null) c on c.ticker = tc.ticker
+      join ${TMP_TABLE_FIPS_DATA_VALID_COLI} f on f.city = g.area and f.state = g.state
+    ) t
+) t
+join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_FRANCHISE}
+where wage >= ${CONST_FRANCHISE_MIN_YEARLY_SALARY} and wage <= ${CONST_FRANCHISE_MAX_YEARLY_SALARY}
+order by ticker, goc, wage desc;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Clean up City FIPS Table" guiX="68" guiY="749" id="CLEAN_UP_CITY_FIPS_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  FIPS data for Virginia was off for some reason, so need to adjust. 
+  Again, this should probably should be in a separate file as it does 
+  not need to be run every time we get new glass door data.
+*/
+update lkp_city_fips
+set 
+  county_fips = '944',
+  state_county_fips = '51944',
+  county_name = 'Roanoke + Salem'
+where city_name = 'ROANOKE' and state_abbreviation = 'VA';
+update lkp_city_fips
+set 
+  county_fips = '933',
+  state_county_fips = '51933',
+  county_name = 'Montgomery + Radford'
+where city_name = 'BLACKSBURG' and state_abbreviation = 'VA';
+update lkp_city_fips
+set 
+  county_fips = '901',
+  state_county_fips = '51901',
+  county_name = 'Albemarle + Charlottesville'
+where city_name = 'CHARLOTTESVILLE' and state_abbreviation = 'VA';
+update lkp_city_fips
+set 
+  county_fips = '911',
+  state_county_fips = '51911',
+  county_name = 'Campbell + Lynchburg'
+where city_name = 'LYNCHBURG' and state_abbreviation = 'VA';
+update lkp_city_fips
+set 
+  county_fips = '929',
+  state_county_fips = '51929',
+  county_name = 'Henry + Martinsville'
+where city_name = 'MARTINSVILLE' and state_abbreviation = 'VA';
+update lkp_city_fips
+set 
+  county_fips = '947',
+  state_county_fips = '51947',
+  county_name = 'Rockingham + Harrisonburg'
+where city_name = 'HARRISONBURG' and state_abbreviation = 'VA';
+update lkp_city_fips
+set 
+  county_fips = '907',
+  state_county_fips = '51907',
+  county_name = 'Augusta, Staunton + Waynesboro'
+where city_name = 'STAUNTON' and state_abbreviation = 'VA';
+update lkp_city_fips
+set 
+  county_fips = '921',
+  state_county_fips = '51921',
+  county_name = 'Frederick + Winchester'
+where city_name = 'WINCHESTER' and state_abbreviation = 'VA';
+update lkp_city_fips
+set 
+  county_fips = '951',
+  state_county_fips = '51951',
+  county_name = 'Spotsylvania + Fredericksburg'
+where city_name = 'DANVILLE' and state_abbreviation = 'VA';]]></attr>
+</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Enigma Data" guiX="201" guiY="673" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${TABLE_WAGE}
@@ -349,139 +488,6 @@ join ${STG_TABLE_SALARY_ADJ_BY_YEAR} adj on adj.year = t.wage_year
 where
   ((t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR}) <= ${CONST_ENIGMA_H1BVISA_MAX_HOURLY_WAGE}
 order by t.ticker, t.joc, t.wage desc;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="194" guiY="597" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
-*/
-SET LOCALE to LEN_S1;
-
-insert into ${TABLE_WAGE}
-select
-  ds.data_source_id,
-  null reviewid,
-  t.city,
-  t.state, 
-  t.ticker,
-  t.goc joc,
-  t.jobtitle,
-  cast(round((t.wage / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)),
-  cast(round((t.wage * 100.0 / t.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)),
-  null,
-  null
-from (
-  select 
-    company,
-    ticker,
-    indy,
-    goc,
-    jobtitle,
-    (case
-      when unit = 'hourly' then ${CONST_HOURS_PER_YEAR} 
-      when unit = 'monthly' then 12.0
-      else 1.0
-    end) * ((min+max)/2) wage,
-    city,
-    state, 
-    isnull(avg_cost_of_living_index,100.0) avg_cost_of_living_index
-  from (
-      select
-        g.company,
-        c.ticker,
-        c.industry indy,
-        goc,
-        g.jobtitle,
-        g.area city,
-        g.state,
-        unit,
-        (case 
-          when regexp_instr(range,'.*k.*k') > 0 then 1000.0
-          else 1
-        end)*min min,
-        (case
-          when regexp_instr(range,'.*k.*k') > 0 then 1000.0
-          when regexp_instr(range,'.*k') > 0 then 1000.0
-          else 1.0
-        end)*max max,
-        f.avg_cost_of_living_index
-      from ${STG_TABLE_FRANCHISE_WAGE} g
-      join ${STG_TABLE_FRANCHISE_JOBTITLE_TO_GOC} j on g.jobtitle = j.jobtitle
-      join ${TMP_TABLE_TICKER_COMPANY_NAME} tc on tc.company_name = g.company
-      join (
-        select c.ticker, c.industry 
-        from ${TABLE_COMPANY} c
-        left join (select ticker from ${TABLE_WAGE} group by ticker) w on w.ticker = c.ticker
-        where w.ticker is null) c on c.ticker = tc.ticker
-      join ${TMP_TABLE_FIPS_DATA_VALID_COLI} f on f.city = g.area and f.state = g.state
-    ) t
-) t
-join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_FRANCHISE}
-where wage >= ${CONST_FRANCHISE_MIN_YEARLY_SALARY} and wage <= ${CONST_FRANCHISE_MAX_YEARLY_SALARY}
-order by ticker, goc, wage desc;
-]]></attr>
-</Node>
-</Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Clean up City FIPS Table" guiX="68" guiY="749" id="CLEAN_UP_CITY_FIPS_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  FIPS data for Virginia was off for some reason, so need to adjust. 
-  Again, this should probably should be in a separate file as it does 
-  not need to be run every time we get new glass door data.
-*/
-update lkp_city_fips
-set 
-  county_fips = '944',
-  state_county_fips = '51944',
-  county_name = 'Roanoke + Salem'
-where city_name = 'ROANOKE' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '933',
-  state_county_fips = '51933',
-  county_name = 'Montgomery + Radford'
-where city_name = 'BLACKSBURG' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '901',
-  state_county_fips = '51901',
-  county_name = 'Albemarle + Charlottesville'
-where city_name = 'CHARLOTTESVILLE' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '911',
-  state_county_fips = '51911',
-  county_name = 'Campbell + Lynchburg'
-where city_name = 'LYNCHBURG' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '929',
-  state_county_fips = '51929',
-  county_name = 'Henry + Martinsville'
-where city_name = 'MARTINSVILLE' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '947',
-  state_county_fips = '51947',
-  county_name = 'Rockingham + Harrisonburg'
-where city_name = 'HARRISONBURG' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '907',
-  state_county_fips = '51907',
-  county_name = 'Augusta, Staunton + Waynesboro'
-where city_name = 'STAUNTON' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '921',
-  state_county_fips = '51921',
-  county_name = 'Frederick + Winchester'
-where city_name = 'WINCHESTER' and state_abbreviation = 'VA';
-update lkp_city_fips
-set 
-  county_fips = '951',
-  state_county_fips = '51951',
-  county_name = 'Spotsylvania + Fredericksburg'
-where city_name = 'DANVILLE' and state_abbreviation = 'VA';]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Update Marriott Maintenance" guiX="232" guiY="826" id="UPDATE_MARRIOTT_MAINTENANCE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
