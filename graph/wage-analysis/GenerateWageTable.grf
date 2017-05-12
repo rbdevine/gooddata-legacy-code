@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 11 15:32:32 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.244" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 11 23:03:36 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.251" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_FIPS_DATA_VALID_COLI" value="${TMP_BASE}_FIPS_DATA_VALID_COLI"/>
 <Property id="GraphParameter1" name="TMP_TABLE_TICKER_COMPANY_NAME" value="${TMP_BASE}_TICKER_COMPANY_NAME"/>
 <Property fileURL="wage.prm" id="GraphParameter2"/>
-<Property fileURL="workspace.prm" id="GraphParameter20"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter38"/>
+<Property fileURL="workspace.prm" id="GraphParameter20"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -197,7 +197,8 @@ group by f.state_county_fips;
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Salary Yr Adj" guiX="192" guiY="442" id="POPULATE_SALARY_YR_ADJ" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2011, 1.127);
+<attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2010, 1.150);
+insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2011, 1.127);
 insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2012, 1.105);
 insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2013, 1.083);
 insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2014, 1.063);
@@ -218,7 +219,7 @@ from ${TABLE_COMPANY} c;
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Wage Table with Glassdoor Data" guiX="199" guiY="519" id="POPULATE_WAGE_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Wage Table with Glassdoor Data" guiX="199" guiY="519" id="POPULATE_WAGE_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_WAGE}
@@ -238,12 +239,7 @@ from ${TMP_TABLE_TICKER_COMPANY_NAME} tc
 join ${STG_TABLE_GLASSDOOR_WAGE} g on g.employer = tc.company_name
 join ${STG_TABLE_SALARY_ADJ_BY_YEAR} ya on ya.year = cast(g.YEAROFSALARY as int)
 join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_GLASSDOOR}
-join (
-  select state, city, max(avg_cost_of_living_index) avg_cost_of_living_index
-  from LKP_CITY_FIPS_AVG
-  group by state, city
-) fd on fd.city = g.cityname and fd.state = g.stateabbreviation
-/*join ${TMP_TABLE_FIPS_DATA_VALID_COLI} fd on fd.city = g.cityname and fd.state = g.stateabbreviation*/
+join ${TMP_TABLE_FIPS_DATA_VALID_COLI} fd on fd.city = g.cityname and fd.state = g.stateabbreviation
 where
   g.goc is not null and
   g.jobtitle is not null and
@@ -251,7 +247,7 @@ where
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Lookup Table with Enigma Data" guiX="201" guiY="673" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Enigma Data" guiX="201" guiY="673" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${TABLE_WAGE}
 */
@@ -354,7 +350,7 @@ where
   ((t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR}) <= ${CONST_ENIGMA_H1BVISA_MAX_HOURLY_WAGE}
 order by t.ticker, t.joc, t.wage desc;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Lookup Table with Franchise Data" guiX="194" guiY="597" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="194" guiY="597" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
 */
