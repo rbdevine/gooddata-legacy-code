@@ -1,24 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Fri May 12 20:51:14 EDT 2017" modifiedBy="hankmobley" name="H1BVisaSOCCodeToGDGOC" revision="1.43" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Sat May 13 14:12:19 EDT 2017" modifiedBy="hankmobley" name="H1BVisaSOCCodeToGDGOC" revision="1.50" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ENIGMAH1BVISA_GOC" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="ENIGMA_SOC_CODE" type="string"/>
 <Field name="ENIGMA_SOC_NAME" type="string"/>
 <Field name="ENIGMA_JOB_TITLE" type="string"/>
-<Field name="GD_GOC" type="string"/>
+<Field name="JOC" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/enigma-h1bvisa-goc.xlsx"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/enigma-h1bvisa-joc.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/enigmah1bvisagoc.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/enigma-h1bvisa-goc.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="${STG_TABLE_ENIGMA_H1BVISA_GOC}"/>
-<Property id="GraphParameter4" name="TMP_REJECTS_TABLENAME" value="TMP_ENIGMAH1BVISA_GOC_REJECTS"/>
-<Property id="GraphParameter5" name="TMP_TABLENAME" value="TMP_SOC_GOC"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${STG_TABLE_ENIGMA_H1BVISA_JOC}"/>
+<Property id="GraphParameter4" name="TMP_REJECTS_TABLENAME" value="TMP_ENIGMAH1BVISA_JOC_REJECTS"/>
+<Property id="GraphParameter5" name="TMP_TABLENAME" value="TMP_SOC_JOC"/>
 <Property fileURL="wage.prm" id="GraphParameter6"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter43"/>
-<Property fileURL="workspace.prm" id="GraphParameter24"/>
-<Property id="GraphParameter42" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisagoc.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter24"/>
+<Property fileURL="workspace.prm" id="GraphParameter40"/>
+<Property id="GraphParameter58" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisagoc.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS ${TABLENAME} (
   ENIGMA_SOC_CODE VARCHAR(7),
   ENIGMA_SOC_NAME VARCHAR(255),
   ENIGMA_JOB_TITLE VARCHAR(255),
-  GD_GOC VARCHAR(255)
+  JOC VARCHAR(255)
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="543" guiY="7" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS ${TMP_TABLENAME} (
   ENIGMA_SOC_CODE VARCHAR(7),
   ENIGMA_SOC_NAME VARCHAR(255),
   ENIGMA_JOB_TITLE VARCHAR(255),
-  GD_GOC VARCHAR(255)
+  JOC VARCHAR(255)
 );]]></attr>
 </Node>
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="209" guiY="7" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
@@ -93,7 +93,7 @@ function integer transform() {
 	ENIGMA_SOC_CODE,
     ENIGMA_SOC_NAME,
     ENIGMA_JOB_TITLE,
-	GD_GOC
+	JOC
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}'
@@ -112,8 +112,8 @@ WHERE
   OR ENIGMA_SOC_NAME = '(null)'
   OR ISNULL(ENIGMA_JOB_TITLE, '') = '' 
   OR ENIGMA_JOB_TITLE = '(null)'
-  OR ISNULL(GD_GOC,'') = ''
-  OR GD_GOC = '(null)';]]></attr>
+  OR ISNULL(JOC,'') = ''
+  OR JOC = '(null)';]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
@@ -125,7 +125,7 @@ WHERE not regexp_like(enigma_soc_code,'^[0-9][0-9]\-[0-9][0-9][0-9][0-9]$');]]><
 <Phase number="5">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Rejects" guiX="385" guiY="405" id="POPULATE_REJECTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TMP_REJECTS_TABLENAME}
-SELECT t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.GD_GOC
+SELECT t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.JOC
 FROM ${TMP_TABLENAME} t
 JOIN (
   SELECT ENIGMA_SOC_CODE, ENIGMA_SOC_NAME, ENIGMA_JOB_TITLE
@@ -141,14 +141,14 @@ JOIN (
 <Phase number="6">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="386" guiY="488" id="POPULATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLENAME}
-SELECT t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.GD_GOC
+SELECT t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.JOC
 FROM ${TMP_TABLENAME} t
 LEFT JOIN ${TMP_REJECTS_TABLENAME} r on 
   r.enigma_soc_code = t.enigma_soc_code
   and r.enigma_soc_name = t.enigma_soc_name
   and r.enigma_job_title = t.enigma_job_title
 where r.enigma_soc_code is null
-GROUP BY t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.GD_GOC;]]></attr>
+GROUP BY t.ENIGMA_SOC_CODE, t.ENIGMA_SOC_NAME, t.ENIGMA_JOB_TITLE, t.JOC;]]></attr>
 </Node>
 </Phase>
 <Phase number="7">

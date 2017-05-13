@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 13:31:26 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.267" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter0"/>
+<Property fileURL="workspace.prm" id="GraphParameter15"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/Census2010FIPS.grf" guiName="Load: 2010 Census FIPS" guiX="98" guiY="211" id="LOAD_2010_CENSUS_FIPS" type="RUN_GRAPH"/>
+<Node enabled="disabled" graphName="${GRAPH_DIR}/FIPS Cities.grf" guiName="Load: City FIPS" guiX="289" guiY="211" id="LOAD_CITY_FIPS" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/RegionalPurchasingPower.grf" guiName="Load: Cost of Living" guiX="266" guiY="108" id="LOAD_COST_OF_LIVING" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/h1bvisa-enigma/load-all-h1bvisa-enigma-data.grf" guiName="Load: Enigma H1BVisa" guiX="393" guiY="6" id="LOAD_ENIGMA_H1BVISA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/GlassdoorWage.grf" guiName="Load: Glassdoor" guiX="51" guiY="6" id="LOAD_GLASSDOOR" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/GlassdoorFranchiseWage.grf" guiName="Load: Glassdoor Franchise" guiX="197" guiY="6" id="LOAD_GLASSDOOR_FRANCHISE" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageMIT2A1PT1C.grf" guiName="Load: Living Wage" guiX="115" guiY="108" id="LOAD_LIVING_WAGE" type="RUN_GRAPH"/>
+</Phase>
+</Graph>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Fri May 12 10:32:21 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.253" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 12:22:36 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.259" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_FIPS_DATA_VALID_COLI" value="${TMP_BASE}_FIPS_DATA_VALID_COLI"/>
@@ -9,12 +9,8 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/GenerateFIPSData.grf" guiName="Generate FIPS Data" guiX="293" guiY="102" id="GENERATE_FIPS_DATA" type="RUN_GRAPH"/>
-<Node enabled="disabled" graphName="${GRAPH_DIR}/H1BVisaEnigma.grf" guiName="Load Staging Data: Enigma" guiX="496" guiY="6" id="LOAD_STAGING_DATA_ENIGMA" type="RUN_GRAPH"/>
-<Node enabled="disabled" graphName="${GRAPH_DIR}/GlassdoorSalaryData.grf" guiName="Load Staging Data: Glassdoor" guiX="1" guiY="6" id="LOAD_STAGING_DATA_GLASSDOOR" type="RUN_GRAPH"/>
-<Node enabled="disabled" graphName="${GRAPH_DIR}/GlassdoorFranchiseSalaryData.grf" guiName="Load Staging Data: Glassdoor Franchise" guiX="444" guiY="102" id="LOAD_STAGING_DATA_GLASSDOOR_FRANCHISE" type="RUN_GRAPH"/>
-<Node enabled="disabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/data-loading/GOCSalaryAdjustments.grf" guiName="Load Staging Data: GOC Salary Adjustments" guiX="7" guiY="102" id="LOAD_STAGING_DATA_GOC_SALARY_ADJUSTMENTS" type="RUN_GRAPH"/>
-<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/TickerDataSourceCompany.grf" guiName="Load Staging Data: Ticker Glassdoor Company" guiX="201" guiY="6" id="LOAD_STAGING_DATA_TICKER_GLASSDOOR_COMPANY" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/GenerateFIPSData.grf" guiName="Generate FIPS Data" guiX="345" guiY="11" id="GENERATE_FIPS_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/LoadAllData.grf" guiName="Load Staging Data" guiX="187" guiY="11" id="LOAD_STAGING_DATA" type="RUN_GRAPH"/>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Staging Table: Data Source" guiX="552" guiY="403" id="STAGING_TABLE_DATA_SOURCE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${STG_TABLE_WAGE_DATA_SOURCE};
 create table ${STG_TABLE_WAGE_DATA_SOURCE} (
@@ -55,21 +51,6 @@ create table ${STG_TABLE_JOC_ADJUSTMENT_REASON} (
   REASON_LONG VARCHAR(255) NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: Salary Yr Adj " guiX="180" guiY="364" id="STAGING_TABLE_SALARY_YR_ADJ" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  ${STG_TABLE_SALARY_ADJ_BY_YEAR} 
-  salary adjustments based on the year of the reported salary.  These 
-  numbers came from Andy S. and apply to the year 2016. These would 
-  need to be adjusted annually.  Might want to move this into a separate 
-  file eventually.
-*/
-drop table if exists ${STG_TABLE_SALARY_ADJ_BY_YEAR};
-create table ${STG_TABLE_SALARY_ADJ_BY_YEAR} (
-  YEAR INT NOT NULL UNIQUE,
-  ADJUSTMENT_FACTOR FLOAT NOT NULL
-);
-]]></attr>
-</Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Table: PPI Avgs" guiX="392" guiY="403" id="TABLE_PPI_AVGS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${TABLE_PPI_AVG} 
@@ -88,7 +69,7 @@ create table ${TABLE_PPI_AVG} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Wage" guiX="335" guiY="206" id="TABLE_WAGE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Wage" guiX="316" guiY="115" id="TABLE_WAGE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_WAGE};
 create table ${TABLE_WAGE} (
   DATA_SOURCE_ID INT NOT NULL,
@@ -104,7 +85,7 @@ create table ${TABLE_WAGE} (
   YEARS_OF_EXPERIENCE INT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: FIPS Data with Valid COLI" guiX="485" guiY="206" id="TEMP_TABLE_FIPS_DATA_WITH_VALID_COLI" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: FIPS Data with Valid COLI" guiX="462" guiY="115" id="TEMP_TABLE_FIPS_DATA_WITH_VALID_COLI" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${TMP_TABLE_FIPS_DATA_VALID_COLI} 
   filters out city/state entries that have more than
@@ -124,7 +105,7 @@ create table ${TMP_TABLE_FIPS_DATA_VALID_COLI} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Ticker Company Name" guiX="68" guiY="206" id="TEMP_TABLE_TICKER_COMPANY_NAME1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Ticker Company Name" guiX="68" guiY="115" id="TEMP_TABLE_TICKER_COMPANY_NAME1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${TMP_TABLE_TICKER_COMPANY_NAME} 
   union of all company tickers and mapped names
@@ -144,7 +125,7 @@ insert into ${STG_TABLE_WAGE_DATA_SOURCE} values(1, 'EnigmaHB1');
 insert into ${STG_TABLE_WAGE_DATA_SOURCE} values(2, 'Franchise');
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Data with Valid COLI" guiX="494" guiY="291" id="POPULATE_FIPS_DATA_WITH_VALID_COLI" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Data with Valid COLI" guiX="471" guiY="193" id="POPULATE_FIPS_DATA_WITH_VALID_COLI" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 INSERT INTO ${TMP_TABLE_FIPS_DATA_VALID_COLI}
@@ -196,18 +177,7 @@ from (
 group by f.state_county_fips;
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Salary Yr Adj" guiX="192" guiY="442" id="POPULATE_SALARY_YR_ADJ" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2010, 1.150);
-insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2011, 1.127);
-insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2012, 1.105);
-insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2013, 1.083);
-insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2014, 1.063);
-insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2015, 1.042);
-insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2016, 1.020);
-insert into ${STG_TABLE_SALARY_ADJ_BY_YEAR} values(2017, 1.000);
-]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Ticker Company Name" guiX="79" guiY="284" id="POPULATE_TICKER_COMPANY_NAME" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Ticker Company Name" guiX="79" guiY="193" id="POPULATE_TICKER_COMPANY_NAME" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_TICKER_COMPANY_NAME}
 select ticker, company_name
 from ${TABLE_TICKER_COMPANY_NAME} tc
@@ -237,7 +207,7 @@ select distinct
   cast(g.YEARSOFRELEVANTEXPNUMBER as int)
 from ${TMP_TABLE_TICKER_COMPANY_NAME} tc
 join ${STG_TABLE_GLASSDOOR_WAGE} g on g.employer = tc.company_name
-join ${STG_TABLE_SALARY_ADJ_BY_YEAR} ya on ya.year = cast(g.YEAROFSALARY as int)
+join ${STG_TABLE_YEAR_ADJUSTMENTS} ya on ya.year = cast(g.YEAROFSALARY as int)
 join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_GLASSDOOR}
 join ${TMP_TABLE_FIPS_DATA_VALID_COLI} fd on fd.city = g.cityname and fd.state = g.stateabbreviation
 where
@@ -484,7 +454,7 @@ from (
 ) t
 join ${TMP_TABLE_FIPS_DATA_VALID_COLI} f on f.city = t.city and f.state = t.state
 join ${TABLE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_ENIGMAH1B}
-join ${STG_TABLE_SALARY_ADJ_BY_YEAR} adj on adj.year = t.wage_year
+join ${STG_TABLE_YEAR_ADJUSTMENTS} adj on adj.year = t.wage_year
 where
   ((t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR}) <= ${CONST_ENIGMA_H1BVISA_MAX_HOURLY_WAGE}
 order by t.ticker, t.joc, t.wage desc;]]></attr>

@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 11 10:23:04 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.310" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 14:14:19 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.311" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="${TMP_BASE}_CENSUS_MAPPED_FIPS"/>
 <Property id="GraphParameter1" name="TMP_TABLE_CITY_NAME_OVERRIDE" value="${TMP_BASE}_CITY_NAME_OVERRIDE"/>
-<Property id="GraphParameter55" name="TMP_TABLE_FIPS_DATA_IGNORE_AVG" value="${TMP_BASE}_FIPS_DATA_IGNORE_AVG"/>
-<Property id="GraphParameter2" name="TMP_TABLE_FIPS_MAP" value="${TMP_BASE}_FIPS_MAP"/>
-<Property id="GraphParameter3" name="TMP_TABLE_LIVING_WAGE_OVERRIDE" value="${TMP_BASE}_LIVING_WAGE_OVERRIDE"/>
-<Property fileURL="wage.prm" id="GraphParameter4"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter22"/>
-<Property fileURL="workspace.prm" id="GraphParameter37"/>
+<Property id="GraphParameter2" name="TMP_TABLE_FIPS_DATA_IGNORE_AVG" value="${TMP_BASE}_FIPS_DATA_IGNORE_AVG"/>
+<Property id="GraphParameter3" name="TMP_TABLE_FIPS_MAP" value="${TMP_BASE}_FIPS_MAP"/>
+<Property id="GraphParameter4" name="TMP_TABLE_LIVING_WAGE_OVERRIDE" value="${TMP_BASE}_LIVING_WAGE_OVERRIDE"/>
+<Property fileURL="wage.prm" id="GraphParameter5"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
+<Property fileURL="workspace.prm" id="GraphParameter39"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -26,29 +26,6 @@
 *********************************************************************************/
 drop table if exists ${TABLE_FIPS_DATA};
 create table ${TABLE_FIPS_DATA} (
-  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
-  CITY_FIPS VARCHAR(5) UNIQUE NOT NULL,
-  STATE VARCHAR(2) NOT NULL,
-  CITY VARCHAR(128) NOT NULL,
-  AVG_COST_OF_LIVING_INDEX FLOAT NULL,
-  LIVING_WAGE_HOURLY FLOAT NULL
-);
-]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp FIPS Data Ignore Avg" guiX="173" guiY="106" id="TABLE_TEMP_FIPS_DATA_IGNORE_AVG" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/********************************************************************************
-  ${TMP_TABLE_FIPS_DATA_IGNORE_AVG} 
-  for city/state entries that have > 1 city_fips and > 1 
-  state_county_fips and therefore no way to know which city/state is needed.
-  averaging is not the right answer, because they could be
-  completely different areas. This is primarily an issue in
-  PA and VA, where there are lots of townships, cities, etc.
-  with same name. These should not be included for wage averages (since
-  living wage adjustment cannot be accurately made)
-  but kept for living wage analysis puproses for getting the county's living wage
-*********************************************************************************/
-drop table if exists ${TMP_TABLE_FIPS_DATA_IGNORE_AVG};
-create table ${TMP_TABLE_FIPS_DATA_IGNORE_AVG} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   CITY_FIPS VARCHAR(5) UNIQUE NOT NULL,
   STATE VARCHAR(2) NOT NULL,
@@ -86,6 +63,29 @@ create table ${TMP_TABLE_CITY_NAME_OVERRIDE} (
   CITY_FIPS VARCHAR(5) NOT NULL,
   STATE VARCHAR(2) NOT NULL,
   CITY VARCHAR(64) NOT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: FIPS Data Ignore Avg" guiX="173" guiY="106" id="TEMP_TABLE_FIPS_DATA_IGNORE_AVG" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************************
+  ${TMP_TABLE_FIPS_DATA_IGNORE_AVG} 
+  for city/state entries that have > 1 city_fips and > 1 
+  state_county_fips and therefore no way to know which city/state is needed.
+  averaging is not the right answer, because they could be
+  completely different areas. This is primarily an issue in
+  PA and VA, where there are lots of townships, cities, etc.
+  with same name. These should not be included for wage averages (since
+  living wage adjustment cannot be accurately made)
+  but kept for living wage analysis puproses for getting the county's living wage
+*********************************************************************************/
+drop table if exists ${TMP_TABLE_FIPS_DATA_IGNORE_AVG};
+create table ${TMP_TABLE_FIPS_DATA_IGNORE_AVG} (
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  CITY_FIPS VARCHAR(5) UNIQUE NOT NULL,
+  STATE VARCHAR(2) NOT NULL,
+  CITY VARCHAR(128) NOT NULL,
+  AVG_COST_OF_LIVING_INDEX FLOAT NULL,
+  LIVING_WAGE_HOURLY FLOAT NULL
 );
 ]]></attr>
 </Node>
