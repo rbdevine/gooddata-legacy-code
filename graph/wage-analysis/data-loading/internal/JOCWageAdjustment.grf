@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat May 13 14:01:33 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.33" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat May 13 17:05:38 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.34" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="GOC_SALARY_MULTIPLIER" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -10,17 +10,17 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/JOCWageMultiplier.xlsx"/>
-<Property id="GraphParameter10" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/jocwagemultipliererror.txt"/>
-<Property id="GraphParameter11" name="READFILEPATH" value="${DATA_TMP_DIR}/JOCWageMultiplier.xlsx"/>
-<Property fileURL="workspace.prm" id="GraphParameter12"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter1"/>
-<Property id="GraphParameter30" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/jocwagemultiplier.txt"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/jocwagemultipliererror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/JOCWageMultiplier.xlsx"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter21"/>
+<Property fileURL="workspace.prm" id="GraphParameter3"/>
+<Property id="GraphParameter37" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/jocwagemultiplier.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="325" guiY="17" id="CREATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${STG_TABLE_JOC_WAGE_MULTIPLIER}
-CREATE TABLE IF NOT EXISTS ${STG_TABLE_JOC_WAGE_MULTIPLIER} (
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${STG_TABLE_JOC_WAGE_MULTIPLIER};
+CREATE TABLE ${STG_TABLE_JOC_WAGE_MULTIPLIER} (
   TICKER VARCHAR(16) NOT NULL,
   SUBSIDIARY VARCHAR(128) NOT NULL,
   JOC VARCHAR(128) NOT NULL,
