@@ -1,21 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 13:38:36 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.258" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 18:42:08 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.259" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter18"/>
-<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter0"/>
+<Property fileURL="workspace.prm" id="GraphParameter16"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: Year Adjustment" guiX="51" guiY="26" id="STAGING_TABLE_YEAR_ADJUSTMENT" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
-  ${STG_TABLE_YEAR_ADJUSTMENT} 
+  ${TABLE_YEAR_ADJUSTMENT} 
   salary adjustments based on the year of the reported salary.  These 
   numbers came from Andy S. and apply to the year 2016. These would 
   need to be adjusted annually.  Might want to move this into a separate 
   file eventually.
 */
-drop table if exists ${STG_TABLE_YEAR_ADJUSTMENT};
-create table ${STG_TABLE_YEAR_ADJUSTMENT} (
+drop table if exists ${TABLE_YEAR_ADJUSTMENT};
+create table ${TABLE_YEAR_ADJUSTMENT} (
   YEAR INT NOT NULL UNIQUE,
   ADJUSTMENT_FACTOR FLOAT NULL,
   WEIGHT FLOAT NOT NULL
@@ -25,14 +25,14 @@ create table ${STG_TABLE_YEAR_ADJUSTMENT} (
 </Phase>
 <Phase number="1">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Year Adjustment" guiX="67" guiY="102" id="POPULATE_YEAR_ADJUSTMENT" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${STG_TABLE_YEAR_ADJUSTMENT} values(2010, 1.150, 5);
-insert into ${STG_TABLE_YEAR_ADJUSTMENT} values(2011, 1.127, 5);
-insert into ${STG_TABLE_YEAR_ADJUSTMENT} values(2012, 1.105, 7);
-insert into ${STG_TABLE_YEAR_ADJUSTMENT} values(2013, 1.083, 7);
-insert into ${STG_TABLE_YEAR_ADJUSTMENT} values(2014, 1.063, 9);
-insert into ${STG_TABLE_YEAR_ADJUSTMENT} values(2015, 1.042, 9);
-insert into ${STG_TABLE_YEAR_ADJUSTMENT} values(2016, 1.020, 10);
-insert into ${STG_TABLE_YEAR_ADJUSTMENT} values(2017, 1.000, 10);
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_YEAR_ADJUSTMENT} values(2010, 1.150, 5);
+insert into ${TABLE_YEAR_ADJUSTMENT} values(2011, 1.127, 5);
+insert into ${TABLE_YEAR_ADJUSTMENT} values(2012, 1.105, 7);
+insert into ${TABLE_YEAR_ADJUSTMENT} values(2013, 1.083, 7);
+insert into ${TABLE_YEAR_ADJUSTMENT} values(2014, 1.063, 9);
+insert into ${TABLE_YEAR_ADJUSTMENT} values(2015, 1.042, 9);
+insert into ${TABLE_YEAR_ADJUSTMENT} values(2016, 1.020, 10);
+insert into ${TABLE_YEAR_ADJUSTMENT} values(2017, 1.000, 10);
 ]]></attr>
 </Node>
 </Phase>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat May 13 18:40:35 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.37" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="GOC_SALARY_MULTIPLIER" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
+<Field name="JOC" type="string"/>
+<Field name="MULTIPLIER" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/JOCWageMultiplier.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/jocwagemultipliererror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/JOCWageMultiplier.xlsx"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter22"/>
+<Property fileURL="workspace.prm" id="GraphParameter3"/>
+<Property id="GraphParameter21" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/jocwagemultiplier.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: JOC Adjustment" guiX="15" guiY="8" id="TABLE_JOC_ADJUSTMENT" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_JOC_ADJUSTMENT};
+create table ${TABLE_JOC_ADJUSTMENT} (
+  JOC VARCHAR(64) NULL,
+  ORIGINAL VARCHAR(64) NULL,
+  REASON_CODE INTEGER NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: JOC Adjustment Reason" guiX="190" guiY="8" id="TABLE_JOC_ADJUSTMENT_REASON" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_JOC_ADJUSTMENT_REASON};
+create table ${TABLE_JOC_ADJUSTMENT_REASON} (
+  REASON_CODE INTEGER UNIQUE NOT NULL,
+  REASON_SHORT VARCHAR(16) UNIQUE NOT NULL,
+  REASON_LONG VARCHAR(255) NOT NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate JOC Adjustment Reason" guiX="102" guiY="89" id="POPULATE_JOC_ADJUSTMENT_REASON" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_JOC_ADJUSTMENT_REASON} values (0,'MARRIOTT','Marriott franchise data had a special case for maintenence workers.');
+insert into ${TABLE_JOC_ADJUSTMENT_REASON} values (1,'JOBTITLE','Override based on job titles specified in ${}. ${} wes populated from a manually created excel file.');
+insert into ${TABLE_JOC_ADJUSTMENT_REASON} values (2,'GOCOVERRIDE','Override based on tickers specified in ${}. ${} wes populated from a manually created excel file.');
+insert into ${TABLE_JOC_ADJUSTMENT_REASON} values (3,'JOBLEVEL','Append levels based on years of experience for certain jobs as specified in ${}. ${} wes populated from hard-coded values in a module of the wage graph.');
+insert into ${TABLE_JOC_ADJUSTMENT_REASON} values (4,'H1BOVERRIDE','Append . Overrides based on hard-coded values in a module of the wage graph.');
+]]></attr>
+</Node>
+</Phase>
+</Graph>

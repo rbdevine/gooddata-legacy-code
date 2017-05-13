@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat May 13 18:40:01 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.74" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="COMPANY_NAME" type="string"/>
+<Field name="INDUSTRY" type="string"/>
+<Field name="ALT_COMPANY_NAME" type="string"/>
+<Field name="INCLUDE_IN_LIVING_WAGE" type="string"/>
+<Field name="SUBSIDY_CODE" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/Company.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/company_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Company.xlsx"/>
+<Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Staging Table: Job Level" guiX="14" guiY="5" id="STAGING_TABLE_JOB_LEVEL" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  ${TABLE_JOB_LEVEL}
+  Table to store level adjustments for joc.
+  For example, software engineer with 0-3 years
+  experience becomes software engineer 1
+*/
+drop table if exists ${TABLE_JOB_LEVEL};
+create table ${TABLE_JOB_LEVEL} (
+  JOC VARCHAR(255) NOT NULL,
+  JOC_WITH_LEVEL VARCHAR(255) NOT NULL,
+  MIN_YEARS_EXPERIENCE INT NULL,
+  MAX_YEARS_EXPERIENCE INT NULL
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Job Levels" guiX="26" guiY="78" id="POPULATE_JOB_LEVELS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_JOB_LEVEL} values('software engineer', 'software engineer < 3 years', null, 3);
+insert into ${TABLE_JOB_LEVEL} values('software engineer', 'software engineer 3 - 5 years', 3, 5);
+insert into ${TABLE_JOB_LEVEL} values('software engineer', 'software engineer 5 - 10 years', 5, 10);
+insert into ${TABLE_JOB_LEVEL} values('software engineer', 'software engineer > 10 years', 10, null);
+insert into ${TABLE_JOB_LEVEL} values('software qa', 'software qa < 3 years', null, 3);
+insert into ${TABLE_JOB_LEVEL} values('software qa', 'software qa 3 - 5 years', 3, 5);
+insert into ${TABLE_JOB_LEVEL} values('software qa', 'software qa 5 - 10 years', 5, 10);
+insert into ${TABLE_JOB_LEVEL} values('software qa', 'software qa > 10 years', 10, null);
+]]></attr>
+</Node>
+</Phase>
+</Graph>

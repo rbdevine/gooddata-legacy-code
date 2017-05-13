@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Sat May 13 17:26:47 EDT 2017" modifiedBy="hankmobley" name="H1BVisaSOCCodeToGDGOC" revision="1.52" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Sat May 13 18:39:36 EDT 2017" modifiedBy="hankmobley" name="H1BVisaSOCCodeToGDGOC" revision="1.53" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ENIGMAH1BVISA_GOC" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -12,7 +12,7 @@
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/enigma-h1bvisa-joc.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/enigmah1bvisajoc.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/enigma-h1bvisa-joc.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="${STG_TABLE_ENIGMA_H1BVISA_JOC}"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${TABLE_ENIGMA_H1BVISA_JOC}"/>
 <Property id="GraphParameter4" name="TMP_REJECTS_TABLENAME" value="TMP_ENIGMAH1BVISA_JOC_REJECTS"/>
 <Property id="GraphParameter5" name="TMP_TABLENAME" value="TMP_SOC_JOC"/>
 <Property fileURL="wage.prm" id="GraphParameter6"/>

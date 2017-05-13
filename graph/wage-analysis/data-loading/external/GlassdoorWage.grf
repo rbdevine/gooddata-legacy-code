@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Thu May 11 00:20:42 EDT 2017" modifiedBy="hankmobley" name="Complete County File" revision="1.217" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Sat May 13 18:38:28 EDT 2017" modifiedBy="hankmobley" name="Complete County File" revision="1.218" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Glassdoor_Salary_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -66,10 +66,10 @@
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/glassdoor/salary/*.csv"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/glassdoorsalaryerror.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/*.csv"/>
-<Property id="GraphParameter3" name="TABLENAME" value="${STG_TABLE_GLASSDOOR_WAGE}"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/glassdoorsalary.txt"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${TABLE_GLASSDOOR_WAGE}"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter4"/>
+<Property fileURL="workspace.prm" id="GraphParameter20"/>
+<Property id="GraphParameter38" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/glassdoorsalary.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">

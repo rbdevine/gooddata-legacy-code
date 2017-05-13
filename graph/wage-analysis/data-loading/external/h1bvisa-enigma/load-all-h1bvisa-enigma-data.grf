@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Fri May 05 16:43:48 EDT 2017" modifiedBy="richdevine" name="Complete County File" revision="1.322" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="scalvillo" created="Fri Jun 10 20:56:50 EDT 2016" guiVersion="3.4.4.P" id="1466014046265" licenseType="Commercial" modified="Sat May 13 18:37:06 EDT 2017" modifiedBy="hankmobley" name="Complete County File" revision="1.324" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," label="enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" name="enigma_h1b_2014_read" previewAttachment="${DATA_TMP_DIR}/enigma-us.gov.dol.oflc.h1b.2014-56e1326ac5eb020a9c4727d1eb8d96e6.csv" previewAttachmentCharset="ISO-8859-1" quoteChar="&quot;" quotedStrings="true" recordDelimiter="\n" skipSourceRows="1" type="delimited">
@@ -180,9 +180,9 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="TABLENAME" value="${STG_TABLE_ENIGMA_H1BVISA}"/>
-<Property fileURL="workspace.prm" id="GraphParameter15"/>
+<Property id="GraphParameter0" name="TABLENAME" value="${TABLE_ENIGMA_H1BVISA}"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter1"/>
+<Property fileURL="workspace.prm" id="GraphParameter17"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -238,15 +238,15 @@ SERIALID VARCHAR(255)
 </Node>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/h1bvisa-enigma/h1bvisa-enigma-2012.grf" guiName="HB1Visa Enigma 2012" guiX="50" guiY="99" id="HB1VISA_ENIGMA_2012" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/h1bvisa-enigma/h1bvisa-enigma-2012.grf" guiName="HB1Visa Enigma 2012" guiX="50" guiY="99" id="HB1VISA_ENIGMA_2012" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="2">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/h1bvisa-enigma/h1bvisa-enigma-2013.grf" guiName="HB1Visa Enigma 2013" guiX="50" guiY="198" id="HB1VISA_ENIGMA_1" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/h1bvisa-enigma/h1bvisa-enigma-2013.grf" guiName="HB1Visa Enigma 2013" guiX="50" guiY="198" id="HB1VISA_ENIGMA_1" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="3">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/h1bvisa-enigma/h1bvisa-enigma-2014.grf" guiName="HB1Visa Enigma 2014" guiX="50" guiY="298" id="HB1VISA_ENIGMA_2" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/h1bvisa-enigma/h1bvisa-enigma-2014.grf" guiName="HB1Visa Enigma 2014" guiX="50" guiY="298" id="HB1VISA_ENIGMA_2" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="4">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/h1bvisa-enigma/h1bvisa-enigma-2015.grf" guiName="HB1Visa Enigma 2015" guiX="50" guiY="398" id="HB1VISA_ENIGMA_3" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/h1bvisa-enigma/h1bvisa-enigma-2015.grf" guiName="HB1Visa Enigma 2015" guiX="50" guiY="398" id="HB1VISA_ENIGMA_3" type="RUN_GRAPH"/>
 </Phase>
 </Graph>

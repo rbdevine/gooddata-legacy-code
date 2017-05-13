@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 16:54:14 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.312" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 18:44:46 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.313" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="${TMP_BASE}_CENSUS_MAPPED_FIPS"/>
@@ -220,7 +220,7 @@ select
   f.state, 
   f.entity_name,
   f.entity_description
-from ${STG_TABLE_CENSUS_FIPS} f
+from ${TABLE_CENSUS_FIPS} f
 left join ${TMP_TABLE_FIPS_MAP} m on m.state_county_fips_census = f.state_county_fips
 ]]></attr>
 </Node>
@@ -253,7 +253,7 @@ from (
     census.state,
     cast(round(avg(cola.cost_of_living_index),1) as numeric(16,1)) avg_cost_of_living_index
   from ${TMP_TABLE_CENSUS_MAPPED_FIPS} census
-  join ${STG_TABLE_REGIONAL_PURCHASING_POWER} cola on cola.fips_code = census.state_county_fips_coli
+  join ${TABLE_REGIONAL_PURCHASING_POWER} cola on cola.fips_code = census.state_county_fips_coli
   where entity_description = 'city'
   group by census.state, census.entity_fips
 ) avgs
@@ -314,7 +314,7 @@ from (
           city/state from glassdoor
         ****************************/
         select cityname city, stateabbreviation state
-        from ${STG_TABLE_GLASSDOOR_WAGE}
+        from ${TABLE_GLASSDOOR_WAGE}
         group by cityname, stateabbreviation
       ) g
       left join (
@@ -327,7 +327,7 @@ from (
       ) f on f.state = g.state and f.city = g.city
       where f.state is null
     ) missing
-    join ${STG_TABLE_CENSUS_FIPS} f on f.state = missing.state and f.entity_name = missing.city
+    join ${TABLE_CENSUS_FIPS} f on f.state = missing.state and f.entity_name = missing.city
     where f.entity_description <> 'county'
     group by f.state_county_fips, missing.state, missing.city
   ) t
@@ -347,7 +347,7 @@ join (
   from ${TMP_TABLE_CENSUS_MAPPED_FIPS}
   group by state_county_fips, state_county_fips_coli, entity_fips, state, entity_name
 ) f on f.state = t.state and f.city = t.city
-join ${STG_TABLE_REGIONAL_PURCHASING_POWER} p on p.fips_code = f.state_county_fips_coli;
+join ${TABLE_REGIONAL_PURCHASING_POWER} p on p.fips_code = f.state_county_fips_coli;
 ]]></attr>
 </Node>
 </Phase>
@@ -357,7 +357,7 @@ join ${STG_TABLE_REGIONAL_PURCHASING_POWER} p on p.fips_code = f.state_county_fi
 
 insert into ${TABLE_FIPS_DATA}
 /********************************************************************
-  some city/state pairs did not match values in ${STG_TABLE_CENSUS_FIPS}
+  some city/state pairs did not match values in ${TABLE_CENSUS_FIPS}
 *********************************************************************/
 select
   override.state_county_fips,
@@ -372,7 +372,7 @@ join (
     o.city_fips,
     cast(round(avg(c.cost_of_living_index),1) as numeric(16,1)) avg_cost_of_living_index
   from ${TMP_TABLE_CITY_NAME_OVERRIDE} o
-  join ${STG_TABLE_REGIONAL_PURCHASING_POWER} c on c.fips_code = o.state_county_fips
+  join ${TABLE_REGIONAL_PURCHASING_POWER} c on c.fips_code = o.state_county_fips
   group by o.state, o.city_fips
 ) coli on coli.state = override.state and coli.city_fips = override.city_fips;]]></attr>
 </Node>
@@ -385,7 +385,7 @@ join (
 SET LOCALE to LEN_S1;
 update ${TABLE_FIPS_DATA} c
 set living_wage_hourly = cast(round(mit._2a1pt1c_hourly,1) as numeric(16,3))
-from ${STG_TABLE_LIVING_WAGE_MIT} mit
+from ${TABLE_LIVING_WAGE_MIT} mit
 join (
   select state_county_fips 
   from ${TABLE_FIPS_DATA} 
@@ -425,7 +425,7 @@ from (
   select
     f.state_county_fips, 
     f._2a1pt1c_hourly
-  from ${STG_TABLE_LIVING_WAGE_MIT} f
+  from ${TABLE_LIVING_WAGE_MIT} f
   left join (
     /*************************************************************************
       unique fips in the coli avg table
@@ -445,7 +445,7 @@ join (
     city_fips, 
     state_abbreviation state, 
     city_name city
-  from ${STG_TABLE_CITY_FIPS} f
+  from ${TABLE_CITY_FIPS} f
   group by f.state_county_fips, city_fips, state_abbreviation, city_name
 ) f on f.state_county_fips = a.state_county_fips
 order by f.state, f.city;]]></attr>
@@ -454,7 +454,7 @@ order by f.state, f.city;]]></attr>
 <Phase number="8">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add LIving Wage Overrides" guiX="224" guiY="722" id="ADD_LIVING_WAGE_OVERRIDES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************
-  need to account for special cases in ${STG_TABLE_LIVING_WAGE_MIT}
+  need to account for special cases in ${TABLE_LIVING_WAGE_MIT}
   (e.g., columbia city, MD)
   Note: a consequence is that these will be only state_county_fips
   with more than one living_wage value
@@ -463,7 +463,7 @@ SET LOCALE to LEN_S1;
 update ${TABLE_FIPS_DATA} coli
 set living_wage_hourly = cast(round(mit._2a1pt1c_hourly,3) as numeric(16,3))
 from ${TMP_TABLE_LIVING_WAGE_OVERRIDE} o
-join ${STG_TABLE_LIVING_WAGE_MIT} mit on mit.state_county_fips = o.state_county_fips_lw
+join ${TABLE_LIVING_WAGE_MIT} mit on mit.state_county_fips = o.state_county_fips_lw
 where 
   coli.state_county_fips = o.state_county_fips_census and
   coli.city_fips = o.city_fips;]]></attr>
@@ -477,7 +477,7 @@ where
 SET LOCALE to LEN_S1;
 update ${TABLE_FIPS_DATA} f
 set avg_cost_of_living_index = cost_of_living_index
-from ${STG_TABLE_REGIONAL_PURCHASING_POWER} p
+from ${TABLE_REGIONAL_PURCHASING_POWER} p
 join (
   select isnull(m.state_county_fips_coli, f.state_county_fips) state_county_fips_map, f.state_county_fips
   from ${TABLE_FIPS_DATA} f
