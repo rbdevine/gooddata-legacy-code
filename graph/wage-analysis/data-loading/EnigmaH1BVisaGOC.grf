@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Wed May 10 00:07:17 EDT 2017" modifiedBy="hankmobley" name="H1BVisaSOCCodeToGDGOC" revision="1.40" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 01 09:06:48 EDT 2016" description="Manually mapping (Andy S., 9/1/2016) of H1B Visa soc codes to glass door gocs.&#10;Glassdoor Inet values (their name for soc) map to multiple gocs, also they were in &#10;a slightly different format for many of the records." guiVersion="3.4.4.P" id="1472745735657" licenseType="Commercial" modified="Fri May 12 20:51:14 EDT 2017" modifiedBy="hankmobley" name="H1BVisaSOCCodeToGDGOC" revision="1.43" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ENIGMAH1BVISA_GOC" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -12,13 +12,13 @@
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/enigma-h1bvisa-goc.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/enigmah1bvisagoc.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/enigma-h1bvisa-goc.xlsx"/>
-<Property id="GraphParameter3" name="TABLENAME" value="${STG_ENIGMA_H1BVISA_GOC}"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${STG_TABLE_ENIGMA_H1BVISA_GOC}"/>
 <Property id="GraphParameter4" name="TMP_REJECTS_TABLENAME" value="TMP_ENIGMAH1BVISA_GOC_REJECTS"/>
 <Property id="GraphParameter5" name="TMP_TABLENAME" value="TMP_SOC_GOC"/>
-<Property fileURL="wage.prm" id="GraphParameter25"/>
-<Property fileURL="workspace.prm" id="GraphParameter6"/>
-<Property id="GraphParameter24" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisagoc.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter6"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter43"/>
+<Property fileURL="workspace.prm" id="GraphParameter24"/>
+<Property id="GraphParameter42" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/enigmah1bvisagoc.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -107,9 +107,13 @@ ABORT ON ERROR;]]></attr>
 <attr name="sqlQuery"><![CDATA[DELETE FROM ${TMP_TABLENAME} 
 WHERE 
   ISNULL(ENIGMA_SOC_CODE,'') = ''
+  OR ENIGMA_SOC_CODE = '(null)'
   OR ISNULL(ENIGMA_SOC_NAME, '') = ''
+  OR ENIGMA_SOC_NAME = '(null)'
   OR ISNULL(ENIGMA_JOB_TITLE, '') = '' 
-  OR ISNULL(GD_GOC,'') = '';]]></attr>
+  OR ENIGMA_JOB_TITLE = '(null)'
+  OR ISNULL(GD_GOC,'') = ''
+  OR GD_GOC = '(null)';]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
