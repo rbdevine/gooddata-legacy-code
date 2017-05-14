@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 18:57:33 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.265" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 19:55:42 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.276" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_FIPS_DATA_VALID_COLI" value="${TMP_BASE}_FIPS_DATA_VALID_COLI"/>
 <Property id="GraphParameter1" name="TMP_TABLE_TICKER_COMPANY_NAME" value="${TMP_BASE}_TICKER_COMPANY_NAME"/>
 <Property fileURL="wage.prm" id="GraphParameter2"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter38"/>
 <Property fileURL="workspace.prm" id="GraphParameter20"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter38"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/GenerateFIPSData.grf" guiName="Generate FIPS Data" guiX="345" guiY="11" id="GENERATE_FIPS_DATA" type="RUN_GRAPH"/>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/LoadData.grf" guiName="Load Staging Data" guiX="187" guiY="11" id="LOAD_STAGING_DATA" type="RUN_GRAPH"/>
+<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/GenerateFIPSData.grf" guiName="Generate FIPS Data" guiX="345" guiY="11" id="GENERATE_FIPS_DATA" type="RUN_GRAPH"/>
+<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/LoadData.grf" guiName="Load Staging Data" guiX="187" guiY="11" id="LOAD_STAGING_DATA" type="RUN_GRAPH"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Wage" guiX="316" guiY="115" id="TABLE_WAGE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_WAGE};
 create table ${TABLE_WAGE} (
@@ -107,7 +107,7 @@ select distinct
   cast(g.YEARSOFRELEVANTEXPNUMBER as int)
 from ${TMP_TABLE_TICKER_COMPANY_NAME} tc
 join ${TABLE_GLASSDOOR_WAGE} g on g.employer = tc.company_name
-join ${TABLE_YEAR_ADJUSTMENTS} ya on ya.year = cast(g.YEAROFSALARY as int)
+join ${TABLE_YEAR_ADJUSTMENT} ya on ya.year = cast(g.YEAROFSALARY as int)
 join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_GLASSDOOR}
 join ${TMP_TABLE_FIPS_DATA_VALID_COLI} fd on fd.city = g.cityname and fd.state = g.stateabbreviation
 where
@@ -119,7 +119,7 @@ where
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="245" guiY="359" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
-  insert enigma h1b visa data into ${SALARY_LOOKUP_TABLENAME}
+  insert enigma h1b visa data into ${TABLE_WAGE}
 */
 SET LOCALE to LEN_S1;
 
@@ -130,7 +130,7 @@ select
   t.city,
   t.state, 
   t.ticker,
-  t.goc joc,
+  t.joc,
   t.jobtitle,
   cast(round((t.wage / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)),
   cast(round((t.wage * 100.0 / t.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)),
@@ -141,7 +141,7 @@ from (
     company,
     ticker,
     indy,
-    goc,
+    joc,
     jobtitle,
     (case
       when unit = 'hourly' then ${CONST_HOURS_PER_YEAR} 
@@ -156,7 +156,7 @@ from (
         g.company,
         c.ticker,
         c.industry indy,
-        goc,
+        j.joc,
         g.jobtitle,
         g.area city,
         g.state,
@@ -172,7 +172,7 @@ from (
         end)*max max,
         f.avg_cost_of_living_index
       from ${TABLE_FRANCHISE_WAGE} g
-      join ${TABLE_FRANCHISE_JOBTITLE_TO_GOC} j on g.jobtitle = j.jobtitle
+      join ${TABLE_FRANCHISE_JOBTITLE_JOC} j on g.jobtitle = j.jobtitle
       join ${TMP_TABLE_TICKER_COMPANY_NAME} tc on tc.company_name = g.company
       join (
         select c.ticker, c.industry 
@@ -190,7 +190,7 @@ from (
 ) t
 join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_FRANCHISE}
 where wage >= ${CONST_FRANCHISE_MIN_YEARLY_SALARY} and wage <= ${CONST_FRANCHISE_MAX_YEARLY_SALARY}
-order by ticker, goc, wage desc;
+order by ticker, joc, wage desc;
 ]]></attr>
 </Node>
 </Phase>
@@ -233,7 +233,7 @@ from (
   from (
     select
       c.ticker,
-      sg.gd_goc joc,
+      sj.joc,
       e.job_title jobtitle,
       cast(round(
         case
@@ -280,10 +280,10 @@ from (
       where case_status = 'CERTIFIED' and length(soc_code) >= 7 and regexp_like(left(soc_code,7),'[0-9][0-9]\-[0-9][0-9][0-9][0-9]')
     ) e
     join ${TMP_TABLE_TICKER_COMPANY_NAME} c on c.company_name = e.employer_name
-    join ${TABLE_ENIGMA_H1BVISA_GOC} sg on 
-      sg.enigma_soc_code = e.soc_code
-      and sg.enigma_soc_name = e.soc_name
-      and sg.enigma_job_title = e.job_title
+    join ${TABLE_ENIGMA_H1BVISA_JOC} sj on 
+      sj.enigma_soc_code = e.soc_code
+      and sj.enigma_soc_name = e.soc_name
+      and sj.enigma_job_title = e.job_title
     where
       (wage_rate_of_pay_from> 0.0 or wage_rate_of_pay_to > 0.0) and ( 
         (not (wage_rate_of_pay_from > 0.0 and wage_rate_of_pay_to > 0.0)) or 
@@ -293,14 +293,14 @@ from (
 ) t
 join ${TMP_TABLE_FIPS_DATA_VALID_COLI} f on f.city = t.city and f.state = t.state
 join ${TABLE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_ENIGMAH1B}
-join ${TABLE_YEAR_ADJUSTMENTS} adj on adj.year = t.wage_year
+join ${TABLE_YEAR_ADJUSTMENT} adj on adj.year = t.wage_year
 where
   ((t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR}) <= ${CONST_ENIGMA_H1BVISA_MAX_HOURLY_WAGE}
 order by t.ticker, t.joc, t.wage desc;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/AdjustJOC.grf" guiName="Apply JOC Name Adjustment" guiX="284" guiY="510" id="APPLY_JOC_NAME_ADJUSTMENT" type="RUN_GRAPH"/>
+<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/AdjustJOC.grf" guiName="Apply JOC Name Adjustment" guiX="284" guiY="510" id="APPLY_JOC_NAME_ADJUSTMENT" type="RUN_GRAPH"/>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp FIPS Data Valid COLI" guiX="496" guiY="522" id="DROP_TEMP_FIPS_DATA_VALID_COLI" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE_FIPS_DATA_VALID_COLI}]]></attr>
 </Node>
@@ -309,7 +309,7 @@ order by t.ticker, t.joc, t.wage desc;]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Wage Multipliers" guiX="287" guiY="609" id="APPLY_JOC_WAGE_MULTIPLIERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Apply JOC Wage Multipliers" guiX="287" guiY="609" id="APPLY_JOC_WAGE_MULTIPLIERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${SALARY_LOOKUP_TABLENAME} s
   set unadjustedbasesalary = multiplier * unadjustedbasesalary,
     unadjustedtotalsalary = multiplier * unadjustedtotalsalary,

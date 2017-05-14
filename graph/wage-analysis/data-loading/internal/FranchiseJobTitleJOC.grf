@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat May 13 19:41:16 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.128" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="JOB_TITLE_TO_JOC" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="JOBTITLE" type="string"/>
+<Field name="JOC" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/FranchiseJobtitleToJOC.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/franchise_jobtitle_to_joc_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/FranchiseJobtitleToJOC.xlsx"/>
+<Property fileURL="wage.prm" id="GraphParameter3"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter40"/>
+<Property fileURL="workspace.prm" id="GraphParameter21"/>
+<Property id="GraphParameter39" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/FranchiseJobtitleToJOC.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="331" guiY="14" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLE_FRANCHISE_JOBTITLE_JOC} (
+  JOBTITLE VARCHAR(64),
+  JOC VARCHAR(64)
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="172" guiY="14" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="331" guiY="91" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="12" guiY="85" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="172" guiY="91" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="179" guiY="185" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="331" guiY="185" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLE_FRANCHISE_JOBTITLE_JOC} (
+    JOBTITLE,
+    JOC
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Data" guiX="331" guiY="264" id="CLEANUP_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TABLE_FRANCHISE_JOBTITLE_JOC} where isnull(JOBTITLE,'') = '';
+delete from ${TABLE_FRANCHISE_JOBTITLE_JOC} where isnull(JOC,'') = '';
+delete from ${TABLE_FRANCHISE_JOBTITLE_JOC} where JOBTITLE = '(null)';
+delete from ${TABLE_FRANCHISE_JOBTITLE_JOC} where JOC = '(null)';
+update ${TABLE_FRANCHISE_JOBTITLE_JOC} set JOBTITLE = ltrim(rtrim(JOBTITLE));
+update ${TABLE_FRANCHISE_JOBTITLE_JOC} set JOC = ltrim(rtrim(JOC));
+]]></attr>
+</Node>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="20" guiY="264" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="179" guiY="264" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sat May 13 20:21:19 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.72" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="SUBSIDIARY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER_PARENT" type="string"/>
+<Field name="TICKER_SUBSIDIARY" type="string"/>
+<Field name="SUBSIDIARY_NAME" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/Subsidiary.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/subsidiary_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Subsidiary.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${TABLE_SUBSIDIARY}"/>
+<Property fileURL="workspace.prm" id="GraphParameter22"/>
+<Property id="GraphParameter40" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Subsidiary.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter4"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="333" guiY="15" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};
+CREATE TABLE ${TABLENAME} (
+  TICKER_PARENT VARCHAR(16) NOT NULL,
+  TICKER_SUBSIDIARY VARCHAR(16) NULL,
+  SUBSIDIARY_NAME VARCHAR(64) NOT NULL
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="174" guiY="15" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="333" guiY="102" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="14" guiY="96" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="174" guiY="102" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="174" guiY="196" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="333" guiY="196" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+    TICKER_PARENT,
+    TICKER_SUBSIDIARY,
+    SUBSIDIARY_NAME
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="333" guiY="281" id="CLEAN_DATA1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLENAME} SET TICKER_PARENT = TRIM(TICKER_PARENT);
+UPDATE ${TABLENAME} SET TICKER_SUBSIDIARY = NULL WHERE TRIM(TICKER_SUBSIDIARY) = '';
+UPDATE ${TABLENAME} SET SUBSIDIARY_NAME = TRIM(SUBSIDIARY_NAME);
+]]></attr>
+</Node>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="15" guiY="281" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="174" guiY="281" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>
