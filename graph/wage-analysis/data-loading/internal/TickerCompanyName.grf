@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon May 08 22:45:52 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.117" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sun May 14 00:19:48 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.122" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="TICKER_COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -12,24 +12,24 @@
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/TickerCompanyName.xlsx"/>
 <Property id="GraphParameter3" name="TMP_TABLE" value="${TMP_BASE}_TICKER_COMPANY_NAME"/>
 <Property fileURL="wage.prm" id="GraphParameter4"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter18"/>
-<Property fileURL="workspace.prm" id="GraphParameter32"/>
-<Property id="GraphParameter50" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/TickerCompanyName.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter22"/>
+<Property fileURL="workspace.prm" id="GraphParameter38"/>
+<Property id="GraphParameter56" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/TickerCompanyName.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="324" guiY="16" id="CREATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_TICKER_COMPANY_NAME};
 CREATE TABLE IF NOT EXISTS ${TABLE_TICKER_COMPANY_NAME} (
-  TICKER VARCHAR(16) NOT NULL,
-  COMPANY_NAME VARCHAR(255) NOT NULL
+  COMPANY_NAME VARCHAR(255) UNIQUE NOT NULL,
+  TICKER VARCHAR(16) NOT NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="467" guiY="16" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE};
 CREATE TABLE IF NOT EXISTS ${TMP_TABLE} (
-  TICKER VARCHAR(16) NOT NULL,
-  COMPANY_NAME VARCHAR(255) NOT NULL
+  COMPANY_NAME VARCHAR(255) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL
 );]]></attr>
 </Node>
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="12" guiY="16" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
@@ -73,8 +73,8 @@ function integer transform() {
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="52" guiY="195" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="315" guiY="195" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TMP_TABLE} (
-    TICKER,
-    COMPANY_NAME
+    COMPANY_NAME,
+    TICKER
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -88,15 +88,20 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 INSERT INTO ${TABLE_TICKER_COMPANY_NAME}
-SELECT TICKER, COMPANY_NAME
-FROM ${TMP_TABLE}
+SELECT COMPANY_NAME, TICKER
+FROM (
+  SELECT COMPANY_NAME, MAX(TICKER) TICKER
+  FROM ${TMP_TABLE}
+  GROUP BY COMPANY_NAME
+) t
 GROUP BY TICKER, COMPANY_NAME;]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="323" guiY="351" id="CLEAN_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[UPDATE ${TABLE_TICKER_COMPANY_NAME} SET TICKER = TRIM(TICKER);
-UPDATE ${TABLE_TICKER_COMPANY_NAME} SET COMPANY_NAME = TRIM(COMPANY_NAME);]]></attr>
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLE_TICKER_COMPANY_NAME} SET COMPANY_NAME = TRIM(COMPANY_NAME);
+UPDATE ${TABLE_TICKER_COMPANY_NAME} SET TICKER = TRIM(TICKER);
+]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="467" guiY="351" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE};]]></attr>
@@ -111,6 +116,10 @@ WHERE COMPANY_NAME IN (
   SELECT tc.COMPANY_NAME
   FROM ${TABLE_TICKER_COMPANY_NAME} tc
   JOIN ${TABLE_COMPANY} c on tc.COMPANY_NAME = c.COMPANY_NAME
+  UNION ALL
+  SELECT tc.COMPANY_NAME
+  FROM ${TABLE_TICKER_COMPANY_NAME} tc
+  JOIN ${TABLE_SUBSIDIARY} s on s.SUBSIDIARY_NAME = tc.COMPANY_NAME
 );]]></attr>
 </Node>
 </Phase>
