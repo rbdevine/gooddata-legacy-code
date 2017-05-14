@@ -1,26 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sun May 14 00:19:48 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.122" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sun May 14 09:53:28 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.127" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="TICKER_COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="TICKER" type="string"/>
+<Record fieldDelimiter="|" name="COMPANY_NAME_TICKER" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="COMPANY_NAME" type="string"/>
+<Field name="TICKER" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/TickerCompanyName.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/ticker_company_name_error.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/TickerCompanyName.xlsx"/>
-<Property id="GraphParameter3" name="TMP_TABLE" value="${TMP_BASE}_TICKER_COMPANY_NAME"/>
-<Property fileURL="wage.prm" id="GraphParameter4"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter22"/>
-<Property fileURL="workspace.prm" id="GraphParameter38"/>
-<Property id="GraphParameter56" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/TickerCompanyName.txt"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/CompanyNameTicker.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/company_name_ticker_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/CompanyNameTicker.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${TABLE_COMPANY_NAME_TICKER}"/>
+<Property id="GraphParameter4" name="TMP_TABLE" value="${TMP_BASE}_COMPANY_NAME_TICKER"/>
+<Property fileURL="wage.prm" id="GraphParameter5"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
+<Property fileURL="workspace.prm" id="GraphParameter39"/>
+<Property id="GraphParameter57" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/CompanyNameTicker.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="324" guiY="16" id="CREATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_TICKER_COMPANY_NAME};
-CREATE TABLE IF NOT EXISTS ${TABLE_TICKER_COMPANY_NAME} (
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TABLENAME} (
   COMPANY_NAME VARCHAR(255) UNIQUE NOT NULL,
   TICKER VARCHAR(16) NOT NULL
 );]]></attr>
@@ -87,7 +88,7 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="324" guiY="273" id="POPULATE_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
-INSERT INTO ${TABLE_TICKER_COMPANY_NAME}
+INSERT INTO ${TABLENAME}
 SELECT COMPANY_NAME, TICKER
 FROM (
   SELECT COMPANY_NAME, MAX(TICKER) TICKER
@@ -99,8 +100,8 @@ GROUP BY TICKER, COMPANY_NAME;]]></attr>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="323" guiY="351" id="CLEAN_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[UPDATE ${TABLE_TICKER_COMPANY_NAME} SET COMPANY_NAME = TRIM(COMPANY_NAME);
-UPDATE ${TABLE_TICKER_COMPANY_NAME} SET TICKER = TRIM(TICKER);
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLENAME} SET COMPANY_NAME = TRIM(COMPANY_NAME);
+UPDATE ${TABLENAME} SET TICKER = TRIM(TICKER);
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="467" guiY="351" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
@@ -111,14 +112,14 @@ UPDATE ${TABLE_TICKER_COMPANY_NAME} SET TICKER = TRIM(TICKER);
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Exact Matches" guiX="309" guiY="430" id="REMOVE_EXACT_MATCHES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
-DELETE FROM ${TABLE_TICKER_COMPANY_NAME} 
+DELETE FROM ${TABLENAME} 
 WHERE COMPANY_NAME IN (
   SELECT tc.COMPANY_NAME
-  FROM ${TABLE_TICKER_COMPANY_NAME} tc
+  FROM ${TABLENAME} tc
   JOIN ${TABLE_COMPANY} c on tc.COMPANY_NAME = c.COMPANY_NAME
   UNION ALL
   SELECT tc.COMPANY_NAME
-  FROM ${TABLE_TICKER_COMPANY_NAME} tc
+  FROM ${TABLENAME} tc
   JOIN ${TABLE_SUBSIDIARY} s on s.SUBSIDIARY_NAME = tc.COMPANY_NAME
 );]]></attr>
 </Node>
