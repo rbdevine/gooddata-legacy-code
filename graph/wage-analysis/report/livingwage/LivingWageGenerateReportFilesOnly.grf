@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Apr 13 15:59:47 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.88" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon May 15 12:04:11 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.89" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -90,13 +90,14 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="graph/local/local-parameters.prm" id="GraphParameter0"/>
-<Property id="GraphParameter36" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
-<Property id="GraphParameter37" name="REPORTFILEPATH_LWAVG" value="${REPORTS_DIR}/LWAverages.csv"/>
-<Property id="GraphParameter38" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
-<Property id="GraphParameter39" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
-<Property id="GraphParameter40" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}"/>
-<Property fileURL="workspace.prm" id="GraphParameter42"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter2"/>
+<Property fileURL="livingwage-parameters.prm" id="GraphParameter24"/>
+<Property id="GraphParameter60" name="REPORTFILEPATH_BLSLWCOUNTY" value="${REPORTS_DIR}/BLSLWCounty.csv"/>
+<Property id="GraphParameter1" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
+<Property id="GraphParameter2" name="REPORTFILEPATH_LWAVG" value="${REPORTS_DIR}/LWAverages.csv"/>
+<Property id="GraphParameter3" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
+<Property id="GraphParameter4" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
+<Property id="GraphParameter5" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}"/>
+<Property fileURL="workspace.prm" id="GraphParameter6"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -335,7 +336,7 @@ from ${SCORE_QUALITY_BY_COMPANY_TABLENAME};]]></attr>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="136" id="WRITE_REPORT1" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCOREQUALITY}" guiName="Write Report" guiX="419" guiY="248" id="WRITE_REPORT2" outputFieldNames="true" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_LWAVG}" guiName="Write Report" guiX="419" guiY="351" id="WRITE_REPORT3" outputFieldNames="true" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="457" id="WRITE_REPORT4" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_BLSLWCOUNTY}" guiName="Write Report" guiX="419" guiY="457" id="WRITE_REPORT4" type="DATA_WRITER"/>
 <Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge15" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_REPORT:0"/>
 <Edge fromNode="REFORMAT2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge19" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_REPORT2:0"/>
 <Edge fromNode="REFORMAT3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_REPORT1:0"/>
