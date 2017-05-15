@@ -1,28 +1,30 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sun May 14 16:46:00 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.37" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sun May 14 15:35:26 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.60" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="GOC_SALARY_MULTIPLIER" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="TICKER" type="string"/>
+<Record fieldDelimiter="|" name="JOC_EXCEPTIONS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="JOC" type="string"/>
-<Field name="MULTIPLIER" type="string"/>
+<Field name="JOC_NEW" type="string"/>
+<Field name="DATA_SOURCE" type="string"/>
+<Field name="TICKER" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/JOCWageMultiplier.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/jocwagemultipliererror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/JOCWageMultiplier.xlsx"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/JOCException.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/jocexceptionerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/JOCException.xlsx"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter3"/>
 <Property fileURL="workspace.prm" id="GraphParameter21"/>
-<Property id="GraphParameter39" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/jocwagemultiplier.txt"/>
+<Property id="GraphParameter39" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/jocexception.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="325" guiY="17" id="CREATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_JOC_WAGE_MULTIPLIER};
-CREATE TABLE ${TABLE_JOC_WAGE_MULTIPLIER} (
-  TICKER VARCHAR(16) NOT NULL,
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_JOC_EXCEPTION};
+CREATE TABLE ${TABLE_JOC_EXCEPTION} (
   JOC VARCHAR(128) NOT NULL,
-  MULTIPLIER FLOAT NOT NULL
+  JOC_NEW VARCHAR(128) NOT NULL,
+  DATA_SOURCE VARCHAR(32) NOT NULL,
+  TICKER VARCHAR(16) NULL
 );]]></attr>
 </Node>
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="166" guiY="17" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
@@ -65,10 +67,11 @@ function integer transform() {
 <Phase number="2">
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="166" guiY="198" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[COPY ${TABLE_JOC_WAGE_MULTIPLIER} (
-    TICKER,
+<attr name="sqlQuery"><![CDATA[COPY ${TABLE_JOC_EXCEPTION} (
     JOC,
-    MULTIPLIER
+    JOC_NEW,
+	DATA_SOURCE,
+	TICKER
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -76,7 +79,14 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Node>
 </Phase>
 <Phase number="3">
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="285" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="325" guiY="285" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="7" guiY="286" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up" guiX="325" guiY="286" id="CLEAN_UP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TABLE_JOC_EXCEPTION} where isnull(JOC,'') = '' or JOC = '(null)';
+delete from ${TABLE_JOC_EXCEPTION} where isnull(JOC_NEW,'') = '' or JOC_NEW = '(null)';
+delete from ${TABLE_JOC_EXCEPTION} where isnull(DATA_SOURCE,'') = '' or DATA_SOURCE = '(null)';
+update ${TABLE_JOC_EXCEPTION} set TICKER = null where TICKER in ('','(null)');
+]]></attr>
+</Node>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="166" guiY="286" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 </Graph>

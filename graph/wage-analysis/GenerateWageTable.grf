@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sun May 14 10:30:55 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.284" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sun May 14 20:10:47 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.310" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_COMPANY_NAME_TICKER" value="${TMP_BASE}_COMPANY_NAME_TICKER"/>
 <Property id="GraphParameter1" name="TMP_TABLE_FIPS_DATA_VALID_COLI" value="${TMP_BASE}_FIPS_DATA_VALID_COLI"/>
 <Property fileURL="wage.prm" id="GraphParameter2"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter20"/>
-<Property fileURL="workspace.prm" id="GraphParameter36"/>
+<Property fileURL="workspace.prm" id="GraphParameter38"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -219,8 +219,8 @@ select
   t.ticker,
   t.joc,
   t.jobtitle,
-  cast(round((t.wage / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) wage,
-  cast(round((t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)) wage_cola,
+  cast(round((ya.ADJUSTMENT_FACTOR*t.wage / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) wage,
+  cast(round((ya.ADJUSTMENT_FACTOR*t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)) wage_cola,
   t.wage_year,
   null years_of_experience
 from (
@@ -301,34 +301,93 @@ from (
 ) t
 join ${TMP_TABLE_FIPS_DATA_VALID_COLI} f on f.city = t.city and f.state = t.state
 join ${TABLE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_ENIGMAH1B}
-join ${TABLE_YEAR_ADJUSTMENT} adj on adj.year = t.wage_year
+join ${TABLE_YEAR_ADJUSTMENT} ya on ya.year = t.wage_year
 where
   ((t.wage * 100.0 / f.avg_cost_of_living_index) / ${CONST_HOURS_PER_YEAR}) <= ${CONST_ENIGMA_H1BVISA_MAX_HOURLY_WAGE}
 order by t.ticker, t.joc, t.wage desc;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/AdjustJOC.grf" guiName="Apply JOC Name Adjustment" guiX="284" guiY="510" id="APPLY_JOC_NAME_ADJUSTMENT" type="RUN_GRAPH"/>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp FIPS Data Valid COLI" guiX="496" guiY="522" id="DROP_TEMP_FIPS_DATA_VALID_COLI" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Modifications" guiX="287" guiY="522" id="APPLY_JOC_MODIFICATIONS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+update ${TABLE_WAGE} w
+  set joc = j.joc
+from (
+  /*********************************************************************************
+    Doing a union so that records with incorrect data source not accidently included 
+  *********************************************************************************/
+  select jobtitle, joc, data_source_id, ticker
+  from ${TABLE_JOBTITLE_JOC} j
+  left join ${TABLE_DATA_SOURCE} ds on ds.data_source = j.data_source
+  where j.data_source is not null
+  union all
+  select jobtitle, joc, cast(null as integer) data_source_id, ticker
+  from ${TABLE_JOBTITLE_JOC}
+  where data_source is null
+) j
+where
+  w.job_title = j.jobtitle 
+  and (j.data_source_id is null or w.data_source_id = j.data_source_id)
+  and (j.ticker is null or w.ticker = j.ticker);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp FIPS Data Valid COLI" guiX="496" guiY="522" id="DROP_TEMP_FIPS_DATA_VALID_COLI" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE_FIPS_DATA_VALID_COLI}]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Ticker Company Name" guiX="41" guiY="522" id="DROP_TEMP_TICKER_COMPANY_NAME" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Ticker Company Name" guiX="41" guiY="522" id="DROP_TEMP_TICKER_COMPANY_NAME" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE_COMPANY_NAME_TICKER}]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Apply JOC Wage Multipliers" guiX="287" guiY="609" id="APPLY_JOC_WAGE_MULTIPLIERS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[update ${SALARY_LOOKUP_TABLENAME} s
-  set unadjustedbasesalary = multiplier * unadjustedbasesalary,
-    unadjustedtotalsalary = multiplier * unadjustedtotalsalary,
-    unadjustedbasesalary_cola = multiplier * unadjustedbasesalary_cola,
-    unadjustedtotalsalary_cola = multiplier * unadjustedtotalsalary_cola,
-    unadjustedbasehourly = multiplier * unadjustedbasehourly,
-    unadjustedtotalhourly = multiplier * unadjustedtotalhourly,
-    unadjustedbasehourly_cola = multiplier * unadjustedbasehourly_cola,
-    unadjustedtotalhourly_cola = multiplier * unadjustedtotalhourly_cola
-from ${GOC_SALARY_MULTIPLIERS_TABLENAME} m
-where m.goc = s.goc and m.ticker = s.ticker;]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Exceptions" guiX="293" guiY="606" id="APPLY_JOC_EXCEPTIONS1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+update ${TABLE_WAGE} w
+  set joc = j.joc_new
+from (
+  /*********************************************************************************
+    Doing a union so that records with incorrect data source not accidently included 
+  *********************************************************************************/
+  select joc, joc_new, data_source_id, ticker
+  from ${TABLE_JOC_EXCEPTION} j
+  left join ${TABLE_DATA_SOURCE} ds on ds.data_source = j.data_source
+  where j.data_source is not null
+  union all
+  select joc, joc_new, cast(null as integer) data_source_id, ticker
+  from ${TABLE_JOC_EXCEPTION}
+  where data_source is null
+) j
+where
+  w.joc = j.joc
+  and (j.data_source_id is null or w.data_source_id = j.data_source_id)
+  and (j.ticker is null or w.ticker = j.ticker);]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Exceptions" guiX="293" guiY="683" id="APPLY_JOC_EXCEPTIONS2" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  update ${TABLE_WAGE} to modify joc by level, given years of experience.
+*/
+SET LOCALE to LEN_S1;
+update ${TABLE_WAGE} w
+set joc = l.joc_with_level
+from ${TABLE_JOB_LEVEL} l
+where
+  w.joc = l.joc and (
+    (MIN_YEARS_EXPERIENCE is null and MAX_YEARS_EXPERIENCE is not null and w.YEARS_OF_EXPERIENCE <= MAX_YEARS_EXPERIENCE) or
+    (MIN_YEARS_EXPERIENCE is not null and w.YEARS_OF_EXPERIENCE > MIN_YEARS_EXPERIENCE and MAX_YEARS_EXPERIENCE is null) or
+    (MIN_YEARS_EXPERIENCE is not null and w.YEARS_OF_EXPERIENCE > MIN_YEARS_EXPERIENCE and MAX_YEARS_EXPERIENCE is not null and w.YEARS_OF_EXPERIENCE <= MAX_YEARS_EXPERIENCE)
+  );
+]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Wage Multipliers" guiX="277" guiY="761" id="APPLY_JOC_WAGE_MULTIPLIERS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+update ${TABLE_WAGE} w
+  set hourly_wage_raw = multiplier * hourly_wage_raw,
+    hourly_wage_cola = multiplier * hourly_wage_cola
+from ${TABLE_JOC_WAGE_MULTIPLIER} m
+where w.joc = w.joc and w.ticker = m.ticker;]]></attr>
 </Node>
 </Phase>
 </Graph>
