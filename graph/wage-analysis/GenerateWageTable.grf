@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sun May 14 20:10:47 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.310" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sun May 14 23:14:10 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.315" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_COMPANY_NAME_TICKER" value="${TMP_BASE}_COMPANY_NAME_TICKER"/>
@@ -133,7 +133,7 @@ SET LOCALE to LEN_S1;
 
 insert into ${TABLE_WAGE}
 select
-  ds.data_source_id,
+  t.data_source_id,
   null reviewid,
   t.city,
   t.state, 
@@ -145,10 +145,10 @@ select
   null,
   null
 from (
-  select 
+  select
+    data_source_id,
     company,
     ticker,
-    indy,
     joc,
     jobtitle,
     (case
@@ -161,9 +161,9 @@ from (
     isnull(avg_cost_of_living_index,100.0) avg_cost_of_living_index
   from (
       select
+        ds.data_source_id,
         g.company,
-        c.ticker,
-        c.industry indy,
+        c.ticker_match ticker,
         j.joc,
         g.jobtitle,
         g.area city,
@@ -180,23 +180,39 @@ from (
         end)*max max,
         f.avg_cost_of_living_index
       from ${TABLE_FRANCHISE_WAGE} g
-      join ${TABLE_FRANCHISE_JOBTITLE_JOC} j on g.jobtitle = j.jobtitle
       join ${TMP_TABLE_COMPANY_NAME_TICKER} tc on tc.company_name = g.company
+      join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_FRANCHISE}
+      join ${TABLE_JOBTITLE_JOC} j on 
+                           (j.jobtitle = g.jobtitle) 
+                           and ((j.ticker is null) or (j.ticker = tc.ticker))
+                           and ((j.data_source is null) or (j.data_source = ds.data_source))
       join (
-        select c.ticker, c.industry 
-        from ${TABLE_COMPANY} c
+        select c.ticker_match, c.ticker 
+        from (
+          select s.ticker ticker_match, s.ticker
+          from (
+            select ticker_parent ticker 
+            from ${TABLE_SUBSIDIARY} 
+            where ticker_subsidiary is not null 
+            group by ticker_parent
+          ) s 
+          union all
+          select isnull(s.ticker_subsidiary,c.ticker) ticker_match, c.ticker
+          from ${TABLE_COMPANY} c
+          left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+        ) c
         left join (
-          select ticker 
+          select ticker, count('x') cnt
           from ${TABLE_WAGE} w 
           join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id 
           where data_source = ${CONST_DATA_SOURCE_NAME_GLASSDOOR}
           group by ticker
-        ) w on w.ticker = c.ticker
-        where w.ticker is null) c on c.ticker = tc.ticker
+        ) w on w.ticker = c.ticker_match
+        where w.ticker is null
+      ) c on c.ticker_match = tc.ticker
       join ${TMP_TABLE_FIPS_DATA_VALID_COLI} f on f.city = g.area and f.state = g.state
     ) t
 ) t
-join ${TABLE_WAGE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_FRANCHISE}
 where wage >= ${CONST_FRANCHISE_MIN_YEARLY_SALARY} and wage <= ${CONST_FRANCHISE_MAX_YEARLY_SALARY}
 order by ticker, joc, wage desc;
 ]]></attr>
