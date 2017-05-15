@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jan 24 19:29:22 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.78" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="NEW_COMPANY_DATA" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="COMPANY" type="string"/>
+<Field name="TICKER" type="string"/>
+<Field name="INDUSTRY" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/FranchiseNewCompanies.xlsx"/>
+<Property fileURL="livingwage-franchise-parameters.prm" id="GraphParameter1"/>
+<Property id="GraphParameter3" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/franchisenewcompanieserror.txt"/>
+<Property id="GraphParameter4" name="READFILEPATH" value="${DATA_TMP_DIR}/FranchiseNewCompanies.xlsx"/>
+<Property id="GraphParameter5" name="TMP_NEW_COMPANY_TABLENAME" value="TMP_LIVING_WAGE_FRANCHISE_NEW_COMPANIES"/>
+<Property id="GraphParameter6" name="TMP_RAW_FRANCHISE_TABLENAME" value="TMP_LIVING_WAGE_FRANCHISE_COMPANIES"/>
+<Property fileURL="workspace.prm" id="GraphParameter7"/>
+<Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/franchisenewcompanies.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="166" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="104" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="98" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="104" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.COMPANY = $in.0.COMPANY;
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.INDUSTRY = $in.0.INDUSTRY;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Lookup Table" guiX="155" guiY="191" id="CREATE_LOOKUP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${FRANCHISE_COMPANY_TABLENAME} (
+  COMPANY VARCHAR(64),
+  JUST_CO_ID VARCHAR(15),
+  NOT_IN_ORIGINAL_JUST_LIST BOOLEAN
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create New Company Table" guiX="419" guiY="274" id="CREATE_NEW_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_NEW_COMPANY_TABLENAME};
+CREATE TABLE ${TMP_NEW_COMPANY_TABLENAME} (
+  JUST_CO_ID VARCHAR(15),
+  TICKER VARCHAR(64),
+  COMPANY VARCHAR(64),
+  INDUSTRY VARCHAR(128)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Raw Franchise Table" guiX="214" guiY="274" id="CREATE_RAW_FRANCHISE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_RAW_FRANCHISE_TABLENAME};
+CREATE TABLE IF NOT EXISTS ${TMP_RAW_FRANCHISE_TABLENAME} (
+  COMPANY VARCHAR(64),
+  TICKER VARCHAR(64),
+  INDUSTRY VARCHAR(128)
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Existing Franchise Tickers" guiX="-20" guiY="274" id="REMOVE_EXISTING_FRANCHISE_TICKERS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DELETE FROM LKP_JUST_CO_SECTY_MASTER WHERE JUST_CO_ID IN (
+  SELECT JUST_CO_ID 
+  FROM ${FRANCHISE_COMPANY_TABLENAME}
+  WHERE not_in_original_just_list AND just_co_id >= 'JUST00000001212'
+  GROUP BY JUST_CO_ID
+);
+
+DELETE FROM LKP_JUST_CO_INDY WHERE JUST_CO_ID IN (
+  SELECT JUST_CO_ID 
+  FROM ${FRANCHISE_COMPANY_TABLENAME}
+  WHERE not_in_original_just_list AND just_co_id >= 'JUST00000001212'
+  GROUP BY JUST_CO_ID
+);
+
+TRUNCATE TABLE ${FRANCHISE_COMPANY_TABLENAME}]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Raw Franchise Table" guiX="46" guiY="355" id="POPULATE_RAW_FRANCHISE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TMP_RAW_FRANCHISE_TABLENAME} (
+    COMPANY,
+    TICKER,
+    INDUSTRY
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Raw Franchise Data" guiX="256" guiY="355" id="CLEANUP_RAW_FRANCHISE_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TMP_RAW_FRANCHISE_TABLENAME} where COMPANY is null;
+delete from ${TMP_RAW_FRANCHISE_TABLENAME} where TICKER is null;
+delete from ${TMP_RAW_FRANCHISE_TABLENAME} where INDUSTRY is null;
+update ${TMP_RAW_FRANCHISE_TABLENAME} set COMPANY = ltrim(rtrim(COMPANY));
+update ${TMP_RAW_FRANCHISE_TABLENAME} set TICKER = ltrim(rtrim(TICKER));
+update ${TMP_RAW_FRANCHISE_TABLENAME} set INDUSTRY = ltrim(rtrim(INDUSTRY));
+]]></attr>
+</Node>
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="28" guiY="750" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="176" guiY="750" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="335" guiY="750" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate New Company Table" guiX="155" guiY="432" id="POPULATE_NEW_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+insert into ${TMP_NEW_COMPANY_TABLENAME}
+select
+  concat('JUST',right(concat('00000000000',f.r + m.maxid + 1),11)) new_id,  f.ticker, f.company, 'Consumer Services'
+from (
+  select rank() over (order by company) r, company, c.ticker
+  from ${TMP_RAW_FRANCHISE_TABLENAME} c
+  left join ( 
+    select ticker_trim ticker
+    from lkp_just_co_secty_master 
+    group by ticker_trim ) m on m.ticker = c.ticker
+  where m.ticker is null
+  group by company, c.ticker
+) f join (
+  select cast(right(just_co_id,11) as integer) maxid
+  from lkp_just_co_secty_master
+  order by cast(right(just_co_id,11) as integer) desc
+  limit 1
+) m on true;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Master Company Table" guiX="30" guiY="510" id="INSERT_INTO_MASTER_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into lkp_just_co_secty_master (just_co_id, ticker_trim, co_long_name)
+select just_co_id, ticker, company from ${TMP_NEW_COMPANY_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Master Industry Table" guiX="258" guiY="510" id="INSERT_INTO_MASTER_INDUSTRY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into lkp_just_co_indy (just_co_id, just_indy)
+select just_co_id, industry from ${TMP_NEW_COMPANY_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert New Companies into Lookup Table" guiX="8" guiY="596" id="INSERT_NEW_COMPANIES_INTO_LOOKUP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${FRANCHISE_COMPANY_TABLENAME} (company, just_co_id, not_in_original_just_list)
+select company, just_co_id, true from ${TMP_NEW_COMPANY_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="10">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert Previously Existing Companies into Lookup Table" guiX="273" guiY="596" id="INSERT_PREVIOUSLY_EXISTING_COMPANIES_INTO_LOOKUP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+insert into ${FRANCHISE_COMPANY_TABLENAME} (company, just_co_id, not_in_original_just_list) 
+select t.company, m.just_co_id, false
+from (
+  select f.company, f.ticker
+  from ${TMP_RAW_FRANCHISE_TABLENAME} f
+  left join ${TMP_NEW_COMPANY_TABLENAME} n on n.company = f.company
+  where n.company is null
+) t
+join lkp_just_co_secty_master m on m.ticker_trim = t.ticker;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="11">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop New Company Table" guiX="63" guiY="674" id="DROP_NEW_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_NEW_COMPANY_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Raw Franchise Table" guiX="248" guiY="674" id="DROP_RAW_FRANCHISE_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_RAW_FRANCHISE_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Wed Sep 07 09:42:43 EDT 2016" description="putting in indeed data matched to glass door goc produced by andy" guiVersion="3.4.4.P" id="1473280387447" licenseType="Commercial" modified="Thu Sep 08 15:36:18 EDT 2016" modifiedBy="hankmobley" name="IndeedGlassdoorMatch" revision="1.18" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="IndeedGDMapping_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="ticker" type="string"/>
+<Field name="goc" type="string"/>
+<Field name="reviewcount" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="IndeedGDMapping_File" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="ticker" type="string"/>
+<Field name="goc" type="string"/>
+<Field name="reviewcount" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/IndeedforGlassdoorMatch2.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/indeedforglassdoormatch2error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/IndeedforGlassdoorMatch2.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="LKP_LIVING_WAGE_INDEED_GOC_COUNTS"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter23" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/indeedforglassdoormatch2.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="156" guiY="17" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="315" guiY="94" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="-4" guiY="88" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="156" guiY="94" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.ticker = $in.0.ticker;
+	$out.0.goc = $in.0.goc;
+	$out.0.reviewcount = $in.0.reviewcount;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Table" guiX="-4" guiY="182" id="DROP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="156" guiY="188" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+  TICKER VARCHAR(255),
+  GOC VARCHAR(255),
+  REVIEWCOUNT VARCHAR(255)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="315" guiY="188" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+	TICKER,
+    GOC,
+    REVIEWCOUNT
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Trim GOCs" guiX="462" guiY="188" id="TRIM_GOCS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TABLENAME} set goc = ltrim(rtrim(goc));]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="8" guiY="275" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="156" guiY="275" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="315" guiY="275" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Tue Nov 01 17:19:56 EDT 2016" modifiedBy="hankmobley" name="LivingWageEmployeeCountByCounty" revision="1.51" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="EMPLOYEE_COUNTS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="STATE_COUNTY_FIPS" type="string"/>
+<Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
+<Field name="EMPLOYEE_COUNT" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/EmployeeCountsByCounty.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/employeecountsbycountyerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/EmployeeCountsByCounty.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="LKP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
+<Property id="GraphParameter4" name="TABLENAMETEMP" value="TMP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
+<Property fileURL="workspace.prm" id="GraphParameter5"/>
+<Property id="GraphParameter20" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/employeecountsbycounty.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="166" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="104" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="98" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="104" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.STATE_COUNTY_FIPS = $in.0.STATE_COUNTY_FIPS;
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
+	$out.0.EMPLOYEE_COUNT = $in.0.EMPLOYEE_COUNT;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Table" guiX="6" guiY="192" id="DROP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="6" guiY="276" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAMETEMP};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
+  STATE_COUNTY_FIPS VARCHAR(5),
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  EMPLOYEE_COUNT INT
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="166" guiY="276" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAMETEMP} (
+  STATE_COUNTY_FIPS VARCHAR(5),
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  EMPLOYEE_COUNT INT
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
+    STATE_COUNTY_FIPS,
+	TICKER,
+    SUBSIDIARY,
+    EMPLOYEE_COUNT
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="317" guiY="276" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAMETEMP} (
+    STATE_COUNTY_FIPS,
+	TICKER,
+    SUBSIDIARY,
+    EMPLOYEE_COUNT
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Cleanup Data" guiX="472" guiY="198" id="CLEANUP_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TABLENAME} where ticker is null;
+update ${TABLENAME} set state_county_fips = ltrim(rtrim(state_county_fips));
+update ${TABLENAME} set ticker = ltrim(rtrim(ticker));
+update ${TABLENAME} set subsidiary = ltrim(rtrim(subsidiary));
+
+delete from ${TABLENAME} where state_county_fips = '(null';
+
+update ${TABLENAME}
+set state_county_fips = concat('0', state_county_fips)
+where length(state_county_fips) = 4;
+
+drop table if exists TMP_${TABLENAME};
+create table TMP_${TABLENAME}(
+  state_county_fips varchar(5),
+  ticker varchar(32),
+  subsidiary varchar(255),
+  employee_count integer
+);
+insert into TMP_${TABLENAME}
+select state_county_fips, ticker, subsidiary, sum(employee_count)
+from ${TABLENAME}
+group by state_county_fips, ticker, subsidiary
+order by ticker, subsidiary, state_county_fips;
+
+truncate table ${TABLENAME};
+
+insert into ${TABLENAME}
+select * from TMP_${TABLENAME};
+
+drop table TMP_${TABLENAME};
+
+delete from ${TABLENAME} 
+where regexp_count(state_county_fips,'^[0-9]{5,5}$') = 0;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Temp Data" guiX="479" guiY="276" id="CLEANUP_TEMP_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TABLENAMETEMP} where ticker is null;
+update ${TABLENAMETEMP} set state_county_fips = ltrim(rtrim(state_county_fips));
+update ${TABLENAMETEMP} set ticker = ltrim(rtrim(ticker));
+update ${TABLENAMETEMP} set subsidiary = ltrim(rtrim(subsidiary));
+
+delete from ${TABLENAMETEMP} where state_county_fips = '(null';
+
+update ${TABLENAMETEMP}
+set state_county_fips = concat('0', state_county_fips)
+where length(state_county_fips) = 4;
+
+drop table if exists TMP_${TABLENAMETEMP};
+create table TMP_${TABLENAMETEMP}(
+  state_county_fips varchar(5),
+  ticker varchar(32),
+  subsidiary varchar(255),
+  employee_count integer
+);
+insert into TMP_${TABLENAMETEMP}
+select state_county_fips, ticker, subsidiary, sum(employee_count)
+from ${TABLENAMETEMP}
+group by state_county_fips, ticker, subsidiary
+order by ticker, subsidiary, state_county_fips;
+
+truncate table ${TABLENAMETEMP};
+
+insert into ${TABLENAMETEMP}
+select * from TMP_${TABLENAMETEMP};
+
+drop table TMP_${TABLENAMETEMP};
+
+delete from ${TABLENAMETEMP} 
+where regexp_count(state_county_fips,'^[0-9]{5,5}$') = 0;
+]]></attr>
+</Node>
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="6" guiY="432" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="432" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="326" guiY="432" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Table" guiX="121" guiY="353" id="INSERT_INTO_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLENAME}
+SELECT * FROM ${TABLENAMETEMP};]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="293" guiY="353" id="DROP_TEMP_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE ${TABLENAMETEMP};]]></attr>
+</Node>
+</Phase>
+</Graph>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Oct 27 16:13:08 PDT 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.57" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Report_Details" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="description" type="string"/>
+<Field name="company_value" type="string"/>
+<Field name="industry_value" type="string"/>
+<Field name="company_value_2" type="string"/>
+<Field name="industry_value_2" type="string"/>
+<Field name="c1" type="string"/>
+<Field name="c2" type="string"/>
+<Field name="c3" type="string"/>
+<Field name="c4" type="string"/>
+<Field name="c5" type="string"/>
+<Field name="c6" type="string"/>
+<Field name="c7" type="string"/>
+<Field name="c8" type="string"/>
+<Field name="c9" type="string"/>
+<Field name="c10" type="string"/>
+<Field name="c11" type="string"/>
+<Field name="c12" type="string"/>
+<Field name="c13" type="string"/>
+<Field name="c14" type="string"/>
+<Field name="c15" type="string"/>
+<Field name="c16" type="string"/>
+<Field name="c17" type="string"/>
+<Field name="c18" type="string"/>
+<Field name="c19" type="string"/>
+<Field name="c20" type="string"/>
+<Field name="c21" type="string"/>
+<Field name="c22" type="string"/>
+<Field name="c23" type="string"/>
+<Field name="c24" type="string"/>
+<Field name="c25" type="string"/>
+<Field name="c26" type="string"/>
+<Field name="c27" type="string"/>
+<Field name="c28" type="string"/>
+<Field name="c29" type="string"/>
+<Field name="c30" type="string"/>
+<Field name="c31" type="string"/>
+<Field name="c32" type="string"/>
+<Field name="c33" type="string"/>
+<Field name="c34" type="string"/>
+<Field name="c35" type="string"/>
+<Field name="c36" type="string"/>
+<Field name="c37" type="string"/>
+<Field name="c38" type="string"/>
+<Field name="c39" type="string"/>
+<Field name="c40" type="string"/>
+<Field name="c41" type="string"/>
+<Field name="c42" type="string"/>
+<Field name="c43" type="string"/>
+<Field name="c44" type="string"/>
+<Field name="c45" type="string"/>
+<Field name="c46" type="string"/>
+<Field name="c47" type="string"/>
+<Field name="c48" type="string"/>
+<Field name="c49" type="string"/>
+<Field name="c50" type="string"/>
+<Field name="rank_value" type="string"/>
+<Field name="industry_job_total" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="," name="Report_Scores" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="Ticker" type="string"/>
+<Field name="Company" type="string"/>
+<Field name="Score" type="string"/>
+<Field name="Ratio" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="fairpay-parameters.prm" id="GraphParameter0"/>
+<Property id="GraphParameter12" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
+<Property id="GraphParameter13" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
+<Property id="GraphParameter14" name="REPORTS_DIR" value="${DATA_DIR}/fairpay-reports"/>
+<Property fileURL="workspace.prm" id="GraphParameter15"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" guiName="Reformat" guiX="223" guiY="22" id="REFORMAT1" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="223" guiY="133" id="REFORMAT3" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details" guiX="26" guiY="22" id="SELECT_DETAILS" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select 
+  $description:=description, $company_value:=company_value, $industry_value:=industry_value, $company_value_2:=company_value_2, $industry_value_2:=industry_value_2,
+  $c1:=c1, $c2:=c2, $c3:=c3, $c4:=c4, $c5:=c5, $c6:=c6, $c7:=c7, $c8:=c8, $c9:=c9, $c10:=c10,
+  $c11:=c11, $c12:=c12, $c13:=c13, $c14:=c14, $c15:=c15, $c16:=c16, $c17:=c17, $c18:=c18, $c19:=c19, $c20:=c20,
+  $c21:=c21, $c22:=c22, $c23:=c23, $c24:=c24, $c25:=c25, $c26:=c26, $c27:=c27, $c28:=c28, $c29:=c29, $c30:=c30,
+  $c31:=c31, $c32:=c32, $c33:=c33, $c34:=c34, $c35:=c35, $c36:=c36, $c37:=c37, $c38:=c38, $c39:=c39, $c40:=c40,
+  $c41:=c41, $c42:=c42, $c43:=c43, $c44:=c44, $c45:=c45, $c46:=c46, $c47:=c47, $c48:=c48, $c49:=c49, $c50:=c50,
+  $rank_value:=rank_value, $industry_job_total:=industry_job_total
+from ${REPORT_MATRIX_TABLENAME} mtx
+join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+where company_value is not null and rt.row_type not in ('IND_HEADER_BLANK_BOTTOM','IND_HEADER_BLANK_BOTTOM_2')
+order by industry, rt.row_section, ticker, rt.display_order, description;
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Scores" guiX="26" guiY="133" id="SELECT_SCORES" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select
+  $Ticker:=case
+    when rt.row_type = 'IND_HEADER_NAME' then description  /* description, is industry */
+    when rt.row_type = 'IND_HEADER_BLANK_BOTTOM_2' then 'TICKER'
+    else mtx.ticker
+  end,
+  $Company:=case
+    when rt.row_type = 'IND_HEADER_BLANK_BOTTOM_2' then 'COMPANY'
+    else isnull(m.co_long_name,'')
+  end,
+  $Score:=case
+    when rt.row_type = 'IND_HEADER_BLANK_BOTTOM_2' then 'SCORE'
+    else mtx.company_value
+  end,
+  $Ratio:=case
+    when rt.row_type = 'IND_HEADER_BLANK_BOTTOM_2' then 'RATIO'
+    else mtx.industry_value 
+  end
+from ${REPORT_MATRIX_TABLENAME} mtx
+join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+left join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = mtx.just_co_id
+where rt.row_type in ('CO_TOTAL', 'IND_HEADER_NAME', 'IND_FOOTER_BLANK_BOTTOM', 'IND_HEADER_BLANK_TOP', 'IND_HEADER_BLANK_BOTTOM', 'IND_HEADER_BLANK_BOTTOM_2')
+order by industry, rt.row_section, rt.display_order, mtx.company_value desc, ticker;]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="22" id="WRITE_REPORT" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="133" id="WRITE_REPORT1" type="DATA_WRITER"/>
+<Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge15" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_REPORT:0"/>
+<Edge fromNode="REFORMAT3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_REPORT1:0"/>
+<Edge fromNode="SELECT_DETAILS:0" guiBendpoints="" guiRouter="Manhattan" id="Edge14" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="REFORMAT1:0"/>
+<Edge fromNode="SELECT_SCORES:0" guiBendpoints="" guiRouter="Manhattan" id="Edge16" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT3:0"/>
+</Phase>
+</Graph>

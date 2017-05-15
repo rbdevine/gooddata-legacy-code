@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Tue Sep 06 14:57:08 EDT 2016" description="Generates data for the company reports. Like the current industry, this uses a queue to process." guiVersion="3.4.4.P" id="1473188265893" licenseType="Commercial" modified="Wed Sep 07 12:16:24 EDT 2016" modifiedBy="hankmobley" name="FairPayGenerateCurrentCompanyData" revision="1.11" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="PARAM_TABLENAME" value="TMP_PARAM_CUR_COMPANY"/>
+<Property fileURL="workspace.prm" id="GraphParameter1"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Param Table" guiX="293" guiY="32" id="CREATE_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${PARAM_TABLENAME};
+create table ${PARAM_TABLENAME} (
+  INDUSTRY VARCHAR(255) NOT NULL,
+  COMPANY VARCHAR(255) NOT NULL
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Param Table" guiX="282" guiY="115" id="POPULATE_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${PARAM_TABLENAME}
+select industry, company
+from ${COMPANY_QUEUE_TABLENAME}
+order by id
+limit 1;
+
+delete from ${COMPANY_QUEUE_TABLENAME}
+where id in (
+  select id
+  from ${COMPANY_QUEUE_TABLENAME}
+  order by id
+  limit 1
+);
+
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Generate Company Data" guiX="274" guiY="204" id="GENERATE_COMPANY_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists TMP_COMPANY_COUNT_PER_JOB;
+create table TMP_COMPANY_COUNT_PER_JOB (
+  JOB VARCHAR(255) NOT NULL,
+  CO_COUNT INT NOT NULL
+);
+
+insert into TMP_COMPANY_COUNT_PER_JOB
+select job, cast(job_company_count as int) 
+from ${FAIRPAY_MATRIX_TABLENAME} m
+join ${PARAM_TABLENAME} p on m.industry = p.industry
+where value_type = 1;
+
+drop table if exists TMP_COMPANY_JOB_TOTALS_REDUCED;
+create table if not exists TMP_COMPANY_JOB_TOTALS_REDUCED (
+  TMP_COMPANY_ID INT NOT NULL,
+  COMPANY VARCHAR(255) NOT NULL,
+  JOB VARCHAR(255) NOT NULL, 
+  RATE FLOAT NULL,
+  SCORE INT NULL,
+  TOTAL INT NULL
+);
+
+insert into TMP_COMPANY_JOB_TOTALS_REDUCED
+select r.rank, t.company, t.job, t.rate, t.score, t.total 
+from ${COMPANY_JOB_TOTALS_TABLENAME} t
+join (
+  select 
+    rank() over (order by job_total, company) rank, 
+    company
+  from (
+    select company, job_total
+    from (
+      select company, count(c.job) job_total
+      from ${COMPANY_JOB_TOTALS_TABLENAME} c
+      join (
+        /*jobs associated with current company (subset of total jobs for industry)*/
+        select job 
+        from ${COMPANY_JOB_TOTALS_TABLENAME} t
+        join TMP_PARAM_CUR_COMPANY p on p.company = t.company
+      ) j on j.job = c.job
+      group by company
+    ) c
+    where c.company not in (select company from TMP_PARAM_CUR_COMPANY)
+  ) c
+) r on t.company = r.company;
+
+/* 
+  insert header
+*/
+insert into ${FAIRPAY_MATRIX_TABLENAME}
+select p.industry, 10 display_order, 0 value_type, 'Job Title' job, 'Just Id' just_id, p.company , h.*, 'Company Score' score, 'Total Participants' total, 'Salary Count' company_salary_count
+from TMP_PARAM_CUR_COMPANY p
+left join (
+  select *
+  from (
+    select company c1 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 1 group by company limit 1
+  ) c1 
+  left join (
+    select company c2 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 2 group by company limit 1
+  ) c2 on true 
+  left join (
+    select company c3 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 3 group by company limit 1
+  ) c3 on true
+  left join (
+    select company c4 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 4 group by company limit 1
+  ) c4 on true
+  left join (
+    select company c5 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 5 group by company limit 1
+  ) c5 on true
+  left join ( 
+    select company c6 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 6 group by company limit 1
+  ) c6 on true 
+  left join (
+    select company c7 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 7 group by company limit 1
+  ) c7 on true 
+  left join (
+    select company c8 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 8 group by company limit 1
+  ) c8 on true
+  left join (
+    select company c9 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 9 group by company limit 1
+  ) c9 on true
+  left join (
+    select company c10 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 10 group by company limit 1
+  ) c10 on true
+  left join ( 
+    select company c11 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 11 group by company limit 1
+  ) c11 on true 
+  left join (
+    select company c12 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 12 group by company limit 1
+  ) c12 on true 
+  left join (
+    select company c13 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 13 group by company limit 1
+  ) c13 on true
+  left join (
+    select company c14 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 14 group by company limit 1
+  ) c14 on true
+  left join (
+    select company c15 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 15 group by company limit 1
+  ) c15 on true
+  left join ( 
+    select company c16 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 16 group by company limit 1
+  ) c16 on true 
+  left join (
+    select company c17 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 17 group by company limit 1
+  ) c17 on true 
+  left join (
+    select company c18 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 18 group by company limit 1
+  ) c18 on true
+  left join (
+    select company c19 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 19 group by company limit 1
+  ) c19 on true
+  left join (
+    select company c20 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 20 group by company limit 1
+  ) c20 on true
+  left join ( 
+    select company c21 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 21 group by company limit 1
+  ) c21 on true 
+  left join (
+    select company c22 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 22 group by company limit 1
+  ) c22 on true 
+  left join (
+    select company c23 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 23 group by company limit 1
+  ) c23 on true
+  left join (
+    select company c24 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 24 group by company limit 1
+  ) c24 on true
+  left join (
+    select company c25 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 25 group by company limit 1
+  ) c25 on true
+  left join ( 
+    select company c26 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 26 group by company limit 1
+  ) c26 on true 
+  left join (
+    select company c27 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 27 group by company limit 1
+  ) c27 on true 
+  left join (
+    select company c28 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 28 group by company limit 1
+  ) c28 on true
+  left join (
+    select company c29 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 29 group by company limit 1
+  ) c29 on true
+  left join (
+    select company c30 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 30 group by company limit 1
+  ) c30 on true
+  left join ( 
+    select company c31 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 31 group by company limit 1
+  ) c31 on true 
+  left join (
+    select company c32 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 32 group by company limit 1
+  ) c32 on true 
+  left join (
+    select company c33 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 33 group by company limit 1
+  ) c33 on true
+  left join (
+    select company c34 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 34 group by company limit 1
+  ) c34 on true
+  left join (
+    select company c35 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 35 group by company limit 1
+  ) c35 on true
+  left join ( 
+    select company c36 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 36 group by company limit 1
+  ) c36 on true 
+  left join (
+    select company c37 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 37 group by company limit 1
+  ) c37 on true 
+  left join (
+    select company c38 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 38 group by company limit 1
+  ) c38 on true
+  left join (
+    select company c39 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 39 group by company limit 1
+  ) c39 on true
+  left join (
+    select company c40 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 40 group by company limit 1
+  ) c40 on true
+  left join ( 
+    select company c41 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 41 group by company limit 1
+  ) c41 on true 
+  left join (
+    select company c42 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 42 group by company limit 1
+  ) c42 on true 
+  left join (
+    select company c43 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 43 group by company limit 1
+  ) c43 on true
+  left join (
+    select company c44 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 44 group by company limit 1
+  ) c44 on true
+  left join (
+    select company c45 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 45 group by company limit 1
+  ) c45 on true
+  left join ( 
+    select company c46 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 46 group by company limit 1
+  ) c46 on true 
+  left join (
+    select company c47 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 47 group by company limit 1
+  ) c47 on true 
+  left join (
+    select company c48 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 48 group by company limit 1
+  ) c48 on true
+  left join (
+    select company c49 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 49 group by company limit 1
+  ) c49 on true
+  left join (
+    select company c50 from TMP_COMPANY_JOB_TOTALS_REDUCED where TMP_COMPANY_ID = 50 group by company limit 1
+  ) c50 on true
+) h on true;
+
+/*
+  insert data
+*/
+insert into ${FAIRPAY_MATRIX_TABLENAME}
+select p.industry, 11 display_order, 1 value_type, c.job, cast(c.rate as varchar) company,
+  c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20,
+  c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, c34, c35, c36, c37, c38, c39, c40,
+  c41, c42, c43, c44, c45, c46, c47, c48, c49, c50,
+  cast(c.score as varchar), cast(jc.CO_COUNT as varchar), c.total salary_count
+from TMP_COMPANY_JOB_TOTALS c
+join TMP_PARAM_CUR_COMPANY p on p.company = c.company
+join TMP_COMPANY_COUNT_PER_JOB jc on c.job = jc.job
+join (
+  select distinct 
+    c.job,
+    isnull(cast(max(c1.rate) as varchar), '') c1, 
+    isnull(cast(max(c2.rate) as varchar), '') c2, 
+    isnull(cast(max(c3.rate) as varchar), '') c3, 
+    isnull(cast(max(c4.rate) as varchar), '') c4, 
+    isnull(cast(max(c5.rate) as varchar), '') c5, 
+    isnull(cast(max(c6.rate) as varchar), '') c6, 
+    isnull(cast(max(c7.rate) as varchar), '') c7, 
+    isnull(cast(max(c8.rate) as varchar), '') c8, 
+    isnull(cast(max(c9.rate) as varchar), '') c9, 
+    isnull(cast(max(c10.rate) as varchar), '') c10,
+    isnull(cast(max(c11.rate) as varchar), '') c11, 
+    isnull(cast(max(c12.rate) as varchar), '') c12, 
+    isnull(cast(max(c13.rate) as varchar), '') c13, 
+    isnull(cast(max(c14.rate) as varchar), '') c14, 
+    isnull(cast(max(c15.rate) as varchar), '') c15, 
+    isnull(cast(max(c16.rate) as varchar), '') c16, 
+    isnull(cast(max(c17.rate) as varchar), '') c17, 
+    isnull(cast(max(c18.rate) as varchar), '') c18, 
+    isnull(cast(max(c19.rate) as varchar), '') c19, 
+    isnull(cast(max(c20.rate) as varchar), '') c20,
+    isnull(cast(max(c21.rate) as varchar), '') c21, 
+    isnull(cast(max(c22.rate) as varchar), '') c22, 
+    isnull(cast(max(c23.rate) as varchar), '') c23, 
+    isnull(cast(max(c24.rate) as varchar), '') c24, 
+    isnull(cast(max(c25.rate) as varchar), '') c25, 
+    isnull(cast(max(c26.rate) as varchar), '') c26, 
+    isnull(cast(max(c27.rate) as varchar), '') c27, 
+    isnull(cast(max(c28.rate) as varchar), '') c28, 
+    isnull(cast(max(c29.rate) as varchar), '') c29, 
+    isnull(cast(max(c30.rate) as varchar), '') c30,
+    isnull(cast(max(c31.rate) as varchar), '') c31, 
+    isnull(cast(max(c32.rate) as varchar), '') c32, 
+    isnull(cast(max(c33.rate) as varchar), '') c33, 
+    isnull(cast(max(c34.rate) as varchar), '') c34, 
+    isnull(cast(max(c35.rate) as varchar), '') c35, 
+    isnull(cast(max(c36.rate) as varchar), '') c36, 
+    isnull(cast(max(c37.rate) as varchar), '') c37, 
+    isnull(cast(max(c38.rate) as varchar), '') c38, 
+    isnull(cast(max(c39.rate) as varchar), '') c39, 
+    isnull(cast(max(c40.rate) as varchar), '') c40,
+    isnull(cast(max(c41.rate) as varchar), '') c41, 
+    isnull(cast(max(c42.rate) as varchar), '') c42, 
+    isnull(cast(max(c43.rate) as varchar), '') c43, 
+    isnull(cast(max(c44.rate) as varchar), '') c44, 
+    isnull(cast(max(c45.rate) as varchar), '') c45, 
+    isnull(cast(max(c46.rate) as varchar), '') c46, 
+    isnull(cast(max(c47.rate) as varchar), '') c47, 
+    isnull(cast(max(c48.rate) as varchar), '') c48, 
+    isnull(cast(max(c49.rate) as varchar), '') c49, 
+    isnull(cast(max(c50.rate) as varchar), '') c50
+  from ${COMPANY_JOB_TOTALS_TABLENAME} c
+  join TMP_PARAM_CUR_COMPANY p on p.company = c.company
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c1 on c1.tmp_company_id = 1 and c1.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c2 on c2.tmp_company_id = 2 and c2.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c3 on c3.tmp_company_id = 3 and c3.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c4 on c4.tmp_company_id = 4 and c4.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c5 on c5.tmp_company_id = 5 and c5.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c6 on c6.tmp_company_id = 6 and c6.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c7 on c7.tmp_company_id = 7 and c7.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c8 on c8.tmp_company_id = 8 and c8.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c9 on c9.tmp_company_id = 9 and c9.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c10 on c10.tmp_company_id = 10 and c10.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c11 on c11.tmp_company_id = 11 and c11.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c12 on c12.tmp_company_id = 12 and c12.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c13 on c13.tmp_company_id = 13 and c13.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c14 on c14.tmp_company_id = 14 and c14.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c15 on c15.tmp_company_id = 15 and c15.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c16 on c16.tmp_company_id = 16 and c16.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c17 on c17.tmp_company_id = 17 and c17.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c18 on c18.tmp_company_id = 18 and c18.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c19 on c19.tmp_company_id = 19 and c19.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c20 on c20.tmp_company_id = 20 and c20.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c21 on c21.tmp_company_id = 21 and c21.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c22 on c22.tmp_company_id = 22 and c22.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c23 on c23.tmp_company_id = 23 and c23.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c24 on c24.tmp_company_id = 24 and c24.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c25 on c25.tmp_company_id = 25 and c25.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c26 on c26.tmp_company_id = 26 and c26.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c27 on c27.tmp_company_id = 27 and c27.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c28 on c28.tmp_company_id = 28 and c28.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c29 on c29.tmp_company_id = 29 and c29.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c30 on c30.tmp_company_id = 30 and c30.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c31 on c31.tmp_company_id = 31 and c31.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c32 on c32.tmp_company_id = 32 and c32.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c33 on c33.tmp_company_id = 33 and c33.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c34 on c34.tmp_company_id = 34 and c34.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c35 on c35.tmp_company_id = 35 and c35.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c36 on c36.tmp_company_id = 36 and c36.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c37 on c37.tmp_company_id = 37 and c37.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c38 on c38.tmp_company_id = 38 and c38.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c39 on c39.tmp_company_id = 39 and c39.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c40 on c40.tmp_company_id = 40 and c40.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c41 on c41.tmp_company_id = 41 and c41.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c42 on c42.tmp_company_id = 42 and c42.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c43 on c43.tmp_company_id = 43 and c43.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c44 on c44.tmp_company_id = 44 and c44.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c45 on c45.tmp_company_id = 45 and c45.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c46 on c46.tmp_company_id = 46 and c46.job = c.job  
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c47 on c47.tmp_company_id = 47 and c47.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c48 on c48.tmp_company_id = 48 and c48.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c49 on c49.tmp_company_id = 49 and c49.job = c.job 
+  left join TMP_COMPANY_JOB_TOTALS_REDUCED c50 on c50.tmp_company_id = 50 and c50.job = c.job 
+  group by c.job
+  order by job
+) t on t.job = c.job;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up" guiX="298" guiY="289" id="CLEAN_UP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${PARAM_TABLENAME};
+]]></attr>
+</Node>
+</Phase>
+</Graph>

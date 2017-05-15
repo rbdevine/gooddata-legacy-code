@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Wed Sep 07 09:42:43 EDT 2016" description="Load counties that will be discarded from living wage reports." guiVersion="3.4.4.P" id="1473296936946" licenseType="Commercial" modified="Thu Sep 08 12:41:33 EDT 2016" modifiedBy="hankmobley" name="GlassdoorConsolidated" revision="1.17" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="CountyData" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="ticker" type="string"/>
+<Field name="state" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/LivingWageExclusions.xlsx"/>
+<Property id="GraphParameter24" name="EXCLUSION_TABLENAME" value="LKP_LIVING_WAGE_EXCLUSION_STATES"/>
+<Property id="GraphParameter3" name="MASTER_TABLENAME" value="LKP_LIVING_WAGE_MASTER"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/livingwageexclusionserror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/LivingWageExclusions.xlsx"/>
+<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter23" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/LivingWageExclusions.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="166" guiY="2" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="66" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="66" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="72" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.ticker = $in.0.ticker;
+	$out.0.state = $in.0.state;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Exclusion Table" guiX="8" guiY="149" id="DROP_EXCLUSION_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${EXCLUSION_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Exclusion Table" guiX="162" guiY="149" id="CREATE_EXCLUSION_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${EXCLUSION_TABLENAME} (
+  TICKER VARCHAR(32) NOT NULL,
+  STATE VARCHAR(8)
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Load Exclusion Table with File Data" guiX="325" guiY="149" id="LOAD_EXCLUSION_TABLE_WITH_FILE_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${EXCLUSION_TABLENAME} (
+  TICKER,
+  STATE
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Master Table" guiX="15" guiY="221" id="DROP_MASTER_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${MASTER_TABLENAME};]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Master Table" guiX="166" guiY="221" id="CREATE_MASTER_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${MASTER_TABLENAME} (
+  TICKER VARCHAR(32) NOT NULL UNIQUE,
+  JUST_CO_ID VARCHAR(15) NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Master Table" guiX="325" guiY="221" id="POPULATE_MASTER_TABLE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${MASTER_TABLENAME}
+select t.ticker, m.just_co_id
+from (select ticker from ${EXCLUSION_TABLENAME} group by ticker) t
+left join lkp_just_co_secty_master m on t.ticker = m.ticker_trim;]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up Exclusion Table" guiX="162" guiY="296" id="CLEAN_UP_EXCLUSION_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${EXCLUSION_TABLENAME} where isnull(state,'') = '';]]></attr>
+</Node>
+</Phase>
+<Phase number="11">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="24" guiY="374" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="176" guiY="374" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="331" guiY="374" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>
