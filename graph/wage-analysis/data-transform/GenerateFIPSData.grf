@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon May 15 17:06:03 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.332" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon May 15 22:52:06 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.344" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="${TMP_BASE}_CENSUS_MAPPED_FIPS"/>
@@ -6,14 +6,14 @@
 <Property id="GraphParameter2" name="TMP_TABLE_FIPS_DATA_IGNORE_AVG" value="${TMP_BASE}_FIPS_DATA_IGNORE_AVG"/>
 <Property id="GraphParameter3" name="TMP_TABLE_FIPS_MAP" value="${TMP_BASE}_FIPS_MAP"/>
 <Property id="GraphParameter4" name="TMP_TABLE_LIVING_WAGE_OVERRIDE" value="${TMP_BASE}_LIVING_WAGE_OVERRIDE"/>
-<Property id="GraphParameter59" name="TMP_TABLE_MISSING_FIPS" value="${TMP_BASE}_MISSING_FIPS"/>
-<Property fileURL="wage.prm" id="GraphParameter5"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
-<Property fileURL="workspace.prm" id="GraphParameter41"/>
+<Property id="GraphParameter5" name="TMP_TABLE_MISSING_FIPS" value="${TMP_BASE}_MISSING_FIPS"/>
+<Property fileURL="wage.prm" id="GraphParameter6"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter24"/>
+<Property fileURL="workspace.prm" id="GraphParameter42"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: FIPS Data" guiX="27" guiY="29" id="TABLE_FIPS_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: FIPS Data" guiX="27" guiY="29" id="TABLE_FIPS_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************************
   ${TABLE_FIPS_DATA} 
   average cost os living index for city_fips
@@ -34,7 +34,7 @@ create table ${TABLE_FIPS_DATA} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Temp Table: Census Mapped FIPS" guiX="409" guiY="29" id="TEMP_TABLE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Census Mapped FIPS" guiX="409" guiY="29" id="TEMP_TABLE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${TMP_TABLE_CENSUS_MAPPED_FIPS} 
   Convenience table to have state_county_fips code mapped to matching coli data.
@@ -50,7 +50,7 @@ create table ${TMP_TABLE_CENSUS_MAPPED_FIPS} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Temp Table: CIty Name Override" guiX="22" guiY="105" id="TEMP_TABLE_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: CIty Name Override" guiX="22" guiY="105" id="TEMP_TABLE_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${TMP_TABLE_CITY_NAME_OVERRIDE}
   These cities were not found in the census data. Manually looked up with lkp_city_fips, which is
@@ -65,7 +65,7 @@ create table ${TMP_TABLE_CITY_NAME_OVERRIDE} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Temp Table: FIPS Data Ignore Avg" guiX="172" guiY="29" id="TEMP_TABLE_FIPS_DATA_IGNORE_AVG" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: FIPS Data Ignore Avg" guiX="172" guiY="29" id="TEMP_TABLE_FIPS_DATA_IGNORE_AVG" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************************
   ${TMP_TABLE_FIPS_DATA_IGNORE_AVG} 
   for city/state entries that have > 1 city_fips and > 1 
@@ -130,7 +130,7 @@ create table ${TMP_TABLE_MISSING_FIPS} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate City Name Override" guiX="32" guiY="185" id="POPULATE_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate City Name Override" guiX="32" guiY="185" id="POPULATE_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('05107','31190','AR','WEST HELENA');
 insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('06109','56870','CA','PHOENIX LAKE');
 insert into ${TMP_TABLE_CITY_NAME_OVERRIDE} values('08043','11810','CO','CAÑON CITY');
@@ -235,7 +235,7 @@ insert into ${TMP_TABLE_MISSING_FIPS} values('51955');
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Census Mapped FIPS" guiX="222" guiY="270" id="POPULATE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Census Mapped FIPS" guiX="222" guiY="270" id="POPULATE_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 insert into ${TMP_TABLE_CENSUS_MAPPED_FIPS}
 select
@@ -254,7 +254,7 @@ left join ${TMP_TABLE_FIPS_MAP} m on m.state_county_fips_census = f.state_county
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate COLI Avgs By City" guiX="236" guiY="349" id="POPULATE_COLI_AVGS_BY_CITY" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate COLI Avgs By City" guiX="236" guiY="349" id="POPULATE_COLI_AVGS_BY_CITY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_FIPS_DATA}
@@ -303,7 +303,7 @@ join (
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add COLI Avgs By Unique Non-City/Non-County" guiX="179" guiY="426" id="ADD_COLI_AVGS_BY_UNIQUE_NON_CITY_NON_COUNTY" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add COLI Avgs By Unique Non-City/Non-County" guiX="179" guiY="426" id="ADD_COLI_AVGS_BY_UNIQUE_NON_CITY_NON_COUNTY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_FIPS_DATA}
@@ -380,7 +380,7 @@ join ${TABLE_REGIONAL_PURCHASING_POWER} p on p.fips_code = f.state_county_fips_c
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add City Name Overrides" guiX="236" guiY="503" id="ADD_CITY_NAME_OVERRIDES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add City Name Overrides" guiX="236" guiY="503" id="ADD_CITY_NAME_OVERRIDES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_FIPS_DATA}
@@ -406,7 +406,7 @@ join (
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Update with Living Wage" guiX="237" guiY="576" id="UPDATE_WITH_LIVING_WAGE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update with Living Wage" guiX="237" guiY="576" id="UPDATE_WITH_LIVING_WAGE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************
   add matched living wage values
 *********************************************************************/
@@ -424,7 +424,7 @@ where c.state_county_fips = a.state_county_fips;]]></attr>
 </Node>
 </Phase>
 <Phase number="7">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Unmatched Living Wage" guiX="221" guiY="650" id="ADD_UNMATCHED_LIVING_WAGE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Unmatched Living Wage" guiX="221" guiY="650" id="ADD_UNMATCHED_LIVING_WAGE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************
   add living wage entries for living wage not in coli avg table.
   may be moot since glassdoor data doesn't match with this anyhow
@@ -482,7 +482,7 @@ order by f.state, f.city;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add LIving Wage Overrides" guiX="224" guiY="722" id="ADD_LIVING_WAGE_OVERRIDES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add LIving Wage Overrides" guiX="224" guiY="722" id="ADD_LIVING_WAGE_OVERRIDES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************
   need to account for special cases in ${TABLE_LIVING_WAGE_MIT}
   (e.g., columbia city, MD)
@@ -500,7 +500,7 @@ where
 </Node>
 </Phase>
 <Phase number="9">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Missing Cost of Living Data" guiX="220" guiY="798" id="ADD_MISSING_COST_OF_LIVING_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Missing Cost of Living Data" guiX="220" guiY="798" id="ADD_MISSING_COST_OF_LIVING_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************
   Some cost of living index data not input
 *********************************************************************/
@@ -516,39 +516,9 @@ join (
 ) m on m.state_county_fips_map = p.fips_code
 where f.avg_cost_of_living_index is null and f.state_county_fips = m.state_county_fips;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Missing Cost of Living Index" guiX="217" guiY="1165" id="ADD_MISSING_COST_OF_LIVING_INDEX" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/********************************************************************
-  Some cost of living index data not input
-*********************************************************************/
-SET LOCALE to LEN_S1;
-select f.state_county_fips, p.cost_of_living_index cost_of_living_index_avg
-from tmp_wage_missing_fips f
-join stg_regionalpurchasingpower p on p.fips_code = f.state_county_fips
-]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Missing Living Wage Averages" guiX="217" guiY="1091" id="ADD_MISSING_LIVING_WAGE_AVERAGES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/********************************************************************
-  Some cost of living index data not input
-*********************************************************************/
-SET LOCALE to LEN_S1;
-select *
-from (
-select f.state_county_fips, _2a1pt1c_hourly living_wage_hourly_avg
-from tmp_wage_missing_fips f
-join lkp_living_wage_mit m on m.state_county_fips = f.state_county_fips
-union all
-select * from (
-select f.state_county_fips, avg(_2a1pt1c_hourly) living_wage_hourly_avg
-from tmp_wage_missing_fips f
-join tmp_wage_fips_map m on m.state_county_fips_coli = f.state_county_fips
-join lkp_living_wage_mit lw on lw.state_county_fips = m.state_county_fips_census
-group by f.state_county_fips ) t
-) t order by state_county_fips
-]]></attr>
-</Node>
 </Phase>
 <Phase number="10">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Set aside City/State with multiple city_fips and state_county_fips" guiX="130" guiY="868" id="SET_ASIDE_CITY_STATE_WITH_MULTIPLE_CITY_FIPS_AND_STATE_COUNTY_FIPS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Set aside City/State with multiple city_fips and state_county_fips" guiX="130" guiY="868" id="SET_ASIDE_CITY_STATE_WITH_MULTIPLE_CITY_FIPS_AND_STATE_COUNTY_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/********************************************************************
   HP Vertica does not seem to support deleting based on multiple
   column criteria, so must use temp table
@@ -607,7 +577,7 @@ drop table tmp_wage_fips_data_2;]]></attr>
 </Node>
 </Phase>
 <Phase number="11">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Avg City/State for multiple Cost of Living/Living Wage" guiX="158" guiY="942" id="AVG_CITY_STATE_FOR_MULTIPLE_COST_OF_LIVING_LIVING_WAGE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Avg City/State for multiple Cost of Living/Living Wage" guiX="158" guiY="942" id="AVG_CITY_STATE_FOR_MULTIPLE_COST_OF_LIVING_LIVING_WAGE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/**************************************************************************
   city/state should always have one and only one cost of living index
   and one and only one living wage hourly. For any city/state records
@@ -631,28 +601,66 @@ where f.city = t.city and f.state = t.state;]]></attr>
 </Node>
 </Phase>
 <Phase number="12">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Return City/State with multiple city_fips and state_county_fips to main table" guiX="123" guiY="1016" id="RETURN_CITY_STATE_WITH_MULTIPLE_CITY_FIPS_AND_STATE_COUNTY_FIPS_TO_MAIN_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Return City/State with multiple city_fips and state_county_fips to main table" guiX="123" guiY="1016" id="RETURN_CITY_STATE_WITH_MULTIPLE_CITY_FIPS_AND_STATE_COUNTY_FIPS_TO_MAIN_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_FIPS_DATA}
 select * from ${TMP_TABLE_FIPS_DATA_IGNORE_AVG};]]></attr>
 </Node>
 </Phase>
 <Phase number="13">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Census Mapped FIPS" guiX="212" guiY="1240" id="DROP_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Missing Living Wage Averages" guiX="217" guiY="1091" id="ADD_MISSING_LIVING_WAGE_AVERAGES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************
+  Some cost of living index data not input
+*********************************************************************/
+SET LOCALE to LEN_S1;
+INSERT INTO ${TABLE_FIPS_DATA}
+(state_county_fips, living_wage_hourly_by_state_county_fips)
+select state_county_fips, _2a1pt1c_hourly
+from (
+  select f.state_county_fips, _2a1pt1c_hourly
+  from ${TMP_TABLE_MISSING_FIPS} f
+  join ${TABLE_LIVING_WAGE_MIT} m on m.state_county_fips = f.state_county_fips
+  union all
+  select * from (
+    select f.state_county_fips, avg(_2a1pt1c_hourly) _2a1pt1c_hourly
+    from ${TMP_TABLE_MISSING_FIPS} f
+    join ${TMP_TABLE_FIPS_MAP} m on m.state_county_fips_coli = f.state_county_fips
+    join ${TABLE_LIVING_WAGE_MIT} lw on lw.state_county_fips = m.state_county_fips_census
+    group by f.state_county_fips 
+  ) t
+) t order by state_county_fips;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="14">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Missing Cost of Living Index" guiX="217" guiY="1165" id="ADD_MISSING_COST_OF_LIVING_INDEX" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************
+  Some cost of living index data not input
+*********************************************************************/
+SET LOCALE to LEN_S1;
+UPDATE ${TABLE_FIPS_DATA} fd
+SET avg_cost_of_living_index = p.cost_of_living_index
+FROM ${TMP_TABLE_MISSING_FIPS} f
+JOIN ${TABLE_REGIONAL_PURCHASING_POWER} p on p.fips_code = f.state_county_fips
+where fd.state_county_fips = f.state_county_fips;]]></attr>
+</Node>
+</Phase>
+<Phase number="15">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Census Mapped FIPS" guiX="212" guiY="1240" id="DROP_CENSUS_MAPPED_FIPS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_CENSUS_MAPPED_FIPS};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop City Name Override" guiX="396" guiY="1240" id="DROP_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop City Name Override" guiX="396" guiY="1240" id="DROP_CITY_NAME_OVERRIDE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_CITY_NAME_OVERRIDE};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop FIPS Map" guiX="71" guiY="1240" id="DROP_FIPS_MAP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop FIPS Map" guiX="71" guiY="1240" id="DROP_FIPS_MAP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_FIPS_MAP};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Living Wage Override" guiX="73" guiY="1316" id="DROP_LIVING_WAGE_OVERRIDE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Living Wage Override" guiX="73" guiY="1316" id="DROP_LIVING_WAGE_OVERRIDE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_LIVING_WAGE_OVERRIDE};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Fips Data" guiX="262" guiY="1316" id="DROP_TEMP_FIPS_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Fips Data" guiX="262" guiY="1316" id="DROP_TEMP_FIPS_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_FIPS_DATA_IGNORE_AVG};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Fips Data" guiX="416" guiY="1316" id="DROP_TEMP_FIPS_DATA1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Fips Data" guiX="416" guiY="1316" id="DROP_TEMP_FIPS_DATA1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_MISSING_FIPS};]]></attr>
 </Node>
 </Phase>
