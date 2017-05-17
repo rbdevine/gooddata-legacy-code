@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Tue May 16 15:33:27 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.90" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, LKP_GLASSDOOR_SALARY_DW, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Tue May 16 23:24:34 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.99" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,10 +16,10 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter18"/>
 <Property fileURL="workspace.prm" id="GraphParameter0"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter53"/>
-<Property fileURL="wage.prm" id="GraphParameter21"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter18"/>
+<Property fileURL="wage.prm" id="GraphParameter38"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter71"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -37,29 +37,12 @@ create table if not exists ${COMPANY_JOB_DATA_TABLENAME} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Company Table" guiX="217" guiY="743" id="CREATE_COMPANY_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_COMPANY_TABLENAME};
-create table if not exists ${TMP_COMPANY_TABLENAME} (
-  JUST_CO_ID VARCHAR(15) NOT NULL UNIQUE,
-  COMPANY_COLUMN_NO INT
-);
-]]></attr>
-</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Table" guiX="257" guiY="12" id="CREATE_COMPANY_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_TABLENAME};
 create table if not exists ${COMPANY_TABLENAME} (
   PROCESS_TYPE_ID INTEGER NOT NULL,
   JUST_CO_ID VARCHAR(15) NOT NULL UNIQUE,
   COMPANY_COLUMN_NO INT
-);
-]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Job Table" guiX="388" guiY="743" id="CREATE_JOB_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_JOB_TABLENAME};
-create table if not exists ${TMP_JOB_TABLENAME} (
-  INDUSTRY VARCHAR(255) NOT NULL,
-  JOB VARCHAR(255) NOT NULL,
-  COMPANY_COUNT INT NOT NULL
 );
 ]]></attr>
 </Node>
@@ -85,12 +68,13 @@ create table ${PARAM_TABLENAME} (
   MIN_CO_PER_JOB INT NOT NULL,
   MIN_IND_GOC_CO_COUNT INT NOT NULL,
   MIN_DATA_POINTS_PER_CO INT NOT NULL,
+  COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT BOOLEAN NOT NULL,
   INDUSTRY VARCHAR(64) NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Process Queue" guiX="83" guiY="95" id="CREATE_PROCESS_QUEUE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_TABLE_PROCESS_QUEUE};
-create table if not exists ${TMP_TABLE_PROCESS_QUEUE} (
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_PROCESS_QUEUE};
+create table if not exists ${TABLE_PROCESS_QUEUE} (
   ID AUTO_INCREMENT,
   PROCESS_TYPE_ID INTEGER UNIQUE NOT NULL
 );]]></attr>
@@ -106,63 +90,37 @@ create table if not exists ${TABLE_PROCESS} (
   MIN_JOCS_PER_COMPANY INTEGER NOT NULL,
   MIN_JOCS_PER_COMPANY_SCORE_1 INTEGER NOT NULL,
   MIN_JOCS_PER_COMPANY_SCORE_2 INTEGER NOT NULL,
-  MIN_JOCS_PER_COMPANY_SCORE_3 INTEGER NOT NULL
-);
-]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Create Temp Company Job Data Table" guiX="151" guiY="662" id="CREATE_TEMP_COMPANY_JOB_DATA_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_COMPANY_JOB_DATA_TABLENAME};
-create table if not exists ${TMP_COMPANY_JOB_DATA_TABLENAME} (
-  JUST_CO_ID VARCHAR(15) NOT NULL,
-  JOB VARCHAR(255) NOT NULL, 
-  RATE FLOAT NULL,
-  SCORE INT NULL,
-  RATE_RAW FLOAT NULL,
-  SCORE_RAW INT NULL,
-  TOTAL INT NULL
+  MIN_JOCS_PER_COMPANY_SCORE_3 INTEGER NOT NULL,
+  COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT BOOLEAN NOT NULL
 );
 ]]></attr>
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Company Job Data Table" guiX="64" guiY="583" id="POPULATE_COMPANY_JOB_DATA_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${COMPANY_JOB_DATA_TABLENAME}
-SELECT 1, * FROM LKP_FAIRPAY_COMPANY_JOB_DATA;
-INSERT INTO ${COMPANY_JOB_DATA_TABLENAME}
-SELECT 2, * FROM LKP_LIVING_WAGE_COMPANY_JOB_DATA;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Company Table" guiX="291" guiY="583" id="POPULATE_COMPANY_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${COMPANY_TABLENAME} 
-SELECT 1, * FROM LKP_FAIRPAY_COMPANY;
-INSERT INTO ${COMPANY_TABLENAME} 
-SELECT 2, * FROM LKP_LIVING_WAGE_COMPANY;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Job Table" guiX="470" guiY="583" id="POPULATE_JOB_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${JOB_TABLENAME}
-SELECT 1, * FROM LKP_FAIRPAY_JOB;
-INSERT INTO ${JOB_TABLENAME}
-SELECT 2, * FROM LKP_LIVING_WAGE_JOB;]]></attr>
-</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Process Table" guiX="251" guiY="171" id="POPULATE_PROCESS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_PROCESS} 
 VALUES (1,'FairPay',
-		CONST_FP_MIN_COMPANIES_PER_JOC,
-		CONST_FP_MIN_DATA_POINTS_PER_COMPANY,
-		CONST_FP_MIN_INDUSTRY_JOCS_PER_COMPANY,
-		CONST_FP_MIN_JOCS_PER_COMPANY,
-		CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_1,
-		CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_2,
-		CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_3);
+		${CONST_FP_MIN_COMPANIES_PER_JOC},
+		${CONST_FP_MIN_DATA_POINTS_PER_COMPANY},
+		${CONST_FP_MIN_INDUSTRY_JOCS_PER_COMPANY},
+		${CONST_FP_MIN_JOCS_PER_COMPANY},
+		${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_1},
+		${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_2},
+		${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_3},
+		${CONST_COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT}
+);
 
 INSERT INTO ${TABLE_PROCESS} 
 VALUES (2,'LivingWage',
-		CONST_LW_MIN_COMPANIES_PER_JOC,
-		CONST_LW_MIN_DATA_POINTS_PER_COMPANY,
-		CONST_LW_MIN_INDUSTRY_JOCS_PER_COMPANY,
-		CONST_LW_MIN_JOCS_PER_COMPANY,
-		CONST_LW_MIN_JOCS_PER_COMPANY_SCORE_1,
-		CONST_LW_MIN_JOCS_PER_COMPANY_SCORE_2,
-		CONST_LW_MIN_JOCS_PER_COMPANY_SCORE_3);
+		${CONST_LW_MIN_COMPANIES_PER_JOC},
+		${CONST_LW_MIN_DATA_POINTS_PER_COMPANY},
+		${CONST_LW_MIN_INDUSTRY_JOCS_PER_COMPANY},
+		${CONST_LW_MIN_JOCS_PER_COMPANY},
+		${CONST_LW_MIN_JOCS_PER_COMPANY_SCORE_1},
+		${CONST_LW_MIN_JOCS_PER_COMPANY_SCORE_2},
+		${CONST_LW_MIN_JOCS_PER_COMPANY_SCORE_3},
+		${CONST_COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT}
+);
 ]]></attr>
 </Node>
 </Phase>

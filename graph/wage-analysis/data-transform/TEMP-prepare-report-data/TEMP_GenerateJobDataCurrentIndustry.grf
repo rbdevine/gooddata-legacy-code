@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Tue May 16 15:45:26 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateCurrentIndustryData" revision="1.135" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Wed May 17 00:17:35 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.152" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
@@ -11,14 +11,15 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter9" name="TMP_LOW_DATA_COMPANIES_TABLENAME" value="TMP_LOW_DATA_COMPANIES"/>
-<Property id="GraphParameter10" name="TMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
-<Property fileURL="workspace.prm" id="GraphParameter11"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
+<Property id="GraphParameter0" name="TMP_LOW_DATA_COMPANIES_TABLENAME" value="TMP_LOW_DATA_COMPANIES"/>
+<Property id="GraphParameter1" name="TMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
+<Property fileURL="wage.prm" id="GraphParameter29"/>
+<Property fileURL="workspace.prm" id="GraphParameter2"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter20"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Summary Table" guiX="68" guiY="19" id="CREATE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Summary Table" guiX="10" guiY="19" id="CREATE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SALARY_SUMMARY_TABLENAME};
 create table if not exists ${TMP_SALARY_SUMMARY_TABLENAME} (
   JOB VARCHAR(255) NOT NULL,
@@ -36,11 +37,20 @@ create table if not exists ${TMP_SALARY_SUMMARY_TABLENAME} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Low Data Companies" guiX="279" guiY="19" id="TABLE_TEMP_LOW_DATA_COMPANIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Low Data Companies" guiX="213" guiY="19" id="TABLE_TEMP_LOW_DATA_COMPANIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_LOW_DATA_COMPANIES_TABLENAME};
 
 create table ${TMP_LOW_DATA_COMPANIES_TABLENAME} (
   JUST_CO_ID VARCHAR(15) NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Ticker Data" guiX="438" guiY="19" id="TABLE_TEMP_TICKER_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_TICKER_DATA_TABLENAME};
+
+create table ${TMP_TICKER_DATA_TABLENAME} (
+  JUST_CO_ID VARCHAR(15) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
+  INDUSTRY VARCHAR(128) NOT NULL
 );]]></attr>
 </Node>
 </Phase>
@@ -64,46 +74,70 @@ where id in (
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Summary Table" guiX="176" guiY="170" id="POPULATE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TMP_SALARY_SUMMARY_TABLENAME}
-select distinct
-  s.goc job,
-  m.just_co_id just_co_id,
-  count(s.goc) total,
-  case
-    when count(s.goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_1) then 0.0
-    when count(s.goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_2) then 1.0
-    when count(s.goc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_3) then 2.0
-    else 3.0
-  end quality_score,
-  cast(round(avg(UNADJUSTEDBASEHOURLY),2) as numeric(36,2)) unadjusted_hourly_avg_base,
-  cast(round(avg(UNADJUSTEDTOTALHOURLY),2) as numeric(36,2)) unadjusted_hourly_avg_total,
-  cast(round(avg(UNADJUSTEDBASEHOURLY_COLA),2) as numeric(36,2)) unadjusted_hourly_avg_base_cola,
-  cast(round(avg(UNADJUSTEDTOTALHOURLY_COLA),2) as numeric(36,2)) unadjusted_hourly_avg_total_cola, 
-  cast(round(avg(UNADJUSTEDBASESALARY),2) as numeric(36,2)) unadjusted_avg_base,
-  cast(round(avg(UNADJUSTEDTOTALSALARY),2) as numeric(36,2)) unadjusted_avg_total,
-  cast(round(avg(UNADJUSTEDBASESALARY_COLA),2) as numeric(36,2)) unadjusted_avg_base_cola,
-  cast(round(avg(UNADJUSTEDTOTALSALARY_COLA),2) as numeric(36,2)) unadjusted_avg_total_cola  
-from LKP_GLASSDOOR_SALARY_DW s
-join LKP_JUST_CO_SECTY_MASTER m on s.just_company_id = m.just_co_id
-join ${PARAM_TABLENAME} p on s.just_indy = p.industry
-join (
-  select just_indy, goc, count(just_company_id) indy_goc_count
-  from (
-    select just_indy, goc, just_company_id
-    from lkp_glassdoor_salary_dw s
-    where goc is not null
-    group by just_indy, goc, just_company_id
-  ) gc
-  group by just_indy, goc
-) t on t.just_indy = s.just_indy and t.goc = s.goc
-where stateabbreviation <> 'PR' and s.goc is not null and t.indy_goc_count >= p.MIN_IND_GOC_CO_COUNT
-group by s.just_indy, m.just_co_id, s.GOC
-having count(s.goc) >= max(p.MIN_JOB_COUNT_PER_CO_SCORE_1);]]></attr>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Ticker Data Table" guiX="171" guiY="168" id="POPULATE_TEMP_TICKER_DATA_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TMP_TICKER_DATA_TABLENAME}
+SELECT m.just_co_id, t.ticker, t.industry
+FROM (
+  SELECT ticker, industry 
+  FROM (
+    SELECT
+      case
+        when p.COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT then c.ticker
+        when isnull(s.ticker_subsidiary,c.ticker) = 'JACKJ' then 'JBOXJ'
+        when isnull(s.ticker_subsidiary,c.ticker) = 'JACKQ' then 'JBOXQ'      
+        else isnull(s.ticker_subsidiary,c.ticker)
+      end ticker,
+      c.industry    
+    FROM ${TABLE_COMPANY} c
+    JOIN ${PARAM_TABLENAME} p on p.industry = c.industry
+    LEFT JOIN (select * from ${TABLE_SUBSIDIARY} where ticker_subsidiary is not null) s on s.ticker_parent = c.ticker
+  ) t group by ticker, industry
+) t
+JOIN lkp_just_co_secty_master m on m.ticker_trim = t.ticker]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Reduce Temp Summary Table" guiX="180" guiY="247" id="REDUCE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Summary Table" guiX="172" guiY="245" id="POPULATE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_SALARY_SUMMARY_TABLENAME}
+select distinct
+  w.joc job,
+  c.just_co_id just_co_id,
+  count(w.joc) total,
+  case
+    when count(w.joc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_1) then 0.0
+    when count(w.joc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_2) then 1.0
+    when count(w.joc) < max(p.MIN_JOB_COUNT_PER_CO_SCORE_3) then 2.0
+    else 3.0
+  end quality_score,
+  cast(round(avg(w.hourly_wage_raw),2) as numeric(36,2)) unadjusted_hourly_avg_base,
+  cast(round(avg(w.hourly_wage_raw),2) as numeric(36,2)) unadjusted_hourly_avg_total,
+  cast(round(avg(w.hourly_wage_cola),2) as numeric(36,2)) unadjusted_hourly_avg_base_cola,
+  cast(round(avg(w.hourly_wage_cola),2) as numeric(36,2)) unadjusted_hourly_avg_total_cola, 
+  cast(round(avg(w.hourly_wage_raw*${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) unadjusted_avg_base,
+  cast(round(avg(w.hourly_wage_raw*${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) unadjusted_avg_total,
+  cast(round(avg(w.hourly_wage_cola*${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) unadjusted_avg_base_cola,
+  cast(round(avg(w.hourly_wage_cola*${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) unadjusted_avg_total_cola  
+from ${TABLE_WAGE} w
+join ${TMP_TICKER_DATA_TABLENAME} c on c.ticker = w.ticker
+join ${PARAM_TABLENAME} p on p.industry = c.industry
+join (
+  select industry, joc, count(ticker) indy_joc_count
+  from (
+    select c.industry, w.joc, w.ticker
+    from ${TABLE_WAGE} w
+    join ${TMP_TICKER_DATA_TABLENAME} c on c.ticker = w.ticker
+    where joc is not null
+    group by c.industry, w.joc, w.ticker
+  ) gc
+  group by industry, joc
+) t on t.industry = c.industry and t.joc = w.joc
+where w.state <> 'PR' and w.joc is not null and t.indy_joc_count >= p.MIN_IND_GOC_CO_COUNT
+group by c.industry, c.just_co_id, w.JOC
+having count(w.joc) >= max(p.MIN_JOB_COUNT_PER_CO_SCORE_1);]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Reduce Temp Summary Table" guiX="180" guiY="320" id="REDUCE_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TMP_SALARY_SUMMARY_TABLENAME}
 where job in (
   select job from ${TMP_SALARY_SUMMARY_TABLENAME} 
@@ -176,8 +210,53 @@ where just_co_id in (
 ]]></attr>
 </Node>
 </Phase>
-<Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Low Data Companies" guiX="192" guiY="469" id="ADD_LOW_DATA_COMPANIES" type="DB_EXECUTE">
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Companies" guiX="114" guiY="393" id="ADD_INDUSTRY_COMPANIES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_COMPANY_TABLENAME} (process_type_id, just_co_id, company_column_no)
+select process_type_id, just_co_id, rank() over (order by jobCnt desc, company) id from (
+  select p.process_type_id, s.just_co_id, m.co_long_name company, count(s.job) jobCnt
+  from ${TMP_SALARY_SUMMARY_TABLENAME} s
+  join lkp_just_co_secty_master m on s.just_co_id = m.just_co_id
+  join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+  join ${PARAM_TABLENAME} p on p.industry = i.just_indy
+  where s.quality_score > 0
+  group by p.process_type_id, p.industry, s.just_co_id, m.co_long_name
+) t;
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Jobs" guiX="306" guiY="393" id="ADD_INDUSTRY_JOBS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_JOB_TABLENAME} (process_type_id, industry, job, company_count)
+select p.process_type_id, p.industry, s.job, count(s.just_co_id)
+from ${TMP_SALARY_SUMMARY_TABLENAME} s
+join lkp_just_co_secty_master m on s.just_co_id = m.just_co_id
+join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+join ${PARAM_TABLENAME} p on p.industry = i.just_indy
+group by p.process_type_id, p.industry, s.job;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Company Job Data" guiX="180" guiY="464" id="ADD_INDUSTRY_COMPANY_JOB_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_COMPANY_JOB_DATA_TABLENAME} 
+select p.process_type_id, c.just_co_id, s.job, s.unadjusted_avg_base_hourly_cola, r.raterank, s.unadjusted_avg_base_hourly, r.raterank_raw, s.total 
+from ${TMP_COMPANY_TABLENAME} c
+join ${TMP_SALARY_SUMMARY_TABLENAME} s on s.just_co_id = c.just_co_id
+join lkp_just_co_secty_master m on m.just_co_id = c.just_co_id
+join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+join ${PARAM_TABLENAME} p on p.industry = i.just_indy
+join (
+  select 
+    rank() over (partition by job order by unadjusted_avg_base_hourly_cola) raterank, 
+    rank() over (partition by job order by unadjusted_avg_base_hourly) raterank_raw, 
+    just_co_id,
+    job
+  from ${TMP_SALARY_SUMMARY_TABLENAME}
+) r on r.just_co_id = s.just_co_id and r.job = s.job;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Low Data Companies" guiX="192" guiY="539" id="ADD_LOW_DATA_COMPANIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_LOW_DATA_COMPANIES_TABLENAME}
 select cjd.just_co_id
 from (
@@ -199,8 +278,8 @@ group by cjd.just_co_id, m.ticker_trim
 having sum(j.company_count) < max(p.MIN_DATA_POINTS_PER_CO);]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Low Data Companies From Summary Table" guiX="128" guiY="541" id="REMOVE_LOW_DATA_COMPANIES_FROM_SUMMARY_TABLE" type="DB_EXECUTE">
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Low Data Companies From Summary Table" guiX="128" guiY="611" id="REMOVE_LOW_DATA_COMPANIES_FROM_SUMMARY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TMP_COMPANY_TABLENAME}
 where just_co_id in (
   select just_co_id
@@ -209,57 +288,15 @@ where just_co_id in (
 ]]></attr>
 </Node>
 </Phase>
-<Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Companies" guiX="114" guiY="323" id="ADD_INDUSTRY_COMPANIES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TMP_COMPANY_TABLENAME} (just_co_id, company_column_no)
-select just_co_id, rank() over (order by jobCnt desc, company) id from (
-  select s.just_co_id, m.co_long_name company, count(s.job) jobCnt
-  from ${TMP_SALARY_SUMMARY_TABLENAME} s
-  join lkp_just_co_secty_master m on s.just_co_id = m.just_co_id
-  join lkp_just_co_indy i on i.just_co_id = m.just_co_id
-  join ${PARAM_TABLENAME} p on p.industry = i.just_indy
-  where s.quality_score > 0
-  group by p.industry, s.just_co_id, m.co_long_name
-) t;
-]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Jobs" guiX="306" guiY="323" id="ADD_INDUSTRY_JOBS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TMP_JOB_TABLENAME} (industry, job, company_count)
-select p.industry, s.job, count(s.just_co_id)
-from ${TMP_SALARY_SUMMARY_TABLENAME} s
-join lkp_just_co_secty_master m on s.just_co_id = m.just_co_id
-join lkp_just_co_indy i on i.just_co_id = m.just_co_id
-join ${PARAM_TABLENAME} p on p.industry = i.just_indy
-group by p.industry, s.job;
-]]></attr>
-</Node>
-</Phase>
-<Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Industry Company Job Data" guiX="180" guiY="394" id="ADD_INDUSTRY_COMPANY_JOB_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TMP_COMPANY_JOB_DATA_TABLENAME} 
-select c.just_co_id, s.job, s.unadjusted_avg_base_hourly_cola, r.raterank, s.unadjusted_avg_base_hourly, r.raterank_raw, s.total 
-from ${TMP_COMPANY_TABLENAME} c
-join ${TMP_SALARY_SUMMARY_TABLENAME} s on s.just_co_id = c.just_co_id
-join lkp_just_co_secty_master m on m.just_co_id = c.just_co_id
-join lkp_just_co_indy i on i.just_co_id = m.just_co_id
-join ${PARAM_TABLENAME} p on p.industry = i.just_indy
-join (
-  select 
-    rank() over (partition by job order by unadjusted_avg_base_hourly_cola) raterank, 
-    rank() over (partition by job order by unadjusted_avg_base_hourly) raterank_raw, 
-    just_co_id,
-    job
-  from ${TMP_SALARY_SUMMARY_TABLENAME}
-) r on r.just_co_id = s.just_co_id and r.job = s.job;
-]]></attr>
-</Node>
-</Phase>
-<Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Low Data Companies Table" guiX="280" guiY="618" id="DROP_TEMP_LOW_DATA_COMPANIES_TABLE" type="DB_EXECUTE">
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Low Data Companies Table" guiX="213" guiY="688" id="DROP_TEMP_LOW_DATA_COMPANIES_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_LOW_DATA_COMPANIES_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Summary Table" guiX="73" guiY="618" id="DROP_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Summary Table" guiX="21" guiY="688" id="DROP_TEMP_SUMMARY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SALARY_SUMMARY_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Ticker Data Table" guiX="466" guiY="688" id="DROP_TEMP_TICKER_DATA_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_TICKER_DATA_TABLENAME};]]></attr>
 </Node>
 </Phase>
 </Graph>
