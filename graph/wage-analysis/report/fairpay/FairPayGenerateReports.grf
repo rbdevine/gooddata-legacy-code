@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Oct 27 16:13:08 PDT 2016" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.57" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed May 17 09:41:28 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.58" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Report_Details" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -70,11 +70,11 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="fairpay-parameters.prm" id="GraphParameter0"/>
-<Property id="GraphParameter12" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
-<Property id="GraphParameter13" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
-<Property id="GraphParameter14" name="REPORTS_DIR" value="${DATA_DIR}/fairpay-reports"/>
-<Property fileURL="workspace.prm" id="GraphParameter15"/>
+<Property id="GraphParameter0" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
+<Property id="GraphParameter1" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
+<Property id="GraphParameter2" name="REPORTS_DIR" value="${DATA_DIR}/fairpay-reports"/>
+<Property fileURL="wage-fairpay-parameters.prm" id="GraphParameter3"/>
+<Property fileURL="workspace.prm" id="GraphParameter9"/>
 <Dictionary/>
 </Global>
 <Phase number="0">

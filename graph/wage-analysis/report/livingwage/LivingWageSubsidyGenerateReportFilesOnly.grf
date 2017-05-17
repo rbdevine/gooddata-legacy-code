@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Apr 10 14:54:21 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.113" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed May 17 15:19:35 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.115" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -107,14 +107,14 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="graph/local/local-parameters.prm" id="GraphParameter9"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter10"/>
-<Property id="GraphParameter44" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
-<Property id="GraphParameter45" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
-<Property id="GraphParameter46" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
-<Property id="GraphParameter47" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
-<Property fileURL="workspace.prm" id="GraphParameter48"/>
+<Property fileURL="graph/local/local-parameters.prm" id="GraphParameter0"/>
+<Property id="GraphParameter1" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
+<Property id="GraphParameter2" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
+<Property id="GraphParameter3" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
+<Property id="GraphParameter4" name="REPORTS_DIR" value="${REPORTS_DIR_LOCAL}/subsidy"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter5"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter14"/>
+<Property fileURL="workspace.prm" id="GraphParameter52"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -257,7 +257,7 @@ from (
       gc.state_county_fips = sc.state_county_fips and 
       gc.ticker = sc.ticker and 
       gc.goc = sc.goc
-    join lkp_living_wage_averages lwa on lwa.state_county_fips = sc.state_county_fips
+    join ${TABLE_FIPS_DATA_FOR_AVG} lwa on lwa.state_county_fips = sc.state_county_fips
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(sc.state_county_fips,2)
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = sc.ticker
     join ${MINIMUM_WAGE_BY_STATE_TABLENAME} mw on mw.state = fs.state

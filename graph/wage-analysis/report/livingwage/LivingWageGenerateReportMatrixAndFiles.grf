@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon May 15 23:56:49 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.287" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed May 17 15:43:03 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.300" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -18,9 +18,9 @@
 <Property id="GraphParameter4" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
 <Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
-<Property id="GraphParameter7" name="WAGE_AVERAGES_TABLENAME" value="LKP_LIVING_WAGE_AVERAGES"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter8"/>
-<Property fileURL="workspace.prm" id="GraphParameter45"/>
+<Property fileURL="wage.prm" id="GraphParameter7"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter41"/>
+<Property fileURL="workspace.prm" id="GraphParameter80"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -49,13 +49,6 @@ create table ${COMPANY_JOB_COUNTY_DATA_TABLENAME} (
   RATE_RAW FLOAT,
   EMPLOYEES_AT_LIVING_WAGE DECIMAL,
   RATE_RAW_MIN_WAGE_ADJ FLOAT
-);]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Living Wage Avg" guiX="482" guiY="10" id="TABLE_LIVING_WAGE_AVG" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${WAGE_AVERAGES_TABLENAME};
-create table ${WAGE_AVERAGES_TABLENAME} (
-  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL UNIQUE,
-  LIVING_WAGE_AVG FLOAT NOT NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Living Wage Avgs By Company" guiX="649" guiY="10" id="TABLE_LIVING_WAGE_AVGS_BY_COMPANY1" type="DB_EXECUTE">
@@ -388,67 +381,6 @@ insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51820', '51907');
 insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51830', '51931');
 insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51951', '51939');]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Living Wage Avgs" guiX="116" guiY="317" id="ADD_LIVING_WAGE_AVGS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${WAGE_AVERAGES_TABLENAME}
-select 
-  '51933',
-  avg(_2a1pt1c_hourly)
-from ${MIT_DATA_TABLENAME}
-where state_county_fips in ('51121','51750');
-
-insert into ${WAGE_AVERAGES_TABLENAME}
-select 
-  '51947', 
-  avg(_2a1pt1c_hourly)
-from ${MIT_DATA_TABLENAME}
-where state_county_fips in ('51165','51660');
-
-insert into ${WAGE_AVERAGES_TABLENAME}
-select 
-  '51945', 
-  avg(_2a1pt1c_hourly)
-from ${MIT_DATA_TABLENAME}
-where state_county_fips in ('51163','51530', '51678');
-
-insert into ${WAGE_AVERAGES_TABLENAME}
-select 
-  '51953', 
-  avg(_2a1pt1c_hourly)
-from ${MIT_DATA_TABLENAME}
-where state_county_fips in ('51191','51520');
-
-insert into ${WAGE_AVERAGES_TABLENAME}
-select 
-  '51909', 
-  avg(_2a1pt1c_hourly)
-from ${MIT_DATA_TABLENAME}
-where state_county_fips = '51019';
-
-insert into ${WAGE_AVERAGES_TABLENAME}
-select 
-  '51951', 
-  avg(_2a1pt1c_hourly)
-from ${MIT_DATA_TABLENAME}
-where state_county_fips in ('51177','51630');
-
-insert into ${WAGE_AVERAGES_TABLENAME}
-select 
-  '51955', 
-  avg(_2a1pt1c_hourly)
-from ${MIT_DATA_TABLENAME}
-where state_county_fips in ('51195','51720');
-
-insert into ${WAGE_AVERAGES_TABLENAME}
-select state_county_fips, _2a1pt1c_hourly
-from (
-  select state_county_fips, _2a1pt1c_hourly
-  from ${MIT_DATA_TABLENAME}
-  union all
-  select c.fips_code state_county_fips, l._2a1pt1c_hourly
-  from ${MIT_DATA_TABLENAME} l
-  join LKP_FIPS_COUNTY_TO_PP_COUNTY c on c.state_county_fips = l.state_county_fips 
-) l;]]></attr>
-</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Matrix Types" guiX="276" guiY="317" id="ADD_MATRIX_TYPES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_BLANK_TOP', 0, 0);
@@ -525,7 +457,7 @@ where not i.has_subsidiaries and m.just_co_id = i.just_co_id;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up FIPS-PP Map" guiX="417" guiY="397" id="CLEAN_UP_FIPS_PP_MAP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from LKP_FIPS_COUNTY_TO_PP_COUNTY
-where state_county_fips in (
+where state_county_fips in (  
   select fpp.state_county_fips
   from lkp_fips_county_to_pp_county fpp
   left join stg_regionalpurchasingpower pp on pp.fips_code = fpp.state_county_fips
@@ -563,14 +495,7 @@ select * from ${COUNTY_COUNT_TABLENAME}
 where state_county_fips in (
   select c.state_county_fips
     from (select state_county_fips from ${COUNTY_COUNT_TABLENAME} group by state_county_fips) c
-    left join (
-      select state_county_fips, _2a1pt1c_hourly
-      from ${MIT_DATA_TABLENAME}
-      union all
-      select mpp.state_county_fips, _2a1pt1c_hourly 
-      from ${MIT_DATA_TABLENAME} mit
-      join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = mit.state_county_fips
-    ) p on p.state_county_fips = c.state_county_fips
+    left join ${TABLE_FIPS_DATA_FOR_MIT} p on p.state_county_fips = c.state_county_fips
   where p.state_county_fips is null
 ) and state_county_fips not in (
   select state_county_fips from ${FIPS_REJECTS_TABLENAME} group by state_county_fips
@@ -701,7 +626,7 @@ join (
   from stg_regionalpurchasingpower pp
   join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
 ) p on p.fips_code = c.state_county_fips
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = c.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
 join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and i.has_subsidiaries
@@ -740,7 +665,7 @@ join (
   from stg_regionalpurchasingpower pp
   join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
 ) p on p.fips_code = c.state_county_fips
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = c.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
 join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and not i.has_subsidiaries
@@ -786,7 +711,7 @@ join (
   from stg_regionalpurchasingpower pp
   join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
 ) p on p.fips_code = c.state_county_fips
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = c.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
 join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and i.has_subsidiaries
@@ -825,7 +750,7 @@ join (
   from stg_regionalpurchasingpower pp
   join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
 ) p on p.fips_code = c.state_county_fips
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = c.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
 join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and not i.has_subsidiaries
@@ -915,7 +840,7 @@ join (
   from stg_regionalpurchasingpower pp
   join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
 ) p on p.fips_code = c.state_county_fips
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = c.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
 join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and i.has_subsidiaries
@@ -954,7 +879,7 @@ join (
   from stg_regionalpurchasingpower pp
   join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
 ) p on p.fips_code = c.state_county_fips
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = c.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
 join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and not i.has_subsidiaries
@@ -1028,7 +953,7 @@ join (
     state_fips, 
     state_abbreviation
 ) fs on fs.state = mrs.state
-join ${LIVING_WAGE_AVERAGES_TABLENAME} lwa on true
+join ${TABLE_FIPS_DATA_FOR_AVG} lwa on true
 where left(cjd.state_county_fips,2) = fs.state_fips and cjd.state_county_fips = lwa.state_county_fips]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Minimum Wage Adjustments" guiX="287" guiY="1543" id="MINIMUM_WAGE_ADJUSTMENTS" type="DB_EXECUTE">
@@ -1052,7 +977,7 @@ join (
     state_fips, 
     state_abbreviation
 ) fs on fs.state = mrs.state
-join ${LIVING_WAGE_AVERAGES_TABLENAME} lwa on true
+join ${TABLE_FIPS_DATA_FOR_AVG} lwa on true
 where left(cjd.state_county_fips,2) = fs.state_fips and cjd.state_county_fips = lwa.state_county_fips]]></attr>
 </Node>
 </Phase>
@@ -1074,7 +999,7 @@ from (
   ) fs on fs.state_fips = left(cjd.state_county_fips,2)
   join ${STATE_MIN_AVG_SALARIES_TABLENAME} mrs on fs.state = mrs.state
   join ${MINIMUM_WAGE_BY_STATE_TABLENAME} w on w.state = mrs.state
-  join ${LIVING_WAGE_AVERAGES_TABLENAME} lwa on cjd.state_county_fips = lwa.state_county_fips
+  join ${TABLE_FIPS_DATA_FOR_AVG} lwa on cjd.state_county_fips = lwa.state_county_fips
   where RATE_RAW_MIN_WAGE_ADJ < (w.minimum_wage + ${MINIMUM_WAGE_CUSHION})
 ) t
 where 
@@ -1152,12 +1077,12 @@ join (
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${WAGE_AVERAGES_TABLENAME} a
+  from ${TABLE_FIPS_DATA_FOR_AVG} a
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
 join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = f.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where s.has_subsidiaries and e.subsidiary is not null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
@@ -1213,12 +1138,12 @@ join (
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${WAGE_AVERAGES_TABLENAME} a
+  from ${TABLE_FIPS_DATA_FOR_AVG} a
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
 join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = f.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where s.has_subsidiaries and e.subsidiary is not null and (${HIGH_TOLERANCE_PROPORTION}) > 0;]]></attr>
@@ -1242,12 +1167,12 @@ join (
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${WAGE_AVERAGES_TABLENAME} a
+  from ${TABLE_FIPS_DATA_FOR_AVG} a
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
 join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = f.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where s.has_subsidiaries and e.subsidiary is not null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
@@ -1351,12 +1276,12 @@ join (
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${WAGE_AVERAGES_TABLENAME} a
+  from ${TABLE_FIPS_DATA_FOR_AVG} a
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
 join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = f.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where e.subsidiary is null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
@@ -1389,12 +1314,12 @@ join (
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${WAGE_AVERAGES_TABLENAME} a
+  from ${TABLE_FIPS_DATA_FOR_AVG} a
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
 join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = f.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where e.subsidiary is null and (${HIGH_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
@@ -1417,12 +1342,12 @@ join (
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${WAGE_AVERAGES_TABLENAME} a
+  from ${TABLE_FIPS_DATA_FOR_AVG} a
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
 join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
-join ${WAGE_AVERAGES_TABLENAME} l on l.state_county_fips = f.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where e.subsidiary is null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
@@ -1805,7 +1730,7 @@ from (
       and cjd.subsidiary = c.subsidiary
       and cjd.state_county_fips = c.state_county_fips
       and cjd.goc = d.goc
-    join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+    join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
     where c.subsidiary is not null
   ) t
   group by ticker, subsidiary, goc
@@ -1837,7 +1762,7 @@ from (
       cjd.just_co_id = s.just_co_id 
       and cjd.state_county_fips = c.state_county_fips
       and cjd.goc = d.goc
-    join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+    join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
     where c.subsidiary is null and m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')
   ) t
   group by ticker, company, goc
@@ -1890,7 +1815,7 @@ from (
     and cjd.subsidiary = c.subsidiary
     and cjd.state_county_fips = c.state_county_fips
     and cjd.goc = d.goc
-  join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+  join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
   where c.subsidiary is not null /*m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')*//* and d.goc = 'assistant manager'*/
   order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
 ) t
@@ -1930,7 +1855,7 @@ from (
     cjd.just_co_id = s.just_co_id 
     and cjd.state_county_fips = c.state_county_fips
     and cjd.goc = d.goc
-  join ${MIT_DATA_TABLENAME} mit on mit.state_county_fips = c.state_county_fips
+  join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
   where c.subsidiary is null and m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')/* and d.goc = 'assistant manager'*/  
   order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
 ) t
