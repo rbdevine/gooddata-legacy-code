@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 18 09:53:51 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.415" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="${TMP_BASE}_CENSUS_MAPPED_FIPS"/>
+<Property id="GraphParameter1" name="TMP_TABLE_CITY_NAME_OVERRIDE" value="${TMP_BASE}_CITY_NAME_OVERRIDE"/>
+<Property id="GraphParameter2" name="TMP_TABLE_FIPS_COLI_COMPLETE" value="${TMP_BASE}_FIPS_COLI_COMPLETE"/>
+<Property id="GraphParameter3" name="TMP_TABLE_FIPS_DATA_IGNORE_AVG" value="${TMP_BASE}_FIPS_DATA_IGNORE_AVG"/>
+<Property id="GraphParameter4" name="TMP_TABLE_FIPS_LIVING_WAGE_COMPLETE" value="${TMP_BASE}_FIPS_LIVING_WAGE_COMPLETE"/>
+<Property id="GraphParameter5" name="TMP_TABLE_FIPS_MAP" value="${TMP_BASE}_FIPS_MAP"/>
+<Property id="GraphParameter6" name="TMP_TABLE_LIVING_WAGE_OVERRIDE" value="${TMP_BASE}_LIVING_WAGE_OVERRIDE"/>
+<Property fileURL="wage.prm" id="GraphParameter7"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter43"/>
+<Property fileURL="workspace.prm" id="GraphParameter63"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/FIPS/CreateFIPSMap.grf" guiName="Create FIPS Map" guiX="225" guiY="-131" id="CREATE_FIPS_MAP" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: FIPS Data By FIPS" guiX="108" guiY="-28" id="TABLE_FIPS_DATA_BY_FIPS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************************
+  ${TABLE_FIPS_DATA_BY_FIPS} 
+  consolidate living wage and cost of living data
+*********************************************************************************/
+drop table if exists ${TABLE_FIPS_DATA_BY_FIPS};
+create table ${TABLE_FIPS_DATA_BY_FIPS} (
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  COST_OF_LIVING_INDEX FLOAT NULL,
+  LIVING_WAGE_HOURLY FLOAT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Fips COLI Complete" guiX="296" guiY="-28" id="TEMP_TABLE_FIPS_COLI_COMPLETE1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  ${TMP_TABLE_FIPS_COLI_COMPLETE}
+  These are the fips that should be in the ${TABLE_FIPS_DATA_BY_FIPS}
+  Will use to update or add at the end.
+*/
+drop table if exists ${TMP_TABLE_FIPS_COLI_COMPLETE};
+create table ${TMP_TABLE_FIPS_COLI_COMPLETE} (
+  STATE_COUNTY_FIPS VARCHAR(5) UNIQUE NOT NULL,
+  COST_OF_LIVING_INDEX FLOAT NOT NULL
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Living Wage by FIPS" guiX="212" guiY="125" id="ADD_LIVING_WAGE_BY_FIPS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_FIPS_DATA_BY_FIPS}
+(state_county_fips, living_wage_hourly)
+/*******************************************************************
+  all lw's (mit does not have more than one per state_county_fips)
+  minus any colis that have an non-existing fips code mapped to 
+  an already existing fips in mit.
+********************************************************************/
+select mit.state_county_fips, cast(round(mit._2a1pt1c_hourly,3) as numeric(16,3))
+from ${TABLE_LIVING_WAGE_MIT} mit
+left join ${TMP_TABLE_FIPS_MAP} fm on fm.state_county_fips_census = mit.state_county_fips
+where fm.state_county_fips_census is null
+union all
+/************************************
+  lw's for mapped fips only
+*************************************/
+select fm.state_county_fips_census state_county_fips, cast(round(mit._2a1pt1c_hourly,3) as numeric(16,3))
+from ${TABLE_LIVING_WAGE_MIT} mit
+join ${TMP_TABLE_FIPS_MAP} fm on fm.state_county_fips_coli = mit.state_county_fips 
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Fips COLI Complete" guiX="201" guiY="49" id="POPULATE_FIPS_COLI_COMPLETE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_FIPS_COLI_COMPLETE}
+/*******************************************************************
+  all coli's (pp does not have more than one per state_county_fips)
+  minus any colis that have an non-existing fips code mapped to 
+  an already existing fips in pp. As of this writing, there were
+  only 2 such cases.
+********************************************************************/
+select pp.fips_code, pp.cost_of_living_index
+from ${TABLE_REGIONAL_PURCHASING_POWER} pp
+left join ${TMP_TABLE_FIPS_MAP} mpp on mpp.state_county_fips_census = pp.fips_code
+where mpp.state_county_fips_census is null
+union all
+/************************************
+  coli's for mapped fips only
+*************************************/
+select mpp.state_county_fips_census fips_code, cost_of_living_index 
+from ${TABLE_REGIONAL_PURCHASING_POWER} pp
+join ${TMP_TABLE_FIPS_MAP} mpp on mpp.state_county_fips_coli = pp.fips_code 
+]]></attr>
+</Node>
+</Phase>
+<Phase number="15">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update COLI by FIPS" guiX="226" guiY="201" id="UPDATE_COLI_BY_FIPS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************
+  add cost_of_living_index for each fips.
+*********************************************************************/
+SET LOCALE to LEN_S1;
+
+update ${TABLE_FIPS_DATA_BY_FIPS} f
+set cost_of_living_index = cast(round(cc.cost_of_living_index,1) as numeric(16,1))
+from ${TMP_TABLE_FIPS_COLI_COMPLETE} cc
+where f.state_county_fips = cc.state_county_fips;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="16">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Missing COLI by FIPS" guiX="212" guiY="276" id="ADD_MISSING_COLI_BY_FIPS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************
+  add coli values that did not get inserted yet
+*********************************************************************/
+SET LOCALE to LEN_S1;
+
+insert into ${TABLE_FIPS_DATA_BY_FIPS} 
+(state_county_fips, cost_of_living_index)
+select cc.state_county_fips, cast(round(cc.cost_of_living_index,1) as numeric(16,1))
+from ${TMP_TABLE_FIPS_COLI_COMPLETE} cc
+left join ${TABLE_FIPS_DATA_BY_FIPS} f on f.state_county_fips = cc.state_county_fips
+where f.state_county_fips is null;]]></attr>
+</Node>
+</Phase>
+<Phase number="17">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Fips Map" guiX="235" guiY="351" id="DROP_FIPS_MAP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_FIPS_MAP};]]></attr>
+</Node>
+</Phase>
+</Graph>

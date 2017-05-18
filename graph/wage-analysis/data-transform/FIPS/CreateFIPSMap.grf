@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 18 09:20:22 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.407" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="${TMP_BASE}_CENSUS_MAPPED_FIPS"/>
+<Property id="GraphParameter1" name="TMP_TABLE_CITY_NAME_OVERRIDE" value="${TMP_BASE}_CITY_NAME_OVERRIDE"/>
+<Property id="GraphParameter2" name="TMP_TABLE_FIPS_COLI_COMPLETE" value="${TMP_BASE}_FIPS_COLI_COMPLETE"/>
+<Property id="GraphParameter3" name="TMP_TABLE_FIPS_DATA_IGNORE_AVG" value="${TMP_BASE}_FIPS_DATA_IGNORE_AVG"/>
+<Property id="GraphParameter4" name="TMP_TABLE_FIPS_LIVING_WAGE_COMPLETE" value="${TMP_BASE}_FIPS_LIVING_WAGE_COMPLETE"/>
+<Property id="GraphParameter5" name="TMP_TABLE_FIPS_MAP" value="${TMP_BASE}_FIPS_MAP"/>
+<Property id="GraphParameter6" name="TMP_TABLE_LIVING_WAGE_OVERRIDE" value="${TMP_BASE}_LIVING_WAGE_OVERRIDE"/>
+<Property fileURL="wage.prm" id="GraphParameter45"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter7"/>
+<Property fileURL="workspace.prm" id="GraphParameter27"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: FIPS Map" guiX="23" guiY="8" id="TEMP_TABLE_FIPS_MAP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  ${TMP_TABLE_FIPS_MAP} 
+  Virginia had some exceptions for some virginia cities. They seemed to have made
+  up their own fips code. Need to map to census fips code, which is what we will
+  be using for visual mapping later.
+*/
+drop table if exists ${TMP_TABLE_FIPS_MAP};
+create table ${TMP_TABLE_FIPS_MAP} (
+  STATE_COUNTY_FIPS_CENSUS VARCHAR(5) UNIQUE NOT NULL,
+  STATE_COUNTY_FIPS_COLI VARCHAR(5) NOT NULL
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Map" guiX="32" guiY="85" id="POPULATE_FIPS_MAP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_FIPS_MAP} values ('30077','30023');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51003','51901');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51540','51901');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51005','51903');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51580','51903');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51015','51907');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51790','51907');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51820','51907');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51019','51909'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51515','51909');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51031','51911');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51680','51911');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51035','51913');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51640','51913');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51053','51918');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51570','51918');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51730','51918');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51059','51919'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51600','51919');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51610','51919');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51069','51921'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51840','51921');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51081','51923'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51595','51923');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51089','51929');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51690','51929');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51095','51931');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51830','51931');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51121','51933');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51750','51933');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51143','51939');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51590','51939');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51149','51941');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51670','51941');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51153','51942');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51683','51942');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51685','51942');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51161','51944');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51770','51944');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51775','51944');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51163','51945');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51530','51945');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51678','51945');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51165','51947');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51660','51947');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51175','51949');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51620','51949');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51177','51951');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51630','51951');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51191','51953');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51520','51953');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51195','51955');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51720','51955');
+insert into ${TMP_TABLE_FIPS_MAP} values ('51199','51958'); 
+insert into ${TMP_TABLE_FIPS_MAP} values ('51735','51958');
+]]></attr>
+</Node>
+</Phase>
+</Graph>
