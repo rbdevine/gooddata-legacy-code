@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed May 17 15:43:03 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.300" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed May 17 18:44:27 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.301" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -454,15 +454,6 @@ set alt_company_name = d.subsidiary
 from (select ticker, subsidiary from ${JOB_DISTRIBUTION_TABLENAME} group by ticker, subsidiary) d
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker 
 where not i.has_subsidiaries and m.just_co_id = i.just_co_id;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up FIPS-PP Map" guiX="417" guiY="397" id="CLEAN_UP_FIPS_PP_MAP" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[delete from LKP_FIPS_COUNTY_TO_PP_COUNTY
-where state_county_fips in (  
-  select fpp.state_county_fips
-  from lkp_fips_county_to_pp_county fpp
-  left join stg_regionalpurchasingpower pp on pp.fips_code = fpp.state_county_fips
-  where pp.fips_code is not null
-);]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Non-Active" guiX="96" guiY="397" id="REMOVE_NON_ACTIVE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${JOB_DISTRIBUTION_TABLENAME}
