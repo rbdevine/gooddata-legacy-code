@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Tue May 23 17:32:20 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.450" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter42" name="TMP_TABLE_ENTITY_CANDIDATE" value="${TMP_BASE}_ENTITY_CANDIDATE"/>
+<Property id="GraphParameter81" name="TMP_TABLE_FIPS_CITY_STATE" value="${TMP_BASE}_FIPS_CITY_STATE"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter43"/>
+<Property fileURL="workspace.prm" id="GraphParameter63"/>
+<Property fileURL="wage.prm" id="GraphParameter1"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/FIPS/CreateFIPSMap.grf" guiName="Create FIPS Map" guiX="235" guiY="-141" id="CREATE_FIPS_MAP" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: COLI Avg" guiX="235" guiY="-42" id="TABLE_COLI_AVG" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************************
+  ${TABLE_COLI_AVG} 
+  average cost os living index for city/state pairs.
+  
+  For counties (most) that have only one city_fips/state pair, value will be for
+  just that county.
+  
+  For others (e.g., NEW YORK< NY with 5 counties) the average is taken and 
+  assigned to the city_fips/state.
+  
+  Average is only taken across city fips. Cities with 2 city fips and 2 corresponding
+  state_county_fips are discarded. (If city/state has 2 city fips, but 1 state_county_fips,
+  then it can be used.)
+  As of this writing that was only Reno, TX and St. Anthony, MN.
+*********************************************************************************/
+drop table if exists ${TABLE_COLI_AVG};
+create table ${TABLE_COLI_AVG} (
+  CITY VARCHAR(128) NOT NULL,
+  STATE VARCHAR(2) NOT NULL,
+  COST_OF_LIVING_INDEX_AVG FLOAT NOT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Entity Candidate" guiX="354" guiY="32" id="TABLE_ENTITY_CANDIDATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************************
+  ${TMP_TABLE_ENTITY_CANDIDATE} 
+  Ranked values of city types in the census table. Holds entities with a single
+  entity_fips (aka, city_fips). If there are city/state pairs with more than
+  one city_fips, they are not included in thise list. Ranking only comes into 
+  play when a city/state pair has more than one entity type (aka, city_type).
+  Ranking determines which city_type to use. (e.g., "city" is ranked
+  higher than "village".)
+*********************************************************************************/
+drop table if exists ${TMP_TABLE_ENTITY_CANDIDATE};
+create table ${TMP_TABLE_ENTITY_CANDIDATE} (
+  RANK INTEGER NOT NULL,
+  CITY VARCHAR(128) NOT NULL,
+  STATE VARCHAR(2) NOT NULL,
+  CITY_TYPE VARCHAR(128) NOT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: FIPS City State" guiX="132" guiY="32" id="TABLE_FIPS_CITY_STATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************************
+  ${TMP_TABLE_FIPS_CITY_STATE} 
+  Unique state_county_fips/city_fips for each city/state
+*********************************************************************************/
+drop table if exists ${TMP_TABLE_FIPS_CITY_STATE};
+create table ${TMP_TABLE_FIPS_CITY_STATE} (
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  CITY_FIPS VARCHAR(5) NOT NULL,
+  CITY VARCHAR(128) NOT NULL,
+  STATE VARCHAR(2) NOT NULL
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Entity Candidate" guiX="347" guiY="105" id="POPULATE_ENTITY_CANDIDATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+INSERT INTO ${TMP_TABLE_ENTITY_CANDIDATE}
+SELECT
+  CASE
+    WHEN CITY_TYPE = 'CITY' THEN 0
+    WHEN CITY_TYPE = 'CITY AND BOROUGH' THEN 1
+    WHEN CITY_TYPE = 'MUNICIPALITY' THEN 2
+    WHEN CITY_TYPE = 'BOROUGH' THEN 3
+    WHEN CITY_TYPE = 'TOWN' THEN 4
+    WHEN CITY_TYPE = 'VILLAGE' THEN 5 
+    WHEN CITY_TYPE = 'HAWAIIAN HOME LAND' THEN 6
+    WHEN CITY_TYPE = 'TOWNSHIP' THEN 7
+    WHEN CITY_TYPE = 'COLONY' THEN 8
+    ELSE 1000    
+  END RANK,
+  CITY,
+  STATE,
+  CITY_TYPE
+FROM (
+  SELECT CITY, STATE, CITY_TYPE
+  FROM (
+    SELECT ENTITY_NAME CITY, STATE, ENTITY_DESCRIPTION CITY_TYPE, ENTITY_FIPS
+    FROM ${TABLE_CENSUS_FIPS}
+    WHERE ENTITY_DESCRIPTION <> 'COUNTY' AND ENTITY_FIPS <> '00000' AND STATE NOT IN ('PR','GU','VI')
+    GROUP BY CITY, STATE, ENTITY_DESCRIPTION, ENTITY_FIPS
+  ) t
+  GROUP BY CITY, STATE, CITY_TYPE
+  HAVING COUNT('X') = 1
+) t;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS City State: Census" guiX="101" guiY="176" id="POPULATE_FIPS_CITY_STATE_CENSUS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+INSERT INTO ${TMP_TABLE_FIPS_CITY_STATE}
+SELECT 
+  census.STATE_COUNTY_FIPS,
+  census.ENTITY_FIPS,
+  t.CITY,
+  t.STATE
+FROM (
+  SELECT c.CITY, c.STATE, c.CITY_TYPE
+  FROM ${TMP_TABLE_ENTITY_CANDIDATE} c
+  JOIN (
+    SELECT MIN(RANK) MIN_RANK, CITY, STATE
+    FROM ${TMP_TABLE_ENTITY_CANDIDATE}
+    GROUP BY STATE, CITY
+  ) r ON r.MIN_RANK = c.RANK AND r.CITY = c.CITY AND r.STATE = c.STATE
+) t
+JOIN ${TABLE_CENSUS_FIPS} census ON census.STATE = t.STATE AND census.ENTITY_NAME = t.CITY AND census.ENTITY_DESCRIPTION = t.CITY_TYPE
+GROUP BY census.STATE_COUNTY_FIPS, census.ENTITY_FIPS, t.CITY, t.STATE;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS City State: City FIPS" guiX="96" guiY="251" id="POPULATE_FIPS_CITY_STATE_CITY_FIPS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+INSERT INTO ${TMP_TABLE_FIPS_CITY_STATE}
+SELECT t.STATE_COUNTY_FIPS, t.CITY_FIPS, t.CITY, t.STATE
+FROM (
+  SELECT
+    fips.STATE_COUNTY_FIPS, fips.CITY_FIPS, t.CITY, t.STATE
+  FROM (
+    /**********************************************
+      City/State with only one city fips
+    **********************************************/
+    SELECT CITY, STATE
+    FROM (
+      SELECT fips.CITY_NAME CITY, fips.STATE_ABBREVIATION STATE, fips.CITY_FIPS
+      FROM LKP_CITY_FIPS fips
+      GROUP BY fips.CITY_NAME, fips.STATE_ABBREVIATION, fips.CITY_FIPS
+    ) t
+    GROUP BY CITY, STATE
+    HAVING COUNT('X') = 1
+  ) t
+  JOIN (
+    SELECT STATE_COUNTY_FIPS, CITY_FIPS, CITY_NAME, STATE_ABBREVIATION
+    FROM LKP_CITY_FIPS
+    GROUP BY STATE_COUNTY_FIPS, CITY_FIPS, CITY_NAME, STATE_ABBREVIATION
+  ) fips ON fips.CITY_NAME = t.CITY AND fips.STATE_ABBREVIATION = t.STATE
+  UNION ALL
+  /************************************************************************
+    City/State with more than one city fips but single state_county_fips
+    choosing arbitrary (max) city_fips to represent that city/state.
+    city_fips only needed for grouping for living wage analysis purposes
+  *************************************************************************/    
+  SELECT fips.STATE_COUNTY_FIPS, max(fips.city_fips) CITY_FIPS, t2.CITY, t2.STATE
+  FROM (
+    /************************************************************************
+      City/State with more than one city fips but single state_county_fips
+    *************************************************************************/    
+    SELECT STATE, CITY
+    FROM (
+      /**********************************************
+       unique City/State/state_county_fips
+      **********************************************/      
+      SELECT t.CITY, t.STATE, t2.STATE_COUNTY_FIPS
+      FROM (
+        /**********************************************
+         City/State with more than one city fips
+        **********************************************/
+        SELECT CITY, STATE
+        FROM (
+          SELECT fips.CITY_NAME CITY, fips.STATE_ABBREVIATION STATE, fips.CITY_FIPS
+          FROM ${TABLE_CITY_FIPS} fips
+          GROUP BY fips.CITY_NAME, fips.STATE_ABBREVIATION, fips.CITY_FIPS
+        ) t
+        GROUP BY CITY, STATE
+        HAVING COUNT('X') > 1
+      ) t
+      JOIN (
+        SELECT city_name city, state_abbreviation state, state_county_fips, city_fips
+        FROM ${TABLE_CITY_FIPS} fips
+        GROUP BY city_name, state_abbreviation, state_county_fips, city_fips
+      ) t2 on t.city = t2.city and t.state = t2.state
+      GROUP BY t.CITY, t.STATE, t2.STATE_COUNTY_FIPS
+    ) t
+    GROUP BY STATE, CITY
+    HAVING COUNT('x') = 1
+  ) t2
+  JOIN (
+    SELECT STATE_COUNTY_FIPS, CITY_FIPS, CITY_NAME, STATE_ABBREVIATION
+    FROM ${TABLE_CITY_FIPS}
+    GROUP BY STATE_COUNTY_FIPS, CITY_FIPS, CITY_NAME, STATE_ABBREVIATION
+  ) fips on fips.CITY_NAME = t2.CITY and fips.STATE_ABBREVIATION = t2.STATE
+  GROUP BY t2.STATE, t2.CITY, fips.STATE_COUNTY_FIPS
+) t
+LEFT JOIN ${TMP_TABLE_FIPS_CITY_STATE} t2 ON t2.STATE = t.STATE and t2.CITY = t.CITY
+WHERE t2.STATE IS NULL AND t.STATE NOT IN ('PR','GU','VI') AND ISNULL(t.CITY,'') <> '' AND ISNULL(t.STATE,'') <> '';]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate COLI Avg" guiX="232" guiY="325" id="POPULATE_COLI_AVG" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+INSERT INTO ${TABLE_COLI_AVG}
+SELECT t.CITY, t.STATE, AVG(coli.COST_OF_LIVING_INDEX) AVG_COST_OF_LIVING_INDEX
+FROM ${TMP_TABLE_FIPS_CITY_STATE} t
+JOIN ${TMP_TABLE_MAPPED_COLI} coli ON coli.state_county_fips = t.state_county_fips
+GROUP BY t.STATE, t.CITY;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Entity Candidate" guiX="374" guiY="402" id="DROP_ENTITY_CANDIDATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_ENTITY_CANDIDATE};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop FIPS City State" guiX="136" guiY="402" id="DROP_FIPS_CITY_STATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_FIPS_CITY_STATE};]]></attr>
+</Node>
+</Phase>
+</Graph>

@@ -1,16 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 18 09:20:22 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.407" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Tue May 23 16:40:17 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.414" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="TMP_TABLE_CENSUS_MAPPED_FIPS" value="${TMP_BASE}_CENSUS_MAPPED_FIPS"/>
-<Property id="GraphParameter1" name="TMP_TABLE_CITY_NAME_OVERRIDE" value="${TMP_BASE}_CITY_NAME_OVERRIDE"/>
-<Property id="GraphParameter2" name="TMP_TABLE_FIPS_COLI_COMPLETE" value="${TMP_BASE}_FIPS_COLI_COMPLETE"/>
-<Property id="GraphParameter3" name="TMP_TABLE_FIPS_DATA_IGNORE_AVG" value="${TMP_BASE}_FIPS_DATA_IGNORE_AVG"/>
-<Property id="GraphParameter4" name="TMP_TABLE_FIPS_LIVING_WAGE_COMPLETE" value="${TMP_BASE}_FIPS_LIVING_WAGE_COMPLETE"/>
-<Property id="GraphParameter5" name="TMP_TABLE_FIPS_MAP" value="${TMP_BASE}_FIPS_MAP"/>
-<Property id="GraphParameter6" name="TMP_TABLE_LIVING_WAGE_OVERRIDE" value="${TMP_BASE}_LIVING_WAGE_OVERRIDE"/>
-<Property fileURL="wage.prm" id="GraphParameter45"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter7"/>
-<Property fileURL="workspace.prm" id="GraphParameter27"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter43"/>
+<Property fileURL="workspace.prm" id="GraphParameter63"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -27,6 +20,17 @@ create table ${TMP_TABLE_FIPS_MAP} (
   STATE_COUNTY_FIPS_COLI VARCHAR(5) NOT NULL
 );
 ]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Mapped COLI" guiX="199" guiY="8" id="TEMP_TABLE_MAPPED_COLI" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  ${TMP_TABLE_MAPPED_COLI} 
+  Create new COLI table that includes mapped data.
+*/
+DROP TABLE IF EXISTS ${TMP_TABLE_MAPPED_COLI};
+CREATE TABLE ${TMP_TABLE_MAPPED_COLI} (
+  STATE_COUNTY_FIPS VARCHAR(5) UNIQUE NOT NULL,
+  COST_OF_LIVING_INDEX FLOAT NOT NULL
+);]]></attr>
 </Node>
 </Phase>
 <Phase number="1">
@@ -87,6 +91,23 @@ insert into ${TMP_TABLE_FIPS_MAP} values ('51720','51955');
 insert into ${TMP_TABLE_FIPS_MAP} values ('51199','51958'); 
 insert into ${TMP_TABLE_FIPS_MAP} values ('51735','51958');
 ]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Mapped COLI" guiX="212" guiY="160" id="POPULATE_MAPPED_COLI" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TMP_TABLE_MAPPED_COLI}
+SELECT 
+  pp.fips_code state_county_fips,
+  pp.cost_of_living_index
+FROM ${TABLE_REGIONAL_PURCHASING_POWER} pp
+LEFT JOIN ${TMP_TABLE_FIPS_MAP} m on m.state_county_fips_census = pp.fips_code
+WHERE m.state_county_fips_census IS NULL
+UNION ALL
+SELECT 
+  m.state_county_fips_census state_county_fips, 
+  pp.cost_of_living_index
+FROM ${TABLE_REGIONAL_PURCHASING_POWER} pp
+JOIN ${TMP_TABLE_FIPS_MAP} m on m.state_county_fips_coli = pp.fips_code;]]></attr>
 </Node>
 </Phase>
 </Graph>

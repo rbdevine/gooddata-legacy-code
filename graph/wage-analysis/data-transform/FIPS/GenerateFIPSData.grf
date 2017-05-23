@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Tue May 23 17:32:32 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.422" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter43"/>
+<Property fileURL="workspace.prm" id="GraphParameter63"/>
+<Property fileURL="wage.prm" id="GraphParameter7"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/FIPS/CreateFIPSMap.grf" guiName="Create FIPS Map" guiX="225" guiY="-131" id="CREATE_FIPS_MAP" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: FIPS Data" guiX="225" guiY="-33" id="TABLE_FIPS_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/********************************************************************************
+  ${TABLE_FIPS_DATA} 
+  consolidate living wage and cost of living data
+*********************************************************************************/
+drop table if exists ${TABLE_FIPS_DATA};
+create table ${TABLE_FIPS_DATA} (
+  STATE_COUNTY_FIPS VARCHAR(5) UNIQUE NOT NULL,
+  COST_OF_LIVING_INDEX FLOAT,
+  LIVING_WAGE FLOAT 
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate FIPS Data" guiX="224" guiY="41" id="POPULATE_FIPS_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_FIPS_DATA}
+SELECT
+  case
+    when coli.state_county_fips IS NULL then mit.state_county_fips
+    else coli.state_county_fips
+  end state_county_fips,
+  coli.cost_of_living_index,
+  mit._2A1PT1C_HOURLY living_wage
+FROM ${TMP_TABLE_MAPPED_COLI} coli
+FULL OUTER JOIN ${TABLE_LIVING_WAGE_MIT} mit on mit.state_county_fips = coli.state_county_fips
+WHERE (coli.state_county_fips IS NOT NULL AND LENGTH(coli.state_county_fips) = 5) OR 
+      (mit.state_county_fips IS NOT NULL AND LENGTH(mit.state_county_fips) = 5)
+order by living_wage;
+]]></attr>
+</Node>
+</Phase>
+</Graph>
