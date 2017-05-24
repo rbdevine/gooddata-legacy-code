@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed May 17 18:44:27 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.301" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed May 24 10:50:14 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.302" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -19,8 +19,8 @@
 <Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
 <Property fileURL="wage.prm" id="GraphParameter7"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter41"/>
-<Property fileURL="workspace.prm" id="GraphParameter80"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter44"/>
+<Property fileURL="workspace.prm" id="GraphParameter83"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -465,17 +465,10 @@ where ticker not in (select ticker from ${ACTIVE_TICKERS_TABLENAME});]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${FIPS_REJECTS_TABLENAME}
 select * from ${COUNTY_COUNT_TABLENAME}
 where state_county_fips in (
-  select state_county_fips
+  select c.state_county_fips
     from (select state_county_fips from ${COUNTY_COUNT_TABLENAME} group by state_county_fips) c
-    left join (
-      select fips_code, cost_of_living_index cost_of_living_index
-      from stg_regionalpurchasingpower
-      union all
-      select mpp.state_county_fips fips_code, cost_of_living_index 
-      from stg_regionalpurchasingpower pp
-      join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-    ) p on p.fips_code = c.state_county_fips
-  where p.fips_code is null
+    left join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
+  where p.state_county_fips is null
 );]]></attr>
 </Node>
 </Phase>
@@ -601,22 +594,15 @@ select
   d.subsidiary,
   1,
   cjd.job, 
-  (${MID_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
+  (${MID_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when ((${MID_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
+      when ((${MID_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} c
-join (
-  select fips_code, cost_of_living_index cost_of_living_index
-  from stg_regionalpurchasingpower
-  union all
-  select mpp.state_county_fips fips_code, cost_of_living_index 
-  from stg_regionalpurchasingpower pp
-  join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-) p on p.fips_code = c.state_county_fips
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
@@ -640,22 +626,15 @@ select
   d.subsidiary,
   1,
   cjd.job, 
-  (${MID_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
+  (${MID_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when ((${MID_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
+      when ((${MID_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} c
-join (
-  select fips_code, cost_of_living_index cost_of_living_index
-  from stg_regionalpurchasingpower
-  union all
-  select mpp.state_county_fips fips_code, cost_of_living_index 
-  from stg_regionalpurchasingpower pp
-  join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-) p on p.fips_code = c.state_county_fips
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
@@ -686,22 +665,15 @@ select
   d.subsidiary,
   2,
   cjd.job, 
-  (${HIGH_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
+  (${HIGH_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when ((${HIGH_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
+      when ((${HIGH_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${HIGH_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} c
-join (
-  select fips_code, cost_of_living_index cost_of_living_index
-  from stg_regionalpurchasingpower
-  union all
-  select mpp.state_county_fips fips_code, cost_of_living_index 
-  from stg_regionalpurchasingpower pp
-  join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-) p on p.fips_code = c.state_county_fips
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
@@ -725,22 +697,15 @@ select
   d.subsidiary,
   2,
   cjd.job, 
-  (${HIGH_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
+  (${HIGH_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when ((${HIGH_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
+      when ((${HIGH_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${HIGH_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} c
-join (
-  select fips_code, cost_of_living_index cost_of_living_index
-  from stg_regionalpurchasingpower
-  union all
-  select mpp.state_county_fips fips_code, cost_of_living_index 
-  from stg_regionalpurchasingpower pp
-  join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-) p on p.fips_code = c.state_county_fips
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
@@ -815,22 +780,15 @@ select
   d.subsidiary,
   0,
   cjd.job, 
-  (${LOW_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
+  (${LOW_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when ((${LOW_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
+      when ((${LOW_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${LOW_TOLERANCE_PROPORTION})
   /*,2) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} c
-join (
-  select fips_code, cost_of_living_index cost_of_living_index
-  from stg_regionalpurchasingpower
-  union all
-  select mpp.state_county_fips fips_code, cost_of_living_index 
-  from stg_regionalpurchasingpower pp
-  join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-) p on p.fips_code = c.state_county_fips
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
@@ -854,22 +812,15 @@ select
   d.subsidiary,
   0,
   cjd.job, 
-  (${LOW_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index reverse_adj, 
+  (${LOW_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index reverse_adj, 
   /*cast(round(*/(
     case
-      when ((${LOW_TOLERANCE})*(cjd.rate/100.0)*cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
+      when ((${LOW_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
     end)*c.employee_count*d.distribution*(${LOW_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} c
-join (
-  select fips_code, cost_of_living_index cost_of_living_index
-  from stg_regionalpurchasingpower
-  union all
-  select mpp.state_county_fips fips_code, cost_of_living_index 
-  from stg_regionalpurchasingpower pp
-  join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-) p on p.fips_code = c.state_county_fips
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
 join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
 join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
@@ -1467,14 +1418,7 @@ join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
 join (
   select c.ticker, sum(c.employee_count) emp_count_tot 
   from ${COUNTY_COUNT_TABLENAME} c
-  join (
-    select fips_code, cost_of_living_index cost_of_living_index
-    from stg_regionalpurchasingpower
-    union all
-    select mpp.state_county_fips fips_code, cost_of_living_index 
-    from stg_regionalpurchasingpower pp
-    join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-  ) p on p.fips_code = c.state_county_fips
+  join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
   join lkp_just_co_secty_master m on m.ticker_trim = c.ticker
   join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
   where subsidiary is null
@@ -1493,14 +1437,7 @@ join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
 join (
   select c.ticker, c.subsidiary, sum(c.employee_count) emp_count_tot 
   from ${COUNTY_COUNT_TABLENAME} c
-  join (
-    select fips_code, cost_of_living_index cost_of_living_index
-    from stg_regionalpurchasingpower
-    union all
-    select mpp.state_county_fips fips_code, cost_of_living_index 
-    from stg_regionalpurchasingpower pp
-    join LKP_FIPS_COUNTY_TO_PP_COUNTY mpp on mpp.fips_code = pp.fips_code
-  ) p on p.fips_code = c.state_county_fips
+  join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
   join lkp_just_co_secty_master m on m.ticker_trim = c.ticker
   join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
   where subsidiary is not null and s.has_subsidiaries

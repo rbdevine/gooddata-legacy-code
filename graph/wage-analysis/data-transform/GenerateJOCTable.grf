@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Apr 27 00:24:17 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.83" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed May 24 11:06:23 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.86" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="CITY_FIPS_AVERAGES_TABLENAME" value="LKP_CITY_FIPS_AVG"/>
-<Property id="GraphParameter1" name="GOC_SALARY_ADJUSTMENTS_TABLENAME" value="LKP_GOC_SALARY_ADJUSTMENTS"/>
-<Property id="GraphParameter2" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
-<Property id="GraphParameter3" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
-<Property fileURL="wage.prm" id="GraphParameter34"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
+<Property id="GraphParameter0" name="GOC_SALARY_ADJUSTMENTS_TABLENAME" value="LKP_GOC_SALARY_ADJUSTMENTS"/>
+<Property id="GraphParameter1" name="JOB_LEVEL_TABLENAME" value="LKP_GOC_LEVEL_DEFS"/>
+<Property id="GraphParameter2" name="SALARY_YEAR_ADJUSTMENT_TABLENAME" value="LKP_SALARY_YEAR_ADJUSTMENT"/>
+<Property fileURL="wage.prm" id="GraphParameter3"/>
+<Property fileURL="workspace.prm" id="GraphParameter40"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -67,22 +66,22 @@ select distinct
   s.onet_code,
   s.UNADJUSTEDBASESALARY,
   s.UNADJUSTEDTOTALSALARY,
-  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDBASESALARY*100/isnull(f.avg_cost_of_living_index,'100')) as numeric(36,2)),
-  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDTOTALSALARY*100/isnull(f.avg_cost_of_living_index,'100')) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDBASESALARY*100/isnull(f.cost_of_living_index_avg,'100')) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDTOTALSALARY*100/isnull(f.cost_of_living_index_avg,'100')) as numeric(36,2)),
   s.UNADJUSTEDBASESALARY/2000,
   s.UNADJUSTEDTOTALSALARY/2000,
-  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDBASESALARY*100/(2000*isnull(f.avg_cost_of_living_index,'100'))) as numeric(36,2)),
-  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDTOTALSALARY*100/(2000*isnull(f.avg_cost_of_living_index,'100'))) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDBASESALARY*100/(2000*isnull(f.cost_of_living_index_avg,'100'))) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*s.UNADJUSTEDTOTALSALARY*100/(2000*isnull(f.cost_of_living_index_avg,'100'))) as numeric(36,2)),
   cast(s.YEAROFSALARY as int),
   cast(s.YEARSOFRELEVANTEXPNUMBER as int),
   s.cityname, 
   s.stateabbreviation, 
-  f.avg_cost_of_living_index
+  f.cost_of_living_index_avg
 from lkp_glassdoor_company g
 join lkp_just_co_secty_master m on g.just_company_id = m.just_co_id
 join stg_glassdoorsalary s on s.fk_employerid = g.glassdoor_employer_id
 join ${SALARY_YEAR_ADJUSTMENT_TABLENAME} ya on ya.year = cast(s.YEAROFSALARY as int)
-left join ${CITY_FIPS_AVERAGES_TABLENAME} f on f.state = s.stateabbreviation and f.city = s.cityname
+join ${TABLE_COLI_AVG} f on f.state = s.stateabbreviation and f.city = s.cityname
 /*left join lkp_city_fips f on f.state_abbreviation = s.stateabbreviation and f.city_name = s.cityname
 left join stg_regionalpurchasingpower pp on pp.fips_code = f.state_county_fips*/
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
@@ -168,7 +167,7 @@ from (
       (wage_rate_of_pay_from is not null and wage_rate_of_pay_from > 0) or 
       (wage_rate_of_pay_to is not null and wage_rate_of_pay_to > 0)
   ) t
-  left join lkp_city_fips_avg f on f.city = t.city and f.state = t.state
+  join ${TABLE_COLI_AVG} f on f.city = t.city and f.state = t.state
 ) t
 join lkp_just_co_secty_master m on m.just_co_id = t.just_co_id
 left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
@@ -220,7 +219,7 @@ from (
     end) * ((min+max)/2) unadjustedbasesalary,
     city,
     state, 
-    isnull(avg_cost_of_living_index,100.0) avg_cost_of_living_index
+    isnull(f.cost_of_living_index_avg,100.0) avg_cost_of_living_index
   from (
       select
         m.just_co_id,
@@ -241,13 +240,13 @@ from (
           when regexp_instr(range,'.*k') > 0 then 1000.0
           else 1.0
         end)*max max,
-        avg_cost_of_living_index
+        f.cost_of_living_index_avg
       from stg_glassdoorfranchisepay g
       join ${FRANCHISE_JOBTITLE_TO_GOC_TABLENAME} j on g.jobtitle = j.jobtitle
       join ${FRANCHISE_COMPANY_TABLENAME} c on c.company = g.company
       join (select just_co_id, ticker_trim from lkp_just_co_secty_master group by just_co_id, ticker_trim) m on m.just_co_id = c.just_co_id
       join (select just_co_id, just_indy from lkp_just_co_indy group by just_co_id, just_indy) i on i.just_co_id = m.just_co_id
-      left join lkp_city_fips_avg f on f.city = g.area and f.state = g.state
+      join ${TABLE_COLI_AVG} f on f.city = g.area and f.state = g.state
       where c.not_in_original_just_list
     ) t
 ) t
