@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Tue May 23 17:36:23 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.425" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Tue May 23 19:38:07 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.427" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="wage.prm" id="GraphParameter0"/>
@@ -14,11 +14,6 @@
 <Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/FIPS/GenerateFIPSData.grf" guiName="Generate FIPS Data" guiX="178" guiY="75" id="GENERATE_FIPS_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop FIPS Map" guiX="29" guiY="179" id="DROP_FIPS_MAP" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_FIPS_MAP};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Mapped COLI" guiX="175" guiY="179" id="DROP_MAPPED_COLI" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table ${TMP_TABLE_MAPPED_COLI};]]></attr>
-</Node>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/FIPS/CleanUpFIPSMap.grf" guiName="Clean Up FIPS Map Data" guiX="98" guiY="174" id="CLEAN_UP_FIPS_MAP_DATA" type="RUN_GRAPH"/>
 </Phase>
 </Graph>
