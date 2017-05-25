@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed May 24 16:51:26 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.329" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed May 24 23:51:42 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.335" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_COMPANY_NAME_TICKER" value="${TMP_BASE}_COMPANY_NAME_TICKER"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter38"/>
-<Property fileURL="workspace.prm" id="GraphParameter58"/>
-<Property fileURL="wage.prm" id="GraphParameter1"/>
+<Property fileURL="wage.prm" id="GraphParameter39"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter1"/>
+<Property fileURL="workspace.prm" id="GraphParameter21"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/FIPS/GenerateAllFIPSData.grf" guiName="Generate FIPS Data" guiX="386" guiY="-67" id="GENERATE_FIPS_DATA" type="RUN_GRAPH"/>
-<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/LoadData.grf" guiName="Load Staging Data" guiX="235" guiY="-67" id="LOAD_STAGING_DATA" type="RUN_GRAPH"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Wage" guiX="316" guiY="43" id="TABLE_WAGE" type="DB_EXECUTE">
+<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/FIPS/GenerateAllFIPSData.grf" guiName="Generate FIPS Data" guiX="173" guiY="-68" id="GENERATE_FIPS_DATA" type="RUN_GRAPH"/>
+<Node enabled="disabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/LoadData.grf" guiName="Load Staging Data" guiX="22" guiY="-68" id="LOAD_STAGING_DATA" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Wage" guiX="103" guiY="42" id="TABLE_WAGE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_WAGE};
 create table ${TABLE_WAGE} (
   DATA_SOURCE_ID INT NOT NULL,
@@ -26,7 +26,7 @@ create table ${TABLE_WAGE} (
   YEARS_OF_EXPERIENCE INT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Company Name Ticker" guiX="267" guiY="122" id="TEMP_TABLE_COMPANY_NAME_TICKER" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Temp Table: Company Name Ticker" guiX="54" guiY="121" id="TEMP_TABLE_COMPANY_NAME_TICKER" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   ${TMP_TABLE_COMPANY_NAME_TICKER} 
   union of all company tickers and mapped names
@@ -40,7 +40,7 @@ create table ${TMP_TABLE_COMPANY_NAME_TICKER} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Name Ticker" guiX="277" guiY="203" id="POPULATE_COMPANY_NAME_TICKER" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Name Ticker" guiX="64" guiY="202" id="POPULATE_COMPANY_NAME_TICKER" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TMP_TABLE_COMPANY_NAME_TICKER}
 select company_name, ticker
 from ${TABLE_COMPANY_NAME_TICKER} tc
@@ -60,7 +60,7 @@ from ${TABLE_SUBSIDIARY} s;
 </Node>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Wage Table with Glassdoor Data" guiX="250" guiY="281" id="POPULATE_WAGE_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Wage Table with Glassdoor Data" guiX="37" guiY="280" id="POPULATE_WAGE_TABLE_WITH_GLASSDOOR_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
 insert into ${TABLE_WAGE}
@@ -88,7 +88,7 @@ where
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply H1BVisa Data Dot Info Title JOC Map Data" guiX="531" guiY="359" id="APPLY_H1BVISA_DATA_DOT_INFO_TITLE_JOC_MAP_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply H1BVisa Data Dot Info Title JOC Map Data" guiX="318" guiY="358" id="APPLY_H1BVISA_DATA_DOT_INFO_TITLE_JOC_MAP_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/************************************************************************
   Since jobtitle/joc included with each record, add those jocs to the 
   jobtitle/joc map, so that this mapping will overwrite any other mapping
@@ -104,14 +104,14 @@ select
   jobtitle,
   joc,
   ${CONST_DATA_SOURCE_NAME_H1BDATADOTINFO},
-  null
+  ticker
 from (
-  select jobtitle, max(joc) joc             /**** ideally, should only have one jobtitle->joc mapping, but is not always case ****/
+  select jobtitle, ticker, max(joc) joc             /**** ideally, should only have one jobtitle,ticker->joc mapping, but is not always case ****/
   from ${TABLE_H1BVISA_H1BDATA_DOT_INFO}
-  group by jobtitle
-);]]></attr>
+  group by jobtitle, ticker
+) t;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="245" guiY="359" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with Franchise Data" guiX="32" guiY="358" id="POPULATE_LOOKUP_TABLE_WITH_FRANCHISE_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${TABLE_WAGE}
 */
@@ -205,7 +205,7 @@ order by ticker, joc, wage desc;
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Lookup Table with Enigma Data" guiX="-46" guiY="432" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Lookup Table with Enigma Data" guiX="345" guiY="431" id="POPULATE_LOOKUP_TABLE_WITH_ENIGMA_DATA1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   insert enigma h1b visa data into ${TABLE_WAGE}
 */
@@ -287,109 +287,6 @@ from (
         end wage_rate_of_pay_to
       from ${TABLE_ENIGMA_H1BVISA} e
       join ${TMP_TABLE_COMPANY_NAME_TICKER} tc on tc.company_name = e.employer_name
-      where case_status = 'CERTIFIED' and length(soc_code) >= 7 and regexp_like(left(soc_code,7),'[0-9]]]><![CDATA[[0-9]\-[0-9][0-9][0-9][0-9]')
-    ) e
-    join ${TMP_TABLE_COMPANY_NAME_TICKER} c on c.company_name = e.employer_name
-    join ${TABLE_ENIGMA_H1BVISA_JOC} sj on 
-      sj.enigma_soc_code = e.soc_code
-      and sj.enigma_soc_name = e.soc_name
-      and sj.enigma_job_title = e.job_title
-    where
-      (wage_rate_of_pay_from> 0.0 or wage_rate_of_pay_to > 0.0) and ( 
-        (not (wage_rate_of_pay_from > 0.0 and wage_rate_of_pay_to > 0.0)) or 
-        (wage_rate_of_pay_to >= wage_rate_of_pay_from)
-      )
-  ) t
-) t
-join ${TABLE_COLI_AVG} f on f.city = t.city and f.state = t.state
-join ${TABLE_DATA_SOURCE} ds on ds.data_source = ${CONST_DATA_SOURCE_NAME_ENIGMAH1B}
-join ${TABLE_YEAR_ADJUSTMENT} ya on ya.year = t.wage_year
-where
-  ((t.wage * 100.0 / f.COST_OF_LIVING_INDEX_AVG) / ${CONST_HOURS_PER_YEAR}) <= ${CONST_ENIGMA_H1BVISA_MAX_HOURLY_WAGE}
-order by t.ticker, t.joc, t.wage desc;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with H1BVisa Data Dot Info" guiX="235" guiY="432" id="POPULATE_LOOKUP_TABLE_WITH_H1BVISA_DATA_DOT_INFO" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[/*
-  insert enigma h1b visa data into ${TABLE_WAGE}
-*/
-
-SET LOCALE to LEN_S1;
-
-insert into ${TABLE_WAGE}
-select 
-  ds.data_source_id,
-  null reviewid,
-  t.city,
-  t.state, 
-  t.ticker,
-  t.joc,
-  t.jobtitle,
-  cast(round((ya.ADJUSTMENT_FACTOR*t.wage / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) wage,
-  cast(round((ya.ADJUSTMENT_FACTOR*t.wage * 100.0 / f.COST_OF_LIVING_INDEX_AVG) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)) wage_cola,
-  t.wage_year,
-  null years_of_experience
-from (
-  select
-    ticker,
-    joc,
-    jobtitle,
-    case 
-      when wage_unit = 'Hour' then wage * ${CONST_HOURS_PER_YEAR}
-      when wage_unit = 'Bi-Weekly' then wage * 26.0
-      when wage_unit = 'Week' then wage * 52.0
-      when wage_unit = 'Month' then wage * 12.0
-      else wage
-    end wage,
-    city,
-    state,
-    wage_year
-  from (
-    select
-      c.ticker,
-      sj.joc,
-      e.job_title jobtitle,
-      cast(round(
-        case
-          when e.wage_rate_of_pay_from > 0.0 and e.wage_rate_of_pay_to > 0.0
-          then (e.wage_rate_of_pay_from + e.wage_rate_of_pay_to)/2.0
-          when e.wage_rate_of_pay_from > 0.0
-          then e.wage_rate_of_pay_from
-          else e.wage_rate_of_pay_to
-        end
-      ,2) as numeric(16,2)) wage,
-      e.wage_rate_of_pay wage_unit,
-      case
-        when e.worksite_city is null or e.worksite_state is null then employer_city
-        else e.worksite_city
-      end city,
-      case
-        when e.worksite_city is null or e.worksite_state is null then employer_state
-        else e.worksite_state
-      end state,
-      cast(isnull(concat('20',right(e.employment_start_date,2)),isnull(e.pw_wage_source_year,cast(EXTRACT(YEAR FROM CURRENT_DATE) as varchar(4)))) as int) wage_year
-    from (
-      select
-        employer_name,
-        soc_code,
-        soc_name,
-        job_title,
-        wage_rate_of_pay,
-        worksite_city,
-        employer_city,
-        worksite_state,
-        employer_state,
-        pw_wage_source_year,
-        employment_start_date,
-        case 
-          when wage_rate_of_pay_from is null or not regexp_like(wage_rate_of_pay_from,'^[0-9.]+$') then 0.0
-          else cast(wage_rate_of_pay_from as float)
-        end wage_rate_of_pay_from,
-        case 
-          when wage_rate_of_pay_to is null or not regexp_like(wage_rate_of_pay_to,'^[0-9.]+$') then 0.0
-          else cast(wage_rate_of_pay_to as float)
-        end wage_rate_of_pay_to
-      from ${TABLE_H1BVISA_H1BDATA_DOT_INFO} h
-      join ${TMP_TABLE_COMPANY_NAME_TICKER} tc on tc.company_name = e.employer_name
       where case_status = 'CERTIFIED' and length(soc_code) >= 7 and regexp_like(left(soc_code,7),'[0-9][0-9]\-[0-9][0-9][0-9][0-9]')
     ) e
     join ${TMP_TABLE_COMPANY_NAME_TICKER} c on c.company_name = e.employer_name
@@ -411,45 +308,96 @@ where
   ((t.wage * 100.0 / f.COST_OF_LIVING_INDEX_AVG) / ${CONST_HOURS_PER_YEAR}) <= ${CONST_ENIGMA_H1BVISA_MAX_HOURLY_WAGE}
 order by t.ticker, t.joc, t.wage desc;]]></attr>
 </Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Lookup Table with H1BVisa Data Dot Info" guiX="22" guiY="431" id="POPULATE_LOOKUP_TABLE_WITH_H1BVISA_DATA_DOT_INFO" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/*
+  insert enigma h1b visa data into ${TABLE_WAGE}
+*/
+
+SET LOCALE to LEN_S1;
+
+insert into ${TABLE_WAGE}
+select 
+  ds.data_source_id,
+  null reviewid,
+  h.city,
+  h.state, 
+  h.ticker,
+  h.joc,
+  h.jobtitle,
+  cast(round((ya.ADJUSTMENT_FACTOR*h.salary / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) wage,
+  cast(round((ya.ADJUSTMENT_FACTOR*h.salary * 100.0 / coli.COST_OF_LIVING_INDEX_AVG) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)) wage_cola,
+  h.year,
+  null years_of_experience
+from ${TABLE_H1BVISA_H1BDATA_DOT_INFO} h
+join (
+  select ticker
+  from ${TABLE_COMPANY}
+  group by ticker
+  union all
+  select ticker_subsidiary ticker
+  from ${TABLE_SUBSIDIARY}
+  group by ticker_subsidiary
+) c on c.ticker = h.ticker
+join ${TABLE_COLI_AVG} coli on coli.city = h.city and coli.state = h.state
+join ${TABLE_YEAR_ADJUSTMENT} ya on ya.year = h.year
+join ${TABLE_DATA_SOURCE} ds on data_source = ${CONST_DATA_SOURCE_NAME_H1BDATADOTINFO};]]></attr>
+</Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Modifications" guiX="287" guiY="522" id="APPLY_JOC_MODIFICATIONS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Modifications" guiX="74" guiY="521" id="APPLY_JOC_MODIFICATIONS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
-to do:
-1st generic map (no datasource, no ticker)
-2nd data source specific (datasource, no ticker)
-3rd ticker specific (ticker, no datasource)
-4th datasource and ticker specific (ticker and datasource)
-easiest way is with 4 queries, harder way would be using ranking, first get rank (after ordering) 
-and map on identically mapped ranking, but that is either duplicating code or requires an extra table.
-
 update ${TABLE_WAGE} w
-  set joc = j.joc
+set joc = 
+  case
+    when isnull(t3.joc,'') <> '' then t3.joc
+    when isnull(t2.joc,'') <> '' then t2.joc
+    when isnull(t1.joc,'') <> '' then t1.joc
+    when isnull(t0.joc,'') <> '' then t0.joc
+    else w2.joc
+  end
 from (
-  /*********************************************************************************
-    Doing a union so that records with incorrect data source not accidently included 
-  *********************************************************************************/
-  select jobtitle, joc, data_source_id, ticker
+  select job_title, joc, data_source_id, ticker
+  from ${TABLE_WAGE}
+  group by job_title, joc, data_source_id, ticker
+) w2
+left join (
+  select j.jobtitle, j.joc, cast(null as integer) data_source_id, null ticker
   from ${TABLE_JOBTITLE_JOC} j
-  left join ${TABLE_DATA_SOURCE} ds on ds.data_source = j.data_source
-  where j.data_source is not null
-  union all
-  select jobtitle, joc, cast(null as integer) data_source_id, ticker
-  from ${TABLE_JOBTITLE_JOC}
-  where data_source is null
-) j
-where
-  w.job_title = j.jobtitle 
-  and (j.data_source_id is null or w.data_source_id = j.data_source_id)
-  and (j.ticker is null or w.ticker = j.ticker);]]></attr>
+  where isnull(data_source,'') = '' and isnull(j.ticker,'') = ''
+) t0 on t0.jobtitle = w2.job_title
+left join (
+  select j.jobtitle, j.joc, ds.data_source_id, null ticker
+  from ${TABLE_JOBTITLE_JOC} j
+  join ${TABLE_DATA_SOURCE} ds on ds.data_source = j.data_source
+  where isnull(j.ticker,'') = ''
+) t1 on t1.jobtitle = w2.job_title and t1.data_source_id = w2.data_source_id
+left join (
+  select j.jobtitle, j.joc, cast(null as integer) data_source_id, j.ticker
+  from ${TABLE_JOBTITLE_JOC} j
+  join ${TABLE_COMPANY} c on c.ticker = j.ticker
+  where isnull(data_source,'') = ''
+) t2 on t2.jobtitle = w2.job_title and t2.ticker = w2.ticker
+left join (
+  select j.jobtitle, j.joc, ds.data_source_id, j.ticker
+  from ${TABLE_JOBTITLE_JOC} j
+  join (
+    select ticker
+    from ${TABLE_COMPANY}
+    union all
+    select ticker_subsidiary ticker
+    from ${TABLE_SUBSIDIARY}
+  ) c on c.ticker = j.ticker
+  join ${TABLE_DATA_SOURCE} ds on ds.data_source = j.data_source
+) t3 on t3.jobtitle = w2.job_title and t3.data_source_id = w2.data_source_id and t3.ticker = w2.ticker
+where w.job_title = w2.job_title and w.data_source_id = w2.data_source_id and w.ticker = w2.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Ticker Company Name" guiX="41" guiY="522" id="DROP_TEMP_TICKER_COMPANY_NAME" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Ticker Company Name" guiX="351" guiY="521" id="DROP_TEMP_TICKER_COMPANY_NAME" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TMP_TABLE_COMPANY_NAME_TICKER}]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Exceptions" guiX="293" guiY="606" id="APPLY_JOC_EXCEPTIONS1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Exceptions" guiX="80" guiY="605" id="APPLY_JOC_EXCEPTIONS1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 update ${TABLE_WAGE} w
   set joc = j.joc_new
@@ -473,7 +421,7 @@ where
 </Node>
 </Phase>
 <Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Level Exceptions" guiX="277" guiY="683" id="APPLY_JOC_LEVEL_EXCEPTIONS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Level Exceptions" guiX="64" guiY="682" id="APPLY_JOC_LEVEL_EXCEPTIONS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/*
   update ${TABLE_WAGE} to modify joc by level, given years of experience.
 */
@@ -491,7 +439,7 @@ where
 </Node>
 </Phase>
 <Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Wage Multipliers" guiX="277" guiY="761" id="APPLY_JOC_WAGE_MULTIPLIERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply JOC Wage Multipliers" guiX="64" guiY="760" id="APPLY_JOC_WAGE_MULTIPLIERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 update ${TABLE_WAGE} w
   set hourly_wage_raw = multiplier * hourly_wage_raw,
