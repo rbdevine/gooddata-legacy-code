@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed May 24 23:51:42 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.335" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 25 13:02:44 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.343" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_COMPANY_NAME_TICKER" value="${TMP_BASE}_COMPANY_NAME_TICKER"/>
-<Property fileURL="wage.prm" id="GraphParameter39"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter1"/>
-<Property fileURL="workspace.prm" id="GraphParameter21"/>
+<Property fileURL="wage.prm" id="GraphParameter1"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter39"/>
+<Property fileURL="workspace.prm" id="GraphParameter59"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -446,6 +446,40 @@ update ${TABLE_WAGE} w
     hourly_wage_cola = multiplier * hourly_wage_cola
 from ${TABLE_JOC_WAGE_MULTIPLIER} m
 where w.joc = w.joc and w.ticker = m.ticker;]]></attr>
+</Node>
+</Phase>
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Records By Weight" guiX="76" guiY="834" id="ADD_RECORDS_BY_WEIGHT" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/******************************************************************
+  Need to duplicate records based on data source weights. 
+  For example, if h1bvisa data dot info data is weighted 3,
+  then for every h1bvisa data dot info salary data point,
+  2 more identical ones need to be added.
+  The code here is a bit of a hack, but it works
+  as long as the weight is less than 10, which should always
+  be the case.
+*******************************************************************/
+insert into ${TABLE_WAGE} 
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-1 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-2 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-3 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-4 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-5 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-6 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-7 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-8 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-9 > 0
+union all
+select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_id = w.data_source_id where ds.weight-10 > 0;
+]]></attr>
 </Node>
 </Phase>
 </Graph>

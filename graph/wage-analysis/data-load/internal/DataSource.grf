@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed May 24 16:36:31 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.72" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu May 25 10:48:35 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.74" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -15,9 +15,9 @@
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/company_error.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Company.xlsx"/>
 <Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
-<Property fileURL="wage.prm" id="GraphParameter23"/>
-<Property fileURL="workspace.prm" id="GraphParameter4"/>
-<Property id="GraphParameter22" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter4"/>
+<Property fileURL="workspace.prm" id="GraphParameter42"/>
+<Property id="GraphParameter60" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -26,16 +26,16 @@
 create table ${TABLE_WAGE_DATA_SOURCE} (
   DATA_SOURCE_ID INTEGER UNIQUE NOT NULL,
   DATA_SOURCE VARCHAR(32) NOT NULL,
-  WEIGHT FLOAT NOT NULL
+  WEIGHT INTEGER NOT NULL
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="1">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Data Source" guiX="36" guiY="87" id="POPULATE_DATA_SOURCE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_WAGE_DATA_SOURCE} values(0, ${CONST_DATA_SOURCE_NAME_GLASSDOOR}, 1.0);
-insert into ${TABLE_WAGE_DATA_SOURCE} values(1, ${CONST_DATA_SOURCE_NAME_ENIGMAH1B}, 3.0);
-insert into ${TABLE_WAGE_DATA_SOURCE} values(2, ${CONST_DATA_SOURCE_NAME_FRANCHISE}, 1.0);
-insert into ${TABLE_WAGE_DATA_SOURCE} values(3, ${CONST_DATA_SOURCE_NAME_H1BDATADOTINFO}, 3.0);
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_WAGE_DATA_SOURCE} values(0, ${CONST_DATA_SOURCE_NAME_GLASSDOOR}, 1);
+insert into ${TABLE_WAGE_DATA_SOURCE} values(1, ${CONST_DATA_SOURCE_NAME_ENIGMAH1B}, 3);
+insert into ${TABLE_WAGE_DATA_SOURCE} values(2, ${CONST_DATA_SOURCE_NAME_FRANCHISE}, 1);
+insert into ${TABLE_WAGE_DATA_SOURCE} values(3, ${CONST_DATA_SOURCE_NAME_H1BDATADOTINFO}, 3);
 ]]></attr>
 </Node>
 </Phase>
