@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu May 25 13:33:38 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.94" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri May 26 01:00:55 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.103" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,10 +16,10 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="wage.prm" id="GraphParameter0"/>
 <Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter38"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter47"/>
 <Property fileURL="workspace.prm" id="GraphParameter67"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -85,8 +85,7 @@ select c.industry
 from ${TABLE_WAGE} w
 join ${TABLE_COMPANY} c on c.ticker = w.ticker
 group by c.industry
-order by c.industry;
-insert into ${INDUSTRY_QUEUE_TABLENAME} (industry) values ('Consumer Services');]]></attr>
+order by c.industry;]]></attr>
 </Node>
 </Phase>
 <Phase number="2">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 25 13:02:44 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.343" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu May 25 18:07:18 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.345" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_COMPANY_NAME_TICKER" value="${TMP_BASE}_COMPANY_NAME_TICKER"/>
@@ -72,8 +72,8 @@ select distinct
   tc.ticker,
   g.goc,
   g.jobtitle,
-  cast(round(ya.ADJUSTMENT_FACTOR*g.UNADJUSTEDBASESALARY/(${CONST_HOURS_PER_YEAR})) as numeric(36,2)),
-  cast(round(ya.ADJUSTMENT_FACTOR*g.UNADJUSTEDBASESALARY*100/(${CONST_HOURS_PER_YEAR}*isnull(fd.COST_OF_LIVING_INDEX_AVG,'100.0'))) as numeric(36,2)),
+  cast(round(g.UNADJUSTEDBASESALARY/${CONST_HOURS_PER_YEAR},2) as numeric(36,2)),
+  cast(round(ya.ADJUSTMENT_FACTOR*g.UNADJUSTEDBASESALARY*100/(${CONST_HOURS_PER_YEAR}*isnull(fd.COST_OF_LIVING_INDEX_AVG,'100.0')),2) as numeric(36,2)),
   cast(g.YEAROFSALARY as int),
   cast(g.YEARSOFRELEVANTEXPNUMBER as int)
 from ${TMP_TABLE_COMPANY_NAME_TICKER} tc
@@ -324,7 +324,7 @@ select
   h.ticker,
   h.joc,
   h.jobtitle,
-  cast(round((ya.ADJUSTMENT_FACTOR*h.salary / ${CONST_HOURS_PER_YEAR}),2) as numeric(36,2)) wage,
+  cast(round(h.salary / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)) wage,
   cast(round((ya.ADJUSTMENT_FACTOR*h.salary * 100.0 / coli.COST_OF_LIVING_INDEX_AVG) / ${CONST_HOURS_PER_YEAR},2) as numeric(36,2)) wage_cola,
   h.year,
   null years_of_experience

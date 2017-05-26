@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed May 17 09:59:54 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.101" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri May 26 00:59:13 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.105" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,10 +16,10 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="wage.prm" id="GraphParameter0"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter34"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter43"/>
-<Property fileURL="workspace.prm" id="GraphParameter63"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter9"/>
+<Property fileURL="workspace.prm" id="GraphParameter29"/>
+<Property fileURL="wage.prm" id="GraphParameter47"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -98,7 +98,15 @@ create table if not exists ${TABLE_PROCESS} (
 </Phase>
 <Phase number="1">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Process Table" guiX="251" guiY="171" id="POPULATE_PROCESS_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_PROCESS} 
+<attr name="sqlQuery"><![CDATA[/***************************************************************
+  For reasons that are unclear, when ${CONST_COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT}
+  is set to false, fair pay ends up second in the process queue
+  and in turn somehow causes double fair pay jobs to be created
+  in the reports. Since only interested in fair pay for now,
+  commenting out the living wage, but this issue will need to 
+  be resolved.
+***************************************************************/
+INSERT INTO ${TABLE_PROCESS} 
 VALUES (1,'FairPay',
 		${CONST_FP_MIN_COMPANIES_PER_JOC},
 		${CONST_FP_MIN_DATA_POINTS_PER_COMPANY},
@@ -110,6 +118,7 @@ VALUES (1,'FairPay',
 		${CONST_COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT}
 );
 
+/*
 INSERT INTO ${TABLE_PROCESS} 
 VALUES (2,'LivingWage',
 		${CONST_LW_MIN_COMPANIES_PER_JOC},
@@ -121,7 +130,7 @@ VALUES (2,'LivingWage',
 		${CONST_LW_MIN_JOCS_PER_COMPANY_SCORE_3},
 		${CONST_COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT}
 );
-]]></attr>
+*/]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
