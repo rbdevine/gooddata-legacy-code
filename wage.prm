@@ -1,4 +1,4 @@
-#Fri May 26 00:59:23 EDT 2017
+#Mon May 29 15:26:26 JST 2017
 CONST_LW_MIN_JOCS_PER_COMPANY=1
 TMP_TABLE_FIPS_MAP=${TMP_BASE}_FIPS_MAP
 TABLE_COMPANY=JUST_COMPANY
@@ -15,6 +15,7 @@ TABLE_COMPANY_NAME_TICKER=${LOOKUP_BASE}_COMPANY_NAME_TICKER
 TABLE_JOC=JUST_JOC
 TABLE_DATA_SOURCE=${LOOKUP_BASE}_DATA_SOURCE
 CONST_LW_MIN_COMPANIES_PER_JOC=1
+TABLE_COMPANY_SUBSIDIARY_INCLUDED=(select ticker, company_name, industry from just_company c left join (select ticker_parent from just_subsidiary where ticker_subsidiary is not null) s on s.ticker_parent \= c.ticker where s.ticker_parent is null union all select s.ticker_subsidiary ticker, s.subsidiary_name company_name, c.industry from just_subsidiary s join just_company c on c.ticker \= s.ticker_parent where s.ticker_subsidiary is not null)
 LOOKUP_BASE=LKP_WAGE
 TABLE_WAGE=JUST_WAGE
 CONST_LW_MIN_INDUSTRY_JOCS_PER_COMPANY=1
@@ -32,8 +33,8 @@ TABLE_FIPS_DATA=${LOOKUP_BASE}_FIPS_DATA
 CONST_LW_MIN_DATA_POINTS_PER_COMPANY=1
 TMP_BASE=TMP_WAGE
 CONST_FRANCHISE_MAX_YEARLY_SALARY=200000.0
-CONST_FP_MIN_COMPANIES_PER_JOC=3
 CONST_FP_MIN_DATA_POINTS_PER_COMPANY=40
+CONST_FP_MIN_COMPANIES_PER_JOC=3
 TABLE_WAGE_DATA_SOURCE=${LOOKUP_BASE}_DATA_SOURCE
 CONST_HOURS_PER_YEAR=2000.0
 TMP_TABLE_MAPPED_COLI=${TMP_BASE}_MAPPED_COLI

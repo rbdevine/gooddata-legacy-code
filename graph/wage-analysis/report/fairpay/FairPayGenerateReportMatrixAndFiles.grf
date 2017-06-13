@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Mon May 15 23:57:38 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.118" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Tue May 30 21:54:50 JST 2017" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.137" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -13,15 +13,16 @@
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="COLUMN_NUMBERS_TABLENAME" value="TMP_REPORT_COLUMN_NUMBERS"/>
 <Property id="GraphParameter1" name="COMPANY_IDS_REMAPPED_TABLENAME" value="TMP_COMPANY_IDS_REMAPPED"/>
-<Property fileURL="wage-fairpay-parameters.prm" id="GraphParameter20"/>
-<Property fileURL="workspace.prm" id="GraphParameter2"/>
+<Property fileURL="wage.prm" id="GraphParameter2"/>
+<Property fileURL="workspace.prm" id="GraphParameter47"/>
+<Property fileURL="wage-fairpay-parameters.prm" id="GraphParameter41"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix" guiX="449" guiY="8" id="TABLE_REPORT_MATRIX" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_TABLENAME};
 create table if not exists ${REPORT_MATRIX_TABLENAME} (
-    INDUSTRY VARCHAR(255) NOT NULL, ROW_TYPE VARCHAR(32) NOT NULL, JUST_CO_ID VARCHAR(15) DEFAULT '', TICKER VARCHAR(255) DEFAULT '',
+    INDUSTRY VARCHAR(255) NOT NULL, ROW_TYPE VARCHAR(32) NOT NULL, TICKER VARCHAR(16) DEFAULT '',
     DESCRIPTION VARCHAR(255) DEFAULT '', COMPANY_VALUE VARCHAR(255) DEFAULT '', COMPANY_VALUE_2 VARCHAR(255) DEFAULT '', 
     INDUSTRY_VALUE VARCHAR(255) DEFAULT '', INDUSTRY_VALUE_2 VARCHAR(255) DEFAULT '',
     C1 VARCHAR(255) DEFAULT '', C2 VARCHAR(255) DEFAULT '', C3 VARCHAR(255) DEFAULT '', C4 VARCHAR(255) DEFAULT '', C5 VARCHAR(255) DEFAULT '', 
@@ -54,8 +55,8 @@ create table ${COLUMN_NUMBERS_TABLENAME} (
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Company Ids Remapped" guiX="-15" guiY="8" id="TABLE_TEMP_COMPANY_IDS_REMAPPED" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_IDS_REMAPPED_TABLENAME};
 create table if not exists ${COMPANY_IDS_REMAPPED_TABLENAME} (
-  JUST_CO_ID VARCHAR(15) NOT NULL,
-  JUST_CO_ID_2 VARCHAR(15) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
+  TICKER_2 VARCHAR(16) NOT NULL,
   COMPANY_COLUMN_NO_ADJ INT NOT NULL
 );]]></attr>
 </Node>
@@ -138,22 +139,22 @@ values ('IND_FOOTER_BLANK_BOTTOM', 2, 0);]]></attr>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Temp Company Ids Remapped" guiX="65" guiY="95" id="ADD_TEMP_COMPANY_IDS_REMAPPED" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_IDS_REMAPPED_TABLENAME}
 select
-  c.just_co_id,
-  c2.just_co_id other_id,
+  c.ticker,
+  c2.ticker other_ticker,
   case 
     when c2.company_column_no > c.company_column_no then c2.company_column_no - 1
     else c2.company_column_no
   end company_column_no_adj
 from ${COMPANY_TABLENAME} c
-join lkp_just_co_indy i on c.just_co_id = i.just_co_id
-join ${COMPANY_TABLENAME} c2 on c.just_co_id <> c2.just_co_id
-join lkp_just_co_indy i2 on i2.just_indy = i.just_indy and i2.just_co_id = c2.just_co_id;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} cs on cs.ticker = c.ticker
+join ${COMPANY_TABLENAME} c2 on c2.ticker <> c.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} cs2 on cs2.industry = cs.industry and cs2.ticker = c2.ticker;]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Data" guiX="123" guiY="346" id="ADD_CO_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
-  industry, row_type, just_co_id, ticker, description,
+  industry, row_type, ticker, description,
   company_value, 
   industry_value, 
   company_value_2, 
@@ -162,7 +163,7 @@ join lkp_just_co_indy i2 on i2.just_indy = i.just_indy and i2.just_co_id = c2.ju
   industry_job_total
 )
 select
-  j.industry, 'CO_DATA', c.just_co_id, m.ticker_trim, j.job, 
+  j.industry, 'CO_DATA', c.ticker, j.job, 
   cast(cast(round(cjd.rate,2) as numeric(36,2)) as varchar(8)),
   cast(cast(round(a.avg_rate,2) as numeric(36,2)) as varchar(8)),
   cast(cast(round(cjd.rate_raw,2) as numeric(36,2)) as varchar(8)),
@@ -170,51 +171,49 @@ select
   cast(cjd.score as varchar(8)),
   cast(j.company_count as varchar(8))
 from ${JOB_TABLENAME} j
-join LKP_JUST_CO_INDY i on j.industry = i.just_indy
-join ${COMPANY_TABLENAME} c on c.just_co_id = i.just_co_id 
-join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = i.just_co_id
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.industry = j.industry
+join ${COMPANY_TABLENAME} c2 on c2.ticker = c.ticker 
 join (
   select 
-    ji.just_indy industry, 
-    job, 
+    c.industry, 
+    jd.job, 
     avg(jd.rate) avg_rate 
   from ${COMPANY_JOB_DATA_TABLENAME} jd
-  join lkp_just_co_indy ji on ji.just_co_id = jd.just_co_id
-  group by ji.just_indy, jd.job
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = jd.ticker
+  group by c.industry, jd.job
 ) a on a.industry = j.industry and a.job = j.job
 join (
   select 
-    ji.just_indy industry, 
+    c.industry, 
     job, 
     avg(jd.rate_raw) avg_rate_raw 
   from ${COMPANY_JOB_DATA_TABLENAME} jd
-  join lkp_just_co_indy ji on ji.just_co_id = jd.just_co_id
-  group by ji.just_indy, jd.job
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = jd.ticker
+  group by c.industry, jd.job
 ) ar on ar.industry = j.industry and ar.job = j.job
-left join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.job = j.job and cjd.just_co_id = c.just_co_id;]]></attr>
+left join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.job = j.job and cjd.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Columns" guiX="440" guiY="267" id="ADD_CO_HEADER_COLUMNS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
-  industry, row_type, just_co_id, ticker, description,
+  industry, row_type, ticker, description,
   company_value, industry_value, company_value_2, industry_value_2, rank_value, industry_job_total
 )
 select
-    i.just_indy industry, 'CO_HEADER_COLUMN_HEADERS', c.just_co_id, m.ticker_trim, 'JOB', 
+    c2.industry, 'CO_HEADER_COLUMN_HEADERS', c.ticker, 'JOB', 
     'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG INDUSTRY', 'UNADJUSTED HOURLY AVG', 'UNADJUSTED HOURLY AVG INDUSTRY', 'SCORE', 'MAX'
 from ${COMPANY_TABLENAME} c
-join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id
-join LKP_JUST_CO_INDY i on i.just_co_id = c.just_co_id;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c2 on c2.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Name" guiX="268" guiY="267" id="ADD_CO_HEADER_NAME" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
-  industry, row_type, just_co_id, ticker, description, company_value,
+  industry, row_type, ticker, description, company_value,
   c1, c2, c3, c4, c5, c6, c7, c8, c9, c10,
   c11, c12, c13, c14, c15, c16, c17, c18, c19, c20,
   c21, c22, c23, c24, c25, c26, c27, c28, c29, c30,
   c31, c32, c33, c34, c35, c36, c37, c38, c39, c40,
   c41, c42, c43, c44, c45, c46, c47, c48, c49, c50
 )
-select i.just_indy industry, 'CO_HEADER_NAME', c.just_co_id, m.ticker_trim, m.ticker_trim, m.co_long_name,
+select c2.industry, 'CO_HEADER_NAME', c.ticker, c.ticker, c2.company_name,
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
@@ -226,43 +225,39 @@ select i.just_indy industry, 'CO_HEADER_NAME', c.just_co_id, m.ticker_trim, m.ti
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG'
 from ${COMPANY_TABLENAME} c
-join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id
-join LKP_JUST_CO_INDY i on i.just_co_id = c.just_co_id;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c2 on c2.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Top" guiX="106" guiY="267" id="ADD_CO_HEADER_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
-  industry, row_type, just_co_id, ticker
+  industry, row_type, ticker
 )
 select
-    i.just_indy industry, 'CO_HEADER_BLANK_TOP', c.just_co_id, m.ticker_trim
+    c2.industry, 'CO_HEADER_BLANK_TOP', c.ticker
 from ${COMPANY_TABLENAME} c
-join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id
-join LKP_JUST_CO_INDY i on i.just_co_id = c.just_co_id;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c2 on c2.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Total" guiX="277" guiY="346" id="ADD_CO_TOTAL" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
-  industry, row_type, just_co_id, ticker, description,
+  industry, row_type, ticker, description,
   company_value, industry_value, rank_value, industry_job_total
 )
 select
-  i.just_indy, 'CO_TOTAL', c.just_co_id, m.ticker_trim, 'SCORE', 
+  c2.industry, 'CO_TOTAL', c2.ticker, 'SCORE', 
   cast(cast(round((cst.score_tot/ist.score_tot)*100,1) as numeric(36,1)) as varchar(8)),
   concat(concat(cast(cst.score_tot as varchar(8)), '/'),cast(ist.score_tot as varchar(8))),
   cast(cst.score_tot as varchar(8)),
   cast(ist.score_tot as varchar(8))
 from ${COMPANY_TABLENAME} c
-join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id
-join LKP_JUST_CO_INDY i on i.just_co_id = c.just_co_id
-join (select just_co_id, sum(score) score_tot from ${COMPANY_JOB_DATA_TABLENAME} t group by just_co_id) cst on cst.just_co_id = c.just_co_id
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c2 on c2.ticker = c.ticker
+join (select ticker, sum(score) score_tot from ${COMPANY_JOB_DATA_TABLENAME} t group by ticker) cst on cst.ticker = c.ticker
 join (
-  select industry, cjd.just_co_id, sum(j.company_count) score_tot 
+  select j.industry, cjd.ticker, sum(j.company_count) score_tot 
   from ${JOB_TABLENAME} j
   join ${COMPANY_JOB_DATA_TABLENAME} cjd on j.job = cjd.job
-  join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = cjd.just_co_id
-  join LKP_JUST_CO_INDY i on i.just_co_id = m.just_co_id and j.industry = i.just_indy
-  group by j.industry, cjd.just_co_id
-  order by industry, just_co_id
-) ist on ist.just_co_id = c.just_co_id;
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c2 on c2.ticker = cjd.ticker
+  group by j.industry, cjd.ticker
+  order by j.industry, cjd.ticker
+) ist on ist.ticker = c.ticker;
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Footer Bottom" guiX="426" guiY="346" id="ADD_IND_FOOTER_BOTTOM" type="DB_EXECUTE">
@@ -316,11 +311,11 @@ group by industry;]]></attr>
 function integer transform() {
 	string sql = "";
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
-	sql = sql + "set c" + $in.0.column_number + " = m.co_long_name ";
+	sql = sql + "set c" + $in.0.column_number + " = c2.company_name ";
 	sql = sql + "from ${COMPANY_IDS_REMAPPED_TABLENAME} r ";
-	sql = sql + "join ${COMPANY_TABLENAME} c on c.just_co_id = r.just_co_id_2 ";
-	sql = sql + "join LKP_JUST_CO_SECTY_MASTER m on m.just_co_id = c.just_co_id ";
-	sql = sql + "where r.just_co_id = mtx.just_co_id and ";
+	sql = sql + "join ${COMPANY_TABLENAME} c on c.ticker = r.ticker ";
+	sql = sql + "join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c2 on c2.ticker = c.ticker ";
+	sql = sql + "where r.ticker = mtx.ticker and ";
 	sql = sql + "  mtx.row_type = 'CO_HEADER_COLUMN_HEADERS' and ";
 	sql = sql + "  r.company_column_no_adj = " + $in.0.column_number + ";";
 
@@ -355,10 +350,10 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set c" + $in.0.column_number + " = cast(cast(round(cjd.rate,2) as numeric(36,2)) as varchar(8)) ";
 	sql = sql + "from ${COMPANY_IDS_REMAPPED_TABLENAME} r ";
-	sql = sql + "join ${COMPANY_TABLENAME} c on c.just_co_id = r.just_co_id_2 ";
-	sql = sql + "join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = c.just_co_id ";
+	sql = sql + "join ${COMPANY_TABLENAME} c on c.ticker = r.ticker ";
+	sql = sql + "join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.ticker = c.ticker ";
 	sql = sql + "where mtx.description = cjd.job and ";
-	sql = sql + "  r.just_co_id = mtx.just_co_id and ";
+	sql = sql + "  r.ticker = mtx.ticker and ";
 	sql = sql + "  mtx.row_type = 'CO_DATA' and ";
 	sql = sql + "  r.company_column_no_adj = " + $in.0.column_number + ";";
 	

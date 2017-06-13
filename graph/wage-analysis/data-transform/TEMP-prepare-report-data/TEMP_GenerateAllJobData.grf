@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri May 26 00:59:13 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.105" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon May 29 12:47:50 JST 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.107" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,10 +16,10 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter9"/>
-<Property fileURL="workspace.prm" id="GraphParameter29"/>
-<Property fileURL="wage.prm" id="GraphParameter47"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter38"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter47"/>
+<Property fileURL="workspace.prm" id="GraphParameter67"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -27,7 +27,7 @@
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_JOB_DATA_TABLENAME};
 create table if not exists ${COMPANY_JOB_DATA_TABLENAME} (
   PROCESS_TYPE_ID INTEGER NOT NULL,
-  JUST_CO_ID VARCHAR(15) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
   JOB VARCHAR(255) NOT NULL, 
   RATE FLOAT NULL,
   SCORE INT NULL,
@@ -41,7 +41,7 @@ create table if not exists ${COMPANY_JOB_DATA_TABLENAME} (
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_TABLENAME};
 create table if not exists ${COMPANY_TABLENAME} (
   PROCESS_TYPE_ID INTEGER NOT NULL,
-  JUST_CO_ID VARCHAR(15) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
   COMPANY_COLUMN_NO INT
 );
 ]]></attr>
