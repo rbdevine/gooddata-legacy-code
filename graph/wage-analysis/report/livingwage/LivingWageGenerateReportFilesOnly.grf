@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu May 25 13:27:45 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.94" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jun 15 16:55:40 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.95" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -89,15 +89,15 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter1" name="REPORTFILEPATH_BLSLWCOUNTY" value="${REPORTS_DIR}/BLSLWCounty.csv"/>
-<Property id="GraphParameter2" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
-<Property id="GraphParameter3" name="REPORTFILEPATH_LWAVG" value="${REPORTS_DIR}/LWAverages.csv"/>
-<Property id="GraphParameter4" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
-<Property id="GraphParameter5" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
-<Property id="GraphParameter6" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter7"/>
-<Property fileURL="workspace.prm" id="GraphParameter46"/>
 <Property fileURL="graph/local/wage-local-parameters.prm" id="GraphParameter0"/>
+<Property id="GraphParameter2" name="REPORTFILEPATH_BLSLWCOUNTY" value="${REPORTS_DIR}/BLSLWCounty.csv"/>
+<Property id="GraphParameter3" name="REPORTFILEPATH_DETAILS" value="${REPORTS_DIR}/Details.csv"/>
+<Property id="GraphParameter4" name="REPORTFILEPATH_LWAVG" value="${REPORTS_DIR}/LWAverages.csv"/>
+<Property id="GraphParameter5" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
+<Property id="GraphParameter6" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
+<Property id="GraphParameter7" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter8"/>
+<Property fileURL="workspace.prm" id="GraphParameter47"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -315,10 +315,10 @@ order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_c
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Scores" guiX="26" guiY="136" id="SELECT_SCORES" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select 
-  $Ticker:=mtx.ticker, $Company:=m.co_long_name, $Subsidiary:=subsidiary, 
+  $Ticker:=mtx.ticker, $Company:=c.company_name, $Subsidiary:=subsidiary, 
   $Score:=description_2, $LWPerCounty:=description_3
 from ${REPORT_MATRIX_TABLENAME} mtx
-join lkp_just_co_secty_master m on m.just_co_id = mtx.just_co_id
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = mtx.ticker
 join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
 where rt.row_type in ('CO_TICKER_COUNT_TOTAL','CO_SUBSIDIARY_COUNT_TOTAL')
 order by mtx.ticker, subsidiary;]]></attr>

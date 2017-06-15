@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed May 24 10:50:14 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.302" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jun 15 16:53:16 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.307" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -19,8 +19,8 @@
 <Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
 <Property fileURL="wage.prm" id="GraphParameter7"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter44"/>
-<Property fileURL="workspace.prm" id="GraphParameter83"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter46"/>
+<Property fileURL="workspace.prm" id="GraphParameter85"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -41,7 +41,7 @@ create table LKP_FIPS_COUNTY_TO_PP_COUNTY (
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_JOB_COUNTY_DATA_TABLENAME};
 create table ${COMPANY_JOB_COUNTY_DATA_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5),
-  JUST_CO_ID VARCHAR(15),
+  TICKER VARCHAR(16),
   COMPANY_COUNT INT,
   SUBSIDIARY VARCHAR(255),
   TOLERANCE_TYPE INTEGER,
@@ -51,7 +51,7 @@ create table ${COMPANY_JOB_COUNTY_DATA_TABLENAME} (
   RATE_RAW_MIN_WAGE_ADJ FLOAT
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Living Wage Avgs By Company" guiX="649" guiY="10" id="TABLE_LIVING_WAGE_AVGS_BY_COMPANY1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Living Wage Avgs By Company" guiX="489" guiY="10" id="TABLE_LIVING_WAGE_AVGS_BY_COMPANY1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME};
 CREATE TABLE ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME} (
   TICKER VARCHAR(32) NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME} (
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Living Wage Totals" guiX="499" guiY="161" id="TABLE_LIVING_WAGE_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TOTALS_TABLENAME};
 create table ${TOTALS_TABLENAME} (
-  JUST_CO_ID VARCHAR(15) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
   SUBSIDIARY VARCHAR(255),
   EMP_COUNT_TOT INT NOT NULL
 );]]></attr>
@@ -74,8 +74,7 @@ create table ${TOTALS_TABLENAME} (
 create table ${REPORT_MATRIX_TABLENAME} (
     INDUSTRY VARCHAR(255) NULL, 
     ROW_TYPE VARCHAR(64) NOT NULL, 
-    JUST_CO_ID VARCHAR(15) DEFAULT '',     /*use to get name of company, not sure I will need*/
-    TICKER VARCHAR(255) DEFAULT '',
+    TICKER VARCHAR(16) DEFAULT '',
     HAS_PARENT BOOLEAN DEFAULT FALSE,
     SUBSIDIARY VARCHAR(255) DEFAULT '',
     STATE_COUNTY_FIPS VARCHAR(5) DEFAULT '',
@@ -126,7 +125,7 @@ CREATE TABLE ${STATE_MIN_AVG_SALARIES_TABLENAME} (
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Subsidiary Info" guiX="-1" guiY="10" id="TABLE_SUBSIDIARY_INFO" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${SUBSIDIARY_INFO_TABLENAME};
 create table ${SUBSIDIARY_INFO_TABLENAME} (
-  JUST_CO_ID VARCHAR(15) NOT NULL UNIQUE,
+  TICKER VARCHAR(16) NOT NULL UNIQUE,
   HAS_SUBSIDIARIES BOOLEAN NOT NULL,
   ALT_COMPANY_NAME VARCHAR(128) NULL
 );]]></attr>
@@ -135,7 +134,7 @@ create table ${SUBSIDIARY_INFO_TABLENAME} (
 <attr name="sqlQuery"><![CDATA[drop table if exists ${EMP_COUNT_TOTALS_TABLENAME};
 create table ${EMP_COUNT_TOTALS_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
-  JUST_CO_ID VARCHAR(15) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
   SUBSIDIARY VARCHAR(255) NULL,
   EMPLOYEES_AT_LIVING_WAGE_TOTAL INT NULL
 );]]></attr>
@@ -159,7 +158,7 @@ CREATE TABLE ${FIPS_REJECTS_TABLENAME} (
 <attr name="sqlQuery"><![CDATA[drop table if exists ${GOC_ORDER_TABLENAME};
 create table ${GOC_ORDER_TABLENAME} (
   SUBSIDIARY VARCHAR(255) NULL,
-  JUST_CO_ID VARCHAR(15) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
   GOC VARCHAR(255) NOT NULL,
   GOC_COLUMN_NO INT NOT NULL
 );]]></attr>
@@ -425,7 +424,7 @@ values ('IND_FOOTER_BLANK_BOTTOM', 2, 0);]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Info" guiX="172" guiY="244" id="ADD_SUBSIDIARY_INFO" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${SUBSIDIARY_INFO_TABLENAME}
-select m.just_co_id, s.has_subsidiary
+select s.ticker, s.has_subsidiary
 from (
   select ticker, (count(subsidiary) > 1) has_subsidiary
   from (
@@ -434,13 +433,12 @@ from (
     group by ticker, subsidiary
   ) d group by ticker
 ) s
-join lkp_just_co_secty_master m on m.ticker_trim = s.ticker;
 
 update ${SUBSIDIARY_INFO_TABLENAME} i
 set alt_company_name = d.subsidiary
 from (select ticker, subsidiary from ${JOB_DISTRIBUTION_TABLENAME} group by ticker, subsidiary) d
-join lkp_just_co_secty_master m on m.ticker_trim = d.ticker 
-where not i.has_subsidiaries and m.just_co_id = i.just_co_id;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = d.ticker 
+where not i.has_subsidiaries;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Remove NULL County Counts" guiX="316" guiY="244" id="REMOVE_NULL_COUNTY_COUNTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* clear rows with null employee counts. They are useless */
@@ -452,8 +450,21 @@ delete from ${COUNTY_COUNT_TABLENAME} where employee_count is null;]]></attr>
 <attr name="sqlQuery"><![CDATA[update ${SUBSIDIARY_INFO_TABLENAME} i
 set alt_company_name = d.subsidiary
 from (select ticker, subsidiary from ${JOB_DISTRIBUTION_TABLENAME} group by ticker, subsidiary) d
-join lkp_just_co_secty_master m on m.ticker_trim = d.ticker 
-where not i.has_subsidiaries and m.just_co_id = i.just_co_id;]]></attr>
+join (  
+  select s.ticker_subsidiary ticker, subsidiary_name company_name
+  from JUST_SUBSIDIARY s
+  where s.ticker_subsidiary is not null and isnull(subsidiary_name,'') <> ''
+  union
+  select c.ticker, c.company_name 
+  from JUST_COMPANY c
+  left join (
+    select ticker_parent
+    from JUST_SUBSIDIARY
+    where ticker_subsidiary is not null and isnull(subsidiary_name,'') <> ''
+  ) s on s.ticker_parent = c.ticker
+  where s.ticker_parent is null
+) c on c.ticker = d.ticker
+where not i.has_subsidiaries;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Non-Active" guiX="96" guiY="397" id="REMOVE_NON_ACTIVE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${JOB_DISTRIBUTION_TABLENAME}
@@ -509,8 +520,7 @@ from (
       from ${JOB_DISTRIBUTION_TABLENAME} d 
       group by ticker, subsidiary
     ) t 
-    join LKP_JUST_CO_SECTY_MASTER m on m.ticker_trim = t.ticker
-    join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+    join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = t.ticker
     where s.has_subsidiaries
     group by t.ticker, t.subsidiary
     order by t.ticker, t.subsidiary
@@ -530,11 +540,11 @@ join ${COUNTY_COUNT_TABLENAME} c on c.ticker = w.ticker;]]></attr>
 
 /* first, set subsidiary to null for any row associated with a ticker that only has one subsidiary name for all records */
 /* that is, any company that has not been split into subsidiaries needs to have null for subsidiary name */
-update ${COUNTY_COUNT_TABLENAME} c
+update ${COUNTY_COUNT_TABLENAME} cc
 set subsidiary = null
-from lkp_just_co_secty_master m
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
-where m.ticker_trim = c.ticker and not s.has_subsidiaries;]]></attr>
+from ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
+where cc.ticker = c.ticker and not s.has_subsidiaries;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">
@@ -544,9 +554,9 @@ where m.ticker_trim = c.ticker and not s.has_subsidiaries;]]></attr>
 delete from ${COUNTY_COUNT_TABLENAME}
 where subsidiary is null and ticker in (
   select c.ticker
-  from ${COUNTY_COUNT_TABLENAME} c
-  join lkp_just_co_secty_master m on m.ticker_trim = c.ticker
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  from ${COUNTY_COUNT_TABLENAME} cc
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where s.has_subsidiaries and subsidiary is null
   group by c.ticker, c.subsidiary
 );]]></attr>
@@ -559,14 +569,14 @@ insert into ${COUNTY_COUNT_TABLENAME}
 select c2.state_county_fips, c2.ticker, null, sum(c2.employee_count)
 from (
   select c.ticker
-  from ${COUNTY_COUNT_TABLENAME} c
-  join LKP_JUST_CO_SECTY_MASTER m on m.ticker_trim = c.ticker
-  join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id
+  from ${COUNTY_COUNT_TABLENAME} cc
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+  join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker
   left join (
     select c.ticker
-    from ${COUNTY_COUNT_TABLENAME} c
-    join LKP_JUST_CO_SECTY_MASTER m on m.ticker_trim = c.ticker
-    join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id
+    from ${COUNTY_COUNT_TABLENAME} cc
+    join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+    join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker
     where i.has_subsidiaries and c.subsidiary is null
     group by c.ticker
   ) c2 on c2.ticker = c.ticker
@@ -588,9 +598,9 @@ update ${COUNTY_COUNT_TABLENAME} set ticker = trim(ticker), subsidiary = trim(su
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
-  c.state_county_fips, 
-  m.just_co_id, 
-  cc.co_count,
+  cc.state_county_fips, 
+  c.ticker,
+  ccd.co_count,
   d.subsidiary,
   1,
   cjd.job, 
@@ -601,13 +611,13 @@ select
       else 0
     end)*c.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
-from ${COUNTY_COUNT_TABLENAME} c
-join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
-join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
-join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
-join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and i.has_subsidiaries
-join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc
+from ${COUNTY_COUNT_TABLENAME} cc
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = cc.state_county_fips
+join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = cc.ticker and d.subsidiary = cc.subsidiary
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker and i.has_subsidiaries
+join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.ticker = c.ticker and cjd.job = d.goc
 join (
   select ticker, count(subsidiary) co_count 
   from (
@@ -615,14 +625,14 @@ join (
     from ${JOB_DISTRIBUTION_TABLENAME} d
     group by ticker, subsidiary
   ) d group by ticker
-) cc on cc.ticker = d.ticker;]]></attr>
+) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Avg Job County Data Tickers (no subs)" guiX="271" guiY="1283" id="ADD_AVG_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
-  c.state_county_fips, 
-  m.just_co_id, 
-  cc.co_count,
+  cc.state_county_fips, 
+  c.ticker, 
+  ccd.co_count,
   d.subsidiary,
   1,
   cjd.job, 
@@ -633,13 +643,13 @@ select
       else 0
     end)*c.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
-from ${COUNTY_COUNT_TABLENAME} c
-join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
-join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
-join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
-join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and not i.has_subsidiaries
-join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc
+from ${COUNTY_COUNT_TABLENAME} cc
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = cc.state_county_fips
+join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = cc.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker and not i.has_subsidiaries
+join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.ticker = c.ticker and cjd.job = d.goc
 join (
   select ticker, count(subsidiary) co_count 
   from (
@@ -647,21 +657,21 @@ join (
     from ${JOB_DISTRIBUTION_TABLENAME} d
     group by ticker, subsidiary
   ) d group by ticker
-) cc on cc.ticker = d.ticker;]]></attr>
+) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Col Count Data" guiX="460" guiY="1105" id="ADD_COL_COUNT_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${EMP_COUNT_TOTALS_TABLENAME}
-select state_county_fips, just_co_id, subsidiary, sum(employees_at_living_wage) employees_at_living_wage 
+select state_county_fips, ticker, subsidiary, sum(employees_at_living_wage) employees_at_living_wage 
 from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} 
-group by state_county_fips, just_co_id, subsidiary;]]></attr>
+group by state_county_fips, ticker, subsidiary;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Subsidiaries" guiX="510" guiY="1183" id="ADD_HIGH_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
-  c.state_county_fips, 
-  m.just_co_id, 
-  cc.co_count,
+  cc.state_county_fips, 
+  c.ticker, 
+  ccd.co_count,
   d.subsidiary,
   2,
   cjd.job, 
@@ -672,13 +682,13 @@ select
       else 0
     end)*c.employee_count*d.distribution*(${HIGH_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
-from ${COUNTY_COUNT_TABLENAME} c
-join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
-join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
-join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
-join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and i.has_subsidiaries
-join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc
+from ${COUNTY_COUNT_TABLENAME} cc
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = cc.state_county_fips
+join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = cc.ticker and d.subsidiary = cc.subsidiary
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker and i.has_subsidiaries
+join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.ticker = c.ticker and cjd.job = d.goc
 join (
   select ticker, count(subsidiary) co_count 
   from (
@@ -686,14 +696,14 @@ join (
     from ${JOB_DISTRIBUTION_TABLENAME} d
     group by ticker, subsidiary
   ) d group by ticker
-) cc on cc.ticker = d.ticker;]]></attr>
+) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Tickers (no subs)" guiX="548" guiY="1283" id="ADD_HIGH_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
-  c.state_county_fips, 
-  m.just_co_id, 
-  cc.co_count,
+  cc.state_county_fips, 
+  c.ticker, 
+  ccd.co_count,
   d.subsidiary,
   2,
   cjd.job, 
@@ -704,13 +714,13 @@ select
       else 0
     end)*c.employee_count*d.distribution*(${HIGH_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
-from ${COUNTY_COUNT_TABLENAME} c
-join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
-join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
-join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
-join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and not i.has_subsidiaries
-join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc
+from ${COUNTY_COUNT_TABLENAME} cc
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = cc.state_county_fips
+join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = cc.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker and not i.has_subsidiaries
+join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.ticker = c.ticker and cjd.job = d.goc
 join (
   select ticker, count(subsidiary) co_count 
   from (
@@ -718,11 +728,11 @@ join (
     from ${JOB_DISTRIBUTION_TABLENAME} d
     group by ticker, subsidiary
   ) d group by ticker
-) cc on cc.ticker = d.ticker;]]></attr>
+) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Order Data (no subs)" guiX="57" guiY="1105" id="ADD_JOB_ORDER_DATA_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${GOC_ORDER_TABLENAME}
-select offsets.subsidiary, m.just_co_id, offsets.goc, (r - ofs + 1) col_no
+select offsets.subsidiary, c.ticker, offsets.goc, (r - ofs + 1) col_no
 from (
   select d.ticker, d.subsidiary, d.goc, rank() over (order by d.subsidiary, d.goc) r, ofs
   from ${JOB_DISTRIBUTION_TABLENAME} d
@@ -734,11 +744,11 @@ from (
     ) ranks group by ticker, subsidiary
   ) offsets on offsets.ticker = d.ticker and offsets.subsidiary = d.subsidiary
 ) offsets
-join lkp_just_co_secty_master m on m.ticker_trim = offsets.ticker;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = offsets.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Order Data (subs)" guiX="272" guiY="1105" id="ADD_JOB_ORDER_DATA_SUBS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${GOC_ORDER_TABLENAME}(just_co_id, goc, goc_column_no)
-select m.just_co_id, offsets.goc, (r - ofs + 1) col_no
+<attr name="sqlQuery"><![CDATA[insert into ${GOC_ORDER_TABLENAME}(ticker, goc, goc_column_no)
+select c.ticker, offsets.goc, (r - ofs + 1) col_no
 from (
   select d.ticker, d.goc, rank() over (order by d.ticker, d.goc) r, ofs
   from (
@@ -768,15 +778,15 @@ from (
     ) ranks group by ticker
   ) offsets on offsets.ticker = d.ticker
 ) offsets
-join lkp_just_co_secty_master m on m.ticker_trim = offsets.ticker;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = offsets.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Add Low Job County Data Subsidiaries" guiX="1" guiY="1183" id="ADD_LOW_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
-  c.state_county_fips, 
-  m.just_co_id, 
-  cc.co_count,
+  cc.state_county_fips, 
+  c.ticker, 
+  ccd.co_count,
   d.subsidiary,
   0,
   cjd.job, 
@@ -787,13 +797,13 @@ select
       else 0
     end)*c.employee_count*d.distribution*(${LOW_TOLERANCE_PROPORTION})
   /*,2) as numeric(18,3))*/ pays_living_wage
-from ${COUNTY_COUNT_TABLENAME} c
-join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
-join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker and d.subsidiary = c.subsidiary
-join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
-join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and i.has_subsidiaries
-join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc
+from ${COUNTY_COUNT_TABLENAME} cc
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = cc.state_county_fips
+join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = cc.ticker and d.subsidiary = cc.subsidiary
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker and i.has_subsidiaries
+join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.ticker = c.ticker and cjd.job = d.goc
 join (
   select ticker, count(subsidiary) co_count 
   from (
@@ -801,14 +811,14 @@ join (
     from ${JOB_DISTRIBUTION_TABLENAME} d
     group by ticker, subsidiary
   ) d group by ticker
-) cc on cc.ticker = d.ticker;]]></attr>
+) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Add Low Job County Data Tickers (no subs)" guiX="-13" guiY="1283" id="ADD_LOW_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
-  c.state_county_fips, 
-  m.just_co_id, 
-  cc.co_count,
+  cc.state_county_fips, 
+  c.ticker, 
+  ccd.co_count,
   d.subsidiary,
   0,
   cjd.job, 
@@ -819,13 +829,13 @@ select
       else 0
     end)*c.employee_count*d.distribution*(${LOW_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
-from ${COUNTY_COUNT_TABLENAME} c
-join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = c.state_county_fips
-join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = c.ticker
-join lkp_just_co_secty_master m on m.ticker_trim = d.ticker
-join ${SUBSIDIARY_INFO_TABLENAME} i on i.just_co_id = m.just_co_id and not i.has_subsidiaries
-join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.just_co_id = m.just_co_id and cjd.job = d.goc
+from ${COUNTY_COUNT_TABLENAME} cc
+join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
+join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = cc.state_county_fips
+join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = cc.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker and not i.has_subsidiaries
+join ${COMPANY_JOB_DATA_TABLENAME} cjd on cjd.ticker = c.ticker and cjd.job = d.goc
 join (
   select ticker, count(subsidiary) co_count 
   from (
@@ -833,17 +843,17 @@ join (
     from ${JOB_DISTRIBUTION_TABLENAME} d
     group by ticker, subsidiary
   ) d group by ticker
-) cc on cc.ticker = d.ticker;]]></attr>
+) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
 </Phase>
 <Phase number="12">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add All Job County Data Tickers (subs)" guiX="254" guiY="1365" id="ADD_ALL_JOB_COUNTY_DATA_TICKERS_SUBS" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Adds subidiary data to get parent ticker data, therefore depends on the subidiary data already being input into the table in previous phase.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
-select state_county_fips, just_co_id, max(company_count), null, tolerance_type, goc, avg(rate_raw), sum(employees_at_living_wage)
+select state_county_fips, ticker, max(company_count), null, tolerance_type, goc, avg(rate_raw), sum(employees_at_living_wage)
 from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
 where company_count > 1
-group by just_co_id, state_county_fips, tolerance_type, goc;]]></attr>
+group by ticker, state_county_fips, tolerance_type, goc;]]></attr>
 </Node>
 </Phase>
 <Phase number="13">
@@ -867,7 +877,7 @@ from (
       state_fips, 
       state_abbreviation
   ) fs on fs.state_fips = left(cjd.state_county_fips,2)
-  group by fs.state, cjd.just_co_id, cjd.goc
+  group by fs.state, cjd.ticker, cjd.goc
 ) t
 group by t.state
 order by t.state;]]></attr>
@@ -946,7 +956,7 @@ from (
 ) t
 where 
   cjd.state_county_fips = t.state_county_fips 
-  and cjd.just_co_id = t.just_co_id
+  and cjd.ticker = t.ticker
   and ((cjd.subsidiary is null and t.subsidiary is null) or (cjd.subsidiary = t.subsidiary))
   and cjd.goc = t.goc
   and cjd.tolerance_type = t.tolerance_type
@@ -956,66 +966,65 @@ where
 <Phase number="16">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Blank Top" guiX="101" guiY="2007" id="ADD_CO_HEADER_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
-  industry, row_type, just_co_id, ticker
+  industry, row_type, ticker
 )
 select
-    i.just_indy industry, 'CO_HEADER_BLANK_TOP', g.just_co_id, m.ticker_trim
-from (select just_co_id from ${GOC_ORDER_TABLENAME} group by just_co_id) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-left join LKP_JUST_CO_INDY i on i.just_co_id = g.just_co_id;]]></attr>
+    c.industry, 'CO_HEADER_BLANK_TOP', g.ticker
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Bottom 1" guiX="186" guiY="1922" id="ADD_IND_HEADER_BLANK_BOTTOM_1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type
 )
-select just_indy, 'IND_HEADER_BLANK_BOTTOM_1'
+select industry, 'IND_HEADER_BLANK_BOTTOM_1'
 from ${GOC_ORDER_TABLENAME} g
-left join lkp_just_co_indy i on g.just_co_id = i.just_co_id 
-group by just_indy;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Bottom 2" guiX="408" guiY="1922" id="ADD_IND_HEADER_BLANK_BOTTOM_2" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type
 )
-select just_indy, 'IND_HEADER_BLANK_BOTTOM_2'
+select c.industry, 'IND_HEADER_BLANK_BOTTOM_2'
 from ${GOC_ORDER_TABLENAME} g
-left join lkp_just_co_indy i on g.just_co_id = i.just_co_id 
-group by just_indy;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Top" guiX="222" guiY="1848" id="ADD_IND_HEADER_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type
 )
-select just_indy, 'IND_HEADER_BLANK_TOP'
+select c.industry, 'IND_HEADER_BLANK_TOP'
 from ${GOC_ORDER_TABLENAME} g
-left join lkp_just_co_indy i on g.just_co_id = i.just_co_id 
-group by just_indy;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Name" guiX="408" guiY="1848" id="ADD_IND_HEADER_NAME" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, description_1
 )
-select just_indy, 'IND_HEADER_NAME', isnull(just_indy,'No Industry')
+select industry, 'IND_HEADER_NAME', isnull(industry,'No Industry')
 from ${GOC_ORDER_TABLENAME} g
-left join lkp_just_co_indy i on g.just_co_id = i.just_co_id 
-group by just_indy;]]></attr>
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
+group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Avg Data" guiX="334" guiY="2479" id="ADD_SUBSIDIARY_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
+  industry, row_type, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
 )
 select
-  just_indy, 'CO_SUBSIDIARY_COUNT_DATA', m.just_co_id, m.ticker_trim, e.subsidiary, e.state_county_fips, 1,
+  c.industry, 'CO_SUBSIDIARY_COUNT_DATA', c.ticker, e.subsidiary, e.state_county_fips, 1,
   f.county_name, 
   f.state_abbreviation,
   concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
   cast(round(e.employee_count*(${MID_TOLERANCE_PROPORTION}),2) as numeric(18,3))
 from ${COUNTY_COUNT_TABLENAME} e
 join (
-  select m.ticker_trim ticker
+  select c.ticker
   from ${GOC_ORDER_TABLENAME} g
-  join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-  group by m.ticker_trim
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
+  group by c.ticker
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
@@ -1023,21 +1032,19 @@ join (
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
-join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = e.ticker
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
 where s.has_subsidiaries and e.subsidiary is not null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Blank Top" guiX="106" guiY="2245" id="ADD_SUBSIDIARY_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, subsidiary
+  industry, row_type, ticker, subsidiary
 )
-select just_indy, 'CO_SUBSIDIARY_HEADER_BLANK_TOP', g.just_co_id, m.ticker_trim, g.subsidiary
-from (select just_co_id, subsidiary from ${GOC_ORDER_TABLENAME} group by just_co_id, subsidiary) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+select c.industry, 'CO_SUBSIDIARY_HEADER_BLANK_TOP', g.ticker, g.subsidiary
+from (select ticker, subsidiary from ${GOC_ORDER_TABLENAME} group by ticker, subsidiary) g
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
 where s.has_subsidiaries;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary County Totals" guiX="150" guiY="2323" id="ADD_SUBSIDIARY_COUNTY_TOTALS" type="DB_EXECUTE">
@@ -1045,38 +1052,36 @@ where s.has_subsidiaries;]]></attr>
 set living_wage_total = d.employees_at_living_wage_total
 from ${EMP_COUNT_TOTALS_TABLENAME} d 
 where d.state_county_fips = mtx.state_county_fips 
-  and d.just_co_id = mtx.just_co_id 
+  and d.ticker = mtx.ticker 
   and d.subsidiary = mtx.subsidiary 
   and mtx.row_type = 'CO_SUBSIDIARY_COUNT_DATA';]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary GOC Headers" guiX="548" guiY="2245" id="ADD_SUBSIDIARY_GOC_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, subsidiary, description_1, description_2, description_3, description_4
+  industry, row_type, ticker, subsidiary, description_1, description_2, description_3, description_4
 )
-select just_indy, 'CO_SUBSIDIARY_COUNT_COLUMN_HEADERS', g.just_co_id, m.ticker_trim, subsidiary,
+select c.industry, 'CO_SUBSIDIARY_COUNT_COLUMN_HEADERS', g.ticker, subsidiary,
   'County', 'State', 'Living Wage', '# Employees'
-from (select just_co_id, subsidiary from ${GOC_ORDER_TABLENAME} group by just_co_id, subsidiary) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+from (select ticker, subsidiary from ${GOC_ORDER_TABLENAME} group by ticker, subsidiary) g
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
 where subsidiary is not null and s.has_subsidiaries;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary High Data" guiX="511" guiY="2479" id="ADD_SUBSIDIARY_HIGH_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
+  industry, row_type, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
 )
 select
-  just_indy, 'CO_SUBSIDIARY_COUNT_DATA', m.just_co_id, m.ticker_trim, e.subsidiary, e.state_county_fips, 2,
+  c.industry, 'CO_SUBSIDIARY_COUNT_DATA', c.ticker, e.subsidiary, e.state_county_fips, 2,
   f.county_name, 
   f.state_abbreviation,
   concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
   cast(round(e.employee_count*(${HIGH_TOLERANCE_PROPORTION}),2) as numeric(18,2))
 from ${COUNTY_COUNT_TABLENAME} e
 join (
-  select m.ticker_trim ticker
-  from ${GOC_ORDER_TABLENAME} g
-  join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-  group by m.ticker_trim
+  select ticker
+  from ${GOC_ORDER_TABLENAME}
+  group by ticker
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
@@ -1084,28 +1089,26 @@ join (
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
-join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = e.ticker
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = e.ticker
 where s.has_subsidiaries and e.subsidiary is not null and (${HIGH_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Low Data" guiX="150" guiY="2479" id="ADD_SUBSIDIARY_LOW_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
+  industry, row_type, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
 )
 select
-  just_indy, 'CO_SUBSIDIARY_COUNT_DATA', m.just_co_id, m.ticker_trim, e.subsidiary, e.state_county_fips, 0,
+  c.ticker, 'CO_SUBSIDIARY_COUNT_DATA', c.ticker, e.subsidiary, e.state_county_fips, 0,
   f.county_name, 
   f.state_abbreviation,
   concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
   cast(round(e.employee_count*(${LOW_TOLERANCE_PROPORTION}),2) as numeric(18,2))
 from ${COUNTY_COUNT_TABLENAME} e
 join (
-  select m.ticker_trim ticker
-  from ${GOC_ORDER_TABLENAME} g
-  join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-  group by m.ticker_trim
+  select ticker
+  from ${GOC_ORDER_TABLENAME}
+  group by ticker
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
@@ -1113,108 +1116,103 @@ join (
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
-join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = e.ticker
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
 where s.has_subsidiaries and e.subsidiary is not null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Name and Dist Headers" guiX="292" guiY="2245" id="ADD_SUBSIDIARY_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, subsidiary, description_1
+  industry, row_type, ticker, subsidiary, description_1
 )
-select just_indy, 'CO_SUBSIDIARY_NAME_COUNT_DIST_HEADERS', g.just_co_id, m.ticker_trim,
+select c.industry, 'CO_SUBSIDIARY_NAME_COUNT_DIST_HEADERS', g.ticker,
   g.subsidiary,
   g.subsidiary
-from (select just_co_id, subsidiary from ${GOC_ORDER_TABLENAME} group by just_co_id, subsidiary) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
+from (select ticker, subsidiary from ${GOC_ORDER_TABLENAME} group by ticker, subsidiary) g
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
 where subsidiary is not null and s.has_subsidiaries;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Totals" guiX="353" guiY="2323" id="ADD_SUBSIDIARY_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, subsidiary, description_1, description_2, description_3, description_4, living_wage_total
+  industry, row_type, ticker, subsidiary, description_1, description_2, description_3, description_4, living_wage_total
 )
 select
-  i.just_indy, 'CO_SUBSIDIARY_COUNT_TOTAL', m.just_co_id, m.ticker_trim, g.subsidiary,
+  c.industry, 'CO_SUBSIDIARY_COUNT_TOTAL', c.ticker, g.subsidiary,
   'Score',
   cast(round(((lw_count/emp_count_tot)*100.0),1) as numeric(36,1)),
   concat(concat(cast(round(lw_count,2) as numeric(36,2)),' / '),emp_count_tot),
   emp_count_tot,
   cast(round(lw_count,2) as numeric(18,2))
 from (
-  select g.just_co_id, g.subsidiary 
+  select g.ticker, g.subsidiary 
   from ${GOC_ORDER_TABLENAME} g
-  join ${SUBSIDIARY_INFO_TABLENAME} s on g.just_co_id = s.just_co_id
+  join ${SUBSIDIARY_INFO_TABLENAME} s on g.ticker = s.ticker
   where subsidiary is not null and s.has_subsidiaries
-  group by g.just_co_id, g.subsidiary
-  order by just_co_id, subsidiary
+  group by g.ticker, g.subsidiary
+  order by g.ticker, g.subsidiary
 ) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
 join (
   select c.ticker, c.subsidiary, sum(c.employee_count) emp_count_tot 
-  from ${COUNTY_COUNT_TABLENAME} c
-  join lkp_just_co_secty_master m on m.ticker_trim = c.ticker
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  from ${COUNTY_COUNT_TABLENAME} cc
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is not null and s.has_subsidiaries
   group by c.ticker, c.subsidiary
 ) e on e.ticker = m.ticker_trim and e.subsidiary = g.subsidiary
 join (
-  select m.ticker_trim ticker, d.subsidiary, sum(employees_at_living_wage) lw_count
+  select c.ticker, d.subsidiary, sum(employees_at_living_wage) lw_count, c.industry
   from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d
-  join lkp_just_co_secty_master m on m.just_co_id = d.just_co_id
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = d.ticker 
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is not null and s.has_subsidiaries
-  group by m.ticker_trim, d.subsidiary
+  group by c.ticker, d.subsidiary
 ) d on d.ticker = m.ticker_trim and d.subsidiary = g.subsidiary
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
-order by ticker_trim, g.subsidiary;]]></attr>
+order by c.ticker, g.subsidiary;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Totals No Data" guiX="510" guiY="2323" id="ADD_SUBSIDIARY_TOTALS_NO_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* total lable for subsidiaries without data */
 insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, description_1, description_2
+  industry, row_type, ticker, description_1, description_2
 )
 select
-  i.just_indy, 'CO_SUBSIDIARY_COUNT_TOTAL', m.just_co_id, m.ticker_trim,
+  c.industry, 'CO_SUBSIDIARY_COUNT_TOTAL', c.ticker,
   'Score',
   'No Data'
 from (
-  select g.just_co_id, g.subsidiary 
+  select g.ticker, g.subsidiary 
   from ${GOC_ORDER_TABLENAME} g
-  join ${SUBSIDIARY_INFO_TABLENAME} s on g.just_co_id = s.just_co_id
+  join ${SUBSIDIARY_INFO_TABLENAME} s on g.ticker = s.ticker
   where subsidiary is not null and s.has_subsidiaries
-  group by g.just_co_id, g.subsidiary
-  order by just_co_id, subsidiary
+  group by g.ticker, g.subsidiary
+  order by g.ticker, g.subsidiary
 ) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = g.just_co_id
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker
 left join (
-  select just_co_id, subsidiary
+  select ticker, subsidiary
   from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} 
   where subsidiary is not null
-  group by just_co_id, subsidiary
-) d on d.just_co_id = g.just_co_id and d.subsidiary = g.subsidiary
-left join lkp_just_co_indy i on i.just_co_id = g.just_co_id
-where d.just_co_id is null and s.has_subsidiaries;]]></attr>
+  group by ticker, subsidiary
+) d on d.ticker = g.ticker and d.subsidiary = g.subsidiary
+where d.ticker is null and s.has_subsidiaries;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Avg Data" guiX="346" guiY="2399" id="ADD_TICKER_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
+  industry, row_type, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
 )
 select
-  just_indy, 'CO_TICKER_COUNT_DATA', m.just_co_id, m.ticker_trim, e.state_county_fips, 1,
+  c.industry, 'CO_TICKER_COUNT_DATA', c.ticker, e.state_county_fips, 1,
   f.county_name, 
   f.state_abbreviation,
   concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
   cast(round(e.employee_count*(${MID_TOLERANCE_PROPORTION}),2) as numeric(18,2))
 from ${COUNTY_COUNT_TABLENAME} e
 join (
-  select m.ticker_trim ticker
+  select g.ticker
   from ${GOC_ORDER_TABLENAME} g
-  join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-  group by m.ticker_trim
+  group by g.ticker
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
@@ -1222,37 +1220,34 @@ join (
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
-join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where e.subsidiary is null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker GOC Headers" guiX="524" guiY="2007" id="ADD_TICKER_GOC_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, description_1, description_2, description_3, description_4
+  industry, row_type, ticker, description_1, description_2, description_3, description_4
 )
-select just_indy, 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS', g.just_co_id, m.ticker_trim,
+select c.industry, 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS', c.ticker,
   'County', 'State', 'Living Wage', '# Employees'
-from (select just_co_id from ${GOC_ORDER_TABLENAME} group by just_co_id) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id;]]></attr>
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker High Data" guiX="522" guiY="2399" id="ADD_TICKER_HIGH_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
+  industry, row_type, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
 )
 select
-  just_indy, 'CO_TICKER_COUNT_DATA', m.just_co_id, m.ticker_trim, e.state_county_fips, 2,
+  c.industry, 'CO_TICKER_COUNT_DATA', c.ticker, e.state_county_fips, 2,
   f.county_name, 
   f.state_abbreviation,
   concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
   cast(round(e.employee_count*(${HIGH_TOLERANCE_PROPORTION}),2) as numeric(18,2))
 from ${COUNTY_COUNT_TABLENAME} e
 join (
-  select m.ticker_trim ticker
-  from ${GOC_ORDER_TABLENAME} g
-  join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-  group by m.ticker_trim
+  select ticker
+  from ${GOC_ORDER_TABLENAME}
+  group by ticker
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
@@ -1260,27 +1255,25 @@ join (
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
-join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = e.ticker 
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where e.subsidiary is null and (${HIGH_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Low Data" guiX="165" guiY="2399" id="ADD_TICKER_LOW_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
+  industry, row_type, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
 )
 select
-  just_indy, 'CO_TICKER_COUNT_DATA', m.just_co_id, m.ticker_trim, e.state_county_fips, 0,
+  c.industry, 'CO_TICKER_COUNT_DATA', c.ticker, e.state_county_fips, 0,
   f.county_name, 
   f.state_abbreviation,
   concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
   cast(round(e.employee_count*(${LOW_TOLERANCE_PROPORTION}),2) as numeric(18,2))
 from ${COUNTY_COUNT_TABLENAME} e
 join (
-  select m.ticker_trim ticker
-  from ${GOC_ORDER_TABLENAME} g
-  join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-  group by m.ticker_trim
+  select ticker
+  from ${GOC_ORDER_TABLENAME}
+  group by ticker
 ) g on g.ticker = e.ticker
 join (
   select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
@@ -1288,73 +1281,68 @@ join (
   left join LKP_CITY_FIPS f on f.state_county_fips = a.state_county_fips
   group by a.state_county_fips
 ) f on f.state_county_fips = e.state_county_fips
-join lkp_just_co_secty_master m on m.ticker_trim = e.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id
 where e.subsidiary is null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Name and Dist Headers" guiX="290" guiY="2007" id="ADD_TICKER_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, description_1, description_2
+  industry, row_type, ticker, description_1, description_2
 )
-select just_indy, 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS', g.just_co_id, m.ticker_trim, m.ticker_trim, 
+select c.industry, 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS', g.ticker, g.ticker, 
   case
     when s.alt_company_name is null then m.co_long_name
     else s.alt_company_name
   end company_name
-from (select just_co_id from ${GOC_ORDER_TABLENAME} group by just_co_id) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = g.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id;]]></attr>
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker (no subs) County Totals" guiX="409" guiY="2087" id="ADD_TICKER_NO_SUBS_COUNTY_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${REPORT_MATRIX_TABLENAME} mtx 
 set living_wage_total = d.employees_at_living_wage_total
 from ${EMP_COUNT_TOTALS_TABLENAME} d 
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = d.just_co_id
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = d.ticker
 where d.state_county_fips = mtx.state_county_fips 
-  and d.just_co_id = mtx.just_co_id 
+  and d.ticker = mtx.ticker 
   and not s.has_subsidiaries
   and mtx.row_type = 'CO_TICKER_COUNT_DATA';]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker (no subs) Totals" guiX="301" guiY="2165" id="ADD_TICKER_NO_SUBS_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, description_1, description_2, description_3, description_4, living_wage_total
+  industry, row_type, ticker, description_1, description_2, description_3, description_4, living_wage_total
 )
 select
-  i.just_indy, 'CO_TICKER_COUNT_TOTAL', m.just_co_id, m.ticker_trim,
+  c.industry, 'CO_TICKER_COUNT_TOTAL', c.ticker,
   'Score',
   cast(round(((lw_count/emp_count_tot)*100.0),1) as numeric(18,1)),
   concat(concat(cast(round(lw_count,2) as numeric(36,2)),' / '),emp_count_tot),
   emp_count_tot,
   cast(round(lw_count,2) as numeric(18,2))
-from (select just_co_id from ${GOC_ORDER_TABLENAME} group by just_co_id) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
 join (
   select c.ticker, sum(c.employee_count) emp_count_tot 
   from ${COUNTY_COUNT_TABLENAME} c
-  join lkp_just_co_secty_master m on m.ticker_trim = c.ticker
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = m.ticker
   where c.subsidiary is null and not s.has_subsidiaries
   group by c.ticker
-) e on e.ticker = m.ticker_trim
+) e on e.ticker = c.ticker
 join (
-  select m.ticker_trim ticker, sum(employees_at_living_wage) lw_count
+  select d.ticker, sum(employees_at_living_wage) lw_count
   from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d
-  join lkp_just_co_secty_master m on m.just_co_id = d.just_co_id
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = d.ticker
   where subsidiary is not null and not s.has_subsidiaries
-  group by m.ticker_trim
-) d on d.ticker = m.ticker_trim
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id;]]></attr>
+  group by d.ticker
+) d on d.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker (subs) County Totals" guiX="190" guiY="2087" id="ADD_TICKER_SUBS_COUNTY_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${REPORT_MATRIX_TABLENAME} mtx 
 set living_wage_total = d.employees_at_living_wage_total
 from ${EMP_COUNT_TOTALS_TABLENAME} d 
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = d.just_co_id
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = d.ticker
 where d.state_county_fips = mtx.state_county_fips 
-  and d.just_co_id = mtx.just_co_id 
+  and d.ticker = mtx.ticker 
   and d.subsidiary is null
   and s.has_subsidiaries
   and mtx.row_type = 'CO_TICKER_COUNT_DATA';]]></attr>
@@ -1362,87 +1350,80 @@ where d.state_county_fips = mtx.state_county_fips
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker (subs) Totals" guiX="128" guiY="2165" id="ADD_TICKER_SUBS_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* ticker total/score for companies with subsidiaries broken out */
 insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, description_1, description_2, description_3, description_4, living_wage_total
+  industry, row_type, ticker, description_1, description_2, description_3, description_4, living_wage_total
 )
 select
-  i.just_indy, 'CO_TICKER_COUNT_TOTAL', m.just_co_id, m.ticker_trim,
+  c.industry, 'CO_TICKER_COUNT_TOTAL', c.ticker,
   'Score',
   cast(round(((lw_count/emp_count_tot)*100.0),1) as numeric(18,1)),
   concat(concat(cast(round(lw_count,2) as numeric(36,2)),' / '),emp_count_tot),
   emp_count_tot,
   cast(round(lw_count,2) as numeric(18,2))
-from (select just_co_id from ${GOC_ORDER_TABLENAME} group by just_co_id) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
 join (
   select c.ticker, sum(c.employee_count) emp_count_tot 
   from ${COUNTY_COUNT_TABLENAME} c
-  join lkp_just_co_secty_master m on m.ticker_trim = c.ticker
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is null and s.has_subsidiaries
   group by c.ticker
 ) e on e.ticker = m.ticker_trim
 join (
-  select m.ticker_trim ticker, sum(employees_at_living_wage) lw_count
+  select d.ticker, sum(employees_at_living_wage) lw_count
   from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d
-  join lkp_just_co_secty_master m on m.just_co_id = d.just_co_id
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = d.ticker
   where subsidiary is null and s.has_subsidiaries
-  group by m.ticker_trim
-) d on d.ticker = m.ticker_trim
-left join lkp_just_co_indy i on i.just_co_id = m.just_co_id;]]></attr>
+  group by d.ticker
+) d on d.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Totals No Data" guiX="491" guiY="2165" id="ADD_TICKER_TOTALS_NO_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* total lable for companies without data */
 insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, just_co_id, ticker, description_1, description_2
+  industry, row_type, ticker, description_1, description_2
 )
 select
-  i.just_indy, 'CO_TICKER_COUNT_TOTAL', m.just_co_id, m.ticker_trim,
+  c.industry, 'CO_TICKER_COUNT_TOTAL', c.ticker,
   'Score',
   'No Data'
-from (select just_co_id from ${GOC_ORDER_TABLENAME} group by just_co_id) g
-join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = g.just_co_id
-left join (select just_co_id from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} group by just_co_id) d on d.just_co_id = g.just_co_id
-left join lkp_just_co_indy i on i.just_co_id = g.just_co_id
-where d.just_co_id is null and not s.has_subsidiaries;]]></attr>
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker
+left join (select ticker from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} group by ticker) d on d.ticker = g.ticker
+where d.ticker is null and not s.has_subsidiaries;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Totals (no subs)" guiX="259" guiY="1768" id="ADD_TOTALS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TOTALS_TABLENAME}
 select
-  s.just_co_id,
+  s.ticker,
   null,
   emp_count_tot
 from ${SUBSIDIARY_INFO_TABLENAME} s
-join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
 join (
   select c.ticker, sum(c.employee_count) emp_count_tot 
   from ${COUNTY_COUNT_TABLENAME} c
   join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-  join lkp_just_co_secty_master m on m.ticker_trim = c.ticker
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is null
   group by c.ticker
-) e on e.ticker = m.ticker_trim;
+) e on e.ticker = s.ticker;
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Totals (subs)" guiX="415" guiY="1768" id="ADD_TOTALS_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TOTALS_TABLENAME}
 select
-  s.just_co_id,
+  s.ticker,
   e.subsidiary,
   emp_count_tot
 from ${SUBSIDIARY_INFO_TABLENAME} s
-join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
 join (
   select c.ticker, c.subsidiary, sum(c.employee_count) emp_count_tot 
   from ${COUNTY_COUNT_TABLENAME} c
   join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-  join lkp_just_co_secty_master m on m.ticker_trim = c.ticker
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is not null and s.has_subsidiaries
   group by c.ticker, c.subsidiary
-) e on e.ticker = m.ticker_trim;]]></attr>
+) e on e.ticker = s.ticker;]]></attr>
 </Node>
 </Phase>
 <Phase number="17">
@@ -1455,10 +1436,9 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = d.distribution ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id ";
-	sql = sql + "join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id ";
-	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.goc = g.goc and d.subsidiary = g.subsidiary ";
-	sql = sql + "where (not s.has_subsidiaries) and g.just_co_id = mtx.just_co_id and mtx.row_type = 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS' ";
+	sql = sql + "join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker ";
+	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc and d.subsidiary = g.subsidiary ";
+	sql = sql + "where (not s.has_subsidiaries) and g.ticker = mtx.ticker and mtx.row_type = 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS' ";
 	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
 
 	$out.0.sql = sql;
@@ -1495,8 +1475,8 @@ function integer transform() {
 	sql = sql + "  concat('$',cast(cast(round(d.RATE_RAW_MIN_WAGE_ADJ,2) as numeric(36,2)) as varchar(8)))";
 	sql = sql + "),')') ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d on d.just_co_id = g.just_co_id and d.goc = g.goc and d.subsidiary = g.subsidiary ";
-	sql = sql + "where d.state_county_fips = mtx.state_county_fips and g.just_co_id = mtx.just_co_id and g.subsidiary = mtx.subsidiary and mtx.row_type = 'CO_SUBSIDIARY_COUNT_DATA' and mtx.tolerance_type = d.tolerance_type ";
+	sql = sql + "join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc and d.subsidiary = g.subsidiary ";
+	sql = sql + "where d.state_county_fips = mtx.state_county_fips and g.ticker = mtx.ticker and g.subsidiary = mtx.subsidiary and mtx.row_type = 'CO_SUBSIDIARY_COUNT_DATA' and mtx.tolerance_type = d.tolerance_type ";
 	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
 	
 	$out.0.sql = sql;
@@ -1511,10 +1491,9 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = d.distribution ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id ";
-	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.goc = g.goc and d.subsidiary = g.subsidiary ";
-	sql = sql + "join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = m.just_co_id ";
-	sql = sql + "where g.subsidiary is not null and g.subsidiary = mtx.subsidiary and g.just_co_id = mtx.just_co_id and mtx.row_type = 'CO_SUBSIDIARY_NAME_COUNT_DIST_HEADERS' ";
+	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc and d.subsidiary = g.subsidiary ";
+	sql = sql + "join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker ";
+	sql = sql + "where g.subsidiary is not null and g.subsidiary = mtx.subsidiary and g.ticker = mtx.ticker and mtx.row_type = 'CO_SUBSIDIARY_NAME_COUNT_DIST_HEADERS' ";
 	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
 	
 	$out.0.sql = sql;
@@ -1529,9 +1508,8 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = g.goc ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id ";
-	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.goc = g.goc and d.subsidiary = g.subsidiary ";
-	sql = sql + "where g.subsidiary is not null and g.subsidiary = mtx.subsidiary and g.just_co_id = mtx.just_co_id and mtx.row_type = 'CO_SUBSIDIARY_COUNT_COLUMN_HEADERS' ";
+	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc and d.subsidiary = g.subsidiary ";
+	sql = sql + "where g.subsidiary is not null and g.subsidiary = mtx.subsidiary and g.ticker = mtx.ticker and mtx.row_type = 'CO_SUBSIDIARY_COUNT_COLUMN_HEADERS' ";
 	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
 	
 	$out.0.sql = sql;
@@ -1549,8 +1527,8 @@ function integer transform() {
 	sql = sql + "  concat('$',cast(cast(round(d.RATE_RAW_MIN_WAGE_ADJ,2) as numeric(36,2)) as varchar(8)))";
 	sql = sql + "),')') ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d on d.just_co_id = g.just_co_id and d.goc = g.goc and ((d.company_count = 1) or (d.company_count > 1 and d.subsidiary is null and g.subsidiary is null)) ";
-	sql = sql + "where d.state_county_fips = mtx.state_county_fips and g.just_co_id = mtx.just_co_id and mtx.row_type = 'CO_TICKER_COUNT_DATA' and mtx.tolerance_type = d.tolerance_type ";
+	sql = sql + "join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc and ((d.company_count = 1) or (d.company_count > 1 and d.subsidiary is null and g.subsidiary is null)) ";
+	sql = sql + "where d.state_county_fips = mtx.state_county_fips and g.ticker = mtx.ticker and mtx.row_type = 'CO_TICKER_COUNT_DATA' and mtx.tolerance_type = d.tolerance_type ";
 	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
 	
 	$out.0.sql = sql;
@@ -1565,10 +1543,9 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = g.goc ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id ";
-	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.goc = g.goc and d.subsidiary = g.subsidiary ";
-	sql = sql + "join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = g.just_co_id ";
-	sql = sql + "where not s.has_subsidiaries and g.just_co_id = mtx.just_co_id and mtx.row_type = 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS' ";
+	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc and d.subsidiary = g.subsidiary ";
+	sql = sql + "join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker ";
+	sql = sql + "where not s.has_subsidiaries and g.ticker = mtx.ticker and mtx.row_type = 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS' ";
 	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
 	
 	$out.0.sql = sql;
@@ -1583,10 +1560,9 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = g.goc ";
 	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join lkp_just_co_secty_master m on m.just_co_id = g.just_co_id ";
-	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.goc = g.goc ";
-	sql = sql + "join ${SUBSIDIARY_INFO_TABLENAME} s on s.just_co_id = g.just_co_id ";
-	sql = sql + "where g.subsidiary is null and s.has_subsidiaries and g.just_co_id = mtx.just_co_id and mtx.row_type = 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS' ";
+	sql = sql + "join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc ";
+	sql = sql + "join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker ";
+	sql = sql + "where g.subsidiary is null and s.has_subsidiaries and g.ticker = mtx.ticker and mtx.row_type = 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS' ";
 	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
 	
 	$out.0.sql = sql;
@@ -1649,12 +1625,11 @@ from (
        else 1.0
     end) lw_hourly_weighted
     from ${SUBSIDIARY_INFO_TABLENAME} s
-    join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
-    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
-    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.subsidiary = c.subsidiary
-    join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id and t.subsidiary = c.subsidiary
+    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = s.ticker
+    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = s.ticker and d.subsidiary = c.subsidiary
+    join ${TOTALS_TABLENAME} t on t.ticker = s.ticker and t.subsidiary = c.subsidiary
     join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
-      cjd.just_co_id = s.just_co_id 
+      cjd.ticker = s.ticker 
       and cjd.subsidiary = c.subsidiary
       and cjd.state_county_fips = c.state_county_fips
       and cjd.goc = d.goc
@@ -1670,7 +1645,7 @@ from (
     cast(round(sum(lw_hourly_weighted),3) as numeric(36,3)) avg_lw_weighted
   from (
     select 
-      m.ticker_trim ticker,
+      s.ticker,
       s.alt_company_name company,
       d.goc,
       mit._2a1pt1c_hourly _2a1pt1c_hourly,
@@ -1682,12 +1657,11 @@ from (
          else 1.0
       end) lw_hourly_weighted
     from ${SUBSIDIARY_INFO_TABLENAME} s
-    join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
-    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
-    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim
-    join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id
+    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = s.ticker
+    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = s.ticker
+    join ${TOTALS_TABLENAME} t on t.ticker = s.ticker
     join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
-      cjd.just_co_id = s.just_co_id 
+      cjd.ticker = s.ticker 
       and cjd.state_county_fips = c.state_county_fips
       and cjd.goc = d.goc
     join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
@@ -1716,8 +1690,7 @@ select
   cast(round(sum(rate_proportion_weighted),3) as numeric(36,3)) avg_rate_proportion_weighted
 from (
   select 
-    s.just_co_id,
-    m.ticker_trim ticker,
+    s.ticker,
     c.subsidiary,
     c.state_county_fips,
     c.employee_count,
@@ -1734,17 +1707,16 @@ from (
     end) rate_proportion_weighted,
     c.employee_count / t.emp_count_tot count_ratio
   from ${SUBSIDIARY_INFO_TABLENAME} s
-  join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
-  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
-  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim and d.subsidiary = c.subsidiary
-  join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id and t.subsidiary = c.subsidiary
+  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = s.ticker
+  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = s.ticker and d.subsidiary = c.subsidiary
+  join ${TOTALS_TABLENAME} t on t.ticker = s.ticker and t.subsidiary = c.subsidiary
   join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
-    cjd.just_co_id = s.just_co_id 
+    cjd.ticker = s.ticker 
     and cjd.subsidiary = c.subsidiary
     and cjd.state_county_fips = c.state_county_fips
     and cjd.goc = d.goc
   join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
-  where c.subsidiary is not null /*m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')*//* and d.goc = 'assistant manager'*/
+  where c.subsidiary is not null /*s.ticker not in ('WMT','BBY','TGT','KR','ICGH')*//* and d.goc = 'assistant manager'*/
   order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
 ) t
 group by ticker, subsidiary, goc
@@ -1757,8 +1729,7 @@ select
   cast(round(sum(rate_proportion_weighted),3) as numeric(36,3)) avg_rate_proportion_weighted
 from (
   select 
-    s.just_co_id,
-    m.ticker_trim ticker,
+    s.ticker,
     s.alt_company_name company,
     c.state_county_fips,
     c.employee_count,
@@ -1775,17 +1746,16 @@ from (
     end) rate_proportion_weighted,
     c.employee_count / t.emp_count_tot count_ratio
   from ${SUBSIDIARY_INFO_TABLENAME} s
-  join lkp_just_co_secty_master m on m.just_co_id = s.just_co_id
-  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = m.ticker_trim
-  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = m.ticker_trim
-  join ${TOTALS_TABLENAME} t on t.just_co_id = s.just_co_id
+  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = s.ticker
+  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = s.ticker
+  join ${TOTALS_TABLENAME} t on t.ticker = s.ticker
   join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
-    cjd.just_co_id = s.just_co_id 
+    cjd.ticker = s.ticker 
     and cjd.state_county_fips = c.state_county_fips
     and cjd.goc = d.goc
   join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
-  where c.subsidiary is null and m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')/* and d.goc = 'assistant manager'*/  
-  order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
+  where c.subsidiary is null and s.ticker not in ('WMT','BBY','TGT','KR','ICGH')/* and d.goc = 'assistant manager'*/  
+  order by s.ticker, c.subsidiary, c.state_county_fips, d.goc
 ) t
 group by ticker, company, goc
 order by ticker, company, goc
