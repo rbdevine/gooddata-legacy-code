@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jun 15 10:59:04 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.108" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Jun 16 11:09:11 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.110" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -118,7 +118,6 @@ VALUES (1,'FairPay',
 		${CONST_COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT}
 );
 
-/*
 INSERT INTO ${TABLE_PROCESS} 
 VALUES (2,'LivingWage',
 		${CONST_LW_MIN_COMPANIES_PER_JOC},
@@ -130,7 +129,7 @@ VALUES (2,'LivingWage',
 		${CONST_LW_MIN_JOCS_PER_COMPANY_SCORE_3},
 		${CONST_COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT}
 );
-*/]]></attr>
+]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
@@ -141,7 +140,6 @@ VALUES (2,'LivingWage',
 )
 SELECT PROCESS_TYPE_ID
 FROM ${TABLE_PROCESS}
-where PROCESS_TYPE_ID = 1
 ORDER BY PROCESS_TYPE_ID;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Read Process Queue" guiX="29" guiY="338" id="READ_PROCESS_QUEUE" type="DB_INPUT_TABLE">
