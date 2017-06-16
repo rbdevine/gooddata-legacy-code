@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jun 15 16:53:16 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.307" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jun 15 19:59:56 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.320" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -432,7 +432,7 @@ from (
     from ${JOB_DISTRIBUTION_TABLENAME} d
     group by ticker, subsidiary
   ) d group by ticker
-) s
+) s;
 
 update ${SUBSIDIARY_INFO_TABLENAME} i
 set alt_company_name = d.subsidiary
@@ -558,7 +558,7 @@ where subsidiary is null and ticker in (
   join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
   join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where s.has_subsidiaries and subsidiary is null
-  group by c.ticker, c.subsidiary
+  group by c.ticker, cc.subsidiary
 );]]></attr>
 </Node>
 </Phase>
@@ -577,7 +577,7 @@ from (
     from ${COUNTY_COUNT_TABLENAME} cc
     join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
     join ${SUBSIDIARY_INFO_TABLENAME} i on i.ticker = c.ticker
-    where i.has_subsidiaries and c.subsidiary is null
+    where i.has_subsidiaries and cc.subsidiary is null
     group by c.ticker
   ) c2 on c2.ticker = c.ticker
   where c2.ticker is null and i.has_subsidiaries
@@ -609,7 +609,7 @@ select
     case
       when ((${MID_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
-    end)*c.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
+    end)*cc.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} cc
 join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
@@ -641,7 +641,7 @@ select
     case
       when ((${MID_TOLERANCE})*(cjd.rate/100.0)*p.cost_of_living_index) >= l.LIVING_WAGE_AVG then 1
       else 0
-    end)*c.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
+    end)*cc.employee_count*d.distribution*(${MID_TOLERANCE_PROPORTION})
   /*,0) as numeric(18,3))*/ pays_living_wage
 from ${COUNTY_COUNT_TABLENAME} cc
 join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
@@ -1147,28 +1147,28 @@ select
 from (
   select g.ticker, g.subsidiary 
   from ${GOC_ORDER_TABLENAME} g
-  join ${SUBSIDIARY_INFO_TABLENAME} s on g.ticker = s.ticker
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker
   where subsidiary is not null and s.has_subsidiaries
   group by g.ticker, g.subsidiary
   order by g.ticker, g.subsidiary
 ) g
 join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
 join (
-  select c.ticker, c.subsidiary, sum(c.employee_count) emp_count_tot 
+  select c.ticker, cc.subsidiary, sum(cc.employee_count) emp_count_tot 
   from ${COUNTY_COUNT_TABLENAME} cc
   join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
   join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is not null and s.has_subsidiaries
-  group by c.ticker, c.subsidiary
-) e on e.ticker = m.ticker_trim and e.subsidiary = g.subsidiary
+  group by c.ticker, cc.subsidiary
+) e on e.ticker = c.ticker and e.subsidiary = g.subsidiary
 join (
-  select c.ticker, d.subsidiary, sum(employees_at_living_wage) lw_count, c.industry
+  select c.ticker, d.subsidiary, sum(employees_at_living_wage) lw_count
   from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d
   join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = d.ticker 
   join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is not null and s.has_subsidiaries
   group by c.ticker, d.subsidiary
-) d on d.ticker = m.ticker_trim and d.subsidiary = g.subsidiary
+) d on d.ticker = c.ticker and d.subsidiary = g.subsidiary
 order by c.ticker, g.subsidiary;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Totals No Data" guiX="510" guiY="2323" id="ADD_SUBSIDIARY_TOTALS_NO_DATA" type="DB_EXECUTE">
@@ -1291,7 +1291,7 @@ where e.subsidiary is null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
 )
 select c.industry, 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS', g.ticker, g.ticker, 
   case
-    when s.alt_company_name is null then m.co_long_name
+    when s.alt_company_name is null then c.company_name
     else s.alt_company_name
   end company_name
 from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
@@ -1324,7 +1324,7 @@ join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
 join (
   select c.ticker, sum(c.employee_count) emp_count_tot 
   from ${COUNTY_COUNT_TABLENAME} c
-  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = m.ticker
+  join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where c.subsidiary is null and not s.has_subsidiaries
   group by c.ticker
 ) e on e.ticker = c.ticker
@@ -1367,7 +1367,7 @@ join (
   join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is null and s.has_subsidiaries
   group by c.ticker
-) e on e.ticker = m.ticker_trim
+) e on e.ticker = c.ticker
 join (
   select d.ticker, sum(employees_at_living_wage) lw_count
   from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d
@@ -1416,13 +1416,13 @@ select
   emp_count_tot
 from ${SUBSIDIARY_INFO_TABLENAME} s
 join (
-  select c.ticker, c.subsidiary, sum(c.employee_count) emp_count_tot 
-  from ${COUNTY_COUNT_TABLENAME} c
-  join ${TABLE_FIPS_DATA} p on p.state_county_fips = c.state_county_fips
-  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
+  select c.ticker, cc.subsidiary, sum(cc.employee_count) emp_count_tot 
+  from ${COUNTY_COUNT_TABLENAME} cc
+  join ${TABLE_FIPS_DATA} p on p.state_county_fips = cc.state_county_fips
+  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = cc.ticker
   join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
   where subsidiary is not null and s.has_subsidiaries
-  group by c.ticker, c.subsidiary
+  group by c.ticker, cc.subsidiary
 ) e on e.ticker = s.ticker;]]></attr>
 </Node>
 </Phase>
@@ -1613,7 +1613,7 @@ from (
     cast(round(sum(lw_hourly_weighted),3) as numeric(36,3)) avg_lw_weighted
   from (
     select 
-      m.ticker_trim ticker,
+      c.ticker,
       c.subsidiary,
       d.goc,
       mit._2a1pt1c_hourly _2a1pt1c_hourly,
@@ -1665,7 +1665,7 @@ from (
       and cjd.state_county_fips = c.state_county_fips
       and cjd.goc = d.goc
     join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
-    where c.subsidiary is null and m.ticker_trim not in ('WMT','BBY','TGT','KR','ICGH')
+    where c.subsidiary is null and c.ticker not in ('WMT','BBY','TGT','KR','ICGH')
   ) t
   group by ticker, company, goc
   order by ticker, company
@@ -1717,7 +1717,7 @@ from (
     and cjd.goc = d.goc
   join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
   where c.subsidiary is not null /*s.ticker not in ('WMT','BBY','TGT','KR','ICGH')*//* and d.goc = 'assistant manager'*/
-  order by m.ticker_trim, c.subsidiary, c.state_county_fips, d.goc
+  order by s.ticker, c.subsidiary, c.state_county_fips, d.goc
 ) t
 group by ticker, subsidiary, goc
 union all
