@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Mon Jun 19 15:24:46 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.36" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
+<Field name="NAME" type="string"/>
+<Field name="CITY" type="string"/>
+<Field name="COUNTY" type="string"/>
+<Field name="STATE" type="string"/>
+<Field name="STATE_COUNTY_FIPS" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="CountyAvg" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
+<Field name="NAME" type="string"/>
+<Field name="AVGEMPLOYEECOUNT" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH_COUNTYAVG" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/AvgEmployeeCounts.xlsx"/>
+<Property id="GraphParameter1" name="DOWNLOADFILEPATH_FIPSMATCH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/CountyCityToLookup.xlsx"/>
+<Property id="GraphParameter2" name="POPULATEERRORFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/avgemployeecountserror.txt"/>
+<Property id="GraphParameter3" name="POPULATEERRORFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/countycitytolookuperror.txt"/>
+<Property id="GraphParameter4" name="READFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/AvgEmployeeCounts.xlsx"/>
+<Property id="GraphParameter5" name="READFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/CountyCityToLookup.xlsx"/>
+<Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
+<Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter28"/>
+<Property fileURL="workspace.prm" id="GraphParameter8"/>
+<Property id="GraphParameter26" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter27" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH_COUNTYAVG}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="County Avg File Download" guiX="351" guiY="3" id="COUNTY_AVG_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Avg Table" guiX="258" guiY="80" id="CREATE_COUNTY_AVG_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_COUNTYAVG};
+CREATE TABLE ${TABLENAME_COUNTYAVG} (
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  NAME VARCHAR(255),
+  AVGEMPLOYEECOUNT FLOAT
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Count Table" guiX="437" guiY="80" id="CREATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_EMPLOYEE_COUNT_BY_COUNTY};
+CREATE TABLE ${TABLE_EMPLOYEE_COUNT_BY_COUNTY} (
+  STATE_COUNTY_FIPS VARCHAR(5),
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  EMPLOYEE_COUNT INTEGER
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Fips Match Table" guiX="80" guiY="80" id="CREATE_FIPS_MATCH_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAME_FIPSMATCH};
+CREATE TABLE ${TABLENAME_FIPSMATCH} (
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  NAME VARCHAR(255),
+  CITY VARCHAR(64),
+  COUNTY VARCHAR(128),
+  STATE VARCHAR(2),
+  STATE_COUNTY_FIPS VARCHAR(5)
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH_FIPSMATCH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="Fips Match File Download" guiX="172" guiY="3" id="FIPS_MATCH_FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${READFILEPATH_COUNTYAVG}" guiName="Read County Avg File" guiX="116" guiY="257" id="READ_COUNTY_AVG_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH_FIPSMATCH}" guiName="Read Fips Match File" guiX="119" guiY="157" id="READ_FIPS_MATCH_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat County Avg" guiX="277" guiY="269" id="REFORMAT_COUNTY_AVG" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
+	$out.0.NAME = $in.0.NAME;
+	$out.0.AVGEMPLOYEECOUNT = $in.0.AVGEMPLOYEECOUNT;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat Fips Match" guiX="279" guiY="163" id="REFORMAT_FIPS_MATCH" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
+	$out.0.NAME = $in.0.NAME;
+	$out.0.CITY = $in.0.CITY;
+	$out.0.COUNTY = $in.0.COUNTY;
+	$out.0.STATE = $in.0.STATE;
+	$out.0.STATE_COUNTY_FIPS = $in.0.STATE_COUNTY_FIPS;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH_COUNTYAVG}" guiName="Write County Avg" guiX="437" guiY="257" id="WRITE_COUNTY_AVG" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${WRITEFILEPATH_FIPSMATCH}" guiName="Write Fips Match" guiX="438" guiY="163" id="WRITE_FIPS_MATCH" type="DATA_WRITER"/>
+<Edge fromNode="READ_COUNTY_AVG_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge2" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (output)" toNode="REFORMAT_COUNTY_AVG:0"/>
+<Edge fromNode="READ_FIPS_MATCH_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT_FIPS_MATCH:0"/>
+<Edge fromNode="REFORMAT_COUNTY_AVG:0" guiBendpoints="" guiRouter="Manhattan" id="Edge3" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_COUNTY_AVG:0"/>
+<Edge fromNode="REFORMAT_FIPS_MATCH:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_FIPS_MATCH:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Download" guiX="70" guiY="973" id="CLEAN_COUNTY_AVG_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Download" guiX="70" guiY="900" id="CLEAN_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Avg Table" guiX="363" guiY="359" id="POPULATE_COUNTY_AVG_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_COUNTYAVG} (
+  TICKER,
+  SUBSIDIARY,
+  NAME,
+  AVGEMPLOYEECOUNT
+)
+FROM LOCAL '${WRITEFILEPATH_COUNTYAVG}'
+EXCEPTIONS '${POPULATEERRORFILEPATH_COUNTYAVG}';
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Fips Match Table" guiX="169" guiY="359" id="POPULATE_FIPS_MATCH_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_FIPSMATCH} (
+  TICKER,
+  SUBSIDIARY,
+  NAME,
+  CITY,
+  COUNTY,
+  STATE,
+  STATE_COUNTY_FIPS
+)
+FROM LOCAL '${WRITEFILEPATH_FIPSMATCH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH_FIPSMATCH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node baseURL="${POPULATEERRORFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Error" guiX="271" guiY="973" id="CLEAN_COUNTY_AVG_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Write" guiX="447" guiY="973" id="CLEAN_COUNTY_AVG_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Error" guiX="274" guiY="900" id="CLEAN_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Write" guiX="450" guiY="900" id="CLEAN_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Trim County Avg Data" guiX="363" guiY="431" id="TRIM_COUNTY_AVG_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TABLENAME_COUNTYAVG} set ticker = ltrim(rtrim(ticker));
+update ${TABLENAME_COUNTYAVG} set subsidiary = ltrim(rtrim(subsidiary));
+update ${TABLENAME_COUNTYAVG} set name = ltrim(rtrim(name));
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Trim Fips Match Data" guiX="196" guiY="431" id="TRIM_FIPS_MATCH_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TABLENAME_FIPSMATCH} set ticker = ltrim(rtrim(ticker));
+update ${TABLENAME_FIPSMATCH} set subsidiary = ltrim(rtrim(subsidiary));
+update ${TABLENAME_FIPSMATCH} set name = ltrim(rtrim(name));
+update ${TABLENAME_FIPSMATCH} set city = ltrim(rtrim(city));
+update ${TABLENAME_FIPSMATCH} set county = ltrim(rtrim(county));
+update ${TABLENAME_FIPSMATCH} set state = ltrim(rtrim(state));
+update ${TABLENAME_FIPSMATCH} set city = null where city = '0';
+update ${TABLENAME_FIPSMATCH} set county = null where county = '0';
+update ${TABLENAME_FIPSMATCH} set state = null where state = '0';
+
+]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Adjust Saints" guiX="288" guiY="505" id="ADJUST_SAINTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+update ${TABLENAME_FIPSMATCH} set city = 'St. Albans' where city = 'St Albans';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Albert' where city = 'St Albert';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Ann' where city = 'St Ann';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Anne' where city = 'St Anne';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Ansgar' where city = 'St Ansgar';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Anthony' where city = 'St Anthony';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Augusta' where city = 'St Augusta';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Augustine' where city = 'St Augustine';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Bernard' where city = 'St Bernard';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Catharines' where city = 'St Catharines';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Charles' where city = 'St Charles';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Clair' where city = 'St Clair';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. CLAIR SHORES' where city = 'ST CLAIR SHORES';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Clairsville' where city = 'St Clairsville';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Cloud' where city = 'St Cloud';
+update ${TABLENAME_FIPSMATCH} set city = 'St. David' where city = 'St David';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Elmo' where city = 'St Elmo';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Francis' where city = 'St Francis';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Genevieve' where city = 'St Genevieve';
+update ${TABLENAME_FIPSMATCH} set city = 'St. George' where city = 'St George';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Helen' where city = 'St Helen';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Helens' where city = 'St Helens';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Ignace' where city = 'St Ignace';
+update ${TABLENAME_FIPSMATCH} set city = 'St. James' where city = 'St James';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Jerome' where city = 'St Jerome';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. JOHN' where city = 'ST JOHN';
+update ${TABLENAME_FIPSMATCH} set city = 'St. John''s' where city = 'St John''s';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Johns' where city = 'St Johns';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Johnsbury' where city = 'St Johnsbury';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Joseph' where city = 'St Joseph';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Louis' where city = 'St Louis';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Louis Park' where city = 'St Louis Park';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Martinville' where city = 'St Martinville';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Marys' where city = 'St Marys';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Michael' where city = 'St Michael';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Paul' where city = 'St Paul';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Pete Beach' where city = 'St Pete Beach';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Peter' where city = 'St Peter';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Peters' where city = 'St Peters';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Petersburg' where city = 'St Petersburg';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Robert' where city = 'St Robert';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Rose' where city = 'St Rose';
+
+update ${TABLENAME_FIPSMATCH} set city = 'St. Albans' where city = 'Saint Albans';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Amant' where city = 'Saint Amant';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Ann' where city = 'Saint Ann';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Anne' where city = 'Saint Anne';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Ansgar' where city = 'Saint Ansgar';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Anthony' where city = 'Saint Anthony';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Augistine' where city = 'Saint Augistine';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Augustine' where city = 'Saint Augustine';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Bernard' where city = 'Saint Bernard';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. CHARLES' where city = 'SAINT CHARLES';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. CLAIR' where city = 'SAINT CLAIR';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Clair Shores' where city = 'Saint Clair Shores';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Clairsville' where city = 'Saint Clairsville';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Cloud' where city = 'Saint Cloud';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Elmo' where city = 'Saint Elmo';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Francis' where city = 'Saint Francis';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Francisville' where city = 'Saint Francisville';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Gabriel' where city = 'Saint Gabriel';
+update ${TABLENAME_FIPSMATCH} set city = 'St. George' where city = 'Saint George';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Helen' where city = 'Saint Helen';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Helens' where city = 'Saint Helens';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Henry' where city = 'Saint Henry';
+update ${TABLENAME_FIPSMATCH} set city = 'St. James' where city = 'Saint James';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. JAMES CITY' where city = 'SAINT JAMES CITY';
+update ${TABLENAME_FIPSMATCH} set city = 'St. John' where city = 'Saint John';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Johns' where city = 'Saint Johns';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Johnsbury' where city = 'Saint Johnsbury';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Johnsville' where city = 'Saint Johnsville';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Joseph' where city = 'Saint Joseph';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Louis' where city = 'Saint Louis';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Louis Park' where city = 'Saint Louis Park';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Lucie West' where city = 'Saint Lucie West';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Marks' where city = 'Saint Marks';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. MARTINVILLE' where city = 'SAINT MARTINVILLE';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. MARY''S' where city = 'SAINT MARY''S';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Marys' where city = 'Saint Marys';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Matthews' where city = 'Saint Matthews';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Michael' where city = 'Saint Michael';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Paris' where city = 'Saint Paris';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. PAUL' where city = 'SAINT PAUL';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Pauls' where city = 'Saint Pauls';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Peter' where city = 'Saint Peter';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Peters' where city = 'Saint Peters';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Petersburg' where city = 'Saint Petersbu';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Petersburg' where city = 'Saint Petersbur';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Petersburg' where city = 'Saint Petersburg';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Robert' where city = 'Saint Robert';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Romuald' where city = 'Saint Romuald';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Rose' where city = 'Saint Rose';
+update ${TABLENAME_FIPSMATCH} set city = 'ST. SIMONS ISLAND' where city = 'SAINT SIMONS ISLAND';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Stephen' where city = 'Saint Stephen';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Stephens' where city = 'Saint Stephens';
+update ${TABLENAME_FIPSMATCH} set city = 'St. Thomas' where city = 'Saint Thomas';
+
+update ${TABLENAME_FIPSMATCH} set county = 'St. Bernard Parish' where county = 'St Bernard Parish';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Charles County' where county = 'St Charles County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Charles Parish' where county = 'St Charles Parish';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Clair County' where county = 'St Clair County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Croix County' where county = 'St Croix County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Francis County' where county = 'St Francis County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Francois County' where county = 'St Francois County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Helena Parish' where county = 'St Helena Parish';
+update ${TABLENAME_FIPSMATCH} set county = 'St. James Parish' where county = 'St James Parish';
+update ${TABLENAME_FIPSMATCH} set county = 'St. John the Baptist Parish' where county = 'St John the Baptist Parish';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Johns County' where county = 'St Johns County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Joseph County' where county = 'St Joseph County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Landry Parish' where county = 'St Landry Parish';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Lawrence County' where county = 'St Lawrence County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Louis County' where county = 'St Louis County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Lucie County' where county = 'St Lucie County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Martin Parish' where county = 'St Martin Parish';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Mary Parish' where county = 'St Mary Parish';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Mary''s County' where county = 'St Mary''s County';
+update ${TABLENAME_FIPSMATCH} set county = 'St. Tammany Parish' where county = 'St Tammany Parish';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Lookup Fips by County" guiX="272" guiY="577" id="LOOKUP_FIPS_BY_COUNTY" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+UPDATE ${TABLENAME_FIPSMATCH} m
+SET STATE_COUNTY_FIPS = f.STATE_COUNTY_FIPS
+FROM LKP_CITY_FIPS f
+WHERE m.state_county_fips is null and f.county_name = m.county and f.state_abbreviation = m.state;]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Lookup Fips by City" guiX="281" guiY="651" id="LOOKUP_FIPS_BY_CITY" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+UPDATE ${TABLENAME_FIPSMATCH} m
+SET STATE_COUNTY_FIPS = f.STATE_COUNTY_FIPS
+FROM LKP_CITY_FIPS f
+WHERE m.state_county_fips is null and f.city_name = m.city and f.state_abbreviation = m.state;]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Count Table" guiX="255" guiY="723" id="POPULATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+INSERT INTO ${TABLE_EMPLOYEE_COUNT_BY_COUNTY}
+SELECT
+  r.state_county_fips,
+  r.ticker,
+  r.subsidiary,
+  cast(round(sum(r.emp_count),0) as int)
+FROM (
+  SELECT 
+    fm.state_county_fips,
+    fm.ticker,
+    fm.subsidiary,
+    fm.name,
+    ca.avgemployeecount*fm.store_count emp_count
+  FROM (
+    SELECT TICKER, SUBSIDIARY, NAME, STATE_COUNTY_FIPS, COUNT('X') STORE_COUNT
+    FROM ${TABLENAME_FIPSMATCH}
+    WHERE state_county_fips is not null
+    GROUP BY TICKER, SUBSIDIARY, NAME, STATE_COUNTY_FIPS
+  ) fm
+  JOIN ${TABLENAME_COUNTYAVG} ca on ca.ticker = fm.ticker and ca.subsidiary = fm.subsidiary and ca.name = fm.name
+) r
+group by state_county_fips, ticker, subsidiary;]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/EmployeeCountByCountyOnly.grf" guiName="Load Other Employee Counts" guiX="255" guiY="800" id="LOAD_OTHER_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
+</Phase>
+</Graph>

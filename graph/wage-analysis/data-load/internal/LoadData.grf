@@ -1,18 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sun May 14 18:43:19 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.281" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Jun 19 15:02:58 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.282" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="workspace.prm" id="GraphParameter17"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter0"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter18"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/CompanyNameTicker.grf" guiName="Load: Company Name Ticker" guiX="122" guiY="108" id="LOAD_COMPANY_NAME_TICKER" type="RUN_GRAPH"/>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/DataSource.grf" guiName="Load: Data Source" guiX="51" guiY="6" id="LOAD_DATA_SOURCE" type="RUN_GRAPH"/>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/EnigmaH1BVisaJOC.grf" guiName="Load: Enigma H1BVisa JOC" guiX="197" guiY="6" id="LOAD_ENIGMA_H1BVISA_JOC" type="RUN_GRAPH"/>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/JobTitleJOC.grf" guiName="Load: Jobtitle JOC" guiX="335" guiY="213" id="LOAD_JOBTITLE_JOC" type="RUN_GRAPH"/>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/JobLevelAdjustment.grf" guiName="Load: Job Level Adjustment" guiX="123" guiY="213" id="LOAD_JOB_LEVEL_ADJUSTMENT1" type="RUN_GRAPH"/>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/JOCException.grf" guiName="Load: JOC Exception" guiX="248" guiY="315" id="LOAD_JOC_EXCEPTION" type="RUN_GRAPH"/>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/JOCWageMultiplier.grf" guiName="Load: JOC Wage Multiplier" guiX="393" guiY="6" id="LOAD_JOC_WAGE_MULTIPLIER" type="RUN_GRAPH"/>
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/YearAdjustment.grf" guiName="Load: Year Adjustment" guiX="330" guiY="108" id="LOAD_YEAR_ADJUSTMENT" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/CompanyNameTicker.grf" guiName="Load: Company Name Ticker" guiX="122" guiY="108" id="LOAD_COMPANY_NAME_TICKER" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/DataSource.grf" guiName="Load: Data Source" guiX="51" guiY="6" id="LOAD_DATA_SOURCE" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/EmployeeCounts.grf" guiName="Load: Employee Counts" guiX="315" guiY="319" id="LOAD_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/EnigmaH1BVisaJOC.grf" guiName="Load: Enigma H1BVisa JOC" guiX="197" guiY="6" id="LOAD_ENIGMA_H1BVISA_JOC" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/JobTitleJOC.grf" guiName="Load: Jobtitle JOC" guiX="335" guiY="213" id="LOAD_JOBTITLE_JOC" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/DistByJOC.grf" guiName="Load: Job Distributions" guiX="232" guiY="421" id="LOAD_JOB_DISTRIBUTIONS" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/JobLevelAdjustment.grf" guiName="Load: Job Level Adjustment" guiX="123" guiY="213" id="LOAD_JOB_LEVEL_ADJUSTMENT1" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/JOCException.grf" guiName="Load: JOC Exception" guiX="151" guiY="319" id="LOAD_JOC_EXCEPTION" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/JOCWageMultiplier.grf" guiName="Load: JOC Wage Multiplier" guiX="393" guiY="6" id="LOAD_JOC_WAGE_MULTIPLIER" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/YearAdjustment.grf" guiName="Load: Year Adjustment" guiX="330" guiY="108" id="LOAD_YEAR_ADJUSTMENT" type="RUN_GRAPH"/>
 </Phase>
 </Graph>
