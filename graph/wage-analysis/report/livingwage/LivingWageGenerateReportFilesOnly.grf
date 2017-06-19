@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jun 16 00:21:32 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.96" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jun 19 10:39:01 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.99" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -96,9 +96,9 @@
 <Property id="GraphParameter5" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
 <Property id="GraphParameter6" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter7" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
-<Property fileURL="wage.prm" id="GraphParameter65"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter8"/>
-<Property fileURL="workspace.prm" id="GraphParameter47"/>
+<Property fileURL="wage.prm" id="GraphParameter8"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter47"/>
+<Property fileURL="workspace.prm" id="GraphParameter86"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -331,7 +331,8 @@ order by mtx.ticker, subsidiary;]]></attr>
   $GOC:=goc,
   $AvgPercentUnweighted:=avg_rate_proportion_unweighted,
   $AvgPercentWeighted:=avg_rate_proportion_weighted
-from ${SCORE_QUALITY_BY_COMPANY_TABLENAME};]]></attr>
+from ${SCORE_QUALITY_BY_COMPANY_TABLENAME}
+order by ticker, company, goc;]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="25" id="WRITE_REPORT" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="136" id="WRITE_REPORT1" type="DATA_WRITER"/>

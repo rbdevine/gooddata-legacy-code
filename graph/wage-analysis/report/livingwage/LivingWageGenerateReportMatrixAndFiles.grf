@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jun 15 19:59:56 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.320" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Jun 19 10:21:13 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.323" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -438,7 +438,7 @@ update ${SUBSIDIARY_INFO_TABLENAME} i
 set alt_company_name = d.subsidiary
 from (select ticker, subsidiary from ${JOB_DISTRIBUTION_TABLENAME} group by ticker, subsidiary) d
 join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = d.ticker 
-where not i.has_subsidiaries;]]></attr>
+where not i.has_subsidiaries and i.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Remove NULL County Counts" guiX="316" guiY="244" id="REMOVE_NULL_COUNTY_COUNTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* clear rows with null employee counts. They are useless */
@@ -464,7 +464,7 @@ join (
   ) s on s.ticker_parent = c.ticker
   where s.ticker_parent is null
 ) c on c.ticker = d.ticker
-where not i.has_subsidiaries;]]></attr>
+where not i.has_subsidiaries and i.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Non-Active" guiX="96" guiY="397" id="REMOVE_NON_ACTIVE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${JOB_DISTRIBUTION_TABLENAME}
@@ -627,7 +627,7 @@ join (
   ) d group by ticker
 ) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Avg Job County Data Tickers (no subs)" guiX="271" guiY="1283" id="ADD_AVG_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Avg Job County Data Tickers (no subs)" guiX="242" guiY="1283" id="ADD_AVG_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
   cc.state_county_fips, 
@@ -665,7 +665,7 @@ select state_county_fips, ticker, subsidiary, sum(employees_at_living_wage) empl
 from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} 
 group by state_county_fips, ticker, subsidiary;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Subsidiaries" guiX="510" guiY="1183" id="ADD_HIGH_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Subsidiaries" guiX="544" guiY="1183" id="ADD_HIGH_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
@@ -698,7 +698,7 @@ join (
   ) d group by ticker
 ) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Tickers (no subs)" guiX="548" guiY="1283" id="ADD_HIGH_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add High Job County Data Tickers (no subs)" guiX="530" guiY="1283" id="ADD_HIGH_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
   cc.state_county_fips, 
@@ -780,7 +780,7 @@ from (
 ) offsets
 join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = offsets.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Low Job County Data Subsidiaries" guiX="1" guiY="1183" id="ADD_LOW_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Low Job County Data Subsidiaries" guiX="-35" guiY="1183" id="ADD_LOW_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
@@ -813,7 +813,7 @@ join (
   ) d group by ticker
 ) ccd on ccd.ticker = d.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Low Job County Data Tickers (no subs)" guiX="-13" guiY="1283" id="ADD_LOW_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Low Job County Data Tickers (no subs)" guiX="-49" guiY="1283" id="ADD_LOW_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
   cc.state_county_fips, 
@@ -884,7 +884,7 @@ order by t.state;]]></attr>
 </Node>
 </Phase>
 <Phase number="14">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Living Wage Count Adjustments" guiX="277" guiY="1618" id="LIVING_WAGE_COUNT_ADJUSTMENTS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Living Wage Count Adjustments" guiX="277" guiY="1616" id="LIVING_WAGE_COUNT_ADJUSTMENTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
 set RATE_RAW_MIN_WAGE_ADJ = (
   case
