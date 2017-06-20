@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jun 19 21:29:16 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.30" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jun 20 16:55:57 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.35" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="DIST_BY_GOC" recordDelimiter="\n" type="delimited">
@@ -8,14 +8,22 @@
 <Field name="DISTRIBUTION" type="string"/>
 </Record>
 </Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="JOC_DIST_DB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
+<Field name="JOC" type="string"/>
+<Field name="DISTRIBUTION" type="string"/>
+</Record>
+</Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/DistributionsByGOC.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/distributionsbygocerror.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/DistributionsByGOC.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="${TABLE_JOC_DISTRIBUTION}"/>
 <Property id="GraphParameter4" name="TMPTABLENAME" value="TMP_WAGE_${TABLE_JOC_DISTRIBUTION}"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
-<Property fileURL="workspace.prm" id="GraphParameter5"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter5"/>
+<Property fileURL="workspace.prm" id="GraphParameter28"/>
 <Property id="GraphParameter46" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/distributionsbygoc.txt"/>
 <Dictionary/>
 </Global>
@@ -25,7 +33,7 @@
 CREATE TABLE IF NOT EXISTS ${TABLENAME} (
   TICKER VARCHAR(32),
   SUBSIDIARY VARCHAR(255),
-  GOC VARCHAR(255),
+  JOC VARCHAR(255),
   DISTRIBUTION FLOAT
 );]]></attr>
 </Node>
@@ -34,7 +42,7 @@ CREATE TABLE IF NOT EXISTS ${TABLENAME} (
 CREATE TABLE IF NOT EXISTS ${TMPTABLENAME} (
   TICKER VARCHAR(32),
   SUBSIDIARY VARCHAR(255),
-  GOC VARCHAR(255),
+  JOC VARCHAR(255),
   DISTRIBUTION FLOAT
 );]]></attr>
 </Node>
@@ -50,7 +58,7 @@ CREATE TABLE IF NOT EXISTS ${TMPTABLENAME} (
 function integer transform() {
 	$out.0.TICKER = $in.0.TICKER;
 	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
-	$out.0.GOC = $in.0.GOC;
+	$out.0.JOC = $in.0.GOC;
 	$out.0.DISTRIBUTION = $in.0.DISTRIBUTION;
 	
 	return ALL;
@@ -76,7 +84,7 @@ function integer transform() {
 ]]></attr>
 </Node>
 <Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
 <Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="14" guiY="188" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
@@ -84,7 +92,7 @@ function integer transform() {
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
 	TICKER,
     SUBSIDIARY,
-    GOC,
+    JOC,
     DISTRIBUTION
 )
 FROM LOCAL '${WRITEFILEPATH}'
@@ -97,7 +105,7 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 <attr name="sqlQuery"><![CDATA[delete from ${TABLENAME} where ticker is null;
 update ${TABLENAME} set TICKER = ltrim(rtrim(TICKER));
 update ${TABLENAME} set SUBSIDIARY = ltrim(rtrim(SUBSIDIARY));
-update ${TABLENAME} set GOC = ltrim(rtrim(GOC));
+update ${TABLENAME} set JOC = ltrim(rtrim(JOC));
 ]]></attr>
 </Node>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="15" guiY="268" id="CLEAN_ERROR" type="FILE_DELETE"/>
