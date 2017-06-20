@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Jun 19 10:21:13 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.323" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Jun 19 22:12:58 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.324" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -19,8 +19,8 @@
 <Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
 <Property fileURL="wage.prm" id="GraphParameter7"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter46"/>
-<Property fileURL="workspace.prm" id="GraphParameter85"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter48"/>
+<Property fileURL="workspace.prm" id="GraphParameter87"/>
 <Dictionary/>
 </Global>
 <Phase number="0">

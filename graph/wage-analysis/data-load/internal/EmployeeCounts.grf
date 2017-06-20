@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Mon Jun 19 15:24:46 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.36" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Mon Jun 19 22:14:18 EDT 2017" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.43" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -28,10 +28,11 @@
 <Property id="GraphParameter5" name="READFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/CountyCityToLookup.xlsx"/>
 <Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
 <Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter28"/>
-<Property fileURL="workspace.prm" id="GraphParameter8"/>
-<Property id="GraphParameter26" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
-<Property id="GraphParameter27" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter51"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter8"/>
+<Property fileURL="workspace.prm" id="GraphParameter31"/>
+<Property id="GraphParameter49" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter50" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -46,8 +47,8 @@ CREATE TABLE ${TABLENAME_COUNTYAVG} (
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Count Table" guiX="437" guiY="80" id="CREATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_EMPLOYEE_COUNT_BY_COUNTY};
-CREATE TABLE ${TABLE_EMPLOYEE_COUNT_BY_COUNTY} (
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COUNTY_EMPLOYEE_COUNT};
+CREATE TABLE ${TABLE_COUNTY_EMPLOYEE_COUNT} (
   STATE_COUNTY_FIPS VARCHAR(5),
   TICKER VARCHAR(32),
   SUBSIDIARY VARCHAR(255),
@@ -146,8 +147,8 @@ function integer transform() {
 <Edge fromNode="REFORMAT_FIPS_MATCH:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_FIPS_MATCH:0"/>
 </Phase>
 <Phase number="2">
-<Node baseURL="${READFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Download" guiX="70" guiY="973" id="CLEAN_COUNTY_AVG_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${READFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Download" guiX="70" guiY="900" id="CLEAN_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Download" guiX="69" guiY="977" id="CLEAN_COUNTY_AVG_DOWNLOAD" type="FILE_DELETE"/>
+<Node baseURL="${READFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Download" guiX="69" guiY="903" id="CLEAN_FIPS_MATCH_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Avg Table" guiX="363" guiY="359" id="POPULATE_COUNTY_AVG_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME_COUNTYAVG} (
   TICKER,
@@ -175,10 +176,10 @@ EXCEPTIONS '${POPULATEERRORFILEPATH_FIPSMATCH}';
 </Node>
 </Phase>
 <Phase number="3">
-<Node baseURL="${POPULATEERRORFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Error" guiX="271" guiY="973" id="CLEAN_COUNTY_AVG_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Write" guiX="447" guiY="973" id="CLEAN_COUNTY_AVG_WRITE" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Error" guiX="274" guiY="900" id="CLEAN_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Write" guiX="450" guiY="900" id="CLEAN_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Error" guiX="270" guiY="977" id="CLEAN_COUNTY_AVG_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_COUNTYAVG}" enabled="enabled" guiName="Clean County Avg Write" guiX="446" guiY="977" id="CLEAN_COUNTY_AVG_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Error" guiX="273" guiY="903" id="CLEAN_FIPS_MATCH_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH_FIPSMATCH}" enabled="enabled" guiName="Clean Fips Match Write" guiX="449" guiY="903" id="CLEAN_FIPS_MATCH_WRITE" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Trim County Avg Data" guiX="363" guiY="431" id="TRIM_COUNTY_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLENAME_COUNTYAVG} set ticker = ltrim(rtrim(ticker));
 update ${TABLENAME_COUNTYAVG} set subsidiary = ltrim(rtrim(subsidiary));
@@ -347,7 +348,7 @@ WHERE m.state_county_fips is null and f.city_name = m.city and f.state_abbreviat
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate County Count Table" guiX="255" guiY="723" id="POPULATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
-INSERT INTO ${TABLE_EMPLOYEE_COUNT_BY_COUNTY}
+INSERT INTO ${TABLE_COUNTY_EMPLOYEE_COUNT}
 SELECT
   r.state_county_fips,
   r.ticker,
@@ -368,7 +369,26 @@ FROM (
   ) fm
   JOIN ${TABLENAME_COUNTYAVG} ca on ca.ticker = fm.ticker and ca.subsidiary = fm.subsidiary and ca.name = fm.name
 ) r
-group by state_county_fips, ticker, subsidiary;]]></attr>
+join (
+  select ticker, company_name, alt_company_name, industry 
+  from ${TABLE_COMPANY} c 
+  left join (
+    select ticker_parent 
+    from ${TABLE_SUBSIDIARY}) s on s.ticker_parent = c.ticker 
+  where s.ticker_parent is null 
+  union all 
+  select 
+    case
+      when s.ticker_subsidiary is null then s.ticker_parent
+      else ticker_subsidiary
+    end ticker, 
+    s.subsidiary_name company_name, 
+    c.alt_company_name, 
+    c.industry 
+  from ${TABLE_SUBSIDIARY} s 
+  join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+) s on s.ticker = r.ticker and r.subsidiary in (s.company_name, s.alt_company_name)
+group by r.state_county_fips, r.ticker, r.subsidiary;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">

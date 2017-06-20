@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Mon Jun 19 16:31:24 EDT 2017" modifiedBy="richdevine" name="LivingWageEmployeeCountByCounty" revision="1.55" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Mon Jun 19 21:35:58 EDT 2017" modifiedBy="hankmobley" name="LivingWageEmployeeCountByCounty" revision="1.59" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLOYEE_COUNTS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -14,12 +14,22 @@
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/EmployeeCountsByCounty.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="${TABLE_COUNTY_EMPLOYEE_COUNT}"/>
 <Property id="GraphParameter4" name="TABLENAMETEMP" value="TMP_COUNTY_EMPLOYEE_COUNT"/>
+<Property fileURL="wage.prm" id="GraphParameter47"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
 <Property fileURL="workspace.prm" id="GraphParameter5"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter24"/>
-<Property id="GraphParameter23" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/employeecountsbycounty.txt"/>
+<Property id="GraphParameter46" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/employeecountsbycounty.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="321" guiY="27" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAMETEMP};
+CREATE TABLE ${TABLENAMETEMP} (
+  STATE_COUNTY_FIPS VARCHAR(5),
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  EMPLOYEE_COUNT INT
+);]]></attr>
+</Node>
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="166" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
@@ -61,21 +71,7 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="6" guiY="192" id="DROP_TEMP_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAMETEMP};]]></attr>
-</Node>
-</Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="166" guiY="192" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAMETEMP} (
-  STATE_COUNTY_FIPS VARCHAR(5),
-  TICKER VARCHAR(32),
-  SUBSIDIARY VARCHAR(255),
-  EMPLOYEE_COUNT INT
-);]]></attr>
-</Node>
-</Phase>
-<Phase number="4">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="6" guiY="192" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="317" guiY="192" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAMETEMP} (
     STATE_COUNTY_FIPS,
@@ -88,8 +84,8 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 ]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Temp Data" guiX="479" guiY="192" id="CLEANUP_TEMP_DATA" type="DB_EXECUTE">
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Temp Data" guiX="321" guiY="268" id="CLEANUP_TEMP_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TABLENAMETEMP} where ticker is null;
 update ${TABLENAMETEMP} set state_county_fips = ltrim(rtrim(state_county_fips));
 update ${TABLENAMETEMP} set ticker = ltrim(rtrim(ticker));
@@ -125,18 +121,37 @@ delete from ${TABLENAMETEMP}
 where regexp_count(state_county_fips,'^[0-9]{5,5}$') = 0;
 ]]></attr>
 </Node>
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="6" guiY="348" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="348" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="326" guiY="348" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="6" guiY="268" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="166" guiY="268" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
-<Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Table" guiX="121" guiY="269" id="INSERT_INTO_TABLE" type="DB_EXECUTE">
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Table" guiX="325" guiY="341" id="INSERT_INTO_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLENAME}
-SELECT * FROM ${TABLENAMETEMP};]]></attr>
+SELECT t.* 
+FROM ${TABLENAMETEMP} t
+JOIN (
+  select ticker, company_name, alt_company_name, industry 
+  from ${TABLE_COMPANY} c 
+  left join (
+    select ticker_parent 
+    from ${TABLE_SUBSIDIARY}) s on s.ticker_parent = c.ticker 
+  where s.ticker_parent is null 
+  union all 
+  select 
+    case
+      when s.ticker_subsidiary is null then s.ticker_parent
+      else ticker_subsidiary
+    end ticker, 
+    s.subsidiary_name company_name, 
+    c.alt_company_name, 
+    c.industry 
+  from ${TABLE_SUBSIDIARY} s 
+  join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+) s on s.ticker = t.ticker and t.subsidiary in (s.company_name, s.alt_company_name);]]></attr>
 </Node>
 </Phase>
-<Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="293" guiY="269" id="DROP_TEMP_TABLE1" type="DB_EXECUTE">
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="326" guiY="415" id="DROP_TEMP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE ${TABLENAMETEMP};]]></attr>
 </Node>
 </Phase>
