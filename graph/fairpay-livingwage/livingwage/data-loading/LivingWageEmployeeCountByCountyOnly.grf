@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Tue Nov 01 17:19:56 EDT 2016" modifiedBy="hankmobley" name="LivingWageEmployeeCountByCounty" revision="1.51" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Wed Jun 21 16:56:49 EDT 2017" modifiedBy="richdevine" name="LivingWageEmployeeCountByCounty" revision="1.52" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLOYEE_COUNTS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -15,7 +15,7 @@
 <Property id="GraphParameter3" name="TABLENAME" value="LKP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
 <Property id="GraphParameter4" name="TABLENAMETEMP" value="TMP_LIVING_WAGE_EMPLOYEE_COUNT_BY_COUNTY"/>
 <Property fileURL="workspace.prm" id="GraphParameter5"/>
-<Property id="GraphParameter20" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/employeecountsbycounty.txt"/>
+<Property id="GraphParameter23" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/employeecountsbycounty.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -186,13 +186,13 @@ where regexp_count(state_county_fips,'^[0-9]{5,5}$') = 0;
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="326" guiY="432" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Table" guiX="121" guiY="353" id="INSERT_INTO_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Insert into Table" guiX="121" guiY="353" id="INSERT_INTO_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLENAME}
 SELECT * FROM ${TABLENAMETEMP};]]></attr>
 </Node>
 </Phase>
 <Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="293" guiY="353" id="DROP_TEMP_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Table" guiX="293" guiY="353" id="DROP_TEMP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE ${TABLENAMETEMP};]]></attr>
 </Node>
 </Phase>

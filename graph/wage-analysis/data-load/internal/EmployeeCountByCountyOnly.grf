@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Mon Jun 19 21:35:58 EDT 2017" modifiedBy="hankmobley" name="LivingWageEmployeeCountByCounty" revision="1.59" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Wed Jun 21 16:33:20 EDT 2017" modifiedBy="richdevine" name="LivingWageEmployeeCountByCounty" revision="1.61" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLOYEE_COUNTS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -14,10 +14,10 @@
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/EmployeeCountsByCounty.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="${TABLE_COUNTY_EMPLOYEE_COUNT}"/>
 <Property id="GraphParameter4" name="TABLENAMETEMP" value="TMP_COUNTY_EMPLOYEE_COUNT"/>
-<Property fileURL="wage.prm" id="GraphParameter47"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter23"/>
-<Property fileURL="workspace.prm" id="GraphParameter5"/>
-<Property id="GraphParameter46" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/employeecountsbycounty.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter5"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter47"/>
+<Property fileURL="workspace.prm" id="GraphParameter70"/>
+<Property id="GraphParameter88" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/employeecountsbycounty.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">

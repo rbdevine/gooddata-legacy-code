@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Tue Jun 20 17:12:07 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.135" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Jun 21 15:11:52 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.136" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,10 +16,10 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="wage.prm" id="GraphParameter50"/>
 <Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter9"/>
 <Property fileURL="workspace.prm" id="GraphParameter32"/>
-<Property fileURL="wage.prm" id="GraphParameter50"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -180,7 +180,7 @@ join ${COUNTY_COUNT_TABLENAME} c on c.ticker = w.ticker;]]></attr>
 </Node>
 </Phase>
 <Phase number="11">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Avg Job County Data Subsidiaries" guiX="92" guiY="241" id="ADD_AVG_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Avg Job County Data Subsidiaries" guiX="92" guiY="340" id="ADD_AVG_JOB_COUNTY_DATA_SUBSIDIARIES" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_LOCATION_DETAIL}
 (state_county_fips, ticker, subsidiary, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, pays_living_wage)
@@ -205,7 +205,45 @@ join ${TABLE_SUBSIDIARY} s on s.ticker_parent = d.ticker and s.subsidiary_name =
 join ${TABLE_WAGE_SUMMARY} ws on ws.ticker = cc.ticker and ws.joc = d.joc
 where cc.employee_count*d.distribution is not null and (ws.wage_hourly_cola/100.0)*f.cost_of_living_index is not null;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Avg Job County Data Tickers (no subs)" guiX="346" guiY="253" id="ADD_AVG_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Avg Job County Data Subsidiaries" guiX="210" guiY="239" id="ADD_AVG_JOB_COUNTY_DATA_SUBSIDIARIES1" type="DB_EXECUTE">
+<attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_LOCATION_DETAIL}
+(state_county_fips, ticker, subsidiary, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, pays_living_wage)
+select 
+  cc.state_county_fips,
+  d.ticker,
+  d.subsidiary,
+  ws.joc,
+  cc.employee_count*d.distribution,
+  (ws.wage_hourly_cola/100.0)*f.cost_of_living_index reverse_adj, 
+  ws.wage_hourly_cola,
+  (
+    case
+      when ((ws.wage_hourly_cola/100.0)*f.cost_of_living_index) >= f.living_wage_hourly then 1
+      else 0
+    end
+  )*cc.employee_count*d.distribution pays_living_wage
+from ${TABLE_COUNTY_EMPLOYEE_COUNT} cc
+join ${TABLE_FIPS_DATA} f on f.state_county_fips = cc.state_county_fips
+join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = cc.ticker and isnull(cc.subsidiary,d.subsidiary) = d.subsidiary
+join (
+  select 
+    case 
+      when isnull(s.ticker_subsidiary, s.ticker_parent) is null then c.ticker
+      else isnull(s.ticker_subsidiary, s.ticker_parent)
+    end ticker,
+    s.subsidiary_name
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on c.ticker in (s.ticker_parent, s.ticker_subsidiary)
+) c on c.ticker = d.ticker and isnull(c.subsidiary_name,d.subsidiary) = d.subsidiary
+join ${TABLE_WAGE_SUMMARY} ws on ws.ticker = cc.ticker and ws.joc = d.joc
+where 
+  cc.employee_count is not null and 
+  d.distribution is not null and
+  ws.wage_hourly_cola is not null and
+  f.cost_of_living_index is not null;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Avg Job County Data Tickers (no subs)" guiX="346" guiY="352" id="ADD_AVG_JOB_COUNTY_DATA_TICKERS_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select 
   cc.state_county_fips, 
@@ -239,7 +277,7 @@ join (
 </Node>
 </Phase>
 <Phase number="12">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add All Job County Data Tickers (subs)" guiX="208" guiY="341" id="ADD_ALL_JOB_COUNTY_DATA_TICKERS_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add All Job County Data Tickers (subs)" guiX="208" guiY="440" id="ADD_ALL_JOB_COUNTY_DATA_TICKERS_SUBS" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Adds subidiary data to get parent ticker data, therefore depends on the subidiary data already being input into the table in previous phase.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${COMPANY_JOB_COUNTY_DATA_TABLENAME}
 select state_county_fips, ticker, max(company_count), null, tolerance_type, goc, avg(rate_raw), sum(employees_at_living_wage)
