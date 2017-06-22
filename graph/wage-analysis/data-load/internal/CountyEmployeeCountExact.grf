@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Wed Jun 21 16:33:20 EDT 2017" modifiedBy="richdevine" name="LivingWageEmployeeCountByCounty" revision="1.61" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the counts of employees estimated for each company by given county." guiVersion="3.4.4.P" id="1473966524806" licenseType="Commercial" modified="Thu Jun 22 10:30:41 EDT 2017" modifiedBy="richdevine" name="LivingWageEmployeeCountByCounty" revision="1.62" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EMPLOYEE_COUNTS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -21,7 +21,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="321" guiY="27" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="322" guiY="8" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLENAMETEMP};
 CREATE TABLE ${TABLENAMETEMP} (
   STATE_COUNTY_FIPS VARCHAR(5),
@@ -30,12 +30,12 @@ CREATE TABLE ${TABLENAMETEMP} (
   EMPLOYEE_COUNT INT
 );]]></attr>
 </Node>
-<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="166" guiY="27" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="167" guiY="8" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="104" id="CSV_WRITER" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="98" id="READ_FILE" type="SPREADSHEET_READER"/>
-<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="104" id="REFORMAT" type="REFORMAT">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="326" guiY="85" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="7" guiY="79" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="167" guiY="85" id="REFORMAT" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -71,8 +71,8 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
 </Phase>
 <Phase number="2">
-<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="6" guiY="192" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="317" guiY="192" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="7" guiY="173" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Temp Table" guiX="318" guiY="173" id="POPULATE_TEMP_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAMETEMP} (
     STATE_COUNTY_FIPS,
 	TICKER,
@@ -85,7 +85,7 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Temp Data" guiX="321" guiY="268" id="CLEANUP_TEMP_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Cleanup Temp Data" guiX="322" guiY="249" id="CLEANUP_TEMP_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[delete from ${TABLENAMETEMP} where ticker is null;
 update ${TABLENAMETEMP} set state_county_fips = ltrim(rtrim(state_county_fips));
 update ${TABLENAMETEMP} set ticker = ltrim(rtrim(ticker));
@@ -121,11 +121,11 @@ delete from ${TABLENAMETEMP}
 where regexp_count(state_county_fips,'^[0-9]{5,5}$') = 0;
 ]]></attr>
 </Node>
-<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="6" guiY="268" id="CLEAN_ERROR" type="FILE_DELETE"/>
-<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="166" guiY="268" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="7" guiY="249" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="167" guiY="249" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Table" guiX="325" guiY="341" id="INSERT_INTO_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Insert into Table" guiX="326" guiY="322" id="INSERT_INTO_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLENAME}
 SELECT t.* 
 FROM ${TABLENAMETEMP} t
@@ -151,7 +151,7 @@ JOIN (
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="326" guiY="415" id="DROP_TEMP_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Table" guiX="327" guiY="396" id="DROP_TEMP_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE ${TABLENAMETEMP};]]></attr>
 </Node>
 </Phase>

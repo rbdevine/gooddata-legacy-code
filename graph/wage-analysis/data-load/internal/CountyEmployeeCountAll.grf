@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Jun 22 12:40:12 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.56" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
+<Field name="NAME" type="string"/>
+<Field name="CITY" type="string"/>
+<Field name="COUNTY" type="string"/>
+<Field name="STATE" type="string"/>
+<Field name="STATE_COUNTY_FIPS" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="CountyAvg" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
+<Field name="NAME" type="string"/>
+<Field name="AVGEMPLOYEECOUNT" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH_COUNTYAVG" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/AvgEmployeeCounts.xlsx"/>
+<Property id="GraphParameter1" name="DOWNLOADFILEPATH_FIPSMATCH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/CountyCityToLookup.xlsx"/>
+<Property id="GraphParameter2" name="POPULATEERRORFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/avgemployeecountserror.txt"/>
+<Property id="GraphParameter3" name="POPULATEERRORFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/countycitytolookuperror.txt"/>
+<Property id="GraphParameter4" name="READFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/AvgEmployeeCounts.xlsx"/>
+<Property id="GraphParameter5" name="READFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/CountyCityToLookup.xlsx"/>
+<Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
+<Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
+<Property fileURL="wage.prm" id="GraphParameter8"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter50"/>
+<Property fileURL="workspace.prm" id="GraphParameter73"/>
+<Property id="GraphParameter91" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter92" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create County Count Table" guiX="77" guiY="8" id="CREATE_COUNTY_COUNT_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COUNTY_EMPLOYEE_COUNT};
+CREATE TABLE ${TABLE_COUNTY_EMPLOYEE_COUNT} (
+  STATE_COUNTY_FIPS VARCHAR(5),
+  TICKER VARCHAR(32),
+  SUBSIDIARY VARCHAR(255),
+  EMPLOYEE_COUNT INTEGER
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/CountyEmployeeCountCalculated.grf" guiName="Load Calculated Employee Counts" guiX="60" guiY="81" id="LOAD_CALCULATED_EMPLOYEE_COUNTS1" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="2">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/CountyEmployeeCountExact.grf" guiName="Load Exact Employee Counts" guiX="70" guiY="179" id="LOAD_EXACT_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="3">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/CountyEmployeeCountFranchise.grf" guiName="Load Franchise Employee Counts" guiX="60" guiY="281" id="LOAD_FRANCHISE_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up no-subsidiary Companies" guiX="57" guiY="388" id="CLEAN_UP_NO_SUBSIDIARY_COMPANIES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/* go the other direction now, add up subsidiaries for parent */
+/* add up county employee counts of subsidiaries for parent ticker (only applies to companies with subsidiaies */
+/* "parent" data will be distinguished by having a null subsidiary */
+/* if there are ANY records with a null subsidiary for a ticker, consider the work done, do not add up subsidiaries again*/
+
+/* first, set subsidiary to null for any row associated with a ticker that only has one subsidiary name for all records */
+/* that is, any company that has not been split into subsidiaries needs to have null for subsidiary name */
+
+/* Note that any subsidiary with a ticker should be considered a ticker without subsidiary. */
+/* Would love to rethink this, but was implemented to deal with the inconsistent data formats. */
+
+update ${TABLE_COUNTY_EMPLOYEE_COUNT} cc
+set subsidiary = null
+from (
+  /*tickers without subsidiaries*/
+  select c.ticker
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where s.ticker_parent is null
+  union all
+  select ticker_subsidiary ticker
+  from ${TABLE_SUBSIDIARY}
+  where ticker_subsidiary is not null
+) c
+where cc.ticker = c.ticker;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up Companies with subsidiaries" guiX="49" guiY="466" id="CLEAN_UP_COMPANIES_WITH_SUBSIDIARIES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/* next delete data for tickers that have at least two subsidiaries and has parent company data, */
+/* (which is represented by parent having a subsidiary of null) */
+/* the purpose of this is to get rid of any ticker data for companies with subsidiaries because */
+/* that data needs to be the sum of the subsidiary data */
+delete from ${TABLE_COUNTY_EMPLOYEE_COUNT}
+where subsidiary is null and ticker in (
+  select c.ticker
+  from ${TABLE_COMPANY} c
+  join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where ticker_subsidiary is null
+  group by c.ticker
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Parent County Counts" guiX="70" guiY="544" id="CREATE_PARENT_COUNTY_COUNTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/* finally, add parent counts for tickers with multiple subsidiaries by adding up subsidiary counts */
+insert into ${TABLE_COUNTY_EMPLOYEE_COUNT}
+select c2.state_county_fips, c2.ticker, null, sum(c2.employee_count)
+from (
+  select c.ticker
+  from ${TABLE_COMPANY} c
+  join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where s.ticker_subsidiary is null
+  group by c.ticker
+) c
+join ${TABLE_COUNTY_EMPLOYEE_COUNT} c2 on c2.ticker = c.ticker
+group by c2.ticker, c2.state_county_fips;]]></attr>
+</Node>
+</Phase>
+</Graph>
