@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Jun 22 11:03:30 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.49" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Jun 22 16:01:51 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.50" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -26,8 +26,8 @@
 <Property id="GraphParameter3" name="POPULATEERRORFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/countycitytolookuperror.txt"/>
 <Property id="GraphParameter4" name="READFILEPATH_COUNTYAVG" value="${DATA_TMP_DIR}/AvgEmployeeCounts.xlsx"/>
 <Property id="GraphParameter5" name="READFILEPATH_FIPSMATCH" value="${DATA_TMP_DIR}/CountyCityToLookup.xlsx"/>
-<Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
-<Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
+<Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="${TMP_BASE}_AVG_STORE_EMPLOYEE_COUNTS"/>
+<Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="${TMP_BASE}_COUNTY_CITY_TO_LOOKUP"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter50"/>
 <Property fileURL="workspace.prm" id="GraphParameter73"/>

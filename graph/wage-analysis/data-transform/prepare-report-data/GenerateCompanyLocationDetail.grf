@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Jun 21 15:11:52 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.136" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jun 22 17:00:03 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.140" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,17 +16,17 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="wage.prm" id="GraphParameter50"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter9"/>
-<Property fileURL="workspace.prm" id="GraphParameter32"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter42"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter51"/>
+<Property fileURL="workspace.prm" id="GraphParameter74"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Company Location Detail Table" guiX="210" guiY="15" id="CREATE_COMPANY_LOCATION_DETAIL_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_COMPANY_LOCATION_DETAIL};
-create table if not exists ${TABLE_COMPANY_LOCATION_DETAIL} (
-  GEO_CODE FLOAT NULL,
+create table ${TABLE_COMPANY_LOCATION_DETAIL} (
+  GEO_CODE FLOAT NULL,  /*  may split into latitude, longitude, geo_accuracy - see CountyEmployeeCountFranchise.grf metadata for details */
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(16) NOT NULL,
   SUBSIDIARY VARCHAR(64) NOT NULL,
@@ -212,7 +212,7 @@ where cc.employee_count*d.distribution is not null and (ws.wage_hourly_cola/100.
 select 
   cc.state_county_fips,
   d.ticker,
-  d.subsidiary,
+  cc.subsidiary,
   ws.joc,
   cc.employee_count*d.distribution,
   (ws.wage_hourly_cola/100.0)*f.cost_of_living_index reverse_adj, 
@@ -228,13 +228,15 @@ join ${TABLE_FIPS_DATA} f on f.state_county_fips = cc.state_county_fips
 join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = cc.ticker and isnull(cc.subsidiary,d.subsidiary) = d.subsidiary
 join (
   select 
-    case 
-      when isnull(s.ticker_subsidiary, s.ticker_parent) is null then c.ticker
-      else isnull(s.ticker_subsidiary, s.ticker_parent)
-    end ticker,
+    c.ticker,
     s.subsidiary_name
   from ${TABLE_COMPANY} c
-  left join ${TABLE_SUBSIDIARY} s on c.ticker in (s.ticker_parent, s.ticker_subsidiary)
+  left join ${TABLE_SUBSIDIARY} s on c.ticker = s.ticker_parent
+  where s.ticker_subsidiary is null
+  union all
+  select ticker_subsidiary, null subsidiary_name
+  from ${TABLE_SUBSIDIARY}
+  where ticker_subsidiary is not null
 ) c on c.ticker = d.ticker and isnull(c.subsidiary_name,d.subsidiary) = d.subsidiary
 join ${TABLE_WAGE_SUMMARY} ws on ws.ticker = cc.ticker and ws.joc = d.joc
 where 
