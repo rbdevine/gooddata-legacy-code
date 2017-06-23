@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jun 23 16:10:06 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.45" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="MIN_WAGE_BY_STATE" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="STATE" type="string"/>
+<Field name="MINIMUM_WAGE" type="number"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="workspace.prm" id="GraphParameter3"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create State Detail Table" guiX="28" guiY="19" id="CREATE_STATE_DETAIL_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_STATE_DETAIL};
+create table ${TABLE_STATE_DETAIL} (
+  STATE VARCHAR(2) NOT NULL UNIQUE,
+  SNAP_PARTICIPATION_MULTIPLIER FLOAT NULL,
+  CHILD_MEDICAID_ANNUAL FLOAT NULL,
+  ADULT_MEDICAID_ANNUAL FLOAT NULL,
+  CHILD_MEDICAIDCHIPS_PERCENTAGE_MULTIPLIER FLOAT NULL,
+  CHILD_MEDICAID_PARTICIPATION_MULTIPLIER FLOAT NULL,
+  ADULT_MEDICAID_PARTICIPATION_MULTIPLIER FLOAT NULL,
+  MINIMUM_WAGE FLOAT NULL,
+  MINIMUM_AVG_WAGE_RAW FLOAT NULL
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add States" guiX="49" guiY="92" id="ADD_STATES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_STATE_DETAIL} (state) values ('AK');
+insert into ${TABLE_STATE_DETAIL} (state) values ('AL');
+insert into ${TABLE_STATE_DETAIL} (state) values ('AR');
+insert into ${TABLE_STATE_DETAIL} (state) values ('AZ');
+insert into ${TABLE_STATE_DETAIL} (state) values ('CA');
+insert into ${TABLE_STATE_DETAIL} (state) values ('CO');
+insert into ${TABLE_STATE_DETAIL} (state) values ('CT');
+insert into ${TABLE_STATE_DETAIL} (state) values ('DC');
+insert into ${TABLE_STATE_DETAIL} (state) values ('DE');
+insert into ${TABLE_STATE_DETAIL} (state) values ('FL');
+insert into ${TABLE_STATE_DETAIL} (state) values ('GA');
+insert into ${TABLE_STATE_DETAIL} (state) values ('HI');
+insert into ${TABLE_STATE_DETAIL} (state) values ('IA');
+insert into ${TABLE_STATE_DETAIL} (state) values ('ID');
+insert into ${TABLE_STATE_DETAIL} (state) values ('IL');
+insert into ${TABLE_STATE_DETAIL} (state) values ('IN');
+insert into ${TABLE_STATE_DETAIL} (state) values ('KS');
+insert into ${TABLE_STATE_DETAIL} (state) values ('KY');
+insert into ${TABLE_STATE_DETAIL} (state) values ('LA');
+insert into ${TABLE_STATE_DETAIL} (state) values ('MA');
+insert into ${TABLE_STATE_DETAIL} (state) values ('MD');
+insert into ${TABLE_STATE_DETAIL} (state) values ('ME');
+insert into ${TABLE_STATE_DETAIL} (state) values ('MI');
+insert into ${TABLE_STATE_DETAIL} (state) values ('MN');
+insert into ${TABLE_STATE_DETAIL} (state) values ('MO');
+insert into ${TABLE_STATE_DETAIL} (state) values ('MS');
+insert into ${TABLE_STATE_DETAIL} (state) values ('MT');
+insert into ${TABLE_STATE_DETAIL} (state) values ('NC');
+insert into ${TABLE_STATE_DETAIL} (state) values ('ND');
+insert into ${TABLE_STATE_DETAIL} (state) values ('NE');
+insert into ${TABLE_STATE_DETAIL} (state) values ('NH');
+insert into ${TABLE_STATE_DETAIL} (state) values ('NJ');
+insert into ${TABLE_STATE_DETAIL} (state) values ('NM');
+insert into ${TABLE_STATE_DETAIL} (state) values ('NV');
+insert into ${TABLE_STATE_DETAIL} (state) values ('NY');
+insert into ${TABLE_STATE_DETAIL} (state) values ('OH');
+insert into ${TABLE_STATE_DETAIL} (state) values ('OK');
+insert into ${TABLE_STATE_DETAIL} (state) values ('OR');
+insert into ${TABLE_STATE_DETAIL} (state) values ('PA');
+insert into ${TABLE_STATE_DETAIL} (state) values ('RI');
+insert into ${TABLE_STATE_DETAIL} (state) values ('SC');
+insert into ${TABLE_STATE_DETAIL} (state) values ('SD');
+insert into ${TABLE_STATE_DETAIL} (state) values ('TN');
+insert into ${TABLE_STATE_DETAIL} (state) values ('TX');
+insert into ${TABLE_STATE_DETAIL} (state) values ('UT');
+insert into ${TABLE_STATE_DETAIL} (state) values ('VA');
+insert into ${TABLE_STATE_DETAIL} (state) values ('VT');
+insert into ${TABLE_STATE_DETAIL} (state) values ('WA');
+insert into ${TABLE_STATE_DETAIL} (state) values ('WI');
+insert into ${TABLE_STATE_DETAIL} (state) values ('WV');
+insert into ${TABLE_STATE_DETAIL} (state) values ('WY');
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/state-detail/StateDetailMedical.grf" guiName="Load Medical" guiX="49" guiY="167" id="LOAD_MEDICAL" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="3">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/state-detail/StateDetailMinimumWage.grf" guiName="Load Minimum Wage" guiX="41" guiY="265" id="LOAD_MINIMUM_WAGE" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="4">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/state-detail/StateDetailSNAPCountyParticipationMultiplier.grf" guiName="Load SNAP Participation Multiplier" guiX="14" guiY="365" id="LOAD_SNAP_PARTICIPATION_MULTIPLIER" type="RUN_GRAPH"/>
+</Phase>
+</Graph>

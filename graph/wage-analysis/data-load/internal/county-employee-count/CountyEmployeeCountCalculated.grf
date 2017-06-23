@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Jun 22 16:01:51 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.50" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Fri Jun 23 13:03:08 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.51" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -29,10 +29,10 @@
 <Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="${TMP_BASE}_AVG_STORE_EMPLOYEE_COUNTS"/>
 <Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="${TMP_BASE}_COUNTY_CITY_TO_LOOKUP"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter50"/>
-<Property fileURL="workspace.prm" id="GraphParameter73"/>
-<Property id="GraphParameter91" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
-<Property id="GraphParameter92" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter52"/>
+<Property fileURL="workspace.prm" id="GraphParameter75"/>
+<Property id="GraphParameter93" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter94" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -319,11 +319,11 @@ update ${TABLENAME_FIPSMATCH} set county = 'St. Tammany Parish' where county = '
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Lookup Fips by County" guiX="177" guiY="578" id="LOOKUP_FIPS_BY_COUNTY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
-/* NOTE: Would like to remove reference to LKP_CITY_FIPS, but that will be big job, so keep for now.*/
+/* NOTE: Would like to remove reference to ${TABLE_CITY_FIPS}, but that will be big job, so keep for now.*/
 
 UPDATE ${TABLENAME_FIPSMATCH} m
 SET STATE_COUNTY_FIPS = f.STATE_COUNTY_FIPS
-FROM LKP_CITY_FIPS f
+FROM ${TABLE_CITY_FIPS} f
 WHERE m.state_county_fips is null and f.county_name = m.county and f.state_abbreviation = m.state;]]></attr>
 </Node>
 </Phase>
@@ -331,11 +331,11 @@ WHERE m.state_county_fips is null and f.county_name = m.county and f.state_abbre
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Lookup Fips by City" guiX="186" guiY="652" id="LOOKUP_FIPS_BY_CITY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
-/* NOTE: Would like to remove reference to LKP_CITY_FIPS, but that will be big job, so keep for now.*/
+/* NOTE: Would like to remove reference to ${TABLE_CITY_FIPS}, but that will be big job, so keep for now.*/
 
 UPDATE ${TABLENAME_FIPSMATCH} m
 SET STATE_COUNTY_FIPS = f.STATE_COUNTY_FIPS
-FROM LKP_CITY_FIPS f
+FROM ${TABLE_CITY_FIPS} f
 WHERE m.state_county_fips is null and f.city_name = m.city and f.state_abbreviation = m.state;]]></attr>
 </Node>
 </Phase>
