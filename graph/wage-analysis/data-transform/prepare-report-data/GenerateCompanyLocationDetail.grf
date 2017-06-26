@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Jun 23 16:59:36 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.155" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon Jun 26 12:49:01 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.178" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,10 +16,10 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="wage.prm" id="GraphParameter50"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter9"/>
-<Property fileURL="workspace.prm" id="GraphParameter32"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter45"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter54"/>
+<Property fileURL="workspace.prm" id="GraphParameter77"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -31,11 +31,12 @@ create table ${TABLE_COMPANY_LOCATION_DETAIL} (
   TICKER VARCHAR(16) NOT NULL,
   SUBSIDIARY VARCHAR(64) NULL,
   JOC VARCHAR(128) NOT NULL,
-  PAYS_LIVING_WAGE INT NOT NULL,
+  EMPLOYEE_COUNT_LIVING_WAGE_TOTAL INT NOT NULL,
   EMPLOYEE_COUNT_TOTAL INT NULL,
   EMPLOYEE_COUNT_SUBSIDY_TOTAL FLOAT NULL,
   WAGE_HOURLY_RAW FLOAT NOT NULL,
   WAGE_HOURLY_COLA FLOAT NOT NULL,
+  WAGE_HOURLY_RAW_MIN_WAGE_ADJ FLOAT NULL,
   SUBSIDY_TOTAL FLOAT NULL,
   SUBSIDY_BY_EMPLOYEE_TOTAL FLOAT NULL,
   SUBSIDY_ABS_BY_EMPLOYEE_TOTAL FLOAT NULL,
@@ -68,7 +69,7 @@ create table ${TABLE_COMPANY_LOCATION_DETAIL} (
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add All sans Subsidiary Parents" guiX="229" guiY="92" id="ADD_ALL_SANS_SUBSIDIARY_PARENTS" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_LOCATION_DETAIL}
-(state_county_fips, ticker, subsidiary, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, pays_living_wage)
+(state_county_fips, ticker, subsidiary, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, employee_count_living_wage_total)
 select 
   cc.state_county_fips,
   d.ticker,
@@ -115,7 +116,7 @@ where
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Calculated Subsidiary Parents" guiX="221" guiY="192" id="ADD_CALCULATED_SUBSIDIARY_PARENTS" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_LOCATION_DETAIL}
-(state_county_fips, ticker, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, pays_living_wage)
+(state_county_fips, ticker, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, employee_count_living_wage_total)
 select
   l.state_county_fips,
   l.ticker,
@@ -123,89 +124,12 @@ select
   sum(employee_count_total),
   cast(round(avg(wage_hourly_raw),2) as numeric(16,2)),
   cast(round(avg(wage_hourly_cola),2) as numeric(16,2)),
-  sum(pays_living_wage)
+  sum(employee_count_living_wage_total)
 from ${TABLE_COMPANY_LOCATION_DETAIL} l
 join ${TABLE_SUBSIDIARY} s on s.ticker_parent = l.ticker and s.subsidiary_name = l.subsidiary
 where s.ticker_subsidiary is null
 group by l.state_county_fips, l.ticker, l.joc;
 ]]></attr>
-</Node>
-<Node enabled="disabled" guiName="Generate Process Data" guiX="479" guiY="995" id="GENERATE_PROCESS_DATA" passThroughInputPort="0" type="RUN_GRAPH"/>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Process Queue" guiX="286" guiY="924" id="POPULATE_PROCESS_QUEUE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_PROCESS_QUEUE} (
-  PROCESS_TYPE_ID
-)
-SELECT PROCESS_TYPE_ID
-FROM ${TABLE_PROCESS}
-ORDER BY PROCESS_TYPE_ID;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Read Process Queue" guiX="105" guiY="995" id="READ_PROCESS_QUEUE" type="DB_INPUT_TABLE">
-<attr name="sqlQuery"><![CDATA[SELECT $ProcessTypeID:=process_type_id
-FROM ${TABLE_PROCESS_QUEUE}
-ORDER BY process_type_id;]]></attr>
-</Node>
-<Node enabled="disabled" guiName="Reformat" guiX="313" guiY="995" id="REFORMAT" type="REFORMAT">
-<attr name="transform"><![CDATA[//#CTL2
-
-// Transforms input record into output record.
-function integer transform() {
-	$out.0.Name = "${GRAPH_DIR}/wage-analysis/data-transform/TEMP-prepare-report-data/TEMP_GenerateJobData.grf";
-
-	return ALL;
-}
-
-// Called during component initialization.
-// function boolean init() {}
-
-// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
-// required by the transform. All resources allocated within this method should be released
-// by the postExecute() method.
-// function void preExecute() {}
-
-// Called only if transform() throws an exception.
-// function integer transformOnError(string errorMessage, string stackTrace) {}
-
-// Called during each graph run after the entire transform was executed. Should be used to free any resources
-// allocated within the preExecute() method.
-// function void postExecute() {}
-
-// Called to return a user-defined error message when an error occurs.
-// function string getMessage() {}
-]]></attr>
-</Node>
-<Edge fromNode="READ_PROCESS_QUEUE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT:0"/>
-<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in regular mode: names of the graphs to be executed, otherwise nothing)" metadata="Metadata2" outPort="Port 0 (out)" toNode="GENERATE_PROCESS_DATA:0"/>
-</Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Param Table" guiX="376" guiY="1071" id="DROP_PARAM_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${PARAM_TABLENAME};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Process Queue" guiX="218" guiY="1071" id="DROP_PROCESS_QUEUE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_PROCESS_QUEUE};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Minimum Wage Adjustments" guiX="237" guiY="368" id="MINIMUM_WAGE_ADJUSTMENTS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[update ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
-set RATE_RAW_MIN_WAGE_ADJ = (
-  case
-    when (rate_raw < lwa.living_wage_avg 
-          and mrs.min_avg_rate_raw < (w.minimum_wage + ${MINIMUM_WAGE_CUSHION})
-       ) then rate_raw + (w.minimum_wage - mrs.min_avg_rate_raw) + ${MINIMUM_WAGE_CUSHION}
-    else rate_raw
-  end
-)
-from ${STATE_MIN_AVG_SALARIES_TABLENAME} mrs
-join ${MINIMUM_WAGE_BY_STATE_TABLENAME} w on w.state = mrs.state
-join (
-  select 
-    state_fips, 
-    state_abbreviation state 
-  from ${TABLE_CITY_FIPS} 
-  group by 
-    state_fips, 
-    state_abbreviation
-) fs on fs.state = mrs.state
-join ${TABLE_FIPS_DATA_FOR_AVG} lwa on true
-where left(cjd.state_county_fips,2) = fs.state_fips and cjd.state_county_fips = lwa.state_county_fips]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
@@ -238,402 +162,28 @@ FROM (
 WHERE d.state = t.state;]]></attr>
 </Node>
 </Phase>
-<Phase number="15">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Minimum Wage Clean Up Bottom" guiX="238" guiY="449" id="MINIMUM_WAGE_CLEAN_UP_BOTTOM" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[update ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
-set RATE_RAW_MIN_WAGE_ADJ = (t.minimum_wage + ${MINIMUM_WAGE_CUSHION})
-from (
-  select cjd.*, w.minimum_wage
-  from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd
-  join (
-    select 
-      state_fips, 
-      state_abbreviation state 
-    from ${TABLE_CITY_FIPS} 
-    group by 
-      state_fips, 
-      state_abbreviation
-  ) fs on fs.state_fips = left(cjd.state_county_fips,2)
-  join ${STATE_MIN_AVG_SALARIES_TABLENAME} mrs on fs.state = mrs.state
-  join ${MINIMUM_WAGE_BY_STATE_TABLENAME} w on w.state = mrs.state
-  join ${TABLE_FIPS_DATA_FOR_AVG} lwa on cjd.state_county_fips = lwa.state_county_fips
-  where RATE_RAW_MIN_WAGE_ADJ < (w.minimum_wage + ${MINIMUM_WAGE_CUSHION})
-) t
-where 
-  cjd.state_county_fips = t.state_county_fips 
-  and cjd.ticker = t.ticker
-  and ((cjd.subsidiary is null and t.subsidiary is null) or (cjd.subsidiary = t.subsidiary))
-  and cjd.goc = t.goc
-  and cjd.tolerance_type = t.tolerance_type
-  and cjd.rate_raw = t.rate_raw;]]></attr>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Minimum Wage Adjustments" guiX="237" guiY="368" id="MINIMUM_WAGE_ADJUSTMENTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TABLE_COMPANY_LOCATION_DETAIL} cd
+set WAGE_HOURLY_RAW_MIN_WAGE_ADJ = (
+  case
+    when (cd.wage_hourly_raw < f.living_wage_hourly
+          and sd.minimum_avg_wage_raw < (sd.minimum_wage + ${CONST_MINIMUM_WAGE_CUSHION})
+       ) then cd.wage_hourly_raw + (sd.minimum_wage - sd.minimum_avg_wage_raw) + ${CONST_MINIMUM_WAGE_CUSHION}
+    else cd.wage_hourly_raw
+  end
+)
+from ${TABLE_STATE_DETAIL} sd
+join ${TABLE_FIPS_DATA} f on true
+where left(cd.state_county_fips,2) = sd.state_fips and cd.state_county_fips = f.state_county_fips;]]></attr>
 </Node>
 </Phase>
-<Phase number="16">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary Avg Data" guiX="261" guiY="607" id="ADD_SUBSIDIARY_AVG_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
-)
-select
-  c.industry, 'CO_SUBSIDIARY_COUNT_DATA', c.ticker, e.subsidiary, e.state_county_fips, 1,
-  f.county_name, 
-  f.state_abbreviation,
-  concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
-  cast(round(e.employee_count*(${MID_TOLERANCE_PROPORTION}),2) as numeric(18,3))
-from ${COUNTY_COUNT_TABLENAME} e
-join (
-  select c.ticker
-  from ${GOC_ORDER_TABLENAME} g
-  join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
-  group by c.ticker
-) g on g.ticker = e.ticker
-join (
-  select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${TABLE_FIPS_DATA_FOR_AVG} a
-  left join ${TABLE_CITY_FIPS} f on f.state_county_fips = a.state_county_fips
-  group by a.state_county_fips
-) f on f.state_county_fips = e.state_county_fips
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = e.ticker
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
-where s.has_subsidiaries and e.subsidiary is not null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary High Data" guiX="438" guiY="607" id="ADD_SUBSIDIARY_HIGH_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
-)
-select
-  c.industry, 'CO_SUBSIDIARY_COUNT_DATA', c.ticker, e.subsidiary, e.state_county_fips, 2,
-  f.county_name, 
-  f.state_abbreviation,
-  concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
-  cast(round(e.employee_count*(${HIGH_TOLERANCE_PROPORTION}),2) as numeric(18,2))
-from ${COUNTY_COUNT_TABLENAME} e
-join (
-  select ticker
-  from ${GOC_ORDER_TABLENAME}
-  group by ticker
-) g on g.ticker = e.ticker
-join (
-  select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${TABLE_FIPS_DATA_FOR_AVG} a
-  left join ${TABLE_CITY_FIPS} f on f.state_county_fips = a.state_county_fips
-  group by a.state_county_fips
-) f on f.state_county_fips = e.state_county_fips
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = e.ticker
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = e.ticker
-where s.has_subsidiaries and e.subsidiary is not null and (${HIGH_TOLERANCE_PROPORTION}) > 0;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary Low Data" guiX="77" guiY="607" id="ADD_SUBSIDIARY_LOW_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, ticker, subsidiary, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
-)
-select
-  c.ticker, 'CO_SUBSIDIARY_COUNT_DATA', c.ticker, e.subsidiary, e.state_county_fips, 0,
-  f.county_name, 
-  f.state_abbreviation,
-  concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
-  cast(round(e.employee_count*(${LOW_TOLERANCE_PROPORTION}),2) as numeric(18,2))
-from ${COUNTY_COUNT_TABLENAME} e
-join (
-  select ticker
-  from ${GOC_ORDER_TABLENAME}
-  group by ticker
-) g on g.ticker = e.ticker
-join (
-  select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${TABLE_FIPS_DATA_FOR_AVG} a
-  left join ${TABLE_CITY_FIPS} f on f.state_county_fips = a.state_county_fips
-  group by a.state_county_fips
-) f on f.state_county_fips = e.state_county_fips
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = e.ticker
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
-where s.has_subsidiaries and e.subsidiary is not null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker Avg Data" guiX="273" guiY="527" id="ADD_TICKER_AVG_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
-)
-select
-  c.industry, 'CO_TICKER_COUNT_DATA', c.ticker, e.state_county_fips, 1,
-  f.county_name, 
-  f.state_abbreviation,
-  concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
-  cast(round(e.employee_count*(${MID_TOLERANCE_PROPORTION}),2) as numeric(18,2))
-from ${COUNTY_COUNT_TABLENAME} e
-join (
-  select g.ticker
-  from ${GOC_ORDER_TABLENAME} g
-  group by g.ticker
-) g on g.ticker = e.ticker
-join (
-  select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${TABLE_FIPS_DATA_FOR_AVG} a
-  left join ${TABLE_CITY_FIPS} f on f.state_county_fips = a.state_county_fips
-  group by a.state_county_fips
-) f on f.state_county_fips = e.state_county_fips
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-where e.subsidiary is null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker High Data" guiX="449" guiY="527" id="ADD_TICKER_HIGH_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
-)
-select
-  c.industry, 'CO_TICKER_COUNT_DATA', c.ticker, e.state_county_fips, 2,
-  f.county_name, 
-  f.state_abbreviation,
-  concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
-  cast(round(e.employee_count*(${HIGH_TOLERANCE_PROPORTION}),2) as numeric(18,2))
-from ${COUNTY_COUNT_TABLENAME} e
-join (
-  select ticker
-  from ${GOC_ORDER_TABLENAME}
-  group by ticker
-) g on g.ticker = e.ticker
-join (
-  select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${TABLE_FIPS_DATA_FOR_AVG} a
-  left join ${TABLE_CITY_FIPS} f on f.state_county_fips = a.state_county_fips
-  group by a.state_county_fips
-) f on f.state_county_fips = e.state_county_fips
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = e.ticker 
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-where e.subsidiary is null and (${HIGH_TOLERANCE_PROPORTION}) > 0;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker Low Data" guiX="92" guiY="527" id="ADD_TICKER_LOW_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
-  industry, row_type, ticker, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4
-)
-select
-  c.industry, 'CO_TICKER_COUNT_DATA', c.ticker, e.state_county_fips, 0,
-  f.county_name, 
-  f.state_abbreviation,
-  concat('$',cast(cast(round(l.LIVING_WAGE_AVG,2) as numeric(36,2)) as varchar(8))),
-  cast(round(e.employee_count*(${LOW_TOLERANCE_PROPORTION}),2) as numeric(18,2))
-from ${COUNTY_COUNT_TABLENAME} e
-join (
-  select ticker
-  from ${GOC_ORDER_TABLENAME}
-  group by ticker
-) g on g.ticker = e.ticker
-join (
-  select a.state_county_fips, max(f.county_name) county_name, max(f.state_abbreviation) state_abbreviation
-  from ${TABLE_FIPS_DATA_FOR_AVG} a
-  left join ${TABLE_CITY_FIPS} f on f.state_county_fips = a.state_county_fips
-  group by a.state_county_fips
-) f on f.state_county_fips = e.state_county_fips
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
-join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
-where e.subsidiary is null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
-</Node>
-</Phase>
-<Phase number="17">
-<Node enabled="disabled" guiName="Create Update Subsidiary Data SQL" guiX="248" guiY="775" id="CREATE_UPDATE_SUBSIDIARY_DATA_SQL" type="REFORMAT">
-<attr name="transform"><![CDATA[// Transforms input record into output record.
-function integer transform() {
-	string sql = "";
-	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
-	sql = sql + "set g" + $in.0.column_number + " = concat(concat(concat(";
-	sql = sql + "  cast(round(d.employees_at_living_wage,2) as numeric(18,2)),' ('),";
-	sql = sql + "  concat('$',cast(cast(round(d.RATE_RAW_MIN_WAGE_ADJ,2) as numeric(36,2)) as varchar(8)))";
-	sql = sql + "),')') ";
-	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc and d.subsidiary = g.subsidiary ";
-	sql = sql + "where d.state_county_fips = mtx.state_county_fips and g.ticker = mtx.ticker and g.subsidiary = mtx.subsidiary and mtx.row_type = 'CO_SUBSIDIARY_COUNT_DATA' and mtx.tolerance_type = d.tolerance_type ";
-	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
-	
-	$out.0.sql = sql;
-
-	return ALL;
-}]]></attr>
-</Node>
-<Node enabled="disabled" guiName="Create Update Ticker Data SQL" guiX="259" guiY="694" id="CREATE_UPDATE_TICKER_DATA_SQL" type="REFORMAT">
-<attr name="transform"><![CDATA[// Transforms input record into output record.
-function integer transform() {
-	string sql = "";
-	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
-	sql = sql + "set g" + $in.0.column_number + " = concat(concat(concat(";
-	sql = sql + "  cast(round(d.employees_at_living_wage,2) as numeric(18,2)),' ('),";
-	sql = sql + "  concat('$',cast(cast(round(d.RATE_RAW_MIN_WAGE_ADJ,2) as numeric(36,2)) as varchar(8)))";
-	sql = sql + "),')') ";
-	sql = sql + "from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} d on d.ticker = g.ticker and d.goc = g.goc and ((d.company_count = 1) or (d.company_count > 1 and d.subsidiary is null and g.subsidiary is null)) ";
-	sql = sql + "where d.state_county_fips = mtx.state_county_fips and g.ticker = mtx.ticker and mtx.row_type = 'CO_TICKER_COUNT_DATA' and mtx.tolerance_type = d.tolerance_type ";
-	sql = sql + "  and g.goc_column_no = " + $in.0.column_number + ";";
-	
-	$out.0.sql = sql;
-
-	return ALL;
-}]]></attr>
-</Node>
-</Phase>
-<Phase number="18">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Living Wage Avgs By Company" guiX="136" guiY="851" id="POPULATE_LIVING_WAGE_AVGS_BY_COMPANY" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME}
-select 
-  ticker, 
-  company, 
-  avg_lw_unweighted, 
-  avg_lw_weighted
-from (
-  select 
-    ticker,
-    subsidiary company,
-    cast(round(avg(_2a1pt1c_hourly),3) as numeric(36,3)) avg_lw_unweighted,
-    cast(round(sum(lw_hourly_weighted),3) as numeric(36,3)) avg_lw_weighted
-  from (
-    select 
-      c.ticker,
-      c.subsidiary,
-      d.goc,
-      mit._2a1pt1c_hourly _2a1pt1c_hourly,
-      mit._2a1pt1c_hourly * (c.employee_count / t.emp_count_tot) * (
-    case
-       when cjd.tolerance_type = 0 then 0.0
-       when cjd.tolerance_type = 1 then 1.0
-       when cjd.tolerance_type = 2 then 0.0
-       else 1.0
-    end) lw_hourly_weighted
-    from ${SUBSIDIARY_INFO_TABLENAME} s
-    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = s.ticker
-    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = s.ticker and d.subsidiary = c.subsidiary
-    join ${TOTALS_TABLENAME} t on t.ticker = s.ticker and t.subsidiary = c.subsidiary
-    join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
-      cjd.ticker = s.ticker 
-      and cjd.subsidiary = c.subsidiary
-      and cjd.state_county_fips = c.state_county_fips
-      and cjd.goc = d.goc
-    join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
-    where c.subsidiary is not null
-  ) t
-  group by ticker, subsidiary, goc
-  union all
-  select 
-    ticker,
-    company,
-    cast(round(avg(_2a1pt1c_hourly),3) as numeric(36,3)) avg_lw_unweighted,
-    cast(round(sum(lw_hourly_weighted),3) as numeric(36,3)) avg_lw_weighted
-  from (
-    select 
-      s.ticker,
-      s.alt_company_name company,
-      d.goc,
-      mit._2a1pt1c_hourly _2a1pt1c_hourly,
-      mit._2a1pt1c_hourly * (c.employee_count / t.emp_count_tot) * (
-      case
-        when cjd.tolerance_type = 0 then 0.0
-         when cjd.tolerance_type = 1 then 1.0
-         when cjd.tolerance_type = 2 then 0.0
-         else 1.0
-      end) lw_hourly_weighted
-    from ${SUBSIDIARY_INFO_TABLENAME} s
-    join ${COUNTY_COUNT_TABLENAME} c on c.ticker = s.ticker
-    join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = s.ticker
-    join ${TOTALS_TABLENAME} t on t.ticker = s.ticker
-    join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
-      cjd.ticker = s.ticker 
-      and cjd.state_county_fips = c.state_county_fips
-      and cjd.goc = d.goc
-    join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
-    where c.subsidiary is null and c.ticker not in ('WMT','BBY','TGT','KR','ICGH')
-  ) t
-  group by ticker, company, goc
-  order by ticker, company
-) t
-group by ticker, company, avg_lw_unweighted, avg_lw_weighted
-order by ticker, company;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Score Quality By Company" guiX="400" guiY="851" id="POPULATE_SCORE_QUALITY_BY_COMPANY" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${SCORE_QUALITY_BY_COMPANY_TABLENAME}
-select 
-  ticker,
-  company,
-  goc,
-  avg_rate_proportion_unweighted,
-  avg_rate_proportion_weighted
-from (
-select 
-  ticker,
-  subsidiary company,
-  goc,
-  cast(round(avg(rate_proportion),3) as numeric(36,3)) avg_rate_proportion_unweighted,
-  cast(round(sum(rate_proportion_weighted),3) as numeric(36,3)) avg_rate_proportion_weighted
-from (
-  select 
-    s.ticker,
-    c.subsidiary,
-    c.state_county_fips,
-    c.employee_count,
-    d.goc,
-    mit._2a1pt1c_hourly,
-    cjd.rate_raw,
-    cjd.rate_raw / mit._2a1pt1c_hourly rate_proportion,
-    (cjd.rate_raw / mit._2a1pt1c_hourly) * (c.employee_count / t.emp_count_tot) * (
-    case
-       when cjd.tolerance_type = 0 then 0.0
-       when cjd.tolerance_type = 1 then 1.0
-       when cjd.tolerance_type = 2 then 0.0
-       else 1.0
-    end) rate_proportion_weighted,
-    c.employee_count / t.emp_count_tot count_ratio
-  from ${SUBSIDIARY_INFO_TABLENAME} s
-  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = s.ticker
-  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = s.ticker and d.subsidiary = c.subsidiary
-  join ${TOTALS_TABLENAME} t on t.ticker = s.ticker and t.subsidiary = c.subsidiary
-  join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
-    cjd.ticker = s.ticker 
-    and cjd.subsidiary = c.subsidiary
-    and cjd.state_county_fips = c.state_county_fips
-    and cjd.goc = d.goc
-  join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
-  where c.subsidiary is not null /*s.ticker not in ('WMT','BBY','TGT','KR','ICGH')*//* and d.goc = 'assistant manager'*/
-  order by s.ticker, c.subsidiary, c.state_county_fips, d.goc
-) t
-group by ticker, subsidiary, goc
-union all
-select 
-  ticker,
-  company,
-  goc,
-  cast(round(avg(rate_proportion),3) as numeric(36,3)) avg_rate_proportion_unweighted,
-  cast(round(sum(rate_proportion_weighted),3) as numeric(36,3)) avg_rate_proportion_weighted
-from (
-  select 
-    s.ticker,
-    s.alt_company_name company,
-    c.state_county_fips,
-    c.employee_count,
-    d.goc,
-    mit._2a1pt1c_hourly,
-    cjd.rate_raw,
-    cjd.rate_raw / mit._2a1pt1c_hourly rate_proportion,
-    (cjd.rate_raw / mit._2a1pt1c_hourly) * (c.employee_count / t.emp_count_tot) * (
-    case
-       when cjd.tolerance_type = 0 then 0.0
-       when cjd.tolerance_type = 1 then 1.0
-       when cjd.tolerance_type = 2 then 0.0
-       else 1.0
-    end) rate_proportion_weighted,
-    c.employee_count / t.emp_count_tot count_ratio
-  from ${SUBSIDIARY_INFO_TABLENAME} s
-  join ${COUNTY_COUNT_TABLENAME} c on c.ticker = s.ticker
-  join ${JOB_DISTRIBUTION_TABLENAME} d on d.ticker = s.ticker
-  join ${TOTALS_TABLENAME} t on t.ticker = s.ticker
-  join ${COMPANY_JOB_COUNTY_DATA_TABLENAME} cjd on 
-    cjd.ticker = s.ticker 
-    and cjd.state_county_fips = c.state_county_fips
-    and cjd.goc = d.goc
-  join ${TABLE_FIPS_DATA_FOR_MIT} mit on mit.state_county_fips = c.state_county_fips
-  where c.subsidiary is null and s.ticker not in ('WMT','BBY','TGT','KR','ICGH')/* and d.goc = 'assistant manager'*/  
-  order by s.ticker, c.subsidiary, c.state_county_fips, d.goc
-) t
-group by ticker, company, goc
-order by ticker, company, goc
-) t
-order by ticker, company, goc;]]></attr>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Minimum Wage Clean Up Bottom" guiX="229" guiY="446" id="MINIMUM_WAGE_CLEAN_UP_BOTTOM" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TABLE_COMPANY_LOCATION_DETAIL} ld
+set WAGE_HOURLY_RAW_MIN_WAGE_ADJ = (sd.minimum_wage + ${CONST_MINIMUM_WAGE_CUSHION})
+from ${TABLE_STATE_DETAIL} sd
+where sd.state_fips = left(ld.state_county_fips,2) and ld.WAGE_HOURLY_RAW_MIN_WAGE_ADJ < (sd.minimum_wage + ${CONST_MINIMUM_WAGE_CUSHION});]]></attr>
 </Node>
 </Phase>
 </Graph>

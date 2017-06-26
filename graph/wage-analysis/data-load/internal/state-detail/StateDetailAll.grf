@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jun 23 16:10:06 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.45" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jun 26 10:44:21 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.47" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="MIN_WAGE_BY_STATE" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -8,13 +8,14 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="wage.prm" id="GraphParameter0"/>
-<Property fileURL="workspace.prm" id="GraphParameter3"/>
+<Property fileURL="workspace.prm" id="GraphParameter45"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create State Detail Table" guiX="28" guiY="19" id="CREATE_STATE_DETAIL_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_STATE_DETAIL};
 create table ${TABLE_STATE_DETAIL} (
+  STATE_FIPS VARCHAR(2) NOT NULL UNIQUE,
   STATE VARCHAR(2) NOT NULL UNIQUE,
   SNAP_PARTICIPATION_MULTIPLIER FLOAT NULL,
   CHILD_MEDICAID_ANNUAL FLOAT NULL,
@@ -30,58 +31,57 @@ create table ${TABLE_STATE_DETAIL} (
 </Phase>
 <Phase number="1">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add States" guiX="49" guiY="92" id="ADD_STATES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_STATE_DETAIL} (state) values ('AK');
-insert into ${TABLE_STATE_DETAIL} (state) values ('AL');
-insert into ${TABLE_STATE_DETAIL} (state) values ('AR');
-insert into ${TABLE_STATE_DETAIL} (state) values ('AZ');
-insert into ${TABLE_STATE_DETAIL} (state) values ('CA');
-insert into ${TABLE_STATE_DETAIL} (state) values ('CO');
-insert into ${TABLE_STATE_DETAIL} (state) values ('CT');
-insert into ${TABLE_STATE_DETAIL} (state) values ('DC');
-insert into ${TABLE_STATE_DETAIL} (state) values ('DE');
-insert into ${TABLE_STATE_DETAIL} (state) values ('FL');
-insert into ${TABLE_STATE_DETAIL} (state) values ('GA');
-insert into ${TABLE_STATE_DETAIL} (state) values ('HI');
-insert into ${TABLE_STATE_DETAIL} (state) values ('IA');
-insert into ${TABLE_STATE_DETAIL} (state) values ('ID');
-insert into ${TABLE_STATE_DETAIL} (state) values ('IL');
-insert into ${TABLE_STATE_DETAIL} (state) values ('IN');
-insert into ${TABLE_STATE_DETAIL} (state) values ('KS');
-insert into ${TABLE_STATE_DETAIL} (state) values ('KY');
-insert into ${TABLE_STATE_DETAIL} (state) values ('LA');
-insert into ${TABLE_STATE_DETAIL} (state) values ('MA');
-insert into ${TABLE_STATE_DETAIL} (state) values ('MD');
-insert into ${TABLE_STATE_DETAIL} (state) values ('ME');
-insert into ${TABLE_STATE_DETAIL} (state) values ('MI');
-insert into ${TABLE_STATE_DETAIL} (state) values ('MN');
-insert into ${TABLE_STATE_DETAIL} (state) values ('MO');
-insert into ${TABLE_STATE_DETAIL} (state) values ('MS');
-insert into ${TABLE_STATE_DETAIL} (state) values ('MT');
-insert into ${TABLE_STATE_DETAIL} (state) values ('NC');
-insert into ${TABLE_STATE_DETAIL} (state) values ('ND');
-insert into ${TABLE_STATE_DETAIL} (state) values ('NE');
-insert into ${TABLE_STATE_DETAIL} (state) values ('NH');
-insert into ${TABLE_STATE_DETAIL} (state) values ('NJ');
-insert into ${TABLE_STATE_DETAIL} (state) values ('NM');
-insert into ${TABLE_STATE_DETAIL} (state) values ('NV');
-insert into ${TABLE_STATE_DETAIL} (state) values ('NY');
-insert into ${TABLE_STATE_DETAIL} (state) values ('OH');
-insert into ${TABLE_STATE_DETAIL} (state) values ('OK');
-insert into ${TABLE_STATE_DETAIL} (state) values ('OR');
-insert into ${TABLE_STATE_DETAIL} (state) values ('PA');
-insert into ${TABLE_STATE_DETAIL} (state) values ('RI');
-insert into ${TABLE_STATE_DETAIL} (state) values ('SC');
-insert into ${TABLE_STATE_DETAIL} (state) values ('SD');
-insert into ${TABLE_STATE_DETAIL} (state) values ('TN');
-insert into ${TABLE_STATE_DETAIL} (state) values ('TX');
-insert into ${TABLE_STATE_DETAIL} (state) values ('UT');
-insert into ${TABLE_STATE_DETAIL} (state) values ('VA');
-insert into ${TABLE_STATE_DETAIL} (state) values ('VT');
-insert into ${TABLE_STATE_DETAIL} (state) values ('WA');
-insert into ${TABLE_STATE_DETAIL} (state) values ('WI');
-insert into ${TABLE_STATE_DETAIL} (state) values ('WV');
-insert into ${TABLE_STATE_DETAIL} (state) values ('WY');
-]]></attr>
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('02','AK');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('01','AL');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('05','AR');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('04','AZ');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('06','CA');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('08','CO');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('09','CT');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('11','DC');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('10','DE');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('12','FL');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('13','GA');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('15','HI');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('19','IA');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('16','ID');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('17','IL');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('18','IN');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('20','KS');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('21','KY');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('22','LA');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('25','MA');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('24','MD');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('23','ME');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('26','MI');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('27','MN');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('29','MO');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('28','MS');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('30','MT');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('37','NC');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('38','ND');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('31','NE');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('33','NH');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('34','NJ');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('35','NM');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('32','NV');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('36','NY');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('39','OH');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('40','OK');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('41','OR');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('42','PA');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('44','RI');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('45','SC');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('46','SD');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('47','TN');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('48','TX');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('49','UT');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('51','VA');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('50','VT');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('53','WA');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('55','WI');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('54','WV');
+insert into ${TABLE_STATE_DETAIL} (state_fips,state) values ('56','WY');]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
