@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon Jun 26 12:49:01 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.178" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Tue Jun 27 11:44:08 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.180" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -94,11 +94,12 @@ join (
     s.subsidiary_name
   from ${TABLE_COMPANY} c
   left join ${TABLE_SUBSIDIARY} s on c.ticker = s.ticker_parent
-  where s.ticker_subsidiary is null
+  where s.ticker_subsidiary is null and c.include_in_living_wage
   union all
-  select ticker_subsidiary, null subsidiary_name
-  from ${TABLE_SUBSIDIARY}
-  where ticker_subsidiary is not null
+  select s.ticker_subsidiary, null subsidiary_name
+  from ${TABLE_SUBSIDIARY} s
+  join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+  where ticker_subsidiary is not null and c.include_in_living_wage
 ) c on c.ticker = d.ticker and isnull(c.subsidiary_name,d.subsidiary) = d.subsidiary
 join ${TABLE_WAGE_SUMMARY} ws on ws.ticker = cc.ticker and ws.joc = d.joc
 where 
@@ -127,7 +128,8 @@ select
   sum(employee_count_living_wage_total)
 from ${TABLE_COMPANY_LOCATION_DETAIL} l
 join ${TABLE_SUBSIDIARY} s on s.ticker_parent = l.ticker and s.subsidiary_name = l.subsidiary
-where s.ticker_subsidiary is null
+join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+where s.ticker_subsidiary is null and c.include_in_living_wage
 group by l.state_county_fips, l.ticker, l.joc;
 ]]></attr>
 </Node>
