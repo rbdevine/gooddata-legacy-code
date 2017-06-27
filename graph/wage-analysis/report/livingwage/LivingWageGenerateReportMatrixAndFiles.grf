@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Jun 26 17:25:22 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.334" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Jun 27 16:56:52 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.350" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -24,20 +24,20 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Active Companies" guiX="163" guiY="10" id="TABLE_ACTIVE_COMPANIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Active Companies" guiX="163" guiY="10" id="TABLE_ACTIVE_COMPANIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${ACTIVE_TICKERS_TABLENAME};
 create table ${ACTIVE_TICKERS_TABLENAME} (
   TICKER VARCHAR(64) NOT NULL UNIQUE
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: FIPS-PP Map" guiX="337" guiY="10" id="TABLE_FIPS_PP_MAP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: FIPS-PP Map" guiX="337" guiY="10" id="TABLE_FIPS_PP_MAP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists LKP_FIPS_COUNTY_TO_PP_COUNTY;
 create table LKP_FIPS_COUNTY_TO_PP_COUNTY (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL UNIQUE,
   FIPS_CODE VARCHAR(5) NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Job Data" guiX="-25" guiY="85" id="TABLE_JOB_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Job Data" guiX="-25" guiY="85" id="TABLE_JOB_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_JOB_COUNTY_DATA_TABLENAME};
 create table ${COMPANY_JOB_COUNTY_DATA_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5),
@@ -69,7 +69,15 @@ create table ${TOTALS_TABLENAME} (
   EMP_COUNT_TOT INT NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix" guiX="633" guiY="85" id="TABLE_REPORT_MATRIX" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Matrix Row Type" guiX="317" guiY="85" id="TABLE_MATRIX_ROW_TYPE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME};
+create table ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (
+  ROW_TYPE VARCHAR(64) NOT NULL UNIQUE,
+  ROW_SECTION INT NOT NULL,  /*0 industry header, 1 companies 2 industry footer*/
+  DISPLAY_ORDER INT NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix" guiX="656" guiY="85" id="TABLE_REPORT_MATRIX" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_TABLENAME};
 create table ${REPORT_MATRIX_TABLENAME} (
     INDUSTRY VARCHAR(255) NULL, 
@@ -96,14 +104,6 @@ create table ${REPORT_MATRIX_TABLENAME} (
     LIVING_WAGE_TOTAL VARCHAR(32) DEFAULT '' /*totals of living wage across*/
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Row Type" guiX="317" guiY="85" id="TABLE_ROW_TYPE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME};
-create table ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (
-  ROW_TYPE VARCHAR(64) NOT NULL UNIQUE,
-  ROW_SECTION INT NOT NULL,  /*0 industry header, 1 companies 2 industry footer*/
-  DISPLAY_ORDER INT NOT NULL
-);]]></attr>
-</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Score Quality By Company" guiX="677" guiY="161" id="TABLE_SCORE_QUALITY_BY_COMPANY1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${SCORE_QUALITY_BY_COMPANY_TABLENAME};
 CREATE TABLE ${SCORE_QUALITY_BY_COMPANY_TABLENAME} (
@@ -115,14 +115,14 @@ CREATE TABLE ${SCORE_QUALITY_BY_COMPANY_TABLENAME} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: State Avg Min Salaries" guiX="116" guiY="85" id="TABLE_STATE_AVG_MIN_SALARIES1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: State Avg Min Salaries" guiX="116" guiY="85" id="TABLE_STATE_AVG_MIN_SALARIES1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${STATE_MIN_AVG_SALARIES_TABLENAME};
 CREATE TABLE ${STATE_MIN_AVG_SALARIES_TABLENAME} (
   STATE VARCHAR(2) NOT NULL,
   MIN_AVG_RATE_RAW FLOAT NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Subsidiary Info" guiX="-1" guiY="10" id="TABLE_SUBSIDIARY_INFO" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Subsidiary Info" guiX="-1" guiY="10" id="TABLE_SUBSIDIARY_INFO" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${SUBSIDIARY_INFO_TABLENAME};
 create table ${SUBSIDIARY_INFO_TABLENAME} (
   TICKER VARCHAR(16) NOT NULL UNIQUE,
@@ -145,7 +145,7 @@ create table ${COLUMN_NUMBERS_TABLENAME} (
   COLUMN_NUMBER VARCHAR(4) UNIQUE NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp FIPS Rejects" guiX="155" guiY="161" id="TABLE_TEMP_FIPS_REJECTS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Temp FIPS Rejects" guiX="155" guiY="161" id="TABLE_TEMP_FIPS_REJECTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${FIPS_REJECTS_TABLENAME};
 CREATE TABLE ${FIPS_REJECTS_TABLENAME} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
@@ -154,7 +154,7 @@ CREATE TABLE ${FIPS_REJECTS_TABLENAME} (
   EMPLOYEE_COUNT INTEGER
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp GOC Order" guiX="458" guiY="85" id="TABLE_TEMP_GOC_ORDER" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp GOC Order" guiX="486" guiY="85" id="TABLE_TEMP_GOC_ORDER" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${GOC_ORDER_TABLENAME};
 create table ${GOC_ORDER_TABLENAME} (
   SUBSIDIARY VARCHAR(255) NULL,
@@ -165,7 +165,7 @@ create table ${GOC_ORDER_TABLENAME} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Active Companies" guiX="10" guiY="244" id="ADD_ACTIVE_COMPANIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Active Companies" guiX="10" guiY="244" id="ADD_ACTIVE_COMPANIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${ACTIVE_TICKERS_TABLENAME} values('AZO');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('AAP');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('ORLY');
@@ -281,7 +281,72 @@ insert into ${ACTIVE_TICKERS_TABLENAME} values('BSTW');
 insert into ${ACTIVE_TICKERS_TABLENAME} values('CHH');
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Col Numbers" guiX="415" guiY="317" id="ADD_COL_NUMBERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add FIPS-PP Map Data" guiX="516" guiY="244" id="ADD_FIPS_PP_MAP_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51003', '51901');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51005', '51903');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51015', '51907');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51019', '51909');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51031', '51911');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51035', '51913');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51053', '51918');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51059', '51919');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51067', '51949');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51069', '51921');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51081', '51923');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51089', '51929');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51095', '51931');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51121', '51933');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51143', '51939');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51149', '51941');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51153', '51942');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51161', '51944');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51163', '51945');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51165', '51947');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51175', '51949');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51177', '51951');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51191', '51953');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51195', '51955');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51199', '51958');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51520', '51953');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51530', '51945');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51570', '51918');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51580', '51903');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51595', '51923');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51610', '51919');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51630', '51951');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51640', '51913');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51670', '51941');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51678', '51945');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51683', '51942');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51685', '51942');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51720', '51955');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51730', '51918');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51735', '51958');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51750', '51933');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51775', '51944');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51820', '51907');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51830', '51931');
+insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51951', '51939');]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary Info" guiX="172" guiY="244" id="ADD_SUBSIDIARY_INFO" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${SUBSIDIARY_INFO_TABLENAME}
+select s.ticker, s.has_subsidiary
+from (
+  select ticker, (count(subsidiary) > 1) has_subsidiary
+  from (
+    select ticker, subsidiary
+    from ${JOB_DISTRIBUTION_TABLENAME} d
+    group by ticker, subsidiary
+  ) d group by ticker
+) s;
+
+update ${SUBSIDIARY_INFO_TABLENAME} i
+set alt_company_name = d.subsidiary
+from (select ticker, subsidiary from ${JOB_DISTRIBUTION_TABLENAME} group by ticker, subsidiary) d
+join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = d.ticker 
+where not i.has_subsidiaries and i.ticker = c.ticker;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Col Numbers" guiX="372" guiY="317" id="POPULATE_COL_NUMBERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${COLUMN_NUMBERS_TABLENAME} values('1');
 insert into ${COLUMN_NUMBERS_TABLENAME} values('2');
 insert into ${COLUMN_NUMBERS_TABLENAME} values('3');
@@ -333,54 +398,7 @@ insert into ${COLUMN_NUMBERS_TABLENAME} values('48');
 insert into ${COLUMN_NUMBERS_TABLENAME} values('49');
 insert into ${COLUMN_NUMBERS_TABLENAME} values('50');]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add FIPS-PP Map Data" guiX="516" guiY="244" id="ADD_FIPS_PP_MAP_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51003', '51901');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51005', '51903');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51015', '51907');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51019', '51909');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51031', '51911');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51035', '51913');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51053', '51918');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51059', '51919');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51067', '51949');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51069', '51921');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51081', '51923');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51089', '51929');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51095', '51931');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51121', '51933');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51143', '51939');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51149', '51941');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51153', '51942');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51161', '51944');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51163', '51945');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51165', '51947');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51175', '51949');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51177', '51951');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51191', '51953');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51195', '51955');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51199', '51958');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51520', '51953');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51530', '51945');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51570', '51918');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51580', '51903');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51595', '51923');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51610', '51919');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51630', '51951');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51640', '51913');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51670', '51941');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51678', '51945');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51683', '51942');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51685', '51942');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51720', '51955');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51730', '51918');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51735', '51958');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51750', '51933');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51775', '51944');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51820', '51907');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51830', '51931');
-insert into LKP_FIPS_COUNTY_TO_PP_COUNTY values ('51951', '51939');]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Matrix Types" guiX="276" guiY="317" id="ADD_MATRIX_TYPES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Matrix Row Types" guiX="174" guiY="317" id="POPULATE_MATRIX_ROW_TYPES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_BLANK_TOP', 0, 0);
 insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
@@ -422,25 +440,7 @@ values ('CO_FOOTER_BLANK_BOTTOM', 1, 14);
 insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_FOOTER_BLANK_BOTTOM', 2, 0);]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Info" guiX="172" guiY="244" id="ADD_SUBSIDIARY_INFO" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${SUBSIDIARY_INFO_TABLENAME}
-select s.ticker, s.has_subsidiary
-from (
-  select ticker, (count(subsidiary) > 1) has_subsidiary
-  from (
-    select ticker, subsidiary
-    from ${JOB_DISTRIBUTION_TABLENAME} d
-    group by ticker, subsidiary
-  ) d group by ticker
-) s;
-
-update ${SUBSIDIARY_INFO_TABLENAME} i
-set alt_company_name = d.subsidiary
-from (select ticker, subsidiary from ${JOB_DISTRIBUTION_TABLENAME} group by ticker, subsidiary) d
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = d.ticker 
-where not i.has_subsidiaries and i.ticker = c.ticker;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove NULL County Counts" guiX="316" guiY="244" id="REMOVE_NULL_COUNTY_COUNTS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Remove NULL County Counts" guiX="316" guiY="244" id="REMOVE_NULL_COUNTY_COUNTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* clear rows with null employee counts. They are useless */
 delete from ${COUNTY_COUNT_TABLENAME} where employee_count is null;]]></attr>
 </Node>
@@ -1032,25 +1032,36 @@ join (
 ) g on g.ticker = d.ticker
 join ${TABLE_FIPS_DATA} fd on fd.state_county_fips = d.state_county_fips;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add County Totals" guiX="-42" guiY="2087" id="ADD_COUNTY_TOTALS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[update ${REPORT_MATRIX_TABLENAME} mtx 
-set living_wage_total = d.employees_at_living_wage_total
-from ${EMP_COUNT_TOTALS_TABLENAME} d
-join ${TABLE_SUBSIDIARY} s on s.ticker_parent = d.ticker
-where d.state_county_fips = mtx.state_county_fips 
-  and d.ticker = mtx.ticker 
-  and d.subsidiary is null
-  and s.ticker_subsidiary is null
-  and mtx.row_type = 'CO_TICKER_COUNT_DATA';]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Blank Top" guiX="101" guiY="2007" id="ADD_CO_HEADER_BLANK_TOP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Co Header Blank Top" guiX="101" guiY="2007" id="ADD_CO_HEADER_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
   industry, row_type, ticker
 )
 select
     c.industry, 'CO_HEADER_BLANK_TOP', g.ticker
 from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker;]]></attr>
+join (
+  select isnull(s.ticker_subsidiary,c.ticker) ticker, c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where c.include_in_living_wage
+  group by isnull(s.ticker_subsidiary,c.ticker), c.industry
+)  c on c.ticker = g.ticker;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Header Blank Top" guiX="-131" guiY="2007" id="ADD_HEADER_BLANK_TOP" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+  industry, row_type, ticker
+)
+select
+    c.industry, case when d.subsidiary is not null then 'CO_SUBSIDIARY_HEADER_BLANK_TOP' else 'CO_HEADER_BLANK_TOP' end, g.ticker
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join (
+  select isnull(s.ticker_subsidiary,c.ticker) ticker, c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where c.include_in_living_wage
+  group by isnull(s.ticker_subsidiary,c.ticker), c.industry
+)  c on c.ticker = g.ticker
+join (select ticker, subsidiary from ${TABLE_COMPANY_LOCATION_DETAIL} group by ticker, subsidiary) d on d.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Bottom 1" guiX="186" guiY="1922" id="ADD_IND_HEADER_BLANK_BOTTOM_1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
@@ -1058,7 +1069,13 @@ join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker;]]></attr>
 )
 select industry, 'IND_HEADER_BLANK_BOTTOM_1'
 from ${GOC_ORDER_TABLENAME} g
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+join (
+  select isnull(s.ticker_subsidiary,c.ticker) ticker, c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where c.include_in_living_wage
+  group by isnull(s.ticker_subsidiary,c.ticker), c.industry
+)  c on c.ticker = g.ticker
 group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Bottom 2" guiX="408" guiY="1922" id="ADD_IND_HEADER_BLANK_BOTTOM_2" type="DB_EXECUTE">
@@ -1067,7 +1084,13 @@ group by c.industry;]]></attr>
 )
 select c.industry, 'IND_HEADER_BLANK_BOTTOM_2'
 from ${GOC_ORDER_TABLENAME} g
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+join (
+  select isnull(s.ticker_subsidiary,c.ticker) ticker, c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where c.include_in_living_wage
+  group by isnull(s.ticker_subsidiary,c.ticker), c.industry
+)  c on c.ticker = g.ticker
 group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Top" guiX="222" guiY="1848" id="ADD_IND_HEADER_BLANK_TOP" type="DB_EXECUTE">
@@ -1085,8 +1108,35 @@ group by c.industry;]]></attr>
 )
 select industry, 'IND_HEADER_NAME', isnull(industry,'No Industry')
 from ${GOC_ORDER_TABLENAME} g
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
+join (
+  select isnull(s.ticker_subsidiary,c.ticker) ticker, c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where c.include_in_living_wage
+  group by isnull(s.ticker_subsidiary,c.ticker), c.industry
+)  c on c.ticker = g.ticker
 group by c.industry;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Name and Dist Headers" guiX="-146" guiY="1933" id="ADD_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
+  industry, row_type, ticker, subsidiary, description_1, description_2
+) /* 'CO_SUBSIDIARY_NAME_COUNT_DIST_HEADERS' */
+select c.industry, 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS', g.ticker, g.ticker, 
+  case
+    when s.alt_company_name is null then c.company_name
+    else s.alt_company_name
+  end company_name
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join (
+  select 
+    isnull(s.ticker_subsidiary,c.ticker) ticker, 
+    isnull(s.subsidiary_name,isnull(c.alt_company_name,c.company_name)) company_name, 
+    c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where c.include_in_living_wage
+) c on c.ticker = g.ticker 
+join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary Avg Data" guiX="334" guiY="2479" id="ADD_SUBSIDIARY_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
@@ -1116,7 +1166,7 @@ join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
 where s.has_subsidiaries and e.subsidiary is not null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Blank Top" guiX="106" guiY="2245" id="ADD_SUBSIDIARY_BLANK_TOP" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary Blank Top" guiX="106" guiY="2245" id="ADD_SUBSIDIARY_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, subsidiary
 )
@@ -1303,6 +1353,15 @@ join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 where e.subsidiary is null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker County Totals" guiX="-140" guiY="2087" id="ADD_TICKER_COUNTY_TOTALS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${REPORT_MATRIX_TABLENAME} mtx 
+set living_wage_total = d.employees_at_living_wage_total
+from ${EMP_COUNT_TOTALS_TABLENAME} d
+where d.state_county_fips = mtx.state_county_fips 
+  and d.ticker = mtx.ticker 
+  and d.subsidiary is null
+  and mtx.row_type = 'CO_TICKER_COUNT_DATA';]]></attr>
+</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker GOC Headers" guiX="524" guiY="2007" id="ADD_TICKER_GOC_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, description_1, description_2, description_3, description_4
@@ -1310,7 +1369,13 @@ where e.subsidiary is null and (${MID_TOLERANCE_PROPORTION}) > 0;]]></attr>
 select c.industry, 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS', c.ticker,
   'County', 'State', 'Living Wage', '# Employees'
 from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker;]]></attr>
+join (
+  select isnull(s.ticker_subsidiary,c.ticker) ticker, c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where c.include_in_living_wage
+  group by isnull(s.ticker_subsidiary,c.ticker), c.industry
+)  c on c.ticker = g.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker High Data" guiX="522" guiY="2399" id="ADD_TICKER_HIGH_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
@@ -1364,7 +1429,7 @@ join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 where e.subsidiary is null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Name and Dist Headers" guiX="290" guiY="2007" id="ADD_TICKER_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Name and Dist Headers" guiX="286" guiY="2007" id="ADD_TICKER_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, description_1, description_2
 )
@@ -1374,10 +1439,18 @@ select c.industry, 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS', g.ticker, g.tick
     else s.alt_company_name
   end company_name
 from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker 
+join (
+  select 
+    isnull(s.ticker_subsidiary,c.ticker) ticker, 
+    isnull(s.subsidiary_name,isnull(c.alt_company_name,c.company_name)) company_name, 
+    c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where c.include_in_living_wage
+) c on c.ticker = g.ticker 
 join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker (no subs) County Totals" guiX="409" guiY="2087" id="ADD_TICKER_NO_SUBS_COUNTY_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker (no subs) County Totals" guiX="409" guiY="2087" id="ADD_TICKER_NO_SUBS_COUNTY_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${REPORT_MATRIX_TABLENAME} mtx 
 set living_wage_total = d.employees_at_living_wage_total
 from ${EMP_COUNT_TOTALS_TABLENAME} d
@@ -1387,7 +1460,7 @@ where d.state_county_fips = mtx.state_county_fips
   and s.ticker_parent is null
   and mtx.row_type = 'CO_TICKER_COUNT_DATA';]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker (no subs) Totals" guiX="301" guiY="2165" id="ADD_TICKER_NO_SUBS_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker (no subs) Totals" guiX="315" guiY="2166" id="ADD_TICKER_NO_SUBS_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, description_1, description_2, description_3, description_4, living_wage_total
 )
@@ -1415,7 +1488,7 @@ join (
   group by d.ticker
 ) d on d.ticker = c.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker (subs) County Totals" guiX="190" guiY="2087" id="ADD_TICKER_SUBS_COUNTY_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker (subs) County Totals" guiX="190" guiY="2087" id="ADD_TICKER_SUBS_COUNTY_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${REPORT_MATRIX_TABLENAME} mtx 
 set living_wage_total = d.employees_at_living_wage_total
 from ${EMP_COUNT_TOTALS_TABLENAME} d
@@ -1426,7 +1499,7 @@ where d.state_county_fips = mtx.state_county_fips
   and s.ticker_subsidiary is null
   and mtx.row_type = 'CO_TICKER_COUNT_DATA';]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker (subs) Totals" guiX="128" guiY="2165" id="ADD_TICKER_SUBS_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker (subs) Totals" guiX="143" guiY="2166" id="ADD_TICKER_SUBS_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* ticker total/score for companies with subsidiaries broken out */
 insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, description_1, description_2, description_3, description_4, living_wage_total
@@ -1455,7 +1528,30 @@ join (
   group by d.ticker
 ) d on d.ticker = c.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Totals No Data" guiX="491" guiY="2165" id="ADD_TICKER_TOTALS_NO_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Totals" guiX="-190" guiY="2166" id="ADD_TICKER_TOTALS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/* ticker total/score for companies with subsidiaries broken out */
+insert into ${REPORT_MATRIX_TABLENAME} (
+  industry, row_type, ticker, description_1, description_2, description_3, description_4, living_wage_total
+)
+select
+  c.industry, 'CO_TICKER_COUNT_TOTAL', c.ticker,
+  'Score',
+  cast(round(((sum(employee_count_living_wage_total)/sum(employee_count_total))*100.0),1) as numeric(18,1)),
+  concat(concat(cast(round(sum(employee_count_living_wage_total),2) as numeric(36,2)),' / '),sum(employee_count_total)),
+  sum(employee_count_total),
+  cast(round(sum(employee_count_living_wage_total),2) as numeric(18,2))
+from lkp_wage_company_location_detail d
+join (
+  select isnull(s.ticker_subsidiary,c.ticker) ticker, c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker and s.ticker_subsidiary is not null
+  where c.include_in_living_wage
+  group by isnull(s.ticker_subsidiary,c.ticker), c.industry
+) c on c.ticker = d.ticker
+where d.subsidiary is null
+group by c.ticker, c.industry;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker Totals No Data" guiX="506" guiY="2166" id="ADD_TICKER_TOTALS_NO_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* total lable for companies without data */
 insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, description_1, description_2
@@ -1469,6 +1565,27 @@ join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
 join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker
 left join (select ticker from ${COMPANY_JOB_COUNTY_DATA_TABLENAME} group by ticker) d on d.ticker = g.ticker
 where d.ticker is null and not s.has_subsidiaries;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Totals No Data" guiX="-48" guiY="2166" id="ADD_TICKER_TOTALS_NO_DATA1" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/* total lable for companies without data */
+insert into ${REPORT_MATRIX_TABLENAME} (
+  industry, row_type, ticker, description_1, description_2
+)
+select
+  c.industry, 'CO_TICKER_COUNT_TOTAL', c.ticker,
+  'Score',
+  'No Data'
+from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
+join (
+  select isnull(s.ticker_subsidiary,c.ticker) ticker, c.industry
+  from just_company c
+  left join just_subsidiary s on s.ticker_parent = c.ticker and s.ticker_subsidiary is not null
+  where c.include_in_living_wage
+  group by isnull(s.ticker_subsidiary,c.ticker), c.industry
+  order by isnull(s.ticker_subsidiary,c.ticker)
+) c on c.ticker = g.ticker
+left join (select ticker from lkp_wage_company_location_detail d where subsidiary is null group by ticker) d on d.ticker = c.ticker
+d.ticker is null;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Totals" guiX="-39" guiY="1693" id="ADD_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TOTALS_TABLENAME}
