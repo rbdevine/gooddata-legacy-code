@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Jun 27 16:56:52 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.350" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Jun 27 22:49:20 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.354" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -1047,6 +1047,35 @@ join (
   group by isnull(s.ticker_subsidiary,c.ticker), c.industry
 )  c on c.ticker = g.ticker;]]></attr>
 </Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add GOC Headers" guiX="-18" guiY="1930" id="ADD_GOC_HEADERS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
+  industry, row_type, ticker, subsidiary, description_1, description_2, description_3, description_4
+)
+select 
+  c.industry,
+  case
+    when d.subsidiary is null then 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS'
+    else 'CO_SUBSIDIARY_COUNT_COLUMN_HEADERS'
+  end,
+  c.ticker,
+  d.subsidiary,
+  'County', 'State', 'Living Wage', '# Employees'
+from (select ticker, subsidiary from ${TABLE_COMPANY_LOCATION_DETAIL} group by ticker, subsidiary) d
+left join (
+  select 
+    isnull(s.ticker_subsidiary,c.ticker) ticker,
+    case 
+      when s.ticker_subsidiary is null then isnull(c.alt_company_name,c.company_name)
+      else s.subsidiary_name
+    end company_name,
+    s.subsidiary_name, 
+    c.industry
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker /*and s.ticker_subsidiary is not null*/
+  where c.include_in_living_wage
+) c on c.ticker = d.ticker and (d.subsidiary is null or d.subsidiary = c.subsidiary_name)
+group by c.industry, c.ticker, d.subsidiary;]]></attr>
+</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Header Blank Top" guiX="-131" guiY="2007" id="ADD_HEADER_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
   industry, row_type, ticker
@@ -1117,26 +1146,41 @@ join (
 )  c on c.ticker = g.ticker
 group by c.industry;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Name and Dist Headers" guiX="-146" guiY="1933" id="ADD_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Name and Dist Headers" guiX="-218" guiY="1930" id="ADD_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, subsidiary, description_1, description_2
-) /* 'CO_SUBSIDIARY_NAME_COUNT_DIST_HEADERS' */
-select c.industry, 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS', g.ticker, g.ticker, 
+)
+select 
+  c.industry,
   case
-    when s.alt_company_name is null then c.company_name
-    else s.alt_company_name
-  end company_name
-from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
-join (
+    when d.subsidiary is null then 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS'
+    else 'CO_SUBSIDIARY_NAME_COUNT_DIST_HEADERS'
+  end,
+  c.ticker,
+  d.subsidiary,
+  case
+    when d.subsidiary is null then c.ticker
+    else d.subsidiary
+  end,
+  case
+    when d.subsidiary is null then max(c.company_name)
+    else cast(null as varchar)
+  end
+from (select ticker, subsidiary from ${TABLE_COMPANY_LOCATION_DETAIL} group by ticker, subsidiary) d
+left join (
   select 
-    isnull(s.ticker_subsidiary,c.ticker) ticker, 
-    isnull(s.subsidiary_name,isnull(c.alt_company_name,c.company_name)) company_name, 
+    isnull(s.ticker_subsidiary,c.ticker) ticker,
+    case 
+      when s.ticker_subsidiary is null then isnull(c.alt_company_name,c.company_name)
+      else s.subsidiary_name
+    end company_name,
+    s.subsidiary_name, 
     c.industry
   from ${TABLE_COMPANY} c
-  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker /*and s.ticker_subsidiary is not null*/
   where c.include_in_living_wage
-) c on c.ticker = g.ticker 
-join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = g.ticker;]]></attr>
+) c on c.ticker = d.ticker and (d.subsidiary is null or d.subsidiary = c.subsidiary_name)
+group by c.industry, c.ticker, d.subsidiary;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary Avg Data" guiX="334" guiY="2479" id="ADD_SUBSIDIARY_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
@@ -1185,7 +1229,7 @@ where d.state_county_fips = mtx.state_county_fips
   and d.subsidiary = mtx.subsidiary 
   and mtx.row_type = 'CO_SUBSIDIARY_COUNT_DATA';]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary GOC Headers" guiX="548" guiY="2245" id="ADD_SUBSIDIARY_GOC_HEADERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary GOC Headers" guiX="548" guiY="2245" id="ADD_SUBSIDIARY_GOC_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, subsidiary, description_1, description_2, description_3, description_4
 )
@@ -1250,7 +1294,7 @@ join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 join ${SUBSIDIARY_INFO_TABLENAME} s on s.ticker = c.ticker
 where s.has_subsidiaries and e.subsidiary is not null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Name and Dist Headers" guiX="292" guiY="2245" id="ADD_SUBSIDIARY_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Subsidiary Name and Dist Headers" guiX="292" guiY="2245" id="ADD_SUBSIDIARY_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, subsidiary, description_1
 )
@@ -1362,7 +1406,7 @@ where d.state_county_fips = mtx.state_county_fips
   and d.subsidiary is null
   and mtx.row_type = 'CO_TICKER_COUNT_DATA';]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker GOC Headers" guiX="524" guiY="2007" id="ADD_TICKER_GOC_HEADERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker GOC Headers" guiX="524" guiY="2007" id="ADD_TICKER_GOC_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, description_1, description_2, description_3, description_4
 )
@@ -1429,7 +1473,7 @@ join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = g.ticker
 join ${TABLE_FIPS_DATA_FOR_AVG} l on l.state_county_fips = f.state_county_fips
 where e.subsidiary is null and (${LOW_TOLERANCE_PROPORTION}) > 0;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker Name and Dist Headers" guiX="286" guiY="2007" id="ADD_TICKER_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Ticker Name and Dist Headers" guiX="286" guiY="2007" id="ADD_TICKER_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, row_type, ticker, description_1, description_2
 )
