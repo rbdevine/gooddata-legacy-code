@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed Jun 28 16:03:13 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.369" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed Jun 28 23:58:14 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.371" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -18,6 +18,7 @@
 <Property id="GraphParameter4" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
 <Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
+<Property id="GraphParameter109" name="TABLE_COMPANY_LIVING_WAGE" value="${TMP_BASE}_COMPANY_LIVING_WAGE"/>
 <Property fileURL="wage.prm" id="GraphParameter7"/>
 <Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter52"/>
 <Property fileURL="workspace.prm" id="GraphParameter91"/>
@@ -161,6 +162,15 @@ create table ${GOC_ORDER_TABLENAME} (
   TICKER VARCHAR(16) NOT NULL,
   GOC VARCHAR(255) NOT NULL,
   GOC_COLUMN_NO INT NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Living Wage Companies" guiX="-270" guiY="161" id="TABLE_TEMP_LIVING_WAGE_COMPANIES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_LIVING_WAGE};
+CREATE TABLE ${TABLE_COMPANY_LIVING_WAGE} (
+  TICKER VARCHAR(16) NOT NULL,
+  COMPANY_NAME VARCHAR(64) NOT NULL, /* use alt_company_name, when present */
+  SUBSIDIARY VARCHAR(64) NULL, /* only use subsidiary name when subsidiary has no ticker (subsidiary with ticker = compaany) */
+  INDUSTRY VARCHAR(128) NOT NULL
 );]]></attr>
 </Node>
 </Phase>
@@ -397,6 +407,34 @@ insert into ${COLUMN_NUMBERS_TABLENAME} values('47');
 insert into ${COLUMN_NUMBERS_TABLENAME} values('48');
 insert into ${COLUMN_NUMBERS_TABLENAME} values('49');
 insert into ${COLUMN_NUMBERS_TABLENAME} values('50');]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Living Wage Companies" guiX="-270" guiY="333" id="POPULATE_LIVING_WAGE_COMPANIES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_LIVING_WAGE}
+select 
+  isnull(s.ticker_subsidiary,c.ticker) ticker,
+  case
+    when s.ticker_parent is not null and s.ticker_subsidiary is not null then subsidiary_name
+    else isnull(c.alt_company_name,c.company_name)
+  end company_name, 
+  case 
+    when s.ticker_subsidiary is not null then null 
+    else s.subsidiary_name 
+  end subsidiary, 
+  c.industry 
+from ${TABLE_COMPANY} c
+left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker 
+where c.include_in_living_wage
+group by isnull(s.ticker_subsidiary,c.ticker), s.ticker_parent, s.ticker_subsidiary, s.subsidiary_name, c.industry, c.company_name, c.alt_company_name
+union all
+select 
+  c.ticker, 
+  c.company_name, 
+  null, 
+  c.industry
+from ${TABLE_COMPANY} c
+join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker and s.ticker_subsidiary is null
+where c.include_in_living_wage
+group by c.ticker, c.company_name, c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Matrix Row Types" guiX="174" guiY="317" id="POPULATE_MATRIX_ROW_TYPES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
@@ -2046,6 +2084,9 @@ order by ticker, company, goc;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Numbers Table" guiX="480" guiY="3283" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COLUMN_NUMBERS_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Company Living Wage Table" guiX="-218" guiY="3283" id="DROP_TEMP_COMPANY_LIVING_WAGE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_COMPANY_LIVING_WAGE};]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp GOC Order Table" guiX="80" guiY="3283" id="DROP_TEMP_GOC_ORDER_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${GOC_ORDER_TABLENAME};]]></attr>
