@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jun 29 17:22:12 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.418" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Fri Jun 30 16:34:10 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.423" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -18,10 +18,10 @@
 <Property id="GraphParameter4" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
 <Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter53"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter110"/>
-<Property fileURL="workspace.prm" id="GraphParameter92"/>
-<Property fileURL="wage.prm" id="GraphParameter8"/>
+<Property fileURL="wage.prm" id="GraphParameter87"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter7"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter46"/>
+<Property fileURL="workspace.prm" id="GraphParameter69"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -354,7 +354,27 @@ from (select ticker, subsidiary from ${TABLE_COMPANY_LOCATION_DETAIL} group by t
 left join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and (d.subsidiary is null or d.subsidiary = c.subsidiary)
 group by c.industry, c.ticker, d.subsidiary;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Order Data (no subs)" guiX="57" guiY="1105" id="ADD_JOB_ORDER_DATA_NO_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Order Data" guiX="-83" guiY="1105" id="ADD_JOB_ORDER_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${GOC_ORDER_TABLENAME}
+select offsets.subsidiary, offsets.ticker, offsets.joc, (r - ofs + 1) col_no
+from (
+  select offsets.ticker, offsets.subsidiary, d.joc, rank() over (order by offsets.ticker, offsets.subsidiary, d.joc) r, ofs
+  from ${TABLE_JOC_DISTRIBUTION} d
+  join (
+    select ticker, subsidiary, min(rnk) ofs
+    from (
+      select c.ticker, case when c.has_subsidiaries then null else max(d.subsidiary) end subsidiary, rank() over (order by c.ticker, case when c.has_subsidiaries then null else max(d.subsidiary) end, d.joc) rnk
+      from ${TABLE_JOC_DISTRIBUTION} d 
+      join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and (c.subsidiary is null or c.subsidiary = d.subsidiary)
+      group by c.ticker, c.subsidiary, c.has_subsidiaries, d.joc
+    ) ranks group by ticker, subsidiary
+    order by ofs
+  ) offsets on offsets.ticker = d.ticker and (offsets.subsidiary is null or offsets.subsidiary = d.subsidiary)
+  group by offsets.ticker, offsets.subsidiary, d.joc, offsets.ofs
+) offsets
+order by ticker, subsidiary, col_no;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Job Order Data (no subs)" guiX="69" guiY="1105" id="ADD_JOB_ORDER_DATA_NO_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${GOC_ORDER_TABLENAME}
 select offsets.subsidiary, c.ticker, offsets.joc, (r - ofs + 1) col_no
 from (
@@ -370,7 +390,7 @@ from (
 ) offsets
 join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = offsets.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Job Order Data (subs)" guiX="272" guiY="1105" id="ADD_JOB_ORDER_DATA_SUBS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Job Order Data (subs)" guiX="272" guiY="1105" id="ADD_JOB_ORDER_DATA_SUBS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${GOC_ORDER_TABLENAME}(ticker, goc, goc_column_no)
 select c.ticker, offsets.joc, (r - ofs + 1) col_no
 from (
@@ -797,10 +817,16 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = j.distribution ";
 	sql = sql + "from ( ";
-	sql = sql + "  select c.ticker, c.subsidiary, d.distribution, g.goc_column_no ";
-	sql = sql + "  from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "  join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker and ((c.subsidiary is null and g.subsidiary is null) or (c.subsidiary = g.subsidiary)) ";
-	sql = sql + "  join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = g.ticker and d.joc = g.goc and ((d.subsidiary is null and c.subsidiary is null) or (d.subsidiary = c.subsidiary)) ";
+    sql = sql + "  select * ";
+    sql = sql + "  from ( ";
+    sql = sql + "    select c.ticker, g.subsidiary, case when c.has_subsidiaries then null else max(d.distribution) end distribution, g.goc_column_no ";
+    sql = sql + "    from ${GOC_ORDER_TABLENAME} g ";
+    sql = sql + "    join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker and (c.subsidiary is null or (c.subsidiary = g.subsidiary)) ";
+    sql = sql + "    join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = g.ticker and d.joc = g.goc and (c.subsidiary is null or (d.subsidiary = c.subsidiary)) ";
+    sql = sql + "    where g.subsidiary is null or c.has_subsidiaries is not null ";
+    sql = sql + "    group by c.ticker, g.subsidiary, c.has_subsidiaries, g.goc_column_no ";
+    sql = sql + "  ) t ";
+    sql = sql + "  where subsidiary is null or distribution is not null ";
 	sql = sql + ") j ";
 	sql = sql + "where j.ticker = mtx.ticker and ( ";
 	sql = sql + "    (j.subsidiary is null and mtx.subsidiary is null and mtx.row_type = 'CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS') or ";
@@ -838,10 +864,16 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = j.joc ";
 	sql = sql + "from ( ";
-	sql = sql + "  select c.ticker, c.subsidiary, g.goc joc, g.goc_column_no ";
-	sql = sql + "  from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "  join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker and ((c.subsidiary is null and g.subsidiary is null) or (c.subsidiary = g.subsidiary)) ";
-	sql = sql + "  join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = c.ticker and d.joc = g.goc ";
+    sql = sql + "  select ticker, subsidiary, joc, goc_column_no ";
+    sql = sql + "  from ( ";
+    sql = sql + "    select c.ticker, g.subsidiary, case when c.has_subsidiaries then null else max(d.distribution) end distribution, max(d.joc) joc, g.goc_column_no ";
+    sql = sql + "    from ${GOC_ORDER_TABLENAME} g ";
+    sql = sql + "    join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker and (c.subsidiary is null or (c.subsidiary = g.subsidiary)) ";
+    sql = sql + "    join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = g.ticker and d.joc = g.goc and (c.subsidiary is null or (d.subsidiary = c.subsidiary)) ";
+    sql = sql + "    where g.subsidiary is null or c.has_subsidiaries is not null ";
+    sql = sql + "    group by c.ticker, g.subsidiary, c.has_subsidiaries, g.goc_column_no ";
+    sql = sql + "  ) t ";
+    sql = sql + "  where subsidiary is null or distribution is not null ";
 	sql = sql + ") j ";
 	sql = sql + "where j.ticker = mtx.ticker and ( ";
 	sql = sql + "    (j.subsidiary is null and mtx.subsidiary is null and mtx.row_type = 'CO_TICKER_COUNT_GOC_COLUMN_HEADERS') or ";
@@ -986,13 +1018,13 @@ where state_county_fips in (
 <Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/report/livingwage/LivingWageGenerateReportFilesOnly.grf" guiName="Generate Reports" guiX="312" guiY="3182" id="GENERATE_REPORTS" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Count Table" guiX="286" guiY="3283" id="DROP_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Col Count Table" guiX="286" guiY="3283" id="DROP_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${EMP_COUNT_TOTALS_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Numbers Table" guiX="480" guiY="3283" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Col Numbers Table" guiX="480" guiY="3283" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COLUMN_NUMBERS_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp GOC Order Table" guiX="80" guiY="3283" id="DROP_TEMP_GOC_ORDER_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp GOC Order Table" guiX="80" guiY="3283" id="DROP_TEMP_GOC_ORDER_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${GOC_ORDER_TABLENAME};]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Remove Counties with invalid FIPS" guiX="238" guiY="632" id="REMOVE_COUNTIES_WITH_INVALID_FIPS" type="DB_EXECUTE">

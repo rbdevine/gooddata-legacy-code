@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Thu Jun 29 15:44:35 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.272" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Fri Jun 30 12:45:32 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.273" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="workspace.prm" id="GraphParameter23"/>
-<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="wage.prm" id="GraphParameter18"/>
+<Property fileURL="workspace.prm" id="GraphParameter0"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -13,7 +13,8 @@ CREATE TABLE ${TABLE_COMPANY_LIVING_WAGE} (
   TICKER VARCHAR(16) NOT NULL,
   COMPANY_NAME VARCHAR(64) NOT NULL, /* use alt_company_name, when present */
   SUBSIDIARY VARCHAR(64) NULL, /* only use subsidiary name when subsidiary has no ticker (subsidiary with ticker = compaany) */
-  INDUSTRY VARCHAR(128) NOT NULL
+  INDUSTRY VARCHAR(128) NOT NULL,
+  HAS_SUBSIDIARIES BOOLEAN NOT NULL
 );]]></attr>
 </Node>
 </Phase>
@@ -33,7 +34,8 @@ select
     when s.ticker_subsidiary is not null then null 
     else s.subsidiary_name 
   end subsidiary, 
-  c.industry 
+  c.industry,
+  false
 from ${TABLE_COMPANY} c
 left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker 
 where c.include_in_living_wage
@@ -43,7 +45,8 @@ select
   c.ticker, 
   c.company_name, 
   null, 
-  c.industry
+  c.industry,
+  true
 from ${TABLE_COMPANY} c
 join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker and s.ticker_subsidiary is null
 where c.include_in_living_wage
