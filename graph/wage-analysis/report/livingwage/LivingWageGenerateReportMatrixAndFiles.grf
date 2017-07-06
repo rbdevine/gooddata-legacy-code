@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jul 06 12:06:22 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.440" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jul 06 13:00:58 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.441" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -595,13 +595,13 @@ order by column_number;]]></attr>
 <Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/report/livingwage/LivingWageGenerateReportFilesOnly.grf" guiName="Generate Reports" guiX="55" guiY="784" id="GENERATE_REPORTS" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Col Count Table" guiX="29" guiY="885" id="DROP_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Count Table" guiX="29" guiY="885" id="DROP_TEMP_COL_COUNT_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${EMP_COUNT_TOTALS_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Col Numbers Table" guiX="223" guiY="885" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp Col Numbers Table" guiX="223" guiY="885" id="DROP_TEMP_COL_NUMBERS_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${COLUMN_NUMBERS_TABLENAME};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp GOC Order Table" guiX="-177" guiY="885" id="DROP_TEMP_GOC_ORDER_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp GOC Order Table" guiX="-177" guiY="885" id="DROP_TEMP_GOC_ORDER_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${GOC_ORDER_TABLENAME};]]></attr>
 </Node>
 </Phase>
