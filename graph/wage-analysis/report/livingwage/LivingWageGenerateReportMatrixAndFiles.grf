@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Fri Jun 30 16:34:10 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.423" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed Jul 05 20:08:06 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.431" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -18,10 +18,10 @@
 <Property id="GraphParameter4" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
 <Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
-<Property fileURL="wage.prm" id="GraphParameter87"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter7"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter46"/>
-<Property fileURL="workspace.prm" id="GraphParameter69"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter53"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter92"/>
+<Property fileURL="workspace.prm" id="GraphParameter115"/>
+<Property fileURL="wage.prm" id="GraphParameter7"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -63,7 +63,7 @@ CREATE TABLE ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME} (
 );
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Living Wage Totals" guiX="499" guiY="161" id="TABLE_LIVING_WAGE_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Living Wage Totals" guiX="499" guiY="161" id="TABLE_LIVING_WAGE_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TOTALS_TABLENAME};
 create table ${TOTALS_TABLENAME} (
   TICKER VARCHAR(16) NOT NULL,
@@ -365,7 +365,7 @@ from (
     from (
       select c.ticker, case when c.has_subsidiaries then null else max(d.subsidiary) end subsidiary, rank() over (order by c.ticker, case when c.has_subsidiaries then null else max(d.subsidiary) end, d.joc) rnk
       from ${TABLE_JOC_DISTRIBUTION} d 
-      join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and (c.subsidiary is null or c.subsidiary = d.subsidiary)
+      join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and ((c.subsidiary is null and d.subsidiary is null) or (c.subsidiary = d.subsidiary))
       group by c.ticker, c.subsidiary, c.has_subsidiaries, d.joc
     ) ranks group by ticker, subsidiary
     order by ofs
@@ -462,7 +462,7 @@ from (select ticker, subsidiary from ${JOB_DISTRIBUTION_TABLENAME} group by tick
 join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = d.ticker 
 where not i.has_subsidiaries and i.ticker = c.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Totals" guiX="-39" guiY="1693" id="ADD_TOTALS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Add Totals" guiX="-39" guiY="1693" id="ADD_TOTALS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TOTALS_TABLENAME}
 select 
   ticker, 
@@ -626,7 +626,7 @@ join (
 ) c on c.ticker = d.ticker
 where not i.has_subsidiaries and i.ticker = c.ticker;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Avg Data" guiX="-39" guiY="1768" id="ADD_AVG_DATA" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Avg Data" guiX="-44" guiY="1768" id="ADD_AVG_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME} (
   industry, 
   row_type, 
@@ -652,7 +652,7 @@ select
   concat('$',cast(cast(round(fd.living_wage_hourly,2) as numeric(36,2)) as varchar(8))),
   cast(round(d.employee_count_total,2) as numeric(18,2))
 from (select state_county_fips, ticker, subsidiary, sum(employee_count_total) employee_count_total from ${TABLE_COMPANY_LOCATION_DETAIL} group by state_county_fips, ticker, subsidiary) d
-join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and isnull(d.subsidiary,c.company_name) = c.company_name
+join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and ((d.subsidiary is null and c.subsidiary is null) or (d.subsidiary = c.subsidiary))
 join (select state_county_fips, state_abbreviation state, max(county_name) county_name from ${TABLE_CITY_FIPS} group by state_county_fips, state_abbreviation) cf on cf.state_county_fips = d.state_county_fips
 join (select g.ticker from ${GOC_ORDER_TABLENAME} g group by g.ticker ) g on g.ticker = d.ticker
 join ${TABLE_FIPS_DATA} fd on fd.state_county_fips = d.state_county_fips;]]></attr>
@@ -785,7 +785,7 @@ from (
     from ${TABLE_COMPANY_LOCATION_DETAIL} 
     group by state_county_fips, ticker, subsidiary
   ) cc 
-  join ${TOTALS_TABLENAME} tc on tc.ticker = cc.ticker and ((tc.subsidiary is null and cc.subsidiary is null) or (tc.subsidiary = cc.subsidiary))
+  join ${TABLE_EMPLOYEE_COUNT_TOTAL} tc on tc.ticker = cc.ticker and ((tc.subsidiary is null and cc.subsidiary is null) or (tc.subsidiary = cc.subsidiary))
   join ${TABLE_FIPS_DATA} f on f.state_county_fips = cc.state_county_fips
   join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = cc.ticker and ((c.subsidiary is null and cc.subsidiary is null) or (c.subsidiary = cc.subsidiary))
 ) t
@@ -819,12 +819,11 @@ function integer transform() {
 	sql = sql + "from ( ";
     sql = sql + "  select * ";
     sql = sql + "  from ( ";
-    sql = sql + "    select c.ticker, g.subsidiary, case when c.has_subsidiaries then null else max(d.distribution) end distribution, g.goc_column_no ";
+    sql = sql + "    select c.ticker, c.subsidiary, case when c.has_subsidiaries then null else max(d.distribution) end distribution, g.goc_column_no ";
     sql = sql + "    from ${GOC_ORDER_TABLENAME} g ";
     sql = sql + "    join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker and (c.subsidiary is null or (c.subsidiary = g.subsidiary)) ";
-    sql = sql + "    join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = g.ticker and d.joc = g.goc and (c.subsidiary is null or (d.subsidiary = c.subsidiary)) ";
-    sql = sql + "    where g.subsidiary is null or c.has_subsidiaries is not null ";
-    sql = sql + "    group by c.ticker, g.subsidiary, c.has_subsidiaries, g.goc_column_no ";
+    sql = sql + "    join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = g.ticker and d.joc = g.goc and ((c.subsidiary is null and d.subsidiary is null) or (d.subsidiary = c.subsidiary)) ";
+    sql = sql + "    group by c.ticker, c.subsidiary, c.has_subsidiaries, g.goc_column_no ";
     sql = sql + "  ) t ";
     sql = sql + "  where subsidiary is null or distribution is not null ";
 	sql = sql + ") j ";
@@ -866,12 +865,11 @@ function integer transform() {
 	sql = sql + "from ( ";
     sql = sql + "  select ticker, subsidiary, joc, goc_column_no ";
     sql = sql + "  from ( ";
-    sql = sql + "    select c.ticker, g.subsidiary, case when c.has_subsidiaries then null else max(d.distribution) end distribution, max(d.joc) joc, g.goc_column_no ";
+    sql = sql + "    select c.ticker, c.subsidiary, case when c.has_subsidiaries then null else max(d.distribution) end distribution, max(d.joc) joc, g.goc_column_no ";
     sql = sql + "    from ${GOC_ORDER_TABLENAME} g ";
     sql = sql + "    join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker and (c.subsidiary is null or (c.subsidiary = g.subsidiary)) ";
-    sql = sql + "    join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = g.ticker and d.joc = g.goc and (c.subsidiary is null or (d.subsidiary = c.subsidiary)) ";
-    sql = sql + "    where g.subsidiary is null or c.has_subsidiaries is not null ";
-    sql = sql + "    group by c.ticker, g.subsidiary, c.has_subsidiaries, g.goc_column_no ";
+    sql = sql + "    join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = g.ticker and d.joc = g.goc and ((c.subsidiary is null and d.subsidiary is null) or (d.subsidiary = c.subsidiary)) ";
+    sql = sql + "    group by c.ticker, c.subsidiary, c.has_subsidiaries, g.goc_column_no ";
     sql = sql + "  ) t ";
     sql = sql + "  where subsidiary is null or distribution is not null ";
 	sql = sql + ") j ";
@@ -949,7 +947,7 @@ function integer transform() {
 	sql = sql + "from ( ";
 	sql = sql + "  select c.ticker, c.subsidiary, d.state_county_fips, g.goc_column_no, d.employee_count_living_wage_total, d.wage_hourly_raw_min_wage_adj ";
 	sql = sql + "  from ${GOC_ORDER_TABLENAME} g ";
-	sql = sql + "  join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker and ((c.subsidiary is null and g.subsidiary is null) or (c.subsidiary = g.subsidiary)) ";
+	sql = sql + "  join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker and (c.subsidiary is null or (c.subsidiary = g.subsidiary)) ";
 	sql = sql + "  join ${TABLE_COMPANY_LOCATION_DETAIL} d on d.ticker = c.ticker and d.joc = g.goc and ((d.subsidiary is null and c.subsidiary is null) or (d.subsidiary = c.subsidiary)) ";
     sql = sql + ") j ";
 	sql = sql + "where j.state_county_fips = mtx.state_county_fips and j.ticker = mtx.ticker and ( ";
