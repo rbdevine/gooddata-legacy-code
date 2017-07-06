@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Jul 05 19:57:03 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.188" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 06 09:50:41 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.189" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -16,10 +16,10 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="wage.prm" id="GraphParameter50"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter9"/>
-<Property fileURL="workspace.prm" id="GraphParameter32"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter47"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter56"/>
+<Property fileURL="workspace.prm" id="GraphParameter79"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -74,7 +74,15 @@ create table ${TABLE_EMPLOYEE_COUNT_TOTAL} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add All sans Subsidiary Parents" guiX="147" guiY="91" id="ADD_ALL_SANS_SUBSIDIARY_PARENTS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Subidiary Ticker Distribution" guiX="381" guiY="97" id="REMOVE_SUBIDIARY_TICKER_DISTRIBUTION" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TABLE_JOC_DISTRIBUTION}
+where ticker in (select ticker from ${TABLE_COMPANY_LIVING_WAGE} where has_subsidiaries)
+and subsidiary is null;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add All sans Subsidiary Parents" guiX="147" guiY="181" id="ADD_ALL_SANS_SUBSIDIARY_PARENTS" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_LOCATION_DETAIL}
 (state_county_fips, ticker, subsidiary, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, employee_count_living_wage_total)
@@ -121,8 +129,8 @@ where
   );]]></attr>
 </Node>
 </Phase>
-<Phase number="2">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Calculated Subsidiary Parents" guiX="139" guiY="191" id="ADD_CALCULATED_SUBSIDIARY_PARENTS" type="DB_EXECUTE">
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Calculated Subsidiary Parents" guiX="139" guiY="281" id="ADD_CALCULATED_SUBSIDIARY_PARENTS" type="DB_EXECUTE">
 <attr name="guiDescription"><![CDATA[Inserts subsidiary data. Parent data depends on this, therefore it must be done in a phase prior to inputing parent data.]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_LOCATION_DETAIL}
 (state_county_fips, ticker, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, employee_count_living_wage_total)
@@ -143,7 +151,7 @@ group by l.state_county_fips, l.ticker, l.joc;
 </Node>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Min Avg State Salaries" guiX="160" guiY="291" id="ADD_MIN_AVG_STATE_SALARIES" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Min Avg State Salaries" guiX="160" guiY="381" id="ADD_MIN_AVG_STATE_SALARIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[UPDATE ${TABLE_STATE_DETAIL} d
 SET MINIMUM_AVG_WAGE_RAW = t.MINIMUM_AVG_WAGE_RAW
 FROM (
@@ -173,7 +181,7 @@ WHERE d.state = t.state;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Minimum Wage Adjustments" guiX="155" guiY="367" id="MINIMUM_WAGE_ADJUSTMENTS" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Minimum Wage Adjustments" guiX="155" guiY="457" id="MINIMUM_WAGE_ADJUSTMENTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLE_COMPANY_LOCATION_DETAIL} cd
 set WAGE_HOURLY_RAW_MIN_WAGE_ADJ = (
   case
@@ -189,7 +197,7 @@ where left(cd.state_county_fips,2) = sd.state_fips and cd.state_county_fips = f.
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Minimum Wage Clean Up Bottom" guiX="147" guiY="445" id="MINIMUM_WAGE_CLEAN_UP_BOTTOM" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Minimum Wage Clean Up Bottom" guiX="147" guiY="535" id="MINIMUM_WAGE_CLEAN_UP_BOTTOM" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[update ${TABLE_COMPANY_LOCATION_DETAIL} ld
 set WAGE_HOURLY_RAW_MIN_WAGE_ADJ = (sd.minimum_wage + ${CONST_MINIMUM_WAGE_CUSHION})
 from ${TABLE_STATE_DETAIL} sd
@@ -197,7 +205,7 @@ where sd.state_fips = left(ld.state_county_fips,2) and ld.WAGE_HOURLY_RAW_MIN_WA
 </Node>
 </Phase>
 <Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Employee Count Total" guiX="381" guiY="515" id="POPULATE_EMPLOYEE_COUNT_TOTAL1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Employee Count Total" guiX="381" guiY="605" id="POPULATE_EMPLOYEE_COUNT_TOTAL1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_EMPLOYEE_COUNT_TOTAL}
 select 
   ticker, 
@@ -209,15 +217,7 @@ order by ticker, subsidiary;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Subidiary Ticker Distribution" guiX="365" guiY="587" id="REMOVE_SUBIDIARY_TICKER_DISTRIBUTION" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[delete from ${TABLE_JOC_DISTRIBUTION}
-where ticker in (select ticker from ${TABLE_COMPANY_LIVING_WAGE} where has_subsidiaries)
-and subsidiary is null;
-]]></attr>
-</Node>
-</Phase>
-<Phase number="9">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subidiary Ticker Distribution" guiX="377" guiY="657" id="ADD_SUBIDIARY_TICKER_DISTRIBUTION" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subidiary Ticker Distribution" guiX="377" guiY="678" id="ADD_SUBIDIARY_TICKER_DISTRIBUTION" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_JOC_DISTRIBUTION}
 select t2.ticker, null subsidiary, t1.joc, sum(dist_count)/t2.emp_count_tot distribution
 from (

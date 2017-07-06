@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jul 05 20:10:59 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.110" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 06 12:51:58 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.111" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -280,8 +280,13 @@ FROM (
       else 0.0
     end dist_contrib
   FROM ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME} a
-  JOIN ${SCORE_QUALITY_BY_COMPANY_TABLENAME} q on q.ticker = a.ticker and q.company = a.company
-  JOIN ${TABLE_JOC_DISTRIBUTION} d on d.ticker = q.ticker and ((a.subsidiary is null and d.subsidiary is null) or (a.subsidiary = d.subsidiary)) and d.joc = q.goc
+  JOIN ${SCORE_QUALITY_BY_COMPANY_TABLENAME} q on q.ticker = a.ticker and ((q.subsidiary is null and a.subsidiary is null) or (q.subsidiary = a.subsidiary))
+  JOIN ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = q.ticker and ((c.subsidiary is null and q.subsidiary is null) or (c.subsidiary = q.subsidiary))
+  JOIN ${TABLE_JOC_DISTRIBUTION} d on d.ticker = q.ticker and d.joc = q.goc and (
+    (c.has_subsidiaries and c.subsidiary is null and d.subsidiary is null) or
+    (not c.has_subsidiaries and c.subsidiary is null) or
+    (not c.has_subsidiaries and c.subsidiary is not null and c.subsidiary = d.subsidiary)
+  )
 ) t
 group by t.ticker, t.company, t.subsidiary, t.AVG_LW_UNWEIGHTED, t.AVG_LW_WEIGHTED
 order by t.ticker, t.company, t.subsidiary;]]></attr>
