@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 06 16:05:52 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.121" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="Industry" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="industry" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2">
+<Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
+<Field name="Name" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="SQL_Industry_Queue" recordDelimiter="\n" type="delimited">
+<Field name="sql" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter0"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter9"/>
+<Property fileURL="workspace.prm" id="GraphParameter32"/>
+<Property fileURL="wage.prm" id="GraphParameter50"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Column" guiX="245" guiY="-71" id="TABLE_COMPANY_COLUMN" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_COMPANY_COLUMN};
+create table if not exists ${TABLE_COMPANY_COLUMN} (
+  TICKER VARCHAR(16) NOT NULL,
+  COMPANY_COLUMN_NO INT
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Job Data" guiX="56" guiY="-71" id="TABLE_COMPANY_JOB_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_COMPANY_JOB_DATA};
+create table if not exists ${TABLE_COMPANY_JOB_DATA} (
+  TICKER VARCHAR(16) NOT NULL,
+  JOC VARCHAR(255) NOT NULL, 
+  SCORE INT NULL,
+  SCORE_RAW INT NULL,
+  TOTAL INT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Industry Queue" guiX="154" guiY="8" id="TABLE_INDUSTRY_QUEUE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_INDUSTRY_QUEUE};
+create table if not exists ${TABLE_INDUSTRY_QUEUE} (
+  ID AUTO_INCREMENT,
+  INDUSTRY VARCHAR(128) UNIQUE NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Job Company Count" guiX="423" guiY="-71" id="TABLE_JOB_COMPANY_COUNT" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_JOC_COMPANY_COUNT};
+create table if not exists ${TABLE_JOC_COMPANY_COUNT} (
+  INDUSTRY VARCHAR(128) NOT NULL,
+  JOC VARCHAR(128) NOT NULL,
+  COMPANY_COUNT INT NOT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Param" guiX="329" guiY="8" id="TABLE_PARAM" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_PARAM};
+
+create table ${TABLE_PARAM} (
+  MIN_JOB_COUNT_PER_CO_SCORE_1 INT NOT NULL,
+  MIN_JOB_COUNT_PER_CO_SCORE_2 INT NOT NULL,
+  MIN_JOB_COUNT_PER_CO_SCORE_3 INT NOT NULL,  
+  MIN_JOBS_PER_CO INT NOT NULL,
+  MIN_CO_PER_JOB INT NOT NULL,
+  MIN_IND_GOC_CO_COUNT INT NOT NULL,
+  MIN_DATA_POINTS_PER_CO INT NOT NULL,
+  COMBINE_SUBSIDIARY_TICKER_UNDER_PARENT BOOLEAN NOT NULL,
+  INDUSTRY VARCHAR(64) NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Param Table" guiX="236" guiY="89" id="POPULATE_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[TRUNCATE TABLE ${TABLE_PARAM};
+INSERT INTO ${TABLE_PARAM} (
+  MIN_JOB_COUNT_PER_CO_SCORE_1,
+  MIN_JOB_COUNT_PER_CO_SCORE_2,
+  MIN_JOB_COUNT_PER_CO_SCORE_3,
+  MIN_JOBS_PER_CO,
+  MIN_CO_PER_JOB,
+  MIN_IND_GOC_CO_COUNT,
+  MIN_DATA_POINTS_PER_CO
+) 
+SELECT
+  ${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_1},
+  ${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_2},
+  ${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_3},
+  ${CONST_FP_MIN_JOCS_PER_COMPANY},
+  ${CONST_FP_MIN_COMPANIES_PER_JOC},
+  ${CONST_FP_MIN_INDUSTRY_JOCS_PER_COMPANY},
+  ${CONST_FP_MIN_DATA_POINTS_PER_COMPANY};]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Dequeue Process" guiX="334" guiY="168" id="DEQUEUE_PROCESS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DELETE FROM ${TABLE_PROCESS_QUEUE}
+WHERE id IN (
+  SELECT id 
+  FROM ${TABLE_PROCESS_QUEUE} 
+  ORDER BY id 
+  LIMIT 1
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Industry Queue" guiX="143" guiY="168" id="POPULATE_INDUSTRY_QUEUE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_INDUSTRY_QUEUE} (
+  industry
+)
+select c.industry
+from ${TABLE_WAGE} w
+join ${TABLE_COMPANY} c on c.ticker = w.ticker
+group by c.industry
+order by c.industry;]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Param Table" guiX="349" guiY="331" id="DROP_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_PARAM};]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Generate Industry Data" guiX="423" guiY="251" id="GENERATE_INDUSTRY_DATA" passThroughInputPort="0" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Read List of Industries" guiX="49" guiY="251" id="READ_LIST_OF_INDUSTRIES1" type="DB_INPUT_TABLE">
+<attr name="sqlQuery"><![CDATA[select distinct $industry:= q.industry
+from ${TABLE_INDUSTRY_QUEUE} q
+join (
+  select id, industry
+  from ${TABLE_INDUSTRY_QUEUE}
+  order by id
+) q2 on q2.id = q.id;
+]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Reformat" guiX="257" guiY="251" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.Name = "${GRAPH_DIR}/wage-analysis/data-transform/prepare-report-data/GenerateJobDataCurrentIndustry.grf";
+
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_LIST_OF_INDUSTRIES1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge5" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in regular mode: names of the graphs to be executed, otherwise nothing)" metadata="Metadata2" outPort="Port 0 (out)" toNode="GENERATE_INDUSTRY_DATA:0"/>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Industry Queue Table" guiX="153" guiY="331" id="DROP_INDUSTRY_QUEUE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_INDUSTRY_QUEUE};]]></attr>
+</Node>
+</Phase>
+</Graph>

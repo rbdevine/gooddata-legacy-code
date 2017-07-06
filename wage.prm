@@ -1,4 +1,4 @@
-#Thu Jul 06 16:40:24 EDT 2017
+#Thu Jul 06 16:56:29 EDT 2017
 TABLE_INDUSTRY_QUEUE=${TMP_BASE}_INDUSTRY_QUEUE
 TABLE_WAGE_SUMMARY=${LOOKUP_BASE}_WAGE_SUMMARY
 TABLE_COMPANY_LOCATION_DETAIL=${LOOKUP_BASE}_COMPANY_LOCATION_DETAIL
@@ -23,7 +23,6 @@ TABLE_JOC=JUST_JOC
 TABLE_COMPANY_COLUMN=${LOOKUP_BASE}_COMPANY_COLUMN
 TABLE_DATA_SOURCE=${LOOKUP_BASE}_DATA_SOURCE
 CONST_LW_MIN_COMPANIES_PER_JOC=1
-TABLE_COMPANY_SUBSIDIARY_INCLUDED=(select ticker, company_name, industry from just_company c left join (select ticker_parent from just_subsidiary where ticker_subsidiary is not null) s on s.ticker_parent \= c.ticker where s.ticker_parent is null union all select s.ticker_subsidiary ticker, s.subsidiary_name company_name, c.industry from just_subsidiary s join just_company c on c.ticker \= s.ticker_parent where s.ticker_subsidiary is not null)
 LOOKUP_BASE=LKP_WAGE
 TABLE_WAGE=JUST_WAGE
 TABLE_JOC_COMPANY_COUNT=${LOOKUP_BASE}_JOC_COMPANY_COUNT
