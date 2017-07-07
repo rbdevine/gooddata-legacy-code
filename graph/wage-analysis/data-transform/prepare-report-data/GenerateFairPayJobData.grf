@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Thu Jul 06 20:33:44 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.214" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
+<Field name="Company" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="GraphName" recordDelimiter="\n" type="delimited">
+<Field name="Name" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="TMP_LOW_DATA_COMPANIES_TABLENAME" value="TMP_LOW_DATA_COMPANIES"/>
+<Property id="GraphParameter1" name="TMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter55"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter64"/>
+<Property fileURL="workspace.prm" id="GraphParameter87"/>
+<Property fileURL="wage.prm" id="GraphParameter2"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Column" guiX="229" guiY="-59" id="TABLE_COMPANY_COLUMN" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_COMPANY_COLUMN};
+create table if not exists ${TABLE_COMPANY_COLUMN} (
+  TICKER VARCHAR(16) NOT NULL,
+  COMPANY_COLUMN_NO INT
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Job Data" guiX="40" guiY="-59" id="TABLE_COMPANY_JOB_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_COMPANY_JOB_DATA};
+create table if not exists ${TABLE_COMPANY_JOB_DATA} (
+  INDUSTRY VARCHAR(128) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
+  JOC VARCHAR(128) NOT NULL, 
+  SCORE_COLA INT NULL,
+  SCORE_RAW INT NULL,
+  TOTAL INT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Job Company Count" guiX="407" guiY="-59" id="TABLE_JOB_COMPANY_COUNT" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_JOC_COMPANY_COUNT};
+create table if not exists ${TABLE_JOC_COMPANY_COUNT} (
+  INDUSTRY VARCHAR(128) NOT NULL,
+  JOC VARCHAR(128) NOT NULL,
+  COMPANY_COUNT INT NOT NULL
+);
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Low Data Company" guiX="229" guiY="22" id="TABLE_LOW_DATA_COMPANY" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_LOW_DATA_COMPANY};
+
+create table ${TABLE_LOW_DATA_COMPANY} (
+  TICKER VARCHAR(16) NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Param" guiX="416" guiY="22" id="TABLE_PARAM" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_PARAM};
+
+create table ${TABLE_PARAM} (
+  MIN_JOB_COUNT_PER_CO_SCORE_1 INT NOT NULL,
+  MIN_JOB_COUNT_PER_CO_SCORE_2 INT NOT NULL,
+  MIN_JOB_COUNT_PER_CO_SCORE_3 INT NOT NULL,  
+  MIN_JOBS_PER_CO INT NOT NULL,
+  MIN_CO_PER_JOB INT NOT NULL,
+  MIN_IND_GOC_CO_COUNT INT NOT NULL,
+  MIN_DATA_POINTS_PER_CO INT NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Valid Company Job" guiX="39" guiY="22" id="TABLE_VALID_COMPANY_JOB" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_VALID_COMPANY_JOC};
+create table if not exists ${TABLE_VALID_COMPANY_JOC} (
+  JOC VARCHAR(128) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Param Table" guiX="357" guiY="95" id="POPULATE_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[TRUNCATE TABLE ${TABLE_PARAM};
+INSERT INTO ${TABLE_PARAM} (
+  MIN_JOB_COUNT_PER_CO_SCORE_1,
+  MIN_JOB_COUNT_PER_CO_SCORE_2,
+  MIN_JOB_COUNT_PER_CO_SCORE_3,
+  MIN_JOBS_PER_CO,
+  MIN_CO_PER_JOB,
+  MIN_IND_GOC_CO_COUNT,
+  MIN_DATA_POINTS_PER_CO
+) 
+SELECT
+  ${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_1},
+  ${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_2},
+  ${CONST_FP_MIN_JOCS_PER_COMPANY_SCORE_3},
+  ${CONST_FP_MIN_JOCS_PER_COMPANY},
+  ${CONST_FP_MIN_COMPANIES_PER_JOC},
+  ${CONST_FP_MIN_INDUSTRY_JOCS_PER_COMPANY},
+  ${CONST_FP_MIN_DATA_POINTS_PER_COMPANY};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Update Industry in Param Table" guiX="124" guiY="95" id="UPDATE_INDUSTRY_IN_PARAM_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TABLE_PARAM} 
+set INDUSTRY = (
+  select INDUSTRY 
+  from ${TABLE_INDUSTRY_QUEUE} 
+  order by id 
+  limit 1
+);
+
+delete from ${TABLE_INDUSTRY_QUEUE}
+where id in (
+  select ID 
+  from ${TABLE_INDUSTRY_QUEUE} 
+  order by id limit 1
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="2">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Valid Company Job Table" guiX="170" guiY="172" id="POPULATE_VALID_COMPANY_JOB_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_VALID_COMPANY_JOC}
+select distinct
+  w.joc,
+  c.ticker
+from ${TABLE_WAGE_SUMMARY} w
+join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on w.ticker = c.ticker
+join ${TABLE_PARAM} p on true
+join (
+  select c.industry, w.joc, count(w.ticker) indy_joc_count
+  from ${TABLE_WAGE_SUMMARY} w
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = w.ticker
+  join ${TABLE_PARAM} p on true
+  where w.joc_count > p.MIN_JOB_COUNT_PER_CO_SCORE_1
+  group by c.industry, w.joc
+) t on t.industry = c.industry and t.joc = w.joc
+where t.indy_joc_count >= p.MIN_IND_GOC_CO_COUNT and w.joc_count > p.MIN_JOB_COUNT_PER_CO_SCORE_1
+order by w.joc, c.ticker;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Reduce Valid Company Job Table" guiX="174" guiY="245" id="REDUCE_VALID_COMPANY_JOB_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TABLE_VALID_COMPANY_JOC}
+where joc in (
+  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
+);
+delete from ${TABLE_VALID_COMPANY_JOC}
+where ticker in (
+  select c.ticker 
+  from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
+);
+
+delete from ${TABLE_VALID_COMPANY_JOC}
+where joc in (
+  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
+);
+delete from ${TABLE_VALID_COMPANY_JOC}
+where ticker in (
+  select c.ticker 
+  from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
+);
+
+delete from ${TABLE_VALID_COMPANY_JOC}
+where joc in (
+  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
+);
+delete from ${TABLE_VALID_COMPANY_JOC}
+where ticker in (
+  select c.ticker 
+  from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
+);
+
+delete from ${TABLE_VALID_COMPANY_JOC}
+where joc in (
+  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
+);
+delete from ${TABLE_VALID_COMPANY_JOC}
+where ticker in (
+  select c.ticker 
+  from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
+);
+
+delete from ${TABLE_VALID_COMPANY_JOC}
+where joc in (
+  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
+);
+delete from ${TABLE_VALID_COMPANY_JOC}
+where ticker in (
+  select c.ticker 
+  from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  join ${TABLE_PARAM} p on true 
+  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
+);
+
+]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Column" guiX="118" guiY="320" id="POPULATE_COMPANY_COLUMN" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_COLUMN} (ticker, company_column_no)
+select ticker, rank() over (partition by industry order by jobCnt desc, company) id from (
+  select c.industry, vcj.ticker, c.company_name company, count(vcj.joc) jobCnt
+  from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  group by c.industry, vcj.ticker, c.company_name
+) t;
+]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Job Company Count" guiX="310" guiY="320" id="POPULATE_JOB_COMPANY_COUNT" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_JOC_COMPANY_COUNT} (industry, joc, company_count)
+select c.industry, vcj.joc, count(vcj.ticker)
+from ${TABLE_VALID_COMPANY_JOC} vcj
+join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+group by c.industry, vcj.joc;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Job Data" guiX="180" guiY="397" id="POPULATE_COMPANY_JOB_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_JOB_DATA} 
+select c2.industry, c.ticker, s.joc, r.rank_cola, r.rank_raw, s.joc_count 
+from ${TABLE_COMPANY_COLUMN} c
+join ${TABLE_VALID_COMPANY_JOC} vcj on vcj.ticker = c.ticker
+join ${TABLE_WAGE_SUMMARY} s on s.ticker = c.ticker and s.joc = vcj.joc
+join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = vcj.ticker
+join (
+  select
+    rank() over (partition by c.industry, s.joc order by s.wage_hourly_cola) rank_cola, 
+    rank() over (partition by c.industry, s.joc order by s.wage_hourly_raw) rank_raw, 
+    vcj.ticker,
+    s.joc
+  from ${TABLE_VALID_COMPANY_JOC} vcj
+  join ${TABLE_WAGE_SUMMARY} s on s.ticker = vcj.ticker and s.joc = vcj.joc
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = s.ticker
+) r on r.ticker = s.ticker and r.joc = s.joc;
+]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Low Data Companies" guiX="188" guiY="475" id="ADD_LOW_DATA_COMPANIES" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_LOW_DATA_COMPANY}
+select cjd.ticker
+from ${TABLE_COMPANY_JOB_DATA} cjd
+join ${TABLE_PARAM} p on true
+group by cjd.ticker
+having sum(cjd.total) < max(p.MIN_DATA_POINTS_PER_CO);]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Remove Low Data Companies From Company Column table" guiX="103" guiY="546" id="REMOVE_LOW_DATA_COMPANIES_FROM_COMPANY_COLUMN_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[delete from ${TABLE_COMPANY_COLUMN}
+where ticker in (
+  select ticker
+  from ${TABLE_LOW_DATA_COMPANY}
+);
+]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Low Data Company Table" guiX="264" guiY="624" id="DROP_LOW_DATA_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_LOW_DATA_COMPANIES_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Ticker Data Table" guiX="469" guiY="624" id="DROP_TEMP_TICKER_DATA_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_TICKER_DATA_TABLENAME};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Valid Company Job Table" guiX="52" guiY="624" id="DROP_VALID_COMPANY_JOB_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_SALARY_SUMMARY_TABLENAME};]]></attr>
+</Node>
+</Phase>
+</Graph>
