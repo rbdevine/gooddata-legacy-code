@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jun 20 16:55:57 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.35" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jul 07 15:15:14 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.38" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="DIST_BY_GOC" recordDelimiter="\n" type="delimited">
@@ -17,11 +17,12 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/DistributionsByGOC.xlsx"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/DistributionsByGOC.xlsx"/>
 <Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/distributionsbygocerror.txt"/>
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/DistributionsByGOC.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="${TABLE_JOC_DISTRIBUTION}"/>
 <Property id="GraphParameter4" name="TMPTABLENAME" value="TMP_WAGE_${TABLE_JOC_DISTRIBUTION}"/>
+<Property fileURL="wage.prm" id="GraphParameter47"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter5"/>
 <Property fileURL="workspace.prm" id="GraphParameter28"/>
 <Property id="GraphParameter46" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/distributionsbygoc.txt"/>
@@ -118,10 +119,10 @@ select t.*
 from ${TMPTABLENAME} t
 join (
   select ticker, company_name, alt_company_name, industry 
-  from just_company c 
+  from ${TABLE_COMPANY} c 
   left join (
     select ticker_parent 
-    from just_subsidiary) s on s.ticker_parent = c.ticker 
+    from ${TABLE_SUBSIDIARY}) s on s.ticker_parent = c.ticker 
   where s.ticker_parent is null 
   union all 
   select 
@@ -132,8 +133,8 @@ join (
     s.subsidiary_name company_name, 
     c.alt_company_name, 
     c.industry 
-  from just_subsidiary s 
-  join just_company c on c.ticker = s.ticker_parent
+  from ${TABLE_SUBSIDIARY} s 
+  join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
 ) s on s.ticker = t.ticker and t.subsidiary in (s.company_name, s.alt_company_name);]]></attr>
 </Node>
 </Phase>
