@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jul 07 12:07:15 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.97" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="Company_Update_Database" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="COMPANY_NAME" type="string"/>
+<Field name="INDUSTRY" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="COMPANY_UPDATE_FILE" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="TICKER" type="string"/>
+<Field name="NAME" type="string"/>
+<Field name="JUST_IND" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/CompanyUpdate.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/companyupdate_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/CompanyUpdate.xlsx"/>
+<Property id="GraphParameter3" name="TABLE_COMPANY_UNMATCHED_TICKER" value="${TMP_BASE}_COMPANY_UNMATCHED_TICKER"/>
+<Property id="GraphParameter4" name="TABLE_COMPANY_UPDATE" value="${STG_BASE}_COMPANY_UPDATE"/>
+<Property id="GraphParameter5" name="TABLE_COMPANY_UPDATE_HISTORY" value="${STG_BASE}_COMPANY_UPDATE_HISTORY"/>
+<Property fileURL="wage.prm" id="GraphParameter6"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter63"/>
+<Property fileURL="workspace.prm" id="GraphParameter86"/>
+<Property id="GraphParameter104" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/companyupdate.txt"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="12" guiY="16" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Unmatched Ticker" guiX="496" guiY="16" id="TABLE_COMPANY_UNMATCHED_TICKER" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_UNMATCHED_TICKER};
+CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY_UNMATCHED_TICKER} (
+  TICKER VARCHAR(16) NOT NULL UNIQUE,
+  COMPANY_NAME VARCHAR(64) NULL,
+  INDUSTRY VARCHAR(128) NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Update" guiX="300" guiY="16" id="TABLE_COMPANY_UPDATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_UPDATE};
+CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY_UPDATE} (
+  TICKER VARCHAR(16) NOT NULL UNIQUE,
+  COMPANY_NAME VARCHAR(64) NULL,
+  INDUSTRY VARCHAR(128) NOT NULL
+);]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Update History" guiX="754" guiY="16" id="TABLE_COMPANY_UPDATE_HISTORY" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_UPDATE_HISTORY};
+CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY_UPDATE_HISTORY} (
+  TICKER VARCHAR(16) NOT NULL UNIQUE,
+  COMPANY_NAME_OLD VARCHAR(64) NULL,
+  COMPANY_NAME_NEW VARCHAR(64) NULL,
+  INDUSTRY_OLD VARCHAR(128) NULL,
+  INDUSTRY_NEW VARCHAR(128) NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="104" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="98" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="104" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.TICKER = $in.0.TICKER;
+	$out.0.COMPANY_NAME = $in.0.NAME;
+	$out.0.INDUSTRY = $in.0.JUST_IND;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="52" guiY="195" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Update" guiX="292" guiY="195" id="POPULATE_COMPANY_UPDATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLE_COMPANY_UPDATE} (
+    TICKER,
+    COMPANY_NAME,
+    INDUSTRY
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Company Update" guiX="301" guiY="273" id="CLEAN_COMPANY_UPDATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLE_COMPANY_UPDATE} SET TICKER = TRIM(TICKER);
+UPDATE ${TABLE_COMPANY_UPDATE} SET COMPANY_NAME = TRIM(COMPANY_NAME);
+UPDATE ${TABLE_COMPANY_UPDATE} SET INDUSTRY = TRIM(INDUSTRY);
+]]></attr>
+</Node>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="0" guiY="273" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="141" guiY="273" id="CLEAN_WRITE" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Update History with Old" guiX="735" guiY="273" id="POPULATE_COMPANY_UPDATE_HISTORY_WITH_OLD" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_UPDATE_HISTORY}
+(TICKER, COMPANY_NAME_OLD, INDUSTRY_OLD)
+SELECT TICKER, COMPANY_NAME, INDUSTRY
+FROM ${TABLE_COMPANY} u;]]></attr>
+</Node>
+</Phase>
+<Phase number="4">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Unmatched Ticker" guiX="489" guiY="349" id="POPULATE_COMPANY_UNMATCHED_TICKER" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_UNMATCHED_TICKER}
+SELECT u.*
+FROM ${TABLE_COMPANY_UPDATE} u
+LEFT JOIN ${TABLE_COMPANY} c on c.ticker = u.ticker
+WHERE c.ticker is null;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Company Table" guiX="302" guiY="349" id="UPDATE_COMPANY_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+UPDATE ${TABLE_COMPANY} c
+SET company_name = isnull(u.company_name,c.company_name),
+    industry = isnull(u.industry,c.industry)
+FROM ${TABLE_COMPANY_UPDATE} u
+WHERE c.ticker = u.ticker;]]></attr>
+</Node>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Unmatched to Company" guiX="287" guiY="428" id="ADD_UNMATCHED_TO_COMPANY" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+INSERT INTO ${TABLE_COMPANY} (TICKER, COMPANY_NAME, INDUSTRY, INCLUDE_IN_LIVING_WAGE)
+SELECT *, true
+FROM ${TABLE_COMPANY_UNMATCHED_TICKER};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Update Company Update History with Update" guiX="733" guiY="428" id="UPDATE_COMPANY_UPDATE_HISTORY_WITH_UPDATE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+UPDATE ${TABLE_COMPANY_UPDATE_HISTORY} h
+SET COMPANY_NAME_NEW = c.COMPANY_NAME,
+    INDUSTRY_NEW = c.INDUSTRY
+FROM ${TABLE_COMPANY} c
+WHERE h.ticker = c.ticker;]]></attr>
+</Node>
+</Phase>
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Company Unmatched Ticker" guiX="496" guiY="501" id="DROP_COMPANY_UNMATCHED_TICKER" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_UNMATCHED_TICKER};]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Update History with New" guiX="733" guiY="501" id="POPULATE_COMPANY_UPDATE_HISTORY_WITH_NEW" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_UPDATE_HISTORY}
+(TICKER, COMPANY_NAME_NEW, INDUSTRY_NEW)
+SELECT * FROM ${TABLE_COMPANY_UNMATCHED_TICKER};]]></attr>
+</Node>
+</Phase>
+</Graph>

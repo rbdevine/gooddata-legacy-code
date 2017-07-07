@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 06 20:45:03 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.114" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Jul 07 09:56:10 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.115" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -21,13 +21,5 @@
 <Phase number="0">
 <Node enabled="enabled" graphName="/Users/hankmobley/Code/cloudconnect/JCDP/graph/wage-analysis/data-transform/prepare-report-data/GenerateFairPayJobData.grf" guiName="Generate Fair Pay Data" guiX="313" guiY="30" id="GENERATE_FAIR_PAY_DATA" type="RUN_GRAPH"/>
 <Node enabled="enabled" graphName="/Users/hankmobley/Code/cloudconnect/JCDP/graph/wage-analysis/data-transform/prepare-report-data/GenerateCompanyLocationDetail.grf" guiName="Generate Living Wage Data" guiX="123" guiY="30" id="GENERATE_LIVING_WAGE_DATA" type="RUN_GRAPH"/>
-</Phase>
-<Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Param Table" guiX="350" guiY="423" id="DROP_PARAM_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${PARAM_TABLENAME};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Process Queue" guiX="192" guiY="423" id="DROP_PROCESS_QUEUE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_PROCESS_QUEUE};]]></attr>
-</Node>
 </Phase>
 </Graph>
