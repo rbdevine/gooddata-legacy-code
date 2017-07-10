@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jul 07 15:15:14 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.38" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Sun Jul 09 20:34:46 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.40" showComponentDetails="true">
 <Global>
-<Metadata id="Metadata0">
-<Record fieldDelimiter="|" name="DIST_BY_GOC" recordDelimiter="\n" type="delimited">
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="DIST_BY_GOC" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="TICKER" type="string"/>
 <Field name="SUBSIDIARY" type="string"/>
-<Field name="GOC" type="string"/>
+<Field name="JOC" type="string"/>
 <Field name="DISTRIBUTION" type="string"/>
 </Record>
 </Metadata>
@@ -17,15 +17,15 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/DistributionsByGOC.xlsx"/>
-<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/distributionsbygocerror.txt"/>
-<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/DistributionsByGOC.xlsx"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/DistributionsByJOC.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/distributionsbyjocerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/DistributionsByJOC.xlsx"/>
 <Property id="GraphParameter3" name="TABLENAME" value="${TABLE_JOC_DISTRIBUTION}"/>
 <Property id="GraphParameter4" name="TMPTABLENAME" value="TMP_WAGE_${TABLE_JOC_DISTRIBUTION}"/>
-<Property fileURL="wage.prm" id="GraphParameter47"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter5"/>
-<Property fileURL="workspace.prm" id="GraphParameter28"/>
-<Property id="GraphParameter46" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/distributionsbygoc.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter5"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter62"/>
+<Property fileURL="workspace.prm" id="GraphParameter85"/>
+<Property id="GraphParameter103" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/distributionsbyjoc.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS ${TMPTABLENAME} (
 function integer transform() {
 	$out.0.TICKER = $in.0.TICKER;
 	$out.0.SUBSIDIARY = $in.0.SUBSIDIARY;
-	$out.0.JOC = $in.0.GOC;
+	$out.0.JOC = $in.0.JOC;
 	$out.0.DISTRIBUTION = $in.0.DISTRIBUTION;
 	
 	return ALL;
