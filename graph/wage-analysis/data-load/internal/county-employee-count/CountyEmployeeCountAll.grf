@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Thu Jun 22 17:00:21 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.65" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Mon Jul 10 01:28:28 EDT 2017" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.66" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -29,10 +29,10 @@
 <Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
 <Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter50"/>
-<Property fileURL="workspace.prm" id="GraphParameter73"/>
-<Property id="GraphParameter91" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
-<Property id="GraphParameter92" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter65"/>
+<Property fileURL="workspace.prm" id="GraphParameter88"/>
+<Property id="GraphParameter106" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter107" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -47,16 +47,19 @@ CREATE TABLE ${TABLE_COUNTY_EMPLOYEE_COUNT} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/CountyEmployeeCountCalculated.grf" guiName="Load Calculated Employee Counts" guiX="60" guiY="81" id="LOAD_CALCULATED_EMPLOYEE_COUNTS1" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/county-employee-count/CountyEmployeeCountCalculated.grf" guiName="Load Calculated Employee Counts" guiX="60" guiY="81" id="LOAD_CALCULATED_EMPLOYEE_COUNTS1" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="2">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/CountyEmployeeCountExact.grf" guiName="Load Exact Employee Counts" guiX="70" guiY="179" id="LOAD_EXACT_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/county-employee-count/CountyEmployeeCountExact.grf" guiName="Load Exact Employee Counts" guiX="70" guiY="179" id="LOAD_EXACT_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="3">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/CountyEmployeeCountFranchise.grf" guiName="Load Franchise Employee Counts" guiX="60" guiY="281" id="LOAD_FRANCHISE_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/county-employee-count/CountyEmployeeCountFranchise.grf" guiName="Load Franchise Employee Counts" guiX="60" guiY="281" id="LOAD_FRANCHISE_EMPLOYEE_COUNTS" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="4">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up no-subsidiary Companies" guiX="57" guiY="388" id="CLEAN_UP_NO_SUBSIDIARY_COMPANIES" type="DB_EXECUTE">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/county-employee-count/CountyEmployeeCountFIPSLookup.grf" guiName="Load Employee Counts FIPS Lookup" guiX="50" guiY="382" id="LOAD_EMPLOYEE_COUNTS_FIPS_LOOKUP" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up no-subsidiary Companies" guiX="55" guiY="480" id="CLEAN_UP_NO_SUBSIDIARY_COMPANIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* go the other direction now, add up subsidiaries for parent */
 /* add up county employee counts of subsidiaries for parent ticker (only applies to companies with subsidiaies */
 /* "parent" data will be distinguished by having a null subsidiary */
@@ -84,8 +87,8 @@ from (
 where cc.ticker = c.ticker;]]></attr>
 </Node>
 </Phase>
-<Phase number="5">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up Companies with subsidiaries" guiX="49" guiY="466" id="CLEAN_UP_COMPANIES_WITH_SUBSIDIARIES" type="DB_EXECUTE">
+<Phase number="6">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean up Companies with subsidiaries" guiX="49" guiY="558" id="CLEAN_UP_COMPANIES_WITH_SUBSIDIARIES" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* next delete data for tickers that have at least two subsidiaries and has parent company data, */
 /* (which is represented by parent having a subsidiary of null) */
 /* the purpose of this is to get rid of any ticker data for companies with subsidiaries because */
@@ -100,8 +103,8 @@ where subsidiary is null and ticker in (
 );]]></attr>
 </Node>
 </Phase>
-<Phase number="6">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Parent County Counts" guiX="70" guiY="544" id="CREATE_PARENT_COUNTY_COUNTS" type="DB_EXECUTE">
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Parent County Counts" guiX="70" guiY="636" id="CREATE_PARENT_COUNTY_COUNTS" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* finally, add parent counts for tickers with multiple subsidiaries by adding up subsidiary counts */
 insert into ${TABLE_COUNTY_EMPLOYEE_COUNT}
 select c2.state_county_fips, c2.ticker, null, sum(c2.employee_count)
