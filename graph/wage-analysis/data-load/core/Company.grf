@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri May 12 16:21:12 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.66" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jul 10 15:12:41 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.72" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -6,7 +6,6 @@
 <Field name="COMPANY_NAME" type="string"/>
 <Field name="INDUSTRY" type="string"/>
 <Field name="ALT_COMPANY_NAME" type="string"/>
-<Field name="INCLUDE_IN_LIVING_WAGE" type="string"/>
 <Field name="SUBSIDY_CODE" type="string"/>
 </Record>
 </Metadata>
@@ -16,8 +15,8 @@
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Company.xlsx"/>
 <Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
 <Property fileURL="wage.prm" id="GraphParameter4"/>
-<Property fileURL="workspace.prm" id="GraphParameter22"/>
-<Property id="GraphParameter40" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Property fileURL="workspace.prm" id="GraphParameter61"/>
+<Property id="GraphParameter79" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -28,7 +27,6 @@ CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY} (
   COMPANY_NAME VARCHAR(64) UNIQUE NOT NULL,
   INDUSTRY VARCHAR(128) NOT NULL,
   ALT_COMPANY_NAME VARCHAR(64) UNIQUE NULL,
-  INCLUDE_IN_LIVING_WAGE BOOLEAN NOT NULL,
   SUBSIDY_CODE INTEGER NULL
 );]]></attr>
 </Node>
@@ -39,7 +37,6 @@ CREATE TABLE IF NOT EXISTS ${TMP_TABLENAME} (
   COMPANY_NAME VARCHAR(64),
   INDUSTRY VARCHAR(128),
   ALT_COMPANY_NAME VARCHAR(64),
-  INCLUDE_IN_LIVING_WAGE VARCHAR(8),
   SUBSIDY_CODE VARCHAR(8)
 );]]></attr>
 </Node>
@@ -88,7 +85,6 @@ function integer transform() {
     COMPANY_NAME,
     INDUSTRY,
     ALT_COMPANY_NAME,
-    INCLUDE_IN_LIVING_WAGE,
     SUBSIDY_CODE
 )
 FROM LOCAL '${WRITEFILEPATH}'
@@ -115,7 +111,6 @@ SELECT
   COMPANY_NAME,
   MAX(INDUSTRY),
   MAX(ALT_COMPANY_NAME),
-  INCLUDE_IN_LIVING_WAGE,
   MAX(SUBSIDY_CODE)
 FROM (
   SELECT
@@ -124,17 +119,12 @@ FROM (
     INDUSTRY,
     ALT_COMPANY_NAME,
     CASE
-      WHEN INCLUDE_IN_LIVING_WAGE IS NULL THEN FALSE
-      WHEN INCLUDE_IN_LIVING_WAGE = '0' THEN FALSE
-      ELSE TRUE
-    END INCLUDE_IN_LIVING_WAGE,
-    CASE
       WHEN SUBSIDY_CODE IS NOT NULL THEN CAST(SUBSIDY_CODE AS INTEGER)
       ELSE NULL
     END SUBSIDY_CODE
   FROM ${TMP_TABLENAME}
 ) t
-GROUP BY COMPANY_NAME, INCLUDE_IN_LIVING_WAGE;]]></attr>
+GROUP BY COMPANY_NAME;]]></attr>
 </Node>
 </Phase>
 <Phase number="5">

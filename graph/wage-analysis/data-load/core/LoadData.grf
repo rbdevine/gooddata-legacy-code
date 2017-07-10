@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Fri Jul 07 11:38:06 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.281" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Jul 10 15:23:31 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.283" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="wage.prm" id="GraphParameter0"/>
@@ -7,17 +7,7 @@
 </Global>
 <Phase number="0">
 <Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/core/Company.grf" guiName="Load: Company" guiX="161" guiY="96" id="LOAD_COMPANY" type="RUN_GRAPH"/>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Living Wage" guiX="38" guiY="22" id="TABLE_COMPANY_LIVING_WAGE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_LIVING_WAGE};
-CREATE TABLE ${TABLE_COMPANY_LIVING_WAGE} (
-  TICKER VARCHAR(16) NOT NULL,
-  COMPANY_NAME VARCHAR(64) NOT NULL, /* use alt_company_name, when present */
-  SUBSIDIARY VARCHAR(64) NULL, /* only use subsidiary name when subsidiary has no ticker (subsidiary with ticker = compaany) */
-  INDUSTRY VARCHAR(128) NOT NULL,
-  HAS_SUBSIDIARIES BOOLEAN NOT NULL
-);]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Subsidiary Ticker" guiX="238" guiY="22" id="TABLE_COMPANY_SUBSIDIARY_TICKER" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Subsidiary Ticker" guiX="116" guiY="18" id="TABLE_COMPANY_SUBSIDIARY_TICKER" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_SUBSIDIARY_TICKER};
 CREATE TABLE ${TABLE_COMPANY_SUBSIDIARY_TICKER} (
   TICKER VARCHAR(16) NOT NULL,
@@ -33,37 +23,7 @@ CREATE TABLE ${TABLE_COMPANY_SUBSIDIARY_TICKER} (
 <Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/core/CompanyUpdate.grf" guiName="Load: Company Update" guiX="151" guiY="293" id="LOAD_COMPANY_UPDATE" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Living Wage" guiX="31" guiY="393" id="POPULATE_COMPANY_LIVING_WAGE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_LIVING_WAGE}
-select 
-  isnull(s.ticker_subsidiary,c.ticker) ticker,
-  case
-    when s.ticker_parent is not null and s.ticker_subsidiary is not null then subsidiary_name
-    else isnull(c.alt_company_name,c.company_name)
-  end company_name, 
-  case 
-    when s.ticker_subsidiary is not null then null 
-    else s.subsidiary_name 
-  end subsidiary, 
-  c.industry,
-  false
-from ${TABLE_COMPANY} c
-left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker 
-where c.include_in_living_wage
-group by isnull(s.ticker_subsidiary,c.ticker), s.ticker_parent, s.ticker_subsidiary, s.subsidiary_name, c.industry, c.company_name, c.alt_company_name
-union all
-select 
-  c.ticker, 
-  c.company_name, 
-  null, 
-  c.industry,
-  true
-from ${TABLE_COMPANY} c
-join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker and s.ticker_subsidiary is null
-where c.include_in_living_wage
-group by c.ticker, c.company_name, c.industry;]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Subsidiary Ticker" guiX="248" guiY="393" id="POPULATE_COMPANY_SUBSIDIARY_TICKER" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Subsidiary Ticker" guiX="121" guiY="394" id="POPULATE_COMPANY_SUBSIDIARY_TICKER" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_SUBSIDIARY_TICKER}
 select ticker, company_name, industry 
 from ${TABLE_COMPANY} c 

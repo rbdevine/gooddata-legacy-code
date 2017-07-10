@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Tue Jun 20 15:56:40 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.352" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Jul 10 14:07:38 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.353" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_COMPANY_NAME_TICKER" value="${TMP_BASE}_COMPANY_NAME_TICKER"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter43"/>
-<Property fileURL="workspace.prm" id="GraphParameter66"/>
-<Property fileURL="wage.prm" id="GraphParameter1"/>
+<Property fileURL="wage.prm" id="GraphParameter42"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter1"/>
+<Property fileURL="workspace.prm" id="GraphParameter24"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -29,7 +29,7 @@ select distinct
   cast(round(sum(isnull(ya.weight,1.0)*w.hourly_wage_raw)/sum(isnull(ya.weight,1.0)),2) as numeric(36,2)) unadjusted_hourly_avg_base,
   cast(round(sum(isnull(ya.weight,1.0)*w.hourly_wage_cola)/sum(isnull(ya.weight,1.0)),2) as numeric(36,2)) unadjusted_hourly_avg_base_cola
 from ${TABLE_WAGE} w
-join ${TABLE_COMPANY_SUBSIDIARY_INCLUDED} c on c.ticker = w.ticker
+join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = w.ticker
 left join ${TABLE_YEAR_ADJUSTMENT} ya on ya.year = w.wage_year
 where w.state <> 'PR' and w.joc is not null
 group by c.ticker, w.JOC;]]></attr>

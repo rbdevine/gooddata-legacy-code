@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 06 12:51:58 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.111" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jul 10 16:33:01 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.112" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -99,9 +99,9 @@
 <Property id="GraphParameter6" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter7" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter55"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter94"/>
-<Property fileURL="workspace.prm" id="GraphParameter117"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter65"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter104"/>
+<Property fileURL="workspace.prm" id="GraphParameter127"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -221,7 +221,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" guiName="Reformat" guiX="241" guiY="457" id="REFORMAT5" type="REFORMAT">
+<Node enabled="disabled" guiName="Reformat" guiX="241" guiY="457" id="REFORMAT5" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -291,7 +291,7 @@ FROM (
 group by t.ticker, t.company, t.subsidiary, t.AVG_LW_UNWEIGHTED, t.AVG_LW_WEIGHTED
 order by t.ticker, t.company, t.subsidiary;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Select BLS and LW By County" guiX="26" guiY="457" id="SELECT_BLS_AND_LW_BY_COUNTY" type="DB_INPUT_TABLE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Select BLS and LW By County" guiX="26" guiY="457" id="SELECT_BLS_AND_LW_BY_COUNTY" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select 
   $state_county_fips:=state_county_fips,
   $description_1:=description_1, $description_2:=description_2, $description_3:=description_3, $description_4:=description_4,
@@ -346,10 +346,10 @@ from ${SCORE_QUALITY_BY_COMPANY_TABLENAME}
 order by ticker, company, subsidiary, goc;]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="25" id="WRITE_REPORT" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="136" id="WRITE_REPORT1" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="136" id="WRITE_REPORT1" outputFieldNames="true" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCOREQUALITY}" guiName="Write Report" guiX="419" guiY="248" id="WRITE_REPORT2" outputFieldNames="true" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_LWAVG}" guiName="Write Report" guiX="419" guiY="351" id="WRITE_REPORT3" outputFieldNames="true" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${REPORTFILEPATH_BLSLWCOUNTY}" guiName="Write Report" guiX="419" guiY="457" id="WRITE_REPORT4" type="DATA_WRITER"/>
+<Node enabled="disabled" fileURL="${REPORTFILEPATH_BLSLWCOUNTY}" guiName="Write Report" guiX="419" guiY="457" id="WRITE_REPORT4" type="DATA_WRITER"/>
 <Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge15" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_REPORT:0"/>
 <Edge fromNode="REFORMAT2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge19" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_REPORT2:0"/>
 <Edge fromNode="REFORMAT3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_REPORT1:0"/>

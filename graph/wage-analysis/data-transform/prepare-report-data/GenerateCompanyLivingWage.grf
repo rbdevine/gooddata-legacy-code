@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Jul 10 16:16:46 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.283" showComponentDetails="true">
+<Global>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter75"/>
+<Property fileURL="workspace.prm" id="GraphParameter57"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Living Wage" guiX="38" guiY="22" id="TABLE_COMPANY_LIVING_WAGE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_LIVING_WAGE};
+CREATE TABLE ${TABLE_COMPANY_LIVING_WAGE} (
+  TICKER VARCHAR(16) NOT NULL,
+  COMPANY_NAME VARCHAR(64) NOT NULL, /* use alt_company_name, when present */
+  SUBSIDIARY VARCHAR(64) NULL, /* only use subsidiary name when subsidiary has no ticker (subsidiary with ticker = compaany) */
+  INDUSTRY VARCHAR(128) NOT NULL,
+  HAS_SUBSIDIARIES BOOLEAN NOT NULL
+);]]></attr>
+</Node>
+</Phase>
+<Phase number="1">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Living Wage" guiX="31" guiY="98" id="POPULATE_COMPANY_LIVING_WAGE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_LIVING_WAGE}
+select c.*
+from (
+  select 
+    isnull(s.ticker_subsidiary,c.ticker) ticker,
+    case
+      when s.ticker_parent is not null and s.ticker_subsidiary is not null then subsidiary_name
+      else isnull(c.alt_company_name,c.company_name)
+    end company_name, 
+    case 
+      when s.ticker_subsidiary is not null then null 
+      else s.subsidiary_name 
+    end subsidiary, 
+    c.industry,
+    false
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker 
+  group by isnull(s.ticker_subsidiary,c.ticker), s.ticker_parent, s.ticker_subsidiary, s.subsidiary_name, c.industry, c.company_name, c.alt_company_name
+  union all
+  select 
+    c.ticker, 
+    c.company_name, 
+    null, 
+    c.industry,
+    true
+  from ${TABLE_COMPANY} c
+  join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker and s.ticker_subsidiary is null
+  group by c.ticker, c.company_name, c.industry
+  order by ticker
+) c
+join (
+  select ec.ticker, ec.subsidiary
+  from (
+    select ec.ticker, ec.subsidiary, (s.ticker is not null and ec.subsidiary is null) has_subsidiaries
+    from ${TABLE_COUNTY_EMPLOYEE_COUNT} ec
+    left join (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker having count(subsidiary_name) > 1) s on s.ticker = ec.ticker
+    group by ec.ticker, ec.subsidiary, s.ticker 
+  ) ec
+  join (
+    select ticker, subsidiary 
+    from ${TABLE_JOC_DISTRIBUTION} 
+    group by ticker, subsidiary 
+  ) d on d.ticker = ec.ticker and ((ec.subsidiary is null and (not ec.has_subsidiaries or d.subsidiary is null)) or (d.subsidiary = ec.subsidiary))
+) c2 on c2.ticker = c.ticker and ((c.subsidiary is null and c2.subsidiary is null) or (c2.subsidiary = c.subsidiary))
+order by ticker, subsidiary;
+
+]]></attr>
+</Node>
+</Phase>
+</Graph>
