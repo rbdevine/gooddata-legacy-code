@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Mon Jul 10 23:52:52 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateCurrentIndustryData" revision="1.215" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Tue Jul 11 16:26:43 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateCurrentIndustryData" revision="1.225" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
@@ -13,10 +13,10 @@
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_LOW_DATA_COMPANIES_TABLENAME" value="TMP_LOW_DATA_COMPANIES"/>
 <Property id="GraphParameter1" name="TMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
-<Property fileURL="wage.prm" id="GraphParameter52"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter2"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter11"/>
-<Property fileURL="workspace.prm" id="GraphParameter34"/>
+<Property fileURL="wage.prm" id="GraphParameter2"/>
+<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter59"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter68"/>
+<Property fileURL="workspace.prm" id="GraphParameter91"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -141,86 +141,211 @@ order by w.joc, c.ticker;
 </Phase>
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Reduce Valid Company Job Table" guiX="174" guiY="245" id="REDUCE_VALID_COMPANY_JOB_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[delete from ${TABLE_VALID_COMPANY_JOC}
-where joc in (
-  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
-);
-delete from ${TABLE_VALID_COMPANY_JOC}
-where ticker in (
-  select c.ticker 
-  from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
+<attr name="sqlQuery"><![CDATA[/*******************************************************************************
+  HP Vertica does not allow multi-criteria deletes, so need to use temp table
+  Do 5 pairs of iterations of the following:
+    1. Select ${TABLE_VALID_COMPANY_JOC} records that pass minimum company per job criteria into temp table
+    2. Truncate ${TABLE_VALID_COMPANY_JOC}
+    3. Select temp table records that pass minimum job per company criteria back into ${TABLE_VALID_COMPANY_JOC}
+    4. Truncate the temp table
+  Iteration is necessary because the 2 elimination criteria are interdependent
+  Could break this into modules, but leaving as series of sql statements for now.
+*******************************************************************************/
+
+DROP TABLE IF EXISTS ${TMP_BASE}_VALID_COMPANY_JOC_TMP;
+CREATE TABLE ${TMP_BASE}_VALID_COMPANY_JOC_TMP (
+  JOC VARCHAR(128) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL
 );
 
-delete from ${TABLE_VALID_COMPANY_JOC}
-where joc in (
-  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
-);
-delete from ${TABLE_VALID_COMPANY_JOC}
-where ticker in (
-  select c.ticker 
-  from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
-);
+/*******************************************************************************
+  ITERATION 1
+*******************************************************************************/
 
-delete from ${TABLE_VALID_COMPANY_JOC}
-where joc in (
-  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
-);
-delete from ${TABLE_VALID_COMPANY_JOC}
-where ticker in (
-  select c.ticker 
-  from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
-);
+/****** Step 1 ********/
+INSERT INTO ${TMP_BASE}_VALID_COMPANY_JOC_TMP
+SELECT vcj.joc, vcj.ticker
+FROM ${TABLE_VALID_COMPANY_JOC} vcj
+JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+JOIN (
+  SELECT c.industry, vcj.joc 
+  FROM ${TABLE_VALID_COMPANY_JOC} vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.joc 
+  HAVING count(c.ticker) >= max(p.MIN_CO_PER_JOB)
+) t on t.joc = vcj.joc and t.industry = c.industry;
 
-delete from ${TABLE_VALID_COMPANY_JOC}
-where joc in (
-  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
-);
-delete from ${TABLE_VALID_COMPANY_JOC}
-where ticker in (
-  select c.ticker 
-  from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
-);
+/****** Step 2 ********/
+TRUNCATE TABLE ${TABLE_VALID_COMPANY_JOC};
 
-delete from ${TABLE_VALID_COMPANY_JOC}
-where joc in (
-  select vcj.joc from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, vcj.joc having count(c.ticker) < max(p.MIN_CO_PER_JOB)
-);
-delete from ${TABLE_VALID_COMPANY_JOC}
-where ticker in (
-  select c.ticker 
-  from ${TABLE_VALID_COMPANY_JOC} vcj
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
-  join ${TABLE_PARAM} p on true 
-  group by c.industry, c.ticker having count(vcj.joc) < max(p.MIN_JOBS_PER_CO)
-);
+/****** Step 3 ********/
+INSERT INTO ${TABLE_VALID_COMPANY_JOC}
+SELECT vcj.joc, vcj.ticker
+FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+join (
+  SELECT c.industry, vcj.ticker, count(vcj.joc) joc_cnt
+  FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.ticker 
+  HAVING count(vcj.joc) >= max(p.MIN_JOBS_PER_CO)
+) t on t.ticker = vcj.ticker;
 
+/****** Step 4 ********/
+TRUNCATE TABLE ${TMP_BASE}_VALID_COMPANY_JOC_TMP;
+
+
+/*******************************************************************************
+  ITERATION 2
+*******************************************************************************/
+
+/****** Step 1 ********/
+INSERT INTO ${TMP_BASE}_VALID_COMPANY_JOC_TMP
+SELECT vcj.joc, vcj.ticker
+FROM ${TABLE_VALID_COMPANY_JOC} vcj
+JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+JOIN (
+  SELECT c.industry, vcj.joc 
+  FROM ${TABLE_VALID_COMPANY_JOC} vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.joc 
+  HAVING count(c.ticker) >= max(p.MIN_CO_PER_JOB)
+) t on t.joc = vcj.joc and t.industry = c.industry;
+
+/****** Step 2 ********/
+TRUNCATE TABLE ${TABLE_VALID_COMPANY_JOC};
+
+/****** Step 3 ********/
+INSERT INTO ${TABLE_VALID_COMPANY_JOC}
+SELECT vcj.joc, vcj.ticker
+FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+join (
+  SELECT c.industry, vcj.ticker, count(vcj.joc) joc_cnt
+  FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.ticker 
+  HAVING count(vcj.joc) >= max(p.MIN_JOBS_PER_CO)
+) t on t.ticker = vcj.ticker;
+
+/****** Step 4 ********/
+TRUNCATE TABLE ${TMP_BASE}_VALID_COMPANY_JOC_TMP;
+
+
+/*******************************************************************************
+  ITERATION 3
+*******************************************************************************/
+
+/****** Step 1 ********/
+INSERT INTO ${TMP_BASE}_VALID_COMPANY_JOC_TMP
+SELECT vcj.joc, vcj.ticker
+FROM ${TABLE_VALID_COMPANY_JOC} vcj
+JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+JOIN (
+  SELECT c.industry, vcj.joc 
+  FROM ${TABLE_VALID_COMPANY_JOC} vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.joc 
+  HAVING count(c.ticker) >= max(p.MIN_CO_PER_JOB)
+) t on t.joc = vcj.joc and t.industry = c.industry;
+
+/****** Step 2 ********/
+TRUNCATE TABLE ${TABLE_VALID_COMPANY_JOC};
+
+/****** Step 3 ********/
+INSERT INTO ${TABLE_VALID_COMPANY_JOC}
+SELECT vcj.joc, vcj.ticker
+FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+join (
+  SELECT c.industry, vcj.ticker, count(vcj.joc) joc_cnt
+  FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.ticker 
+  HAVING count(vcj.joc) >= max(p.MIN_JOBS_PER_CO)
+) t on t.ticker = vcj.ticker;
+
+/****** Step 4 ********/
+TRUNCATE TABLE ${TMP_BASE}_VALID_COMPANY_JOC_TMP;
+
+
+/*******************************************************************************
+  ITERATION 4
+*******************************************************************************/
+
+/****** Step 1 ********/
+INSERT INTO ${TMP_BASE}_VALID_COMPANY_JOC_TMP
+SELECT vcj.joc, vcj.ticker
+FROM ${TABLE_VALID_COMPANY_JOC} vcj
+JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+JOIN (
+  SELECT c.industry, vcj.joc 
+  FROM ${TABLE_VALID_COMPANY_JOC} vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.joc 
+  HAVING count(c.ticker) >= max(p.MIN_CO_PER_JOB)
+) t on t.joc = vcj.joc and t.industry = c.industry;
+
+/****** Step 2 ********/
+TRUNCATE TABLE ${TABLE_VALID_COMPANY_JOC};
+
+/****** Step 3 ********/
+INSERT INTO ${TABLE_VALID_COMPANY_JOC}
+SELECT vcj.joc, vcj.ticker
+FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+join (
+  SELECT c.industry, vcj.ticker, count(vcj.joc) joc_cnt
+  FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.ticker 
+  HAVING count(vcj.joc) >= max(p.MIN_JOBS_PER_CO)
+) t on t.ticker = vcj.ticker;
+
+/****** Step 4 ********/
+TRUNCATE TABLE ${TMP_BASE}_VALID_COMPANY_JOC_TMP;
+
+
+/*******************************************************************************
+  ITERATION 5
+*******************************************************************************/
+
+/****** Step 1 ********/
+INSERT INTO ${TMP_BASE}_VALID_COMPANY_JOC_TMP
+SELECT vcj.joc, vcj.ticker
+FROM ${TABLE_VALID_COMPANY_JOC} vcj
+JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+JOIN (
+  SELECT c.industry, vcj.joc 
+  FROM ${TABLE_VALID_COMPANY_JOC} vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.joc 
+  HAVING count(c.ticker) >= max(p.MIN_CO_PER_JOB)
+) t on t.joc = vcj.joc and t.industry = c.industry;
+
+/****** Step 2 ********/
+TRUNCATE TABLE ${TABLE_VALID_COMPANY_JOC};
+
+/****** Step 3 ********/
+INSERT INTO ${TABLE_VALID_COMPANY_JOC}
+SELECT vcj.joc, vcj.ticker
+FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+join (
+  SELECT c.industry, vcj.ticker, count(vcj.joc) joc_cnt
+  FROM ${TMP_BASE}_VALID_COMPANY_JOC_TMP vcj
+  JOIN ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = vcj.ticker
+  JOIN ${TABLE_PARAM} p on true 
+  GROUP BY c.industry, vcj.ticker 
+  HAVING count(vcj.joc) >= max(p.MIN_JOBS_PER_CO)
+) t on t.ticker = vcj.ticker;
+
+/****** Step 4 ********/
+TRUNCATE TABLE ${TMP_BASE}_VALID_COMPANY_JOC_TMP;
 ]]></attr>
 </Node>
 </Phase>
