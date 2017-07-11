@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Fri Jul 07 00:52:38 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.158" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Tue Jul 11 01:30:28 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.165" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -49,6 +49,7 @@ create table if not exists ${REPORT_MATRIX_TABLENAME} (
     C36 VARCHAR(255) DEFAULT '', C37 VARCHAR(255) DEFAULT '', C38 VARCHAR(255) DEFAULT '', C39 VARCHAR(255) DEFAULT '', C40 VARCHAR(255) DEFAULT '',
     C41 VARCHAR(255) DEFAULT '', C42 VARCHAR(255) DEFAULT '', C43 VARCHAR(255) DEFAULT '', C44 VARCHAR(255) DEFAULT '', C45 VARCHAR(255) DEFAULT '', 
     C46 VARCHAR(255) DEFAULT '', C47 VARCHAR(255) DEFAULT '', C48 VARCHAR(255) DEFAULT '', C49 VARCHAR(255) DEFAULT '', C50 VARCHAR(255) DEFAULT '',
+    C51 VARCHAR(255) DEFAULT '', C52 VARCHAR(255) DEFAULT '', C53 VARCHAR(255) DEFAULT '', C54 VARCHAR(255) DEFAULT '', C55 VARCHAR(255) DEFAULT '',
     RANK_VALUE VARCHAR(8) DEFAULT '', INDUSTRY_JOB_TOTAL VARCHAR(8) DEFAULT ''
 );]]></attr>
 </Node>
@@ -112,7 +113,12 @@ insert into ${TABLE_COLUMN_NUMBER} values('46');
 insert into ${TABLE_COLUMN_NUMBER} values('47');
 insert into ${TABLE_COLUMN_NUMBER} values('48');
 insert into ${TABLE_COLUMN_NUMBER} values('49');
-insert into ${TABLE_COLUMN_NUMBER} values('50');]]></attr>
+insert into ${TABLE_COLUMN_NUMBER} values('50');
+insert into ${TABLE_COLUMN_NUMBER} values('51');
+insert into ${TABLE_COLUMN_NUMBER} values('52');
+insert into ${TABLE_COLUMN_NUMBER} values('53');
+insert into ${TABLE_COLUMN_NUMBER} values('54');
+insert into ${TABLE_COLUMN_NUMBER} values('55');]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Id Remapped" guiX="65" guiY="95" id="POPULATE_COMPANY_ID_REMAPPED" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_ID_REMAPPED}
@@ -217,7 +223,8 @@ join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = c.ticker;]]></attr>
   c11, c12, c13, c14, c15, c16, c17, c18, c19, c20,
   c21, c22, c23, c24, c25, c26, c27, c28, c29, c30,
   c31, c32, c33, c34, c35, c36, c37, c38, c39, c40,
-  c41, c42, c43, c44, c45, c46, c47, c48, c49, c50
+  c41, c42, c43, c44, c45, c46, c47, c48, c49, c50,
+  c51, c52, c53, c54, c55
 )
 select c2.industry, 'CO_HEADER_NAME', c.ticker, c.ticker, c2.company_name,
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
@@ -229,6 +236,7 @@ select c2.industry, 'CO_HEADER_NAME', c.ticker, c.ticker, c2.company_name,
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG',
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG'
 from ${TABLE_COMPANY_COLUMN} c
 join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = c.ticker;]]></attr>
@@ -260,7 +268,7 @@ join (
   select j.industry, cjd.ticker, sum(j.company_count) ind_company_count 
   from ${TABLE_JOC_COMPANY_COUNT} j
   join ${TABLE_COMPANY_JOB_DATA} cjd on j.joc = cjd.joc
-  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = cjd.ticker
+  join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = cjd.ticker and c2.industry = j.industry
   group by j.industry, cjd.ticker
   order by j.industry, cjd.ticker
 ) ist on ist.ticker = c.ticker;
@@ -319,8 +327,7 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set c" + $in.0.column_number + " = c2.company_name ";
 	sql = sql + "from ${TABLE_COMPANY_ID_REMAPPED} r ";
-	sql = sql + "join ${TABLE_COMPANY_COLUMN} c on c.ticker = r.ticker ";
-	sql = sql + "join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = c.ticker ";
+	sql = sql + "join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = r.ticker_2 ";
 	sql = sql + "where r.ticker = mtx.ticker and ";
 	sql = sql + "  mtx.row_type = 'CO_HEADER_COLUMN_HEADERS' and ";
 	sql = sql + "  r.company_column_no_adj = " + $in.0.column_number + ";";
@@ -356,9 +363,9 @@ function integer transform() {
 	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
 	sql = sql + "set c" + $in.0.column_number + " = cast(cast(round(s.wage_hourly_cola,2) as numeric(36,2)) as varchar(8)) ";
 	sql = sql + "from ${TABLE_COMPANY_ID_REMAPPED} r ";
-	sql = sql + "join ${TABLE_COMPANY_COLUMN} c on c.ticker = r.ticker ";
-	sql = sql + "join ${TABLE_COMPANY_JOB_DATA} cjd on cjd.ticker = c.ticker ";
-	sql = sql + "join ${TABLE_WAGE_SUMMARY} s on s.ticker = c.ticker and s.joc = cjd.joc ";
+	//sql = sql + "join ${TABLE_COMPANY_COLUMN} c on c.ticker = r.ticker ";
+	sql = sql + "join ${TABLE_COMPANY_JOB_DATA} cjd on cjd.ticker = r.ticker_2 ";
+	sql = sql + "join ${TABLE_WAGE_SUMMARY} s on s.ticker = r.ticker_2 and s.joc = cjd.joc ";
 	sql = sql + "where mtx.description = cjd.joc and ";
 	sql = sql + "  r.ticker = mtx.ticker and ";
 	sql = sql + "  mtx.row_type = 'CO_DATA' and ";
