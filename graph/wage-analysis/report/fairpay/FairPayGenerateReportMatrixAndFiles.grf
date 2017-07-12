@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Tue Jul 11 01:30:28 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.165" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Tue Jul 11 22:31:25 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.172" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -50,6 +50,9 @@ create table if not exists ${REPORT_MATRIX_TABLENAME} (
     C41 VARCHAR(255) DEFAULT '', C42 VARCHAR(255) DEFAULT '', C43 VARCHAR(255) DEFAULT '', C44 VARCHAR(255) DEFAULT '', C45 VARCHAR(255) DEFAULT '', 
     C46 VARCHAR(255) DEFAULT '', C47 VARCHAR(255) DEFAULT '', C48 VARCHAR(255) DEFAULT '', C49 VARCHAR(255) DEFAULT '', C50 VARCHAR(255) DEFAULT '',
     C51 VARCHAR(255) DEFAULT '', C52 VARCHAR(255) DEFAULT '', C53 VARCHAR(255) DEFAULT '', C54 VARCHAR(255) DEFAULT '', C55 VARCHAR(255) DEFAULT '',
+    C56 VARCHAR(255) DEFAULT '', C57 VARCHAR(255) DEFAULT '', C58 VARCHAR(255) DEFAULT '', C59 VARCHAR(255) DEFAULT '', C60 VARCHAR(255) DEFAULT '',
+    C61 VARCHAR(255) DEFAULT '', C62 VARCHAR(255) DEFAULT '', C63 VARCHAR(255) DEFAULT '', C64 VARCHAR(255) DEFAULT '', C65 VARCHAR(255) DEFAULT '',
+    C66 VARCHAR(255) DEFAULT '', C67 VARCHAR(255) DEFAULT '', C68 VARCHAR(255) DEFAULT '', C69 VARCHAR(255) DEFAULT '', C70 VARCHAR(255) DEFAULT '',
     RANK_VALUE VARCHAR(8) DEFAULT '', INDUSTRY_JOB_TOTAL VARCHAR(8) DEFAULT ''
 );]]></attr>
 </Node>
@@ -118,7 +121,22 @@ insert into ${TABLE_COLUMN_NUMBER} values('51');
 insert into ${TABLE_COLUMN_NUMBER} values('52');
 insert into ${TABLE_COLUMN_NUMBER} values('53');
 insert into ${TABLE_COLUMN_NUMBER} values('54');
-insert into ${TABLE_COLUMN_NUMBER} values('55');]]></attr>
+insert into ${TABLE_COLUMN_NUMBER} values('55');
+insert into ${TABLE_COLUMN_NUMBER} values('56');
+insert into ${TABLE_COLUMN_NUMBER} values('57');
+insert into ${TABLE_COLUMN_NUMBER} values('58');
+insert into ${TABLE_COLUMN_NUMBER} values('59');
+insert into ${TABLE_COLUMN_NUMBER} values('60');
+insert into ${TABLE_COLUMN_NUMBER} values('61');
+insert into ${TABLE_COLUMN_NUMBER} values('62');
+insert into ${TABLE_COLUMN_NUMBER} values('63');
+insert into ${TABLE_COLUMN_NUMBER} values('64');
+insert into ${TABLE_COLUMN_NUMBER} values('65');
+insert into ${TABLE_COLUMN_NUMBER} values('66');
+insert into ${TABLE_COLUMN_NUMBER} values('67');
+insert into ${TABLE_COLUMN_NUMBER} values('68');
+insert into ${TABLE_COLUMN_NUMBER} values('69');
+insert into ${TABLE_COLUMN_NUMBER} values('70');]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Id Remapped" guiX="65" guiY="95" id="POPULATE_COMPANY_ID_REMAPPED" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_ID_REMAPPED}
@@ -224,7 +242,8 @@ join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = c.ticker;]]></attr>
   c21, c22, c23, c24, c25, c26, c27, c28, c29, c30,
   c31, c32, c33, c34, c35, c36, c37, c38, c39, c40,
   c41, c42, c43, c44, c45, c46, c47, c48, c49, c50,
-  c51, c52, c53, c54, c55
+  c51, c52, c53, c54, c55, c56, c57, c58, c59, c60,
+  c61, c62, c63, c64, c65, c66, c67, c68, c69, c70
 )
 select c2.industry, 'CO_HEADER_NAME', c.ticker, c.ticker, c2.company_name,
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
@@ -236,6 +255,9 @@ select c2.industry, 'CO_HEADER_NAME', c.ticker, c.ticker, c2.company_name,
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG',
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG',
+  'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG',
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG',
   'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG', 'REAL WAGE HOURLY AVG'
 from ${TABLE_COMPANY_COLUMN} c
