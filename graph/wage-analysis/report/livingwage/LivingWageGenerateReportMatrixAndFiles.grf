@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jul 06 13:00:58 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.441" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jul 13 15:55:41 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.444" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -18,10 +18,10 @@
 <Property id="GraphParameter4" name="MINIMUM_WAGE_BY_STATE_TABLENAME" value="LKP_MINIMUM_WAGE_BY_STATE"/>
 <Property id="GraphParameter5" name="MINIMUM_WAGE_CUSHION" value="0.10"/>
 <Property id="GraphParameter6" name="STATE_MIN_AVG_SALARIES_TABLENAME" value="LKP_LIVING_WAGE_STATE_MINIMUM_AVERAGE_SALARIES"/>
-<Property fileURL="wage.prm" id="GraphParameter87"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter7"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter46"/>
-<Property fileURL="workspace.prm" id="GraphParameter69"/>
+<Property fileURL="wage.prm" id="GraphParameter7"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter53"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter92"/>
+<Property fileURL="workspace.prm" id="GraphParameter115"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -419,7 +419,14 @@ select
   cast(round(sum(employee_count_living_wage_total),2) as numeric(18,2))
 from (select ticker from ${GOC_ORDER_TABLENAME} group by ticker) g
 join ${TABLE_COMPANY_LOCATION_DETAIL} d on d.ticker = g.ticker
-join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker
+join (
+  select industry, ticker, subsidiary
+  from ${TABLE_COMPANY_LIVING_WAGE}
+  union all
+  select industry, s.ticker, null
+  from (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent) s
+  join ${TABLE_COMPANY} c on c.ticker = s.ticker
+) c on c.ticker = d.ticker and isnull(c.subsidiary,'') = isnull(d.subsidiary,'')
 group by c.ticker, d.subsidiary, c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Totals No Data" guiX="260" guiY="391" id="ADD_TOTALS_NO_DATA" type="DB_EXECUTE">
