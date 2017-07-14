@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Sat May 13 13:27:00 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupTables" revision="1.262" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Fri Jul 14 15:37:53 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.263" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="wage-staging.prm" id="GraphParameter0"/>
-<Property fileURL="workspace.prm" id="GraphParameter15"/>
+<Property fileURL="workspace.prm" id="GraphParameter23"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/core/LoadData.grf" guiName="Load Core Data" guiX="51" guiY="6" id="LOAD_CORE_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/core/LoadData.grf" guiName="Load Company Data" guiX="51" guiY="6" id="LOAD_COMPANY_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/external/LoadData.grf" guiName="Load External Data" guiX="51" guiY="109" id="LOAD_EXTERNAL_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/DistByJOC.grf" guiName="Load Distribution Data" guiX="44" guiY="107" id="LOAD_DISTRIBUTION_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="2">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-loading/internal/LoadData.grf" guiName="Load Internal Data" guiX="52" guiY="212" id="LOAD_INTERNAL_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/internal/county-employee-count/CountyEmployeeCountAll.grf" guiName="Load County Count Data" guiX="38" guiY="203" id="LOAD_COUNTY_COUNT_DATA" type="RUN_GRAPH"/>
 </Phase>
 </Graph>

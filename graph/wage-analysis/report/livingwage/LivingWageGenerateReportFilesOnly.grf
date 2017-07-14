@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jul 10 16:33:01 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.112" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jul 14 14:32:17 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.115" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -99,9 +99,9 @@
 <Property id="GraphParameter6" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter7" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter65"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter104"/>
-<Property fileURL="workspace.prm" id="GraphParameter127"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter54"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter93"/>
+<Property fileURL="workspace.prm" id="GraphParameter116"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -261,7 +261,7 @@ function integer transform() {
   $Avg_wages_below_lw:=(
     case
       when sum(dist_contrib) = 0 then ''
-      else cast(cast(round(sum(avg_per_goc_below_lw)/sum(dist_contrib),3) as numeric(36,3)) as varchar(32))
+      else cast(cast(round(sum(avg_per_goc_below_lw)/(sum(dist_contrib)/(sum(dist_contrib) + sum(dist_non_contrib))),3) as numeric(36,3)) as varchar(32))
     end
   )
 FROM (
@@ -278,7 +278,11 @@ FROM (
     case
       when q.AVG_RATE_PROPORTION_WEIGHTED < 1.0 then d.distribution
       else 0.0
-    end dist_contrib
+    end dist_contrib,
+    case
+      when q.AVG_RATE_PROPORTION_WEIGHTED >= 1.0 then d.distribution
+      else 0.0
+    end dist_non_contrib
   FROM ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME} a
   JOIN ${SCORE_QUALITY_BY_COMPANY_TABLENAME} q on q.ticker = a.ticker and ((q.subsidiary is null and a.subsidiary is null) or (q.subsidiary = a.subsidiary))
   JOIN ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = q.ticker and ((c.subsidiary is null and q.subsidiary is null) or (c.subsidiary = q.subsidiary))

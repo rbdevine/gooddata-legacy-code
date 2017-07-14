@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 13 00:56:17 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateLookupMatrix" revision="1.124" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Jul 14 09:45:22 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.125" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -20,7 +20,7 @@
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/prepare-report-data/GenerateAllJobData.grf" guiName="Generate Company Living Wage" guiX="177" guiY="18" id="GENERATE_COMPANY_LIVING_WAGE" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/prepare-report-data/GenerateCompanyLivingWage.grf" guiName="Generate Company Living Wage" guiX="177" guiY="18" id="GENERATE_COMPANY_LIVING_WAGE" type="RUN_GRAPH"/>
 <Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/prepare-report-data/GenerateFairPayJobData.grf" guiName="Generate Fair Pay Data" guiX="403" guiY="18" id="GENERATE_FAIR_PAY_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="1">

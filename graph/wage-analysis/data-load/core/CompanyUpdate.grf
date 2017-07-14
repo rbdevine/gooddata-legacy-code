@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jul 10 15:17:11 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.125" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jul 14 15:42:17 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.132" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Company_Update_Database" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -6,6 +6,7 @@
 <Field name="COMPANY_NAME" type="string"/>
 <Field name="INDUSTRY" type="string"/>
 <Field name="ALT_COMPANY_NAME" type="string"/>
+<Field name="SUBSIDY_CODE" type="string"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
@@ -14,6 +15,7 @@
 <Field name="NAME" type="string"/>
 <Field name="JUST_IND" type="string"/>
 <Field name="ALT_NAME" type="string"/>
+<Field name="SUBSIDY_CODE" type="integer"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -24,9 +26,9 @@
 <Property id="GraphParameter4" name="TABLE_COMPANY_UPDATE" value="${STG_BASE}_COMPANY_UPDATE"/>
 <Property id="GraphParameter5" name="TABLE_COMPANY_UPDATE_HISTORY" value="${STG_BASE}_COMPANY_UPDATE_HISTORY"/>
 <Property fileURL="wage.prm" id="GraphParameter6"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter63"/>
-<Property fileURL="workspace.prm" id="GraphParameter86"/>
-<Property id="GraphParameter104" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/companyupdate.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter52"/>
+<Property fileURL="workspace.prm" id="GraphParameter75"/>
+<Property id="GraphParameter93" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/companyupdate.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -182,13 +184,15 @@ WHERE h.ticker = c.ticker;]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Company Unmatched Ticker" guiX="496" guiY="501" id="DROP_COMPANY_UNMATCHED_TICKER" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_UNMATCHED_TICKER};]]></attr>
-</Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Update History with New" guiX="733" guiY="501" id="POPULATE_COMPANY_UPDATE_HISTORY_WITH_NEW" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_UPDATE_HISTORY}
 (TICKER, COMPANY_NAME_NEW, INDUSTRY_NEW, ALT_COMPANY_NAME_NEW, SUBSIDY_CODE_NEW)
 SELECT * FROM ${TABLE_COMPANY_UNMATCHED_TICKER};]]></attr>
+</Node>
+</Phase>
+<Phase number="7">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Company Unmatched Ticker" guiX="500" guiY="574" id="DROP_COMPANY_UNMATCHED_TICKER" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_COMPANY_UNMATCHED_TICKER};]]></attr>
 </Node>
 </Phase>
 </Graph>
