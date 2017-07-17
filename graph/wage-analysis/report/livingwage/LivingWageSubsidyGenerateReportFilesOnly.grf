@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu May 25 13:34:28 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.117" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jul 17 15:33:30 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.124" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -46,7 +46,7 @@
 <Field name="GOC" type="string"/>
 <Field name="HOURLY_WAGE_RAW" type="string"/>
 <Field name="MINIMUM_WAGE" type="string"/>
-<Field name="LIVING_WAGE_AVG" type="string"/>
+<Field name="LIVING_WAGE_HOURLY" type="string"/>
 <Field name="EMP_COUNT_TOTAL" type="string"/>
 <Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_TOTAL" type="string"/>
@@ -108,24 +108,23 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="graph/local/wage-local-parameters.prm" id="GraphParameter0"/>
-<Property id="GraphParameter1" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
-<Property id="GraphParameter2" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
-<Property id="GraphParameter3" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
-<Property id="GraphParameter4" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}/subsidy"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter5"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter14"/>
-<Property fileURL="workspace.prm" id="GraphParameter53"/>
+<Property id="GraphParameter2" name="REPORTFILEPATH_DETAILS_COUNTY" value="${REPORTS_DIR}/Details_County.csv"/>
+<Property id="GraphParameter3" name="REPORTFILEPATH_DETAILS_COUNTY_TICKER" value="${REPORTS_DIR}/Details_County_Ticker.csv"/>
+<Property id="GraphParameter4" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
+<Property id="GraphParameter5" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}/subsidy"/>
+<Property fileURL="wage.prm" id="GraphParameter6"/>
+<Property fileURL="workspace.prm" id="GraphParameter62"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Subsidy Details Table" guiX="211" guiY="10" id="CREATE_SUBSIDY_DETAILS_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${SUBSIDY_DETAILS_TABLENAME};
-CREATE TABLE ${SUBSIDY_DETAILS_TABLENAME} (
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Subsidy Detail" guiX="233" guiY="10" id="TABLE_SUBSIDY_DETAIL" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_SUBSIDY_DETAIL};
+CREATE TABLE ${TABLE_SUBSIDY_DETAIL} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(32) NOT NULL,
   GOC VARCHAR(128) NOT NULL,
   HOURLY_WAGE_RAW FLOAT NOT NULL,
-  LIVING_WAGE_AVG FLOAT NOT NULL,
+  LIVING_WAGE_HOURLY FLOAT NOT NULL,
   STATE_MINIMUM_WAGE FLOAT NOT NULL,
   EMP_COUNT_TOTAL FLOAT NOT NULL,
   EMP_COUNT_SUBSIDY_TOTAL FLOAT NOT NULL,
@@ -145,14 +144,14 @@ CREATE TABLE ${SUBSIDY_DETAILS_TABLENAME} (
 </Node>
 </Phase>
 <Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Details" guiX="222" guiY="103" id="POPULATE_SUBSIDY_DETAILS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${SUBSIDY_DETAILS_TABLENAME}
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Detail" guiX="225" guiY="103" id="POPULATE_SUBSIDY_DETAIL" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_SUBSIDY_DETAIL}
 select
   state_county_fips,
   ticker,
   goc,
   rate_raw,
-  living_wage_avg,
+  living_wage_hourly,
   minimum_wage,
   emp_count_total,
   emp_count_subsidy_total,
@@ -173,7 +172,7 @@ from (
     ticker,
     goc,
     isnull(rate_raw,0.0) rate_raw,
-    isnull(living_wage_avg,0.0) living_wage_avg,
+    isnull(living_wage_hourly,0.0) living_wage_hourly,
     isnull(minimum_wage,0.0) minimum_wage,
     isnull(emp_count_total,0.0) emp_count_total, 
     isnull(emp_count_subsidy_total,0.0) emp_count_subsidy_total,
@@ -193,11 +192,11 @@ from (
       sc.ticker,
       sc.goc,
       gc.rate_raw,
-      lwa.living_wage_avg,
+      f.living_wage_hourly,
       mw.minimum_wage,
       gc.employee_count emp_count_total,
       case 
-        when gc.rate_raw < lwa.living_wage_avg then gc.employee_count
+        when gc.rate_raw < lwa.living_wage_hourly then gc.employee_count
         else 0.0
       end emp_count_below_lw,
       case
@@ -252,12 +251,12 @@ from (
         when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
         else aca_lw.subsidy_annual - isnull(aca_base.subsidy_annual,0.0)
       end) * sc.emp_count_aca aca_subsidy_total
-    from ${SUBSIDY_COUNTS_TABLENAME} sc
-    join ${SUBSIDY_GOC_RATE_BY_COUNTY_TABLENAME} gc on 
+    from ${TABLE_SUBSIDY_COUNT} sc
+    join ${TABLE_SUBSIDY_COUNTY_JOC_RATE} gc on 
       gc.state_county_fips = sc.state_county_fips and 
       gc.ticker = sc.ticker and 
       gc.goc = sc.goc
-    join ${TABLE_FIPS_DATA_FOR_AVG} lwa on lwa.state_county_fips = sc.state_county_fips
+    join ${TABLE_FIPS_DATA} f on f.state_county_fips = sc.state_county_fips
     join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(sc.state_county_fips,2)
     join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = sc.ticker
     join ${MINIMUM_WAGE_BY_STATE_TABLENAME} mw on mw.state = fs.state
@@ -265,7 +264,7 @@ from (
     left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= gc.rate_raw and gc.rate_raw <= eitc.maximum_wage
     left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= gc.rate_raw and gc.rate_raw <= snap.maximum_wage
     left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= gc.rate_raw and gc.rate_raw <= aca_base.maximum_wage
-    left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_avg and lwa.living_wage_avg <= aca_lw.maximum_wage
+    left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_hourly and lwa.living_wage_hourly <= aca_lw.maximum_wage
   ) t
 ) t
 group by
@@ -273,7 +272,7 @@ group by
   ticker,
   goc,
   rate_raw,
-  living_wage_avg,
+  living_wage_hourly,
   minimum_wage,
   emp_count_total,
   emp_count_subsidy_total,
@@ -478,7 +477,7 @@ from (
       when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
       else 0.0
     end SUBSIDY_ABS_BY_EMP_ACA
-  from ${SUBSIDY_DETAILS_TABLENAME}
+  from ${TABLE_SUBSIDY_DETAIL}
   group by state_county_fips
 ) t
 order by state_county_fips;]]></attr>
@@ -490,7 +489,7 @@ order by state_county_fips;]]></attr>
   $GOC:=GOC,
   $HOURLY_WAGE_RAW:=concat('$',cast(round(HOURLY_WAGE_RAW,2) as numeric(16,2))),
   $MINIMUM_WAGE:=concat('$',cast(round(MINIMUM_WAGE,2) as numeric(16,2))),
-  $LIVING_WAGE_AVG:=concat('$',cast(round(LIVING_WAGE_AVG,2) as numeric(16,2))),
+  $LIVING_WAGE_HOURLY:=concat('$',cast(round(LIVING_WAGE_HOURLY,2) as numeric(16,2))),
   $EMP_COUNT_TOTAL:=cast(round(EMP_COUNT_TOTAL,3) as numeric(16,3)),
   $EMP_COUNT_SUBSIDY_TOTAL:=cast(round(EMP_COUNT_SUBSIDY_TOTAL,3) as numeric(16,3)),
   $SUBSIDY_TOTAL:=concat('$',cast(round(SUBSIDY_TOTAL,2) as numeric(16,2))),
@@ -532,7 +531,7 @@ from (
     GOC,
     HOURLY_WAGE_RAW,
     STATE_MINIMUM_WAGE MINIMUM_WAGE,
-    LIVING_WAGE_AVG,
+    LIVING_WAGE_HOURLY,
     EMP_COUNT_TOTAL,
     EMP_COUNT_SUBSIDY_TOTAL,
     SUBSIDY_TOTAL,
@@ -590,7 +589,7 @@ from (
       when EMP_COUNT_SUBSIDY_TOTAL > 0 then (SUBSIDY_TOTAL_ACA/EMP_COUNT_SUBSIDY_TOTAL)/1500.0
       else 0.0
     end SUBSIDY_ABS_BY_EMP_ACA
-  from ${SUBSIDY_DETAILS_TABLENAME}
+  from ${TABLE_SUBSIDY_DETAIL}
 ) t
 order by state_county_fips, ticker, hourly_wage_raw;]]></attr>
 </Node>
@@ -691,7 +690,7 @@ from (
       when sum(EMP_COUNT_SUBSIDY_TOTAL) > 0 then (sum(SUBSIDY_TOTAL_ACA)/sum(EMP_COUNT_SUBSIDY_TOTAL))/1500.0
       else 0.0
     end SUBSIDY_ABS_BY_EMP_ACA
-  from ${SUBSIDY_DETAILS_TABLENAME}
+  from ${TABLE_SUBSIDY_DETAIL}
   group by ticker
 ) t
 order by ticker;]]></attr>

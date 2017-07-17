@@ -1,25 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Feb 28 11:48:40 EST 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.36" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jul 17 14:46:55 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.49" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="ACA_SUBSIDY_MULT_IN" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Record fieldDelimiter="|" name="CODE_SUBSIDY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="CODE" type="integer"/>
-<Field name="ACA_SUBSIDY_MULTIPLIER" type="number"/>
+<Field name="DESCRIPTION" type="string"/>
 </Record>
 </Metadata>
-<Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
-<Record fieldDelimiter="|" name="ACA_SUBSIDY_MULT_OUT" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
-<Field name="CODE" type="integer"/>
-<Field name="MULTIPLIER" type="number"/>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" name="SUBSIDY_CODE_DB" recordDelimiter="\n" type="delimited">
+<Field name="SUBSIDY_CODE" type="integer"/>
+<Field name="DESCRIPTION" type="string"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/ACASUBSIDYMULTIPLIER.xlsx"/>
-<Property id="GraphParameter31" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/acasubsidymultipliererror.txt"/>
-<Property id="GraphParameter32" name="READFILEPATH" value="${DATA_TMP_DIR}/ACASubsidyMultiplier.xlsx"/>
-<Property id="GraphParameter33" name="TABLENAME" value="${SUBSIDY_ACA_MULTIPLIER_TABLENAME}"/>
-<Property fileURL="workspace.prm" id="GraphParameter34"/>
-<Property id="GraphParameter52" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/ACASubsidyMultiplier.txt"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter1"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/livingwage/CODEDESCRIPTION.xlsx"/>
+<Property id="GraphParameter37" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/codedescriptionerror.txt"/>
+<Property id="GraphParameter38" name="READFILEPATH" value="${DATA_TMP_DIR}/CodeDescription.xlsx"/>
+<Property id="GraphParameter39" name="TABLENAME" value="${TABLE_SUBSIDY_CODE}"/>
+<Property fileURL="workspace.prm" id="GraphParameter40"/>
+<Property id="GraphParameter58" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/CodeDescription.txt"/>
+<Property fileURL="wage.prm" id="GraphParameter1"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -33,8 +33,8 @@
 
 // Transforms input record into output record.
 function integer transform() {
-	$out.0.CODE = $in.0.CODE;
-	$out.0.MULTIPLIER = $in.0.ACA_SUBSIDY_MULTIPLIER;
+	$out.0.SUBSIDY_CODE = $in.0.CODE;
+	$out.0.DESCRIPTION = $in.0.DESCRIPTION;
 	
 	return ALL;
 }
@@ -70,16 +70,16 @@ function integer transform() {
 <Phase number="3">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="166" guiY="198" id="CREATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[CREATE TABLE IF NOT EXISTS ${TABLENAME} (
-  CODE INTEGER UNIQUE NOT NULL,
-  MULTIPLIER FLOAT NOT NULL
+  SUBSIDY_CODE INTEGER UNIQUE NOT NULL,
+  DESCRIPTION VARCHAR(128) UNIQUE NOT NULL
 );]]></attr>
 </Node>
 </Phase>
 <Phase number="4">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="198" id="POPULATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[COPY ${TABLENAME} (
-    CODE,
-    MULTIPLIER
+    SUBSIDY_CODE,
+    DESCRIPTION
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -87,6 +87,10 @@ EXCEPTIONS '${POPULATEERRORFILEPATH}';
 </Node>
 </Phase>
 <Phase number="5">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="472" guiY="198" id="CLEAN_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLENAME} SET DESCRIPTION = TRIM(DESCRIPTION);
+]]></attr>
+</Node>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="166" guiY="285" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="325" guiY="285" id="CLEAN_WRITE" type="FILE_DELETE"/>
 </Phase>
