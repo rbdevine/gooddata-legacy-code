@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 18 16:16:42 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.99" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" name="CITY_FIPS" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="STATE_FIPS" type="string"/>
+<Field name="STATE_ABBREVIATION" type="string"/>
+<Field name="STATE_NAME" type="string"/>
+<Field name="COUNTY_FIPS" type="string"/>
+<Field name="COUNTY_NAME" type="string"/>
+<Field name="STATE_COUNTY_FIPS" type="string"/>
+<Field name="CITY_FIPS" type="string"/>
+<Field name="CITY_NAME" type="string"/>
+</Record>
+</Metadata>
+<Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/CityFips.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/city_fips_error.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/CityFips.xlsx"/>
+<Property fileURL="wage.prm" id="GraphParameter43"/>
+<Property fileURL="workspace.prm" id="GraphParameter25"/>
+<Property id="GraphParameter105" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/CityFIPS.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter3"/>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Create Table" guiX="324" guiY="16" id="CREATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_CITY_FIPS};
+CREATE TABLE IF NOT EXISTS ${TABLE_CITY_FIPS} (
+  STATE_FIPS VARCHAR(2) NOT NULL,
+  STATE_ABBREVIATION VARCHAR(2) NOT NULL,
+  STATE_NAME VARCHAR(128) NOT NULL,
+  COUNTY_FIPS VARCHAR(3) NOT NULL,
+  COUNTY_NAME VARCHAR(128) NOT NULL,
+  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
+  CITY_FIPS VARCHAR(5) NULL,
+  CITY_NAME VARCHAR(128) NOT NULL
+);]]></attr>
+</Node>
+<Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="12" guiY="16" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
+</Phase>
+<Phase number="1">
+<Node enabled="enabled" fileURL="${WRITEFILEPATH}" guiName="CSV Writer" guiX="325" guiY="104" id="CSV_WRITER" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${READFILEPATH}" guiName="Read File" guiX="6" guiY="98" id="READ_FILE" type="SPREADSHEET_READER"/>
+<Node enabled="enabled" guiName="Reformat" guiX="166" guiY="104" id="REFORMAT" type="REFORMAT">
+<attr name="transform"><![CDATA[//#CTL2
+
+// Transforms input record into output record.
+function integer transform() {
+	$out.0.* = $in.0.*;
+	
+	return ALL;
+}
+
+// Called during component initialization.
+// function boolean init() {}
+
+// Called during each graph run before the transform is executed. May be used to allocate and initialize resources
+// required by the transform. All resources allocated within this method should be released
+// by the postExecute() method.
+// function void preExecute() {}
+
+// Called only if transform() throws an exception.
+// function integer transformOnError(string errorMessage, string stackTrace) {}
+
+// Called during each graph run after the entire transform was executed. Should be used to free any resources
+// allocated within the preExecute() method.
+// function void postExecute() {}
+
+// Called to return a user-defined error message when an error occurs.
+// function string getMessage() {}
+]]></attr>
+</Node>
+<Edge fromNode="READ_FILE:0" guiBendpoints="" guiRouter="Manhattan" id="Edge0" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (output)" toNode="REFORMAT:0"/>
+<Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="CSV_WRITER:0"/>
+</Phase>
+<Phase number="2">
+<Node baseURL="${READFILEPATH}" enabled="enabled" guiName="Clean Download" guiX="52" guiY="195" id="CLEAN_DOWNLOAD" type="FILE_DELETE"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Table" guiX="325" guiY="195" id="POPULATE_TABLE" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[COPY ${TABLE_CITY_FIPS} (
+    STATE_FIPS,
+    STATE_ABBREVIATION,
+    STATE_NAME,
+    COUNTY_FIPS,
+    COUNTY_NAME,
+    STATE_COUNTY_FIPS,
+    CITY_FIPS,
+    CITY_NAME
+)
+FROM LOCAL '${WRITEFILEPATH}'
+EXCEPTIONS '${POPULATEERRORFILEPATH}';
+]]></attr>
+</Node>
+</Phase>
+<Phase number="3">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Clean Data" guiX="325" guiY="273" id="CLEAN_DATA" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[UPDATE ${TABLE_CITY_FIPS} SET STATE_FIPS = TRIM(STATE_FIPS);
+UPDATE ${TABLE_CITY_FIPS} SET STATE_ABBREVIATION = TRIM(STATE_ABBREVIATION);
+UPDATE ${TABLE_CITY_FIPS} SET STATE_NAME = TRIM(STATE_NAME);
+UPDATE ${TABLE_CITY_FIPS} SET COUNTY_FIPS = TRIM(COUNTY_FIPS);
+UPDATE ${TABLE_CITY_FIPS} SET COUNTY_NAME = TRIM(COUNTY_NAME);
+UPDATE ${TABLE_CITY_FIPS} SET STATE_COUNTY_FIPS = TRIM(STATE_COUNTY_FIPS);
+UPDATE ${TABLE_CITY_FIPS} SET CITY_FIPS = TRIM(CITY_FIPS);
+UPDATE ${TABLE_CITY_FIPS} SET CITY_NAME = TRIM(CITY_NAME);
+
+DELETE FROM ${TABLE_CITY_FIPS} WHERE REGEXP_LIKE(STATE_COUNTY_FIPS,'[^0-9]');
+UPDATE ${TABLE_CITY_FIPS} SET STATE_COUNTY_FIPS = TRIM(TO_CHAR(CAST(STATE_COUNTY_FIPS as INTEGER),'00000'));
+
+UPDATE ${TABLE_CITY_FIPS} SET STATE_FIPS = LEFT(STATE_COUNTY_FIPS,2) WHERE REGEXP_LIKE(STATE_FIPS,'[^0-9]');
+UPDATE ${TABLE_CITY_FIPS} SET COUNTY_FIPS = RIGHT(STATE_COUNTY_FIPS,3) WHERE REGEXP_LIKE(COUNTY_FIPS,'[^0-9]');
+UPDATE ${TABLE_CITY_FIPS} SET CITY_FIPS = NULL WHERE REGEXP_LIKE(CITY_FIPS,'[^0-9]');
+UPDATE ${TABLE_CITY_FIPS} SET CITY_FIPS = NULL WHERE TRIM(CITY_FIPS) = '';
+
+UPDATE ${TABLE_CITY_FIPS} SET STATE_FIPS = TRIM(TO_CHAR(CAST(STATE_FIPS as INTEGER),'00'));
+UPDATE ${TABLE_CITY_FIPS} SET COUNTY_FIPS = TRIM(TO_CHAR(CAST(COUNTY_FIPS as INTEGER),'000'));
+UPDATE ${TABLE_CITY_FIPS} SET CITY_FIPS = TRIM(TO_CHAR(CAST(CITY_FIPS as INTEGER),'00000')) WHERE CITY_FIPS IS NOT NULL;
+]]></attr>
+</Node>
+<Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="0" guiY="273" id="CLEAN_ERROR" type="FILE_DELETE"/>
+<Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="141" guiY="273" id="CLEAN_WRITE" type="FILE_DELETE"/>
+</Phase>
+</Graph>
