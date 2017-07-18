@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jul 14 14:32:17 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.115" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 18 09:39:40 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.116" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -98,10 +98,10 @@
 <Property id="GraphParameter5" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
 <Property id="GraphParameter6" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter7" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
-<Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter54"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter93"/>
-<Property fileURL="workspace.prm" id="GraphParameter116"/>
+<Property fileURL="wage.prm" id="GraphParameter88"/>
+<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter8"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter47"/>
+<Property fileURL="workspace.prm" id="GraphParameter70"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -283,8 +283,8 @@ FROM (
       when q.AVG_RATE_PROPORTION_WEIGHTED >= 1.0 then d.distribution
       else 0.0
     end dist_non_contrib
-  FROM ${LIVING_WAGE_AVERAGES_BY_COMPANY_TABLENAME} a
-  JOIN ${SCORE_QUALITY_BY_COMPANY_TABLENAME} q on q.ticker = a.ticker and ((q.subsidiary is null and a.subsidiary is null) or (q.subsidiary = a.subsidiary))
+  FROM ${TABLE_LIVING_WAGE_AVERAGES_BY_COMPANY} a
+  JOIN ${TABLE_SCORE_QUALITY_BY_COMPANY} q on q.ticker = a.ticker and ((q.subsidiary is null and a.subsidiary is null) or (q.subsidiary = a.subsidiary))
   JOIN ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = q.ticker and ((c.subsidiary is null and q.subsidiary is null) or (c.subsidiary = q.subsidiary))
   JOIN ${TABLE_JOC_DISTRIBUTION} d on d.ticker = q.ticker and d.joc = q.goc and (
     (c.has_subsidiaries and c.subsidiary is null and d.subsidiary is null) or
@@ -346,7 +346,7 @@ order by mtx.ticker, mtx.subsidiary;]]></attr>
   $GOC:=goc,
   $AvgPercentUnweighted:=avg_rate_proportion_unweighted,
   $AvgPercentWeighted:=avg_rate_proportion_weighted
-from ${SCORE_QUALITY_BY_COMPANY_TABLENAME}
+from ${TABLE_SCORE_QUALITY_BY_COMPANY}
 order by ticker, company, subsidiary, goc;]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="25" id="WRITE_REPORT" type="DATA_WRITER"/>

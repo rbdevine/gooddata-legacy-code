@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Mon Jul 17 15:33:30 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.124" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 18 10:16:13 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.129" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -43,7 +43,7 @@
 <Record fieldDelimiter="," name="Report_Details_County_Ticker" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="STATE_COUNTY_FIPS" type="string"/>
 <Field name="TICKER" type="string"/>
-<Field name="GOC" type="string"/>
+<Field name="JOC" type="string"/>
 <Field name="HOURLY_WAGE_RAW" type="string"/>
 <Field name="MINIMUM_WAGE" type="string"/>
 <Field name="LIVING_WAGE_HOURLY" type="string"/>
@@ -113,7 +113,7 @@
 <Property id="GraphParameter4" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
 <Property id="GraphParameter5" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}/subsidy"/>
 <Property fileURL="wage.prm" id="GraphParameter6"/>
-<Property fileURL="workspace.prm" id="GraphParameter62"/>
+<Property fileURL="workspace.prm" id="GraphParameter65"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -122,7 +122,7 @@
 CREATE TABLE ${TABLE_SUBSIDY_DETAIL} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(32) NOT NULL,
-  GOC VARCHAR(128) NOT NULL,
+  JOC VARCHAR(128) NOT NULL,
   HOURLY_WAGE_RAW FLOAT NOT NULL,
   LIVING_WAGE_HOURLY FLOAT NOT NULL,
   STATE_MINIMUM_WAGE FLOAT NOT NULL,
@@ -149,8 +149,8 @@ CREATE TABLE ${TABLE_SUBSIDY_DETAIL} (
 select
   state_county_fips,
   ticker,
-  goc,
-  rate_raw,
+  joc,
+  wage_hourly_raw,
   living_wage_hourly,
   minimum_wage,
   emp_count_total,
@@ -170,8 +170,8 @@ from (
   select
     state_county_fips,
     ticker,
-    goc,
-    isnull(rate_raw,0.0) rate_raw,
+    joc,
+    isnull(wage_hourly_raw,0.0) wage_hourly_raw,
     isnull(living_wage_hourly,0.0) living_wage_hourly,
     isnull(minimum_wage,0.0) minimum_wage,
     isnull(emp_count_total,0.0) emp_count_total, 
@@ -190,13 +190,13 @@ from (
     select 
       sc.state_county_fips,
       sc.ticker,
-      sc.goc,
-      gc.rate_raw,
+      sc.joc,
+      gc.wage_hourly_raw,
       f.living_wage_hourly,
-      mw.minimum_wage,
+      sd.minimum_wage,
       gc.employee_count emp_count_total,
       case 
-        when gc.rate_raw < lwa.living_wage_hourly then gc.employee_count
+        when gc.wage_hourly_raw < f.living_wage_hourly then gc.employee_count
         else 0.0
       end emp_count_below_lw,
       case
@@ -239,9 +239,9 @@ from (
       snap.subsidy_annual,
       sc.emp_count_snap * isnull(snap.subsidy_annual,0.0) snap_subsidy_total,
       sc.emp_count_adult_medicaid,
-      sc.emp_count_adult_medicaid * isnull(ms.adult_medicaid_annual,0.0) adult_medicaid_subsidy_total,
+      sc.emp_count_adult_medicaid * isnull(sd.adult_medicaid_annual,0.0) adult_medicaid_subsidy_total,
       sc.emp_count_child_medicaid,
-      sc.emp_count_child_medicaid * isnull(ms.child_medicaid_annual,0.0) child_medicaid_subsidy_total,
+      sc.emp_count_child_medicaid * isnull(sd.child_medicaid_annual,0.0) child_medicaid_subsidy_total,
       case
         when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
         else sc.emp_count_aca
@@ -255,23 +255,22 @@ from (
     join ${TABLE_SUBSIDY_COUNTY_JOC_RATE} gc on 
       gc.state_county_fips = sc.state_county_fips and 
       gc.ticker = sc.ticker and 
-      gc.goc = sc.goc
+      gc.joc = sc.joc
     join ${TABLE_FIPS_DATA} f on f.state_county_fips = sc.state_county_fips
-    join (select state_fips, state_abbreviation state from lkp_city_fips group by state_fips, state_abbreviation) fs on fs.state_fips = left(sc.state_county_fips,2)
-    join ${SUBSIDY_TICKER_CODE_TABLENAME} tc on tc.ticker = sc.ticker
-    join ${MINIMUM_WAGE_BY_STATE_TABLENAME} mw on mw.state = fs.state
-    left join ${SUBSIDY_MEDICAL_BY_STATE_TABLENAME} ms on ms.state = fs.state
-    left join ${SUBSIDY_EITC_TABLENAME} eitc on eitc.minimum_wage <= gc.rate_raw and gc.rate_raw <= eitc.maximum_wage
-    left join ${SUBSIDY_SNAP_TABLENAME} snap on snap.code = tc.code and snap.minimum_wage <= gc.rate_raw and gc.rate_raw <= snap.maximum_wage
-    left join ${SUBSIDY_ACA_TABLENAME} aca_base on aca_base.minimum_wage <= gc.rate_raw and gc.rate_raw <= aca_base.maximum_wage
-    left join ${SUBSIDY_ACA_TABLENAME} aca_lw on aca_lw.minimum_wage <= lwa.living_wage_hourly and lwa.living_wage_hourly <= aca_lw.maximum_wage
+    join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(sc.state_county_fips,2)
+    join ${TABLE_COMPANY} c on c.ticker = sc.ticker
+    join ${TABLE_STATE_DETAIL} sd on sd.state = fs.state
+    left join ${TABLE_SUBSIDY_EITC} eitc on eitc.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= eitc.maximum_wage
+    left join ${TABLE_SUBSIDY_SNAP} snap on snap.subsidy_code = c.subsidy_code and snap.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= snap.maximum_wage
+    left join ${TABLE_SUBSIDY_ACA} aca_base on aca_base.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= aca_base.maximum_wage
+    left join ${TABLE_SUBSIDY_ACA} aca_lw on aca_lw.minimum_wage <= f.living_wage_hourly and f.living_wage_hourly <= aca_lw.maximum_wage
   ) t
 ) t
 group by
   state_county_fips,
   ticker,
-  goc,
-  rate_raw,
+  joc,
+  wage_hourly_raw,
   living_wage_hourly,
   minimum_wage,
   emp_count_total,
@@ -288,7 +287,7 @@ group by
   aca_subsidy_total
 order by 
   state_county_fips, 
-  rate_raw;
+  wage_hourly_raw;
 ]]></attr>
 </Node>
 </Phase>
@@ -486,7 +485,7 @@ order by state_county_fips;]]></attr>
 <attr name="sqlQuery"><![CDATA[select
   $STATE_COUNTY_FIPS:=STATE_COUNTY_FIPS,
   $TICKER:=TICKER,
-  $GOC:=GOC,
+  $JOC:=JOC,
   $HOURLY_WAGE_RAW:=concat('$',cast(round(HOURLY_WAGE_RAW,2) as numeric(16,2))),
   $MINIMUM_WAGE:=concat('$',cast(round(MINIMUM_WAGE,2) as numeric(16,2))),
   $LIVING_WAGE_HOURLY:=concat('$',cast(round(LIVING_WAGE_HOURLY,2) as numeric(16,2))),
@@ -528,7 +527,7 @@ from (
   select
     STATE_COUNTY_FIPS,
     TICKER,
-    GOC,
+    JOC,
     HOURLY_WAGE_RAW,
     STATE_MINIMUM_WAGE MINIMUM_WAGE,
     LIVING_WAGE_HOURLY,
