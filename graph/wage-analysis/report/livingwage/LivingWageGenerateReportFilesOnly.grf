@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 18 09:39:40 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.116" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 18 12:59:24 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByJOC" revision="1.120" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -76,7 +76,7 @@
 <Field name="Ticker" type="string"/>
 <Field name="Company" type="string"/>
 <Field name="Subsidiary" type="string"/>
-<Field name="GOC" type="string"/>
+<Field name="JOC" type="string"/>
 <Field name="AvgPercentUnweighted" type="string"/>
 <Field name="AvgPercentWeighted" type="string"/>
 </Record>
@@ -98,10 +98,9 @@
 <Property id="GraphParameter5" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
 <Property id="GraphParameter6" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter7" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
-<Property fileURL="wage.prm" id="GraphParameter88"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter8"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter47"/>
-<Property fileURL="workspace.prm" id="GraphParameter70"/>
+<Property fileURL="wage.prm" id="GraphParameter8"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter109"/>
+<Property fileURL="workspace.prm" id="GraphParameter132"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -257,24 +256,24 @@ function integer transform() {
   $Subsidiary:=t.Subsidiary,
   $Avg_lw_unweighted:=t.Avg_lw_unweighted,
   $Avg_lw_weighted:=t.Avg_lw_weighted,
-  $Payroll_avg_wage:=cast(round(sum(avg_per_goc),3) as numeric(36,3)),
+  $Payroll_avg_wage:=cast(round(sum(avg_per_joc),3) as numeric(36,3)),
   $Avg_wages_below_lw:=(
     case
       when sum(dist_contrib) = 0 then ''
-      else cast(cast(round(sum(avg_per_goc_below_lw)/(sum(dist_contrib)/(sum(dist_contrib) + sum(dist_non_contrib))),3) as numeric(36,3)) as varchar(32))
+      else cast(cast(round(sum(avg_per_joc_below_lw)/(sum(dist_contrib)/(sum(dist_contrib) + sum(dist_non_contrib))),3) as numeric(36,3)) as varchar(32))
     end
   )
 FROM (
   SELECT
     a.*,
-    q.goc,
+    q.joc,
     q.AVG_RATE_PROPORTION_WEIGHTED,
     d.distribution,
-    a.AVG_LW_WEIGHTED * q.AVG_RATE_PROPORTION_WEIGHTED * d.distribution avg_per_goc,
+    a.AVG_LW_WEIGHTED * q.AVG_RATE_PROPORTION_WEIGHTED * d.distribution avg_per_joc,
     case
       when q.AVG_RATE_PROPORTION_WEIGHTED < 1.0 then a.AVG_LW_WEIGHTED * q.AVG_RATE_PROPORTION_WEIGHTED * d.distribution
       else 0.0
-    end avg_per_goc_below_lw,
+    end avg_per_joc_below_lw,
     case
       when q.AVG_RATE_PROPORTION_WEIGHTED < 1.0 then d.distribution
       else 0.0
@@ -286,7 +285,7 @@ FROM (
   FROM ${TABLE_LIVING_WAGE_AVERAGES_BY_COMPANY} a
   JOIN ${TABLE_SCORE_QUALITY_BY_COMPANY} q on q.ticker = a.ticker and ((q.subsidiary is null and a.subsidiary is null) or (q.subsidiary = a.subsidiary))
   JOIN ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = q.ticker and ((c.subsidiary is null and q.subsidiary is null) or (c.subsidiary = q.subsidiary))
-  JOIN ${TABLE_JOC_DISTRIBUTION} d on d.ticker = q.ticker and d.joc = q.goc and (
+  JOIN ${TABLE_JOC_DISTRIBUTION} d on d.ticker = q.ticker and d.joc = q.joc and (
     (c.has_subsidiaries and c.subsidiary is null and d.subsidiary is null) or
     (not c.has_subsidiaries and c.subsidiary is null) or
     (not c.has_subsidiaries and c.subsidiary is not null and c.subsidiary = d.subsidiary)
@@ -305,8 +304,8 @@ order by t.ticker, t.company, t.subsidiary;]]></attr>
   $g31:=g31, $g32:=g32, $g33:=g33, $g34:=g34, $g35:=g35, $g36:=g36, $g37:=g37, $g38:=g38, $g39:=g39, $g40:=g40,
   $g41:=g41, $g42:=g42, $g43:=g43, $g44:=g44, $g45:=g45, $g46:=g46, $g47:=g47, $g48:=g48, $g49:=g49, $g50:=g50,
   $living_wage_total:=living_wage_total
-from ${REPORT_MATRIX_TABLENAME} mtx
-join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+from ${TABLE_REPORT_MATRIX} mtx
+join ${TABLE_REPORT_MATRIX_ROW_TYPE} rt on rt.row_type = mtx.row_type
 where rt.row_type not in ('IND_HEADER_BLANK_BOTTOM_1','IND_HEADER_BLANK_BOTTOM_2')
 order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4;
 ]]></attr>
@@ -321,8 +320,8 @@ order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_c
   $g31:=g31, $g32:=g32, $g33:=g33, $g34:=g34, $g35:=g35, $g36:=g36, $g37:=g37, $g38:=g38, $g39:=g39, $g40:=g40,
   $g41:=g41, $g42:=g42, $g43:=g43, $g44:=g44, $g45:=g45, $g46:=g46, $g47:=g47, $g48:=g48, $g49:=g49, $g50:=g50,
   $living_wage_total:=living_wage_total
-from ${REPORT_MATRIX_TABLENAME} mtx
-join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+from ${TABLE_REPORT_MATRIX} mtx
+join ${TABLE_REPORT_MATRIX_ROW_TYPE} rt on rt.row_type = mtx.row_type
 where rt.row_type not in ('IND_HEADER_BLANK_BOTTOM_1','IND_HEADER_BLANK_BOTTOM_2')
 order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4;
 ]]></attr>
@@ -331,9 +330,9 @@ order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_c
 <attr name="sqlQuery"><![CDATA[select 
   $Ticker:=mtx.ticker, $Company:=c.company_name, $Subsidiary:=mtx.subsidiary, 
   $Score:=description_2, $LWPerCounty:=description_3
-from ${REPORT_MATRIX_TABLENAME} mtx
+from ${TABLE_REPORT_MATRIX} mtx
 join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = mtx.ticker
-join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+join ${TABLE_REPORT_MATRIX_ROW_TYPE} rt on rt.row_type = mtx.row_type
 where rt.row_type in ('CO_TICKER_COUNT_TOTAL','CO_SUBSIDIARY_COUNT_TOTAL')
 group by mtx.ticker, c.company_name, mtx.subsidiary, description_2, description_3
 order by mtx.ticker, mtx.subsidiary;]]></attr>
@@ -343,11 +342,11 @@ order by mtx.ticker, mtx.subsidiary;]]></attr>
   $Ticker:=ticker,
   $Company:=company,
   $Subsidiary:=subsidiary,
-  $GOC:=goc,
+  $JOC:=joc,
   $AvgPercentUnweighted:=avg_rate_proportion_unweighted,
   $AvgPercentWeighted:=avg_rate_proportion_weighted
 from ${TABLE_SCORE_QUALITY_BY_COMPANY}
-order by ticker, company, subsidiary, goc;]]></attr>
+order by ticker, company, subsidiary, joc;]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="25" id="WRITE_REPORT" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="136" id="WRITE_REPORT1" outputFieldNames="true" type="DATA_WRITER"/>
