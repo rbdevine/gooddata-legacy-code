@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Fri Jul 14 15:42:17 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.132" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jul 19 12:54:31 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.146" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata1" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Company_Update_Database" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -6,7 +6,8 @@
 <Field name="COMPANY_NAME" type="string"/>
 <Field name="INDUSTRY" type="string"/>
 <Field name="ALT_COMPANY_NAME" type="string"/>
-<Field name="SUBSIDY_CODE" type="string"/>
+<Field name="SUBSIDY_CODE" type="integer"/>
+<Field name="EMPLOYEE_COUNT_MULTIPLIER" type="number"/>
 </Record>
 </Metadata>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
@@ -16,6 +17,7 @@
 <Field name="JUST_IND" type="string"/>
 <Field name="ALT_NAME" type="string"/>
 <Field name="SUBSIDY_CODE" type="integer"/>
+<Field name="EMPLOYEE_COUNT_MULTIPLIER" type="number"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -26,9 +28,9 @@
 <Property id="GraphParameter4" name="TABLE_COMPANY_UPDATE" value="${STG_BASE}_COMPANY_UPDATE"/>
 <Property id="GraphParameter5" name="TABLE_COMPANY_UPDATE_HISTORY" value="${STG_BASE}_COMPANY_UPDATE_HISTORY"/>
 <Property fileURL="wage.prm" id="GraphParameter6"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter52"/>
-<Property fileURL="workspace.prm" id="GraphParameter75"/>
-<Property id="GraphParameter93" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/companyupdate.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter68"/>
+<Property fileURL="workspace.prm" id="GraphParameter90"/>
+<Property id="GraphParameter108" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/companyupdate.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -40,7 +42,8 @@ CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY_UNMATCHED_TICKER} (
   COMPANY_NAME VARCHAR(64) NULL,
   INDUSTRY VARCHAR(128) NOT NULL,
   ALT_COMPANY_NAME VARCHAR(64) NULL,
-  SUBSIDY_CODE INTEGER NULL
+  SUBSIDY_CODE INTEGER NULL,
+  EMPLOYEE_COUNT_MULTIPLIER FLOAT NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Update" guiX="300" guiY="16" id="TABLE_COMPANY_UPDATE" type="DB_EXECUTE">
@@ -50,7 +53,8 @@ CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY_UPDATE} (
   COMPANY_NAME VARCHAR(64) NULL,
   INDUSTRY VARCHAR(128) NOT NULL,
   ALT_COMPANY_NAME VARCHAR(64) NULL,
-  SUBSIDY_CODE INTEGER NULL
+  SUBSIDY_CODE INTEGER NULL,
+  EMPLOYEE_COUNT_MULTIPLIER FLOAT NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Company Update History" guiX="754" guiY="16" id="TABLE_COMPANY_UPDATE_HISTORY" type="DB_EXECUTE">
@@ -64,7 +68,9 @@ CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY_UPDATE_HISTORY} (
   ALT_COMPANY_NAME_OLD VARCHAR(64) NULL,
   ALT_COMPANY_NAME_NEW VARCHAR(64) NULL,
   SUBSIDY_CODE_OLD INTEGER NULL,
-  SUBSIDY_CODE_NEW INTEGER NULL
+  SUBSIDY_CODE_NEW INTEGER NULL,
+  EMPLOYEE_COUNT_MULTIPLIER_OLD FLOAT NULL,
+  EMPLOYEE_COUNT_MULTIPLIER_NEW FLOAT NULL
 );]]></attr>
 </Node>
 </Phase>
@@ -80,6 +86,8 @@ function integer transform() {
 	$out.0.COMPANY_NAME = $in.0.NAME;
 	$out.0.INDUSTRY = $in.0.JUST_IND;
 	$out.0.ALT_COMPANY_NAME = $in.0.ALT_NAME;
+	$out.0.SUBSIDY_CODE = $in.0.SUBSIDY_CODE;
+	$out.0.EMPLOYEE_COUNT_MULTIPLIER = $in.0.EMPLOYEE_COUNT_MULTIPLIER;
 	
 	return ALL;
 }
@@ -114,7 +122,8 @@ function integer transform() {
     COMPANY_NAME,
     INDUSTRY,
     ALT_COMPANY_NAME,
-    SUBSIDY_CODE
+    SUBSIDY_CODE,
+    EMPLOYEE_COUNT_MULTIPLIER
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -128,14 +137,15 @@ UPDATE ${TABLE_COMPANY_UPDATE} SET COMPANY_NAME = TRIM(COMPANY_NAME);
 UPDATE ${TABLE_COMPANY_UPDATE} SET INDUSTRY = TRIM(INDUSTRY);
 UPDATE ${TABLE_COMPANY_UPDATE} SET ALT_COMPANY_NAME = TRIM(ALT_COMPANY_NAME);
 UPDATE ${TABLE_COMPANY_UPDATE} SET SUBSIDY_CODE = NULL WHERE SUBSIDY_CODE <= 0;
+UPDATE ${TABLE_COMPANY_UPDATE} SET EMPLOYEE_COUNT_MULTIPLIER = NULL WHERE EMPLOYEE_COUNT_MULTIPLIER <= 0.0;
 ]]></attr>
 </Node>
 <Node baseURL="${POPULATEERRORFILEPATH}" enabled="enabled" guiName="Clean Error" guiX="0" guiY="273" id="CLEAN_ERROR" type="FILE_DELETE"/>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="141" guiY="273" id="CLEAN_WRITE" type="FILE_DELETE"/>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Update History with Old" guiX="735" guiY="273" id="POPULATE_COMPANY_UPDATE_HISTORY_WITH_OLD" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_UPDATE_HISTORY}
-(TICKER, COMPANY_NAME_OLD, INDUSTRY_OLD, ALT_COMPANY_NAME_OLD, SUBSIDY_CODE_OLD)
-SELECT TICKER, COMPANY_NAME, INDUSTRY, ALT_COMPANY_NAME, SUBSIDY_CODE
+(TICKER, COMPANY_NAME_OLD, INDUSTRY_OLD, ALT_COMPANY_NAME_OLD, SUBSIDY_CODE_OLD, EMPLOYEE_COUNT_MULTIPLIER_OLD)
+SELECT TICKER, COMPANY_NAME, INDUSTRY, ALT_COMPANY_NAME, SUBSIDY_CODE, EMPLOYEE_COUNT_MULTIPLIER
 FROM ${TABLE_COMPANY} u;]]></attr>
 </Node>
 </Phase>
@@ -154,7 +164,8 @@ UPDATE ${TABLE_COMPANY} c
 SET company_name = isnull(u.company_name,c.company_name),
     industry = isnull(u.industry,c.industry),
     alt_company_name = isnull(u.alt_company_name,c.alt_company_name),
-    subsidy_code = isnull(u.subsidy_code,c.subsidy_code)
+    subsidy_code = isnull(u.subsidy_code,c.subsidy_code),
+    employee_count_multiplier = isnull(u.employee_count_multiplier,c.employee_count_multiplier)
 FROM ${TABLE_COMPANY_UPDATE} u
 WHERE c.ticker = u.ticker;]]></attr>
 </Node>
@@ -163,7 +174,7 @@ WHERE c.ticker = u.ticker;]]></attr>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Unmatched to Company" guiX="287" guiY="428" id="ADD_UNMATCHED_TO_COMPANY" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
 
-INSERT INTO ${TABLE_COMPANY} (TICKER, COMPANY_NAME, INDUSTRY, ALT_COMPANY_NAME, SUBSIDY_CODE)
+INSERT INTO ${TABLE_COMPANY} (TICKER, COMPANY_NAME, INDUSTRY, ALT_COMPANY_NAME, SUBSIDY_CODE, EMPLOYEE_COUNT_MULTIPLIER)
 SELECT *
 FROM ${TABLE_COMPANY_UNMATCHED_TICKER};]]></attr>
 </Node>
@@ -174,9 +185,10 @@ UPDATE ${TABLE_COMPANY_UPDATE_HISTORY} h
 SET COMPANY_NAME_NEW = case when isnull(c.COMPANY_NAME, isnull(h.COMPANY_NAME_OLD,'')) <> isnull(h.COMPANY_NAME_OLD,'') then c.COMPANY_NAME else null end,
     INDUSTRY_NEW = case when isnull(c.INDUSTRY,isnull(h.INDUSTRY_OLD,'')) <> isnull(h.INDUSTRY_OLD,'') then c.INDUSTRY else null end,
     ALT_COMPANY_NAME_NEW = case when isnull(c.ALT_COMPANY_NAME,isnull(h.ALT_COMPANY_NAME_OLD,'')) <> isnull(h.ALT_COMPANY_NAME_OLD,'') then c.ALT_COMPANY_NAME else null end,
-    SUBSIDY_CODE_NEW = case when isnull(c.SUBSIDY_CODE,isnull(h.SUBSIDY_CODE_OLD,-1)) <> isnull(h.SUBSIDY_CODE_OLD,-1) then c.SUBSIDY_CODE else null end
+    SUBSIDY_CODE_NEW = case when isnull(c.SUBSIDY_CODE,isnull(h.SUBSIDY_CODE_OLD,-1)) <> isnull(h.SUBSIDY_CODE_OLD,-1) then c.SUBSIDY_CODE else null end,
+    EMPLOYEE_COUNT_MULTIPLIER_NEW = case when isnull(c.EMPLOYEE_COUNT_MULTIPLIER,isnull(h.EMPLOYEE_COUNT_MULTIPLIER_OLD,-1)) <> isnull(h.EMPLOYEE_COUNT_MULTIPLIER_OLD,-1) then c.EMPLOYEE_COUNT_MULTIPLIER else null end
 FROM (
-  SELECT c.TICKER, u.COMPANY_NAME, u.INDUSTRY, u.ALT_COMPANY_NAME, u.SUBSIDY_CODE
+  SELECT c.TICKER, u.COMPANY_NAME, u.INDUSTRY, u.ALT_COMPANY_NAME, u.SUBSIDY_CODE, u.EMPLOYEE_COUNT_MULTIPLIER
   FROM ${TABLE_COMPANY} c
   JOIN ${TABLE_COMPANY_UPDATE} u on u.ticker = c.ticker
 ) c
@@ -186,7 +198,7 @@ WHERE h.ticker = c.ticker;]]></attr>
 <Phase number="6">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Company Update History with New" guiX="733" guiY="501" id="POPULATE_COMPANY_UPDATE_HISTORY_WITH_NEW" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_COMPANY_UPDATE_HISTORY}
-(TICKER, COMPANY_NAME_NEW, INDUSTRY_NEW, ALT_COMPANY_NAME_NEW, SUBSIDY_CODE_NEW)
+(TICKER, COMPANY_NAME_NEW, INDUSTRY_NEW, ALT_COMPANY_NAME_NEW, SUBSIDY_CODE_NEW, EMPLOYEE_COUNT_MULTIPLIER_NEW)
 SELECT * FROM ${TABLE_COMPANY_UNMATCHED_TICKER};]]></attr>
 </Node>
 </Phase>
