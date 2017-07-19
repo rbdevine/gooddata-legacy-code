@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Mon Jul 10 01:28:28 EDT 2017" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.66" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Tue Jul 18 22:53:11 EDT 2017" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.67" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -29,10 +29,10 @@
 <Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
 <Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter65"/>
-<Property fileURL="workspace.prm" id="GraphParameter88"/>
-<Property id="GraphParameter106" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
-<Property id="GraphParameter107" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter70"/>
+<Property fileURL="workspace.prm" id="GraphParameter92"/>
+<Property id="GraphParameter110" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter111" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -117,6 +117,28 @@ from (
 ) c
 join ${TABLE_COUNTY_EMPLOYEE_COUNT} c2 on c2.ticker = c.ticker
 group by c2.ticker, c2.state_county_fips;]]></attr>
+</Node>
+</Phase>
+<Phase number="8">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply County Count Multiplier" guiX="68" guiY="713" id="APPLY_COUNTY_COUNT_MULTIPLIER" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/* rough adjustment for companies with distribution/branches we did not capture due to missing job distribution information */
+update ${TABLE_COUNTY_EMPLOYEE_COUNT} ec
+set employee_count = isnull(employee_count_multiplier,1.0) * employee_count
+from (
+  select 
+    isnull(s.ticker_subsidiary,c.ticker) ticker, 
+    null subsidiary,
+    isnull(s.employee_count_multiplier,c.employee_count_multiplier) employee_count_multiplier
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where s.ticker_subsidiary is not null
+  union all
+  select c.ticker, s.subsidiary_name subsidiary, isnull(s.employee_count_multiplier,c.employee_count_multiplier)
+  from ${TABLE_SUBSIDIARY} s
+  join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+  where s.ticker_subsidiary is null
+) c
+where ec.ticker = c.ticker and isnull(ec.subsidiary,'') = isnull(c.subsidiary,'');]]></attr>
 </Node>
 </Phase>
 </Graph>
