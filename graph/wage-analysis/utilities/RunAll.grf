@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jan 31 18:47:58 EST 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.74" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 20 13:01:02 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.78" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -87,32 +87,19 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="livingwage-parameters.prm" id="GraphParameter0"/>
-<Property fileURL="workspace.prm" id="GraphParameter18"/>
+<Property fileURL="workspace.prm" id="GraphParameter36"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageFranchiseNewCompanies.grf" guiName="Add New Franchise Companies" guiX="69" guiY="3" id="ADD_NEW_FRANCHISE_COMPANIES" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-load/LoadData.grf" guiName="Load Data" guiX="69" guiY="3" id="LOAD_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="1">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/shared/GenerateSalaryLookupTables.grf" guiName="Generate Salary LookupTables" guiX="69" guiY="106" id="GENERATE_SALARY_LOOKUP_TABLES" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/data-transform/TransformData.grf" guiName="Transform Data" guiX="69" guiY="106" id="TRANSFORM_DATA" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="2">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageDistByGOC.grf" guiName="Load GOC Distribution Data" guiX="78" guiY="214" id="LOAD_GOC_DISTRIBUTION_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageDistByGOC.grf" guiName="Run Reports" guiX="64" guiY="214" id="RUN_REPORTS" type="RUN_GRAPH"/>
 </Phase>
 <Phase number="3">
-<Node enabled="disabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageAllCountyCount.grf" guiName="Load County Count Data" guiX="86" guiY="321" id="LOAD_COUNTY_COUNT_DATA1" type="RUN_GRAPH"/>
-</Phase>
-<Phase number="4">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/data-loading/LivingWageCountyEmployeeCount.grf" guiName="Load County Count sans FIPS Data" guiX="64" guiY="429" id="LOAD_COUNTY_COUNT_SANS_FIPS_DATA" type="RUN_GRAPH"/>
-</Phase>
-<Phase number="5">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateJobData.grf" guiName="Generate Job Data" guiX="102" guiY="537" id="GENERATE_JOB_DATA1" type="RUN_GRAPH"/>
-</Phase>
-<Phase number="6">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageGenerateReportMatrixAndFiles.grf" guiName="Generate Reports" guiX="104" guiY="646" id="GENERATE_REPORTS1" type="RUN_GRAPH"/>
-</Phase>
-<Phase number="7">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/fairpay-livingwage/livingwage/LivingWageCleanUpMatrixData.grf" guiName="Clean Up Matrix Data" guiX="96" guiY="756" id="CLEAN_UP_MATRIX_DATA" type="RUN_GRAPH"/>
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/report/livingwage/LivingWageCleanUpMatrixData.grf" guiName="Clean Up Matrix Data" guiX="60" guiY="325" id="CLEAN_UP_MATRIX_DATA" type="RUN_GRAPH"/>
 </Phase>
 </Graph>

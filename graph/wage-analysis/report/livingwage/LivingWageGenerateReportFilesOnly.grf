@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 18 12:59:24 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByJOC" revision="1.120" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 20 16:42:25 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByJOC" revision="1.121" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -99,8 +99,8 @@
 <Property id="GraphParameter6" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter7" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter109"/>
-<Property fileURL="workspace.prm" id="GraphParameter132"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter73"/>
+<Property fileURL="workspace.prm" id="GraphParameter95"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -304,8 +304,8 @@ order by t.ticker, t.company, t.subsidiary;]]></attr>
   $g31:=g31, $g32:=g32, $g33:=g33, $g34:=g34, $g35:=g35, $g36:=g36, $g37:=g37, $g38:=g38, $g39:=g39, $g40:=g40,
   $g41:=g41, $g42:=g42, $g43:=g43, $g44:=g44, $g45:=g45, $g46:=g46, $g47:=g47, $g48:=g48, $g49:=g49, $g50:=g50,
   $living_wage_total:=living_wage_total
-from ${TABLE_REPORT_MATRIX} mtx
-join ${TABLE_REPORT_MATRIX_ROW_TYPE} rt on rt.row_type = mtx.row_type
+from ${TABLE_REPORT_MATRIX_LIVING_WAGE} mtx
+join ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} rt on rt.row_type = mtx.row_type
 where rt.row_type not in ('IND_HEADER_BLANK_BOTTOM_1','IND_HEADER_BLANK_BOTTOM_2')
 order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4;
 ]]></attr>
@@ -320,8 +320,8 @@ order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_c
   $g31:=g31, $g32:=g32, $g33:=g33, $g34:=g34, $g35:=g35, $g36:=g36, $g37:=g37, $g38:=g38, $g39:=g39, $g40:=g40,
   $g41:=g41, $g42:=g42, $g43:=g43, $g44:=g44, $g45:=g45, $g46:=g46, $g47:=g47, $g48:=g48, $g49:=g49, $g50:=g50,
   $living_wage_total:=living_wage_total
-from ${TABLE_REPORT_MATRIX} mtx
-join ${TABLE_REPORT_MATRIX_ROW_TYPE} rt on rt.row_type = mtx.row_type
+from ${TABLE_REPORT_MATRIX_LIVING_WAGE} mtx
+join ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} rt on rt.row_type = mtx.row_type
 where rt.row_type not in ('IND_HEADER_BLANK_BOTTOM_1','IND_HEADER_BLANK_BOTTOM_2')
 order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_county_fips, tolerance_type, description_1, description_2, description_3, description_4;
 ]]></attr>
@@ -330,9 +330,9 @@ order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_c
 <attr name="sqlQuery"><![CDATA[select 
   $Ticker:=mtx.ticker, $Company:=c.company_name, $Subsidiary:=mtx.subsidiary, 
   $Score:=description_2, $LWPerCounty:=description_3
-from ${TABLE_REPORT_MATRIX} mtx
+from ${TABLE_REPORT_MATRIX_LIVING_WAGE} mtx
 join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = mtx.ticker
-join ${TABLE_REPORT_MATRIX_ROW_TYPE} rt on rt.row_type = mtx.row_type
+join ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} rt on rt.row_type = mtx.row_type
 where rt.row_type in ('CO_TICKER_COUNT_TOTAL','CO_SUBSIDIARY_COUNT_TOTAL')
 group by mtx.ticker, c.company_name, mtx.subsidiary, description_2, description_3
 order by mtx.ticker, mtx.subsidiary;]]></attr>

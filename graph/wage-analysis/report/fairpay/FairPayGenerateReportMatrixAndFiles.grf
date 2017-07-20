@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Tue Jul 11 22:31:25 EDT 2017" modifiedBy="hankmobley" name="FairPayGenerateJobData" revision="1.172" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sat Oct 22 10:25:59 PDT 2016" description="Sets parameters for fair pay and then runs generate lookup tables." guiVersion="3.4.4.P" id="1477175011045" licenseType="Commercial" modified="Thu Jul 20 16:17:44 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateJobData" revision="1.178" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -11,11 +11,8 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="COLUMN_NUMBERS_TABLENAME" value="TMP_REPORT_COLUMN_NUMBERS"/>
-<Property id="GraphParameter1" name="COMPANY_IDS_REMAPPED_TABLENAME" value="TMP_COMPANY_IDS_REMAPPED"/>
-<Property fileURL="wage.prm" id="GraphParameter2"/>
-<Property fileURL="wage-fairpay-parameters.prm" id="GraphParameter59"/>
-<Property fileURL="workspace.prm" id="GraphParameter65"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="workspace.prm" id="GraphParameter69"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -34,8 +31,8 @@ create table if not exists ${TABLE_COMPANY_ID_REMAPPED} (
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix" guiX="449" guiY="8" id="TABLE_REPORT_MATRIX" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_TABLENAME};
-create table if not exists ${REPORT_MATRIX_TABLENAME} (
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_REPORT_MATRIX_FAIRPAY};
+create table if not exists ${TABLE_REPORT_MATRIX_FAIRPAY} (
     INDUSTRY VARCHAR(255) NOT NULL, ROW_TYPE VARCHAR(32) NOT NULL, TICKER VARCHAR(16) DEFAULT '',
     DESCRIPTION VARCHAR(255) DEFAULT '', COMPANY_VALUE VARCHAR(255) DEFAULT '', COMPANY_VALUE_2 VARCHAR(255) DEFAULT '', 
     INDUSTRY_VALUE VARCHAR(255) DEFAULT '', INDUSTRY_VALUE_2 VARCHAR(255) DEFAULT '',
@@ -57,8 +54,8 @@ create table if not exists ${REPORT_MATRIX_TABLENAME} (
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix Row Type" guiX="238" guiY="8" id="TABLE_REPORT_MATRIX_ROW_TYPE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME};
-create table if not exists ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY};
+create table if not exists ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (
   ROW_TYPE VARCHAR(32) NOT NULL UNIQUE,
   ROW_SECTION INT NOT NULL,  /*0 industry header, 1 companies 2 industry footer*/
   DISPLAY_ORDER INT NOT NULL
@@ -153,31 +150,31 @@ join ${TABLE_COMPANY_COLUMN} c2 on c2.ticker <> c.ticker
 join ${TABLE_COMPANY_SUBSIDIARY_TICKER} cs2 on cs2.industry = cs.industry and cs2.ticker = c2.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Report Matrix Row Type" guiX="286" guiY="95" id="POPULATE_REPORT_MATRIX_ROW_TYPE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_BLANK_TOP', 0, 0);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_NAME', 0, 1);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_BLANK_BOTTOM_1', 0, 2);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_BLANK_BOTTOM_2', 0, 3);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_HEADER_BLANK_TOP', 1, 0);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_HEADER_NAME', 1, 1);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_HEADER_COLUMN_HEADERS', 1, 2);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_DATA', 1, 3);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_TOTAL', 1, 4);
-insert into ${REPORT_MATRIX_ROW_TYPE_TABLENAME} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_FOOTER_BLANK_BOTTOM', 2, 0);]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Data" guiX="123" guiY="346" id="ADD_CO_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type, ticker, description,
   company_value, 
   industry_value, 
@@ -224,7 +221,7 @@ left join (
 ) cjd on cjd.joc = j.joc and cjd.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Columns" guiX="440" guiY="267" id="ADD_CO_HEADER_COLUMNS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type, ticker, description,
   company_value, industry_value, company_value_2, industry_value_2, rank_value, industry_job_total
 )
@@ -235,7 +232,7 @@ from ${TABLE_COMPANY_COLUMN} c
 join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Name" guiX="268" guiY="267" id="ADD_CO_HEADER_NAME" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type, ticker, description, company_value,
   c1, c2, c3, c4, c5, c6, c7, c8, c9, c10,
   c11, c12, c13, c14, c15, c16, c17, c18, c19, c20,
@@ -264,7 +261,7 @@ from ${TABLE_COMPANY_COLUMN} c
 join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Header Top" guiX="106" guiY="267" id="ADD_CO_HEADER_TOP" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type, ticker
 )
 select
@@ -273,7 +270,7 @@ from ${TABLE_COMPANY_COLUMN} c
 join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = c.ticker;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Co Total" guiX="277" guiY="346" id="ADD_CO_TOTAL" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type, ticker, description,
   company_value, industry_value, rank_value, industry_job_total
 )
@@ -297,7 +294,7 @@ join (
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Footer Bottom" guiX="426" guiY="346" id="ADD_IND_FOOTER_BOTTOM" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type
 )
 select industry, 'IND_FOOTER_BLANK_BOTTOM'
@@ -305,7 +302,7 @@ from ${TABLE_JOC_COMPANY_COUNT} t
 group by industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Bottom 1" guiX="351" guiY="185" id="ADD_IND_HEADER_BOTTOM_1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type
 )
 select industry, 'IND_HEADER_BLANK_BOTTOM_1'
@@ -314,7 +311,7 @@ group by industry;
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Bottom 2" guiX="535" guiY="185" id="ADD_IND_HEADER_BOTTOM_2" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type
 )
 select industry, 'IND_HEADER_BLANK_BOTTOM_2'
@@ -323,7 +320,7 @@ group by industry;
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Name" guiX="183" guiY="185" id="ADD_IND_HEADER_NAME" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type, description
 )
 select industry, 'IND_HEADER_NAME', industry
@@ -331,7 +328,7 @@ from ${TABLE_JOC_COMPANY_COUNT} t
 group by industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Top" guiX="28" guiY="185" id="ADD_IND_HEADER_TOP" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${REPORT_MATRIX_TABLENAME}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_FAIRPAY}(
   industry, row_type
 )
 select industry, 'IND_HEADER_BLANK_TOP'
@@ -346,7 +343,7 @@ group by industry;]]></attr>
 // Transforms input record into output record.
 function integer transform() {
 	string sql = "";
-	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
+	sql = sql + "update ${TABLE_REPORT_MATRIX_FAIRPAY} mtx ";
 	sql = sql + "set c" + $in.0.column_number + " = c2.company_name ";
 	sql = sql + "from ${TABLE_COMPANY_ID_REMAPPED} r ";
 	sql = sql + "join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c2 on c2.ticker = r.ticker_2 ";
@@ -382,7 +379,7 @@ function integer transform() {
 <attr name="transform"><![CDATA[// Transforms input record into output record.
 function integer transform() {
 	string sql = "";	
-	sql = sql + "update ${REPORT_MATRIX_TABLENAME} mtx ";
+	sql = sql + "update ${TABLE_REPORT_MATRIX_FAIRPAY} mtx ";
 	sql = sql + "set c" + $in.0.column_number + " = cast(cast(round(s.wage_hourly_cola,2) as numeric(36,2)) as varchar(8)) ";
 	sql = sql + "from ${TABLE_COMPANY_ID_REMAPPED} r ";
 	//sql = sql + "join ${TABLE_COMPANY_COLUMN} c on c.ticker = r.ticker ";
@@ -418,7 +415,7 @@ order by column_number;]]></attr>
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_COLUMN_NUMBER};]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Company Ids Remapped Table" guiX="99" guiY="734" id="DROP_TEMP_COMPANY_IDS_REMAPPED_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${COMPANY_IDS_REMAPPED_TABLENAME};]]></attr>
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_COMPANY_ID_REMAPPED};]]></attr>
 </Node>
 </Phase>
 </Graph>

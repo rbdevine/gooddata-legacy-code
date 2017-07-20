@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Jul 18 12:58:56 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.454" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jul 20 16:32:05 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.456" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -14,9 +14,9 @@
 <Property id="GraphParameter0" name="TABLE_COLUMN_NUMBER" value="${TMP_BASE}_REPORT_COLUMN_NUMBER"/>
 <Property id="GraphParameter1" name="TABLE_EMP_COUNT_TOTAL" value="${TMP_BASE}_EMP_COUNT_TOTAL"/>
 <Property id="GraphParameter2" name="TABLE_JOC_ORDER" value="${TMP_BASE}_JOC_ORDER"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter42"/>
-<Property fileURL="workspace.prm" id="GraphParameter65"/>
-<Property fileURL="wage.prm" id="GraphParameter83"/>
+<Property fileURL="wage.prm" id="GraphParameter3"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter68"/>
+<Property fileURL="workspace.prm" id="GraphParameter90"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -32,16 +32,16 @@ CREATE TABLE ${TABLE_LIVING_WAGE_AVERAGES_BY_COMPANY} (
 ]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Matrix Row Type" guiX="-133" guiY="82" id="TABLE_MATRIX_ROW_TYPE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_REPORT_MATRIX_ROW_TYPE};
-create table ${TABLE_REPORT_MATRIX_ROW_TYPE} (
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE};
+create table ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (
   ROW_TYPE VARCHAR(64) NOT NULL UNIQUE,
   ROW_SECTION INT NOT NULL,  /*0 industry header, 1 companies 2 industry footer*/
   DISPLAY_ORDER INT NOT NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Report Matrix" guiX="39" guiY="82" id="TABLE_REPORT_MATRIX" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_REPORT_MATRIX};
-create table ${TABLE_REPORT_MATRIX} (
+<attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_REPORT_MATRIX_LIVING_WAGE};
+create table ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
     INDUSTRY VARCHAR(255) NULL, 
     ROW_TYPE VARCHAR(64) NOT NULL, 
     TICKER VARCHAR(16) DEFAULT '',
@@ -131,7 +131,7 @@ from (
 order by ticker, subsidiary, col_no;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add JOC Headers" guiX="61" guiY="239" id="ADD_JOC_HEADERS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX} (
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, row_type, ticker, subsidiary, description_1, description_2, description_3, description_4
 )
 select 
@@ -148,7 +148,7 @@ left join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and (d.subsidiar
 group by c.industry, c.ticker, d.subsidiary;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Name and Dist Headers" guiX="-134" guiY="239" id="ADD_NAME_AND_DIST_HEADERS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX} (
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, row_type, ticker, subsidiary, description_1, description_2
 )
 select 
@@ -224,45 +224,45 @@ insert into ${TABLE_COLUMN_NUMBER} values('49');
 insert into ${TABLE_COLUMN_NUMBER} values('50');]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Matrix Row Types" guiX="-147" guiY="161" id="POPULATE_MATRIX_ROW_TYPES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_BLANK_TOP', 0, 0);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_NAME', 0, 1);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_BLANK_BOTTOM_1', 0, 2);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_HEADER_BLANK_BOTTOM_2', 0, 3);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_HEADER_BLANK_TOP', 1, 0);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_TICKER_NAME_COUNT_DIST_COLOMUN_HEADERS', 1, 1);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_TICKER_COUNT_JOC_COLUMN_HEADERS', 1, 2);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_TICKER_COUNT_DATA', 1, 3);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_TICKER_COUNT_TOTAL', 1, 4);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_HEADER_BLANK_TOP', 1, 5);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_NAME_COUNT_DIST_HEADERS', 1, 6);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_COUNT_COLUMN_HEADERS', 1, 7);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_COUNT_DATA', 1, 8);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_COUNT_TOTAL', 1, 9);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_COUNT_BLANK_BOTTOM', 1, 10);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_PAY_DIST_HEADERS', 1, 11);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_PAY_JOC_COLUMN_HEADERS', 1, 12);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_SUBSIDIARY_PAY_DATA', 1, 13);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('CO_FOOTER_BLANK_BOTTOM', 1, 14);
-insert into ${TABLE_REPORT_MATRIX_ROW_TYPE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
+insert into ${TABLE_REPORT_MATRIX_ROW_TYPE_LIVING_WAGE} (ROW_TYPE, ROW_SECTION, DISPLAY_ORDER)
 values ('IND_FOOTER_BLANK_BOTTOM', 2, 0);]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Score Quality By Company" guiX="157" guiY="708" id="POPULATE_SCORE_QUALITY_BY_COMPANY" type="DB_EXECUTE">
@@ -302,7 +302,7 @@ group by ticker, company, subsidiary, joc;]]></attr>
 </Phase>
 <Phase number="2">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Avg Data" guiX="202" guiY="239" id="ADD_AVG_DATA" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX} (
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, 
   row_type, 
   ticker,
@@ -333,7 +333,7 @@ join (select g.ticker from ${TABLE_JOC_ORDER} g group by g.ticker ) g on g.ticke
 join ${TABLE_FIPS_DATA} fd on fd.state_county_fips = d.state_county_fips;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Header Blank Top" guiX="4" guiY="316" id="ADD_HEADER_BLANK_TOP" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX}(
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE}(
   industry, row_type, ticker, subsidiary
 )
 select
@@ -348,7 +348,7 @@ join (
 group by c.industry, row_type, c.ticker, c.subsidiary;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Bottom 1" guiX="173" guiY="316" id="ADD_IND_HEADER_BLANK_BOTTOM_1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX} (
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, row_type
 )
 select industry, 'IND_HEADER_BLANK_BOTTOM_1'
@@ -357,7 +357,7 @@ join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker
 group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Bottom 2" guiX="394" guiY="316" id="ADD_IND_HEADER_BLANK_BOTTOM_2" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX} (
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, row_type
 )
 select c.industry, 'IND_HEADER_BLANK_BOTTOM_2'
@@ -366,7 +366,7 @@ join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker
 group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Top" guiX="346" guiY="239" id="ADD_IND_HEADER_BLANK_TOP" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX} (
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, row_type
 )
 select c.industry, 'IND_HEADER_BLANK_TOP'
@@ -375,7 +375,7 @@ join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker
 group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Name" guiX="-163" guiY="316" id="ADD_IND_HEADER_NAME" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX} (
+<attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, row_type, description_1
 )
 select industry, 'IND_HEADER_NAME', isnull(industry,'No Industry')
@@ -384,7 +384,7 @@ join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = g.ticker
 group by c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ticker County Totals" guiX="-77" guiY="391" id="ADD_TICKER_COUNTY_TOTALS" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[update ${TABLE_REPORT_MATRIX} mtx 
+<attr name="sqlQuery"><![CDATA[update ${TABLE_REPORT_MATRIX_LIVING_WAGE} mtx 
 set living_wage_total = d.employees_at_living_wage_total
 from ${TABLE_EMP_COUNT_TOTAL} d
 where d.state_county_fips = mtx.state_county_fips 
@@ -396,7 +396,7 @@ where d.state_county_fips = mtx.state_county_fips
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Totals" guiX="111" guiY="391" id="ADD_TOTALS1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* ticker total/score for companies with subsidiaries broken out */
-insert into ${TABLE_REPORT_MATRIX} (
+insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, row_type, ticker, subsidiary, description_1, description_2, description_3, description_4, living_wage_total
 )
 select
@@ -426,7 +426,7 @@ group by c.ticker, d.subsidiary, c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Totals No Data" guiX="260" guiY="391" id="ADD_TOTALS_NO_DATA" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* total lable for companies without data */
-insert into ${TABLE_REPORT_MATRIX} (
+insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE} (
   industry, row_type, ticker, description_1, description_2
 )
 select
@@ -482,7 +482,7 @@ group by ticker, company, subsidiary;
 // Transforms input record into output record.
 function integer transform() {
 	string sql = "";
-	sql = sql + "update ${TABLE_REPORT_MATRIX} mtx ";
+	sql = sql + "update ${TABLE_REPORT_MATRIX_LIVING_WAGE} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = j.distribution ";
 	sql = sql + "from ( ";
 	sql = sql + "  select c.ticker, c.subsidiary, d.distribution, g.joc_column_no ";
@@ -527,7 +527,7 @@ function integer transform() {
 <attr name="transform"><![CDATA[// Transforms input record into output record.
 function integer transform() {
 	string sql = "";
-	sql = sql + "update ${TABLE_REPORT_MATRIX} mtx ";
+	sql = sql + "update ${TABLE_REPORT_MATRIX_LIVING_WAGE} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = j.joc ";
 	sql = sql + "from ( ";
 	sql = sql + "  select c.ticker, c.subsidiary, d.joc, g.joc_column_no ";
@@ -553,7 +553,7 @@ function integer transform() {
 <attr name="transform"><![CDATA[// Transforms input record into output record.
 function integer transform() {
 	string sql = "";
-	sql = sql + "update ${TABLE_REPORT_MATRIX} mtx ";
+	sql = sql + "update ${TABLE_REPORT_MATRIX_LIVING_WAGE} mtx ";
 	sql = sql + "set g" + $in.0.column_number + " = concat(concat(concat(";
 	sql = sql + "  cast(round(j.employee_count_living_wage_total,2) as numeric(18,2)),' ('),";
 	sql = sql + "  concat('$',cast(cast(round(j.WAGE_HOURLY_RAW_MIN_WAGE_ADJ,2) as numeric(36,2)) as varchar(8)))";

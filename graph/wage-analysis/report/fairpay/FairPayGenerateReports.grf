@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 11 22:37:55 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.72" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 20 16:25:53 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.75" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Report_Details" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -95,8 +95,7 @@
 <Property id="GraphParameter3" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter4" name="REPORTS_DIR" value="${REPORTS_DIR_FP_LOCAL}"/>
 <Property fileURL="wage.prm" id="GraphParameter5"/>
-<Property fileURL="wage-fairpay-parameters.prm" id="GraphParameter62"/>
-<Property fileURL="workspace.prm" id="GraphParameter68"/>
+<Property fileURL="workspace.prm" id="GraphParameter75"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -169,8 +168,8 @@ function integer transform() {
   $c51:=c51, $c52:=c52, $c53:=c53, $c54:=c54, $c55:=c55, $c56:=c56, $c57:=c57, $c58:=c58, $c59:=c59, $c60:=c60,
   $c61:=c61, $c62:=c62, $c63:=c63, $c64:=c64, $c65:=c65, $c66:=c66, $c67:=c67, $c68:=c68, $c69:=c69, $c70:=c70,
   $rank_value:=rank_value, $industry_job_total:=industry_job_total
-from ${REPORT_MATRIX_TABLENAME} mtx
-join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+from ${TABLE_REPORT_MATRIX_FAIRPAY} mtx
+join ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} rt on rt.row_type = mtx.row_type
 where company_value is not null and rt.row_type not in ('IND_HEADER_BLANK_BOTTOM','IND_HEADER_BLANK_BOTTOM_2')
 order by industry, rt.row_section, ticker, rt.display_order, description;
 ]]></attr>
@@ -194,8 +193,8 @@ order by industry, rt.row_section, ticker, rt.display_order, description;
     when rt.row_type = 'IND_HEADER_BLANK_BOTTOM_2' then 'RATIO'
     else mtx.industry_value 
   end
-from ${REPORT_MATRIX_TABLENAME} mtx
-join ${REPORT_MATRIX_ROW_TYPE_TABLENAME} rt on rt.row_type = mtx.row_type
+from ${TABLE_REPORT_MATRIX_FAIRPAY} mtx
+join ${TABLE_REPORT_MATRIX_ROW_TYPE_FAIRPAY} rt on rt.row_type = mtx.row_type
 left join ${TABLE_COMPANY_SUBSIDIARY_TICKER} c on c.ticker = mtx.ticker
 where rt.row_type in ('CO_TOTAL', 'IND_HEADER_NAME', 'IND_FOOTER_BLANK_BOTTOM', 'IND_HEADER_BLANK_TOP', 'IND_HEADER_BLANK_BOTTOM', 'IND_HEADER_BLANK_BOTTOM_2')
 order by mtx.industry, rt.row_section, rt.display_order, mtx.company_value desc, ticker;]]></attr>

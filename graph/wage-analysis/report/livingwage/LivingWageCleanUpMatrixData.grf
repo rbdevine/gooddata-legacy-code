@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed May 17 09:43:56 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.52" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 20 16:28:38 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.55" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -92,13 +92,13 @@
 <Property id="GraphParameter2" name="REPORTFILEPATH_SCOREQUALITY" value="${REPORTS_DIR}/ScoreQuality.csv"/>
 <Property id="GraphParameter3" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter4" name="REPORTS_DIR" value="${DATA_DIR}/livingwage-reports"/>
-<Property fileURL="wage-livingwage-parameters.prm" id="GraphParameter5"/>
-<Property fileURL="workspace.prm" id="GraphParameter42"/>
+<Property fileURL="workspace.prm" id="GraphParameter44"/>
+<Property fileURL="wage.prm" id="GraphParameter62"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Temp FIPS" guiX="336" guiY="177" id="DROP_TEMP_FIPS1" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${FIPS_REJECTS_TABLENAME};]]></attr>
+<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_FIPS_REJECT};]]></attr>
 </Node>
 </Phase>
 </Graph>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Wed Jul 12 16:12:02 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateCurrentIndustryData" revision="1.239" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="Pop industry off the industry queue then creates the industry data for that industry.&#10;Add results to LKP_FAIRPAY_JOB_COMPANY_MATRIX.&#10;&#10;If queue is empty, it will run, but will produce no new data." guiVersion="3.4.4.P" id="1473005344166" licenseType="Commercial" modified="Thu Jul 20 16:03:29 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateCurrentIndustryData" revision="1.244" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Companies" recordDelimiter="\n" type="delimited">
@@ -11,12 +11,9 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter0" name="TMP_LOW_DATA_COMPANIES_TABLENAME" value="TMP_LOW_DATA_COMPANIES"/>
-<Property id="GraphParameter1" name="TMP_SALARY_SUMMARY_TABLENAME" value="TMP_GD_SALARY_SUMMARY"/>
-<Property fileURL="wage-fairpay-livingwage-shared-parameters.prm" id="GraphParameter2"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter11"/>
-<Property fileURL="workspace.prm" id="GraphParameter34"/>
-<Property fileURL="wage.prm" id="GraphParameter52"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter71"/>
+<Property fileURL="workspace.prm" id="GraphParameter93"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -372,13 +369,10 @@ where ticker in (
 </Node>
 </Phase>
 <Phase number="7">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Low Data Company Table" guiX="216" guiY="554" id="DROP_LOW_DATA_COMPANY_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Low Data Company Table" guiX="326" guiY="558" id="DROP_LOW_DATA_COMPANY_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_LOW_DATA_COMPANY};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Temp Ticker Data Table" guiX="421" guiY="554" id="DROP_TEMP_TICKER_DATA_TABLE" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[drop table if exists ${TMP_TICKER_DATA_TABLENAME};]]></attr>
-</Node>
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Valid Company Job Table" guiX="4" guiY="554" id="DROP_VALID_COMPANY_JOB_TABLE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Valid Company Job Table" guiX="114" guiY="558" id="DROP_VALID_COMPANY_JOB_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_VALID_COMPANY_JOC};]]></attr>
 </Node>
 </Phase>
