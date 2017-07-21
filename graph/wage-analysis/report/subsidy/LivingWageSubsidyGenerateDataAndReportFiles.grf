@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 20 16:57:46 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.190" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Jul 21 10:43:19 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.192" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -16,8 +16,8 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property fileURL="wage.prm" id="GraphParameter18"/>
-<Property fileURL="workspace.prm" id="GraphParameter0"/>
+<Property fileURL="wage.prm" id="GraphParameter0"/>
+<Property fileURL="workspace.prm" id="GraphParameter65"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -60,7 +60,7 @@ create table if not exists ${TABLE_SUBSIDY_COUNTY_JOC_RATE} (
   WAGE_HOURLY_RAW FLOAT NOT NULL
 );]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Ticker Queue" guiX="242" guiY="16" id="TABLE_TICKER_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Table: Ticker Queue" guiX="242" guiY="16" id="TABLE_TICKER_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_SUBSIDY_TICKER_QUEUE};
 create table if not exists ${TABLE_SUBSIDY_TICKER_QUEUE} (
   TICKER VARCHAR(32) UNIQUE NOT NULL
@@ -110,7 +110,7 @@ where ticker not in ('WMT', 'SYY');]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Ticker Queue" guiX="158" guiY="322" id="POPULATE_TICKER_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Populate Ticker Queue" guiX="158" guiY="322" id="POPULATE_TICKER_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_SUBSIDY_TICKER_QUEUE}
 select ticker
 from ${TABLE_SUBSIDY_COUNTY_JOC_RATE}
@@ -148,7 +148,6 @@ select
   gc.ticker,
   gc.joc
 from ${TABLE_SUBSIDY_COUNTY_JOC_RATE} gc
-join ${TABLE_SUBSIDY_TICKER_QUEUE} q on q.ticker = gc.ticker
 group by 
   gc.state_county_fips, 
   gc.ticker, 
@@ -313,12 +312,6 @@ from (
         ticker
     ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker
     join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
-    join (
-      select ticker
-      from ${TABLE_SUBSIDY_TICKER_QUEUE} 
-      order by ticker 
-      limit 1
-    ) t on a.ticker = t.ticker
     join ${TABLE_COMPANY} c on c.ticker = a.ticker
     left join ${TABLE_SUBSIDY_SNAP_PARTICIPATION_BY_CODE} sc on sc.subsidy_code = c.subsidy_code
     left join ${TABLE_STATE_DETAIL} sd on sd.state = fs.state
@@ -364,12 +357,6 @@ from (
     ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker
     join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
     join ${TABLE_COMPANY} c on c.ticker = a.ticker
-    join (
-      select ticker
-      from ${TABLE_SUBSIDY_TICKER_QUEUE} 
-      order by ticker 
-      limit 1
-    ) t on a.ticker = t.ticker
     join (
       select state_county_fips, ticker, sum(emp_count_adult_medicaid) emp_count_adult_medicaid
       from ${TABLE_SUBSIDY_COUNT}
@@ -438,7 +425,7 @@ function integer transform() {
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Accumulation Table" guiX="104" guiY="1188" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_SUBSIDY_ACCUMULATED_COUNT};]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Ticker Queue" guiX="288" guiY="1188" id="DROP_TICKER_QUEUE" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Ticker Queue" guiX="288" guiY="1188" id="DROP_TICKER_QUEUE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_SUBSIDY_TICKER_QUEUE};]]></attr>
 </Node>
 </Phase>
