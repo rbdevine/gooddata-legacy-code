@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Fri Jul 21 10:43:19 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.192" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon Jul 24 12:45:31 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.195" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -74,7 +74,7 @@ select
   cd.state_county_fips,
   cd.ticker,
   cd.joc,
-  cd.employee_count_total,
+  cast(cd.employee_count_total as integer) employee_count_total,
   AVG(cd.wage_hourly_raw_min_wage_adj) wage_hourly_raw 
 from (
   select 
@@ -82,9 +82,40 @@ from (
     cd.ticker,
     cd.subsidiary,
     cd.joc,
-    cd.employee_count_total,
+    cd.employee_count_total*isnull(cm.employee_count_multiplier,1.0) employee_count_total,
     cd.wage_hourly_raw_min_wage_adj
   from ${TABLE_COMPANY_LOCATION_DETAIL} cd
+  join (
+    select
+      c.ticker,
+      null subsidiary,
+      c.employee_count_multiplier
+    from ${TABLE_COMPANY} c
+    left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+    where s.ticker_parent is null
+    union all
+    select
+      c.ticker,
+      s.subsidiary_name subsidiary,
+      isnull(s.employee_count_multiplier,c.employee_count_multiplier) employee_count_multiplier
+    from ${TABLE_SUBSIDIARY} s
+    join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+    where s.ticker_subsidiary is null
+    union all
+    select
+      c.ticker,
+      null subsidiary,
+      c.employee_count_multiplier
+    from (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent) s
+    join ${TABLE_COMPANY} c on c.ticker = s.ticker
+    union all
+    select
+      s.ticker_subsidiary ticker,
+      null subsidiary,
+      isnull(s.employee_count_multiplier,c.employee_count_multiplier) employee_count_multiplier
+    from (select ticker_parent, ticker_subsidiary, employee_count_multiplier from ${TABLE_SUBSIDIARY} where ticker_subsidiary is not null) s
+    join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+  ) cm on cm.ticker = cd.ticker and isnull(cm.subsidiary,'') = isnull(cd.subsidiary,'')
   left join (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent) s on s.ticker = cd.ticker
   where s.ticker is null or cd.subsidiary is null
   group by 
@@ -93,7 +124,8 @@ from (
     cd.subsidiary, 
     cd.joc, 
     cd.employee_count_total,
-    cd.wage_hourly_raw_min_wage_adj
+    cd.wage_hourly_raw_min_wage_adj,
+    cm.employee_count_multiplier
 ) cd
 group by 
   cd.state_county_fips, 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jul 20 16:32:05 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.456" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Jul 24 12:43:43 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.457" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -84,7 +84,7 @@ create table ${TABLE_EMP_COUNT_TOTAL} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(16) NOT NULL,
   SUBSIDIARY VARCHAR(255) NULL,
-  EMPLOYEES_AT_LIVING_WAGE_TOTAL INT NULL
+  EMPLOYEES_AT_LIVING_WAGE_TOTAL FLOAT NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Temp Col Numbers" guiX="346" guiY="8" id="TABLE_TEMP_COL_NUMBERS" type="DB_EXECUTE">
@@ -410,7 +410,7 @@ select
   'Score',
   cast(round(((sum(employee_count_living_wage_total)/sum(employee_count_total))*100.0),1) as numeric(18,1)),
   concat(concat(cast(round(sum(employee_count_living_wage_total),2) as numeric(36,2)),' / '),sum(employee_count_total)),
-  sum(employee_count_total),
+  cast(round(sum(employee_count_total),2) as numeric(18,2)),
   cast(round(sum(employee_count_living_wage_total),2) as numeric(18,2))
 from (select ticker from ${TABLE_JOC_ORDER} group by ticker) g
 join ${TABLE_COMPANY_LOCATION_DETAIL} d on d.ticker = g.ticker

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 20 15:57:59 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.193" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon Jul 24 15:20:02 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.203" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -17,8 +17,8 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="wage.prm" id="GraphParameter0"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter71"/>
-<Property fileURL="workspace.prm" id="GraphParameter93"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter65"/>
+<Property fileURL="workspace.prm" id="GraphParameter87"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -30,12 +30,15 @@ create table ${TABLE_COMPANY_LOCATION_DETAIL} (
   TICKER VARCHAR(16) NOT NULL,
   SUBSIDIARY VARCHAR(64) NULL,
   JOC VARCHAR(128) NOT NULL,
-  EMPLOYEE_COUNT_LIVING_WAGE_TOTAL INT NOT NULL,
-  EMPLOYEE_COUNT_TOTAL INT NULL,
+  EMPLOYEE_COUNT_LIVING_WAGE_TOTAL FLOAT NOT NULL,
+  EMPLOYEE_COUNT_TOTAL FLOAT NULL,
+  /*
   EMPLOYEE_COUNT_SUBSIDY_TOTAL FLOAT NULL,
+  */
   WAGE_HOURLY_RAW FLOAT NOT NULL,
   WAGE_HOURLY_COLA FLOAT NOT NULL,
-  WAGE_HOURLY_RAW_MIN_WAGE_ADJ FLOAT NULL,
+  WAGE_HOURLY_RAW_MIN_WAGE_ADJ FLOAT NULL 
+  /*,
   SUBSIDY_TOTAL FLOAT NULL,
   SUBSIDY_BY_EMPLOYEE_TOTAL FLOAT NULL,
   SUBSIDY_ABS_BY_EMPLOYEE_TOTAL FLOAT NULL,
@@ -60,6 +63,7 @@ create table ${TABLE_COMPANY_LOCATION_DETAIL} (
   SUBSIDY_TOTAL_ACA FLOAT NULL,
   SUBSIDY_BY_EMP_ACA FLOAT NULL,
   SUBSIDY_ABS_BY_EMP_ACA FLOAT NULL
+  */
 );
 ]]></attr>
 </Node>
@@ -68,7 +72,7 @@ create table ${TABLE_COMPANY_LOCATION_DETAIL} (
 create table ${TABLE_EMPLOYEE_COUNT_TOTAL} (
   TICKER VARCHAR(16) NOT NULL,
   SUBSIDIARY VARCHAR(255),
-  EMP_COUNT_TOT INT NOT NULL
+  EMP_COUNT_TOT FLOAT NOT NULL
 );]]></attr>
 </Node>
 </Phase>
@@ -90,16 +94,19 @@ select
   d.ticker,
   cc.subsidiary,
   ws.joc,
-  cast(cc.employee_count*d.distribution as int) emp_count,
+  /*cast(*/cc.employee_count*d.distribution /*as int)*/ emp_count,
   cast(round((ws.wage_hourly_cola/100.0)*f.cost_of_living_index,2) as numeric (16,2)) reverse_adj, 
   ws.wage_hourly_cola,
+  -1.0
+  /*
   cast(
    (
     case
       when ((ws.wage_hourly_cola/100.0)*f.cost_of_living_index) >= f.living_wage_hourly then 1
       else 0
     end
-  )*cc.employee_count*d.distribution as int) pays_living_wage
+  )*cc.employee_count*d.distribution as int) pays_living_wage 
+  */
 from ${TABLE_COUNTY_EMPLOYEE_COUNT} cc
 join ${TABLE_FIPS_DATA} f on f.state_county_fips = cc.state_county_fips
 join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = cc.ticker and isnull(cc.subsidiary,d.subsidiary) = d.subsidiary
@@ -133,7 +140,10 @@ select
   sum(employee_count_total),
   cast(round(avg(wage_hourly_raw),2) as numeric(16,2)),
   cast(round(avg(wage_hourly_cola),2) as numeric(16,2)),
+  -1.0
+  /*
   sum(employee_count_living_wage_total)
+  */
 from ${TABLE_COMPANY_LOCATION_DETAIL} l
 join ${TABLE_SUBSIDIARY} s on s.ticker_parent = l.ticker and s.subsidiary_name = l.subsidiary
 join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
@@ -197,7 +207,17 @@ where sd.state_fips = left(ld.state_county_fips,2) and ld.WAGE_HOURLY_RAW_MIN_WA
 </Node>
 </Phase>
 <Phase number="7">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Employee Count Total" guiX="381" guiY="605" id="POPULATE_EMPLOYEE_COUNT_TOTAL1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Living Wage Count" guiX="169" guiY="614" id="ADD_LIVING_WAGE_COUNT" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[update ${TABLE_COMPANY_LOCATION_DETAIL} d
+set employee_count_living_wage_total = 
+  case 
+    when wage_hourly_raw_min_wage_adj >= f.living_wage_hourly then employee_count_total
+    else 0.0
+  end
+from ${TABLE_FIPS_DATA} f
+where d.state_county_fips = f.state_county_fips;]]></attr>
+</Node>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Employee Count Total" guiX="373" guiY="614" id="POPULATE_EMPLOYEE_COUNT_TOTAL1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_EMPLOYEE_COUNT_TOTAL}
 select 
   ticker, 
@@ -209,7 +229,7 @@ order by ticker, subsidiary;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subidiary Ticker Distribution" guiX="377" guiY="678" id="ADD_SUBIDIARY_TICKER_DISTRIBUTION" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subidiary Ticker Distribution" guiX="369" guiY="687" id="ADD_SUBIDIARY_TICKER_DISTRIBUTION" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_JOC_DISTRIBUTION}
 select t2.ticker, null subsidiary, t1.joc, sum(dist_count)/t2.emp_count_tot distribution
 from (

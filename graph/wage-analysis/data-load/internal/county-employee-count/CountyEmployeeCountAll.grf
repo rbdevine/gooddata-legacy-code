@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Wed Jul 19 16:47:20 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.69" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Mon Jul 24 10:48:29 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.74" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -29,10 +29,10 @@
 <Property id="GraphParameter6" name="TABLENAME_COUNTYAVG" value="TMP_AVG_STORE_EMPLOYEE_COUNTS"/>
 <Property id="GraphParameter7" name="TABLENAME_FIPSMATCH" value="TMP_COUNTY_CITY_TO_LOOKUP"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter70"/>
-<Property fileURL="workspace.prm" id="GraphParameter92"/>
-<Property id="GraphParameter110" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
-<Property id="GraphParameter111" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter73"/>
+<Property fileURL="workspace.prm" id="GraphParameter95"/>
+<Property id="GraphParameter113" name="WRITEFILEPATH_COUNTYAVG" value="${DATA_TRANSFORM_DIR}/avgemployeecounts.txt"/>
+<Property id="GraphParameter114" name="WRITEFILEPATH_FIPSMATCH" value="${DATA_TRANSFORM_DIR}/countycitytolookup.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -120,7 +120,17 @@ group by c2.ticker, c2.state_county_fips;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply County Count Multiplier" guiX="68" guiY="714" id="APPLY_COUNTY_COUNT_MULTIPLIER1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Leading Zeros" guiX="99" guiY="712" id="ADD_LEADING_ZEROS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[/* insure state_county_fips is exactly 5 characters, adding leading zeros as needed. */
+delete from ${TABLE_COUNTY_EMPLOYEE_COUNT} where length(state_county_fips) < 4;
+
+update ${TABLE_COUNTY_EMPLOYEE_COUNT}
+set state_county_fips = trim(to_char(cast(state_county_fips as integer),'00000'))
+where length(state_county_fips) = 4;]]></attr>
+</Node>
+</Phase>
+<Phase number="9">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Apply County Count Multiplier" guiX="70" guiY="786" id="APPLY_COUNTY_COUNT_MULTIPLIER1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* rough adjustment for companies with distribution/branches we did not capture due to missing job distribution information */
 update ${TABLE_COUNTY_EMPLOYEE_COUNT} ec
 set employee_count = employee_count_multiplier * employee_count
