@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Mon Jul 10 01:20:27 EDT 2017" modifiedBy="hankmobley" name="LivingWageCitiesThatNeedFips" revision="1.82" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Tue Jul 25 10:52:09 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.84" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="EmpCountCityCountyStateGeoDB" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -29,14 +29,14 @@
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
-<Property id="GraphParameter1" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/CountyCountCityStateGeo.xlsx"/>
-<Property id="GraphParameter2" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/countycountcitystategeoerror.txt"/>
-<Property id="GraphParameter4" name="READFILEPATH" value="${DATA_TMP_DIR}/CountyCountCityStateGeo.xlsx"/>
-<Property id="GraphParameter0" name="TABLENAME" value="${TABLE_COUNTY_COUNT_CITY_STATE_GEO}"/>
-<Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="workspace.prm" id="GraphParameter88"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter5"/>
-<Property id="GraphParameter3" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/countycountcitystategeo.txt"/>
+<Property id="GraphParameter0" name="DOWNLOADFILEPATH" value="https://${S3ACCESSKEY}:${S3SECRETKEY}@${S3BUCKETNAME}.s3.amazonaws.com/ranking/wageanalysis/CountyCountCityStateGeo.xlsx"/>
+<Property id="GraphParameter1" name="POPULATEERRORFILEPATH" value="${DATA_TMP_DIR}/countycountcitystategeoerror.txt"/>
+<Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/CountyCountCityStateGeo.xlsx"/>
+<Property id="GraphParameter3" name="TABLENAME" value="${TABLE_COUNTY_COUNT_CITY_STATE_GEO}"/>
+<Property fileURL="wage.prm" id="GraphParameter4"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter88"/>
+<Property fileURL="workspace.prm" id="GraphParameter70"/>
+<Property id="GraphParameter110" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/countycountcitystategeo.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -134,7 +134,8 @@ update ${TABLENAME} set state = trim(state);
 update ${TABLENAME} set city = null where city = '0';
 update ${TABLENAME} set county = null where county = '0';
 update ${TABLENAME} set state = null where state = '0';
-update ${TABLENAME} set state_county_fips = null where REGEXP_COUNT(state_county_fips,'^[0-9]{5,5}$') = 0;
+update ${TABLENAME} set state_county_fips = null where REGEXP_COUNT(state_county_fips,'^[0-9]{4,5}$') = 0;
+update ${TABLENAME} set state_county_fips = TRIM(TO_CHAR(CAST(state_county_fips as INTEGER),'00000'));
 
 update ${TABLENAME} 
   set longitude = case 

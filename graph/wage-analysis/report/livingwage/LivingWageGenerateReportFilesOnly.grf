@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 20 16:42:25 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByJOC" revision="1.121" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 25 12:55:40 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByJOC" revision="1.126" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata3" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Living_Wage_Averages" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -13,6 +13,7 @@
 </Metadata>
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Report_Details" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
+<Field name="ticker" type="string"/>
 <Field name="state_county_fips" type="string"/>
 <Field name="description_1" type="string"/>
 <Field name="description_2" type="string"/>
@@ -99,8 +100,8 @@
 <Property id="GraphParameter6" name="REPORTFILEPATH_SCORES" value="${REPORTS_DIR}/Scores.csv"/>
 <Property id="GraphParameter7" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}"/>
 <Property fileURL="wage.prm" id="GraphParameter8"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter73"/>
-<Property fileURL="workspace.prm" id="GraphParameter95"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter74"/>
+<Property fileURL="workspace.prm" id="GraphParameter96"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -312,6 +313,7 @@ order by industry, rt.row_section, ticker, subsidiary, rt.display_order, state_c
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details" guiX="26" guiY="25" id="SELECT_DETAILS" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select 
+  $ticker:=case when rt.row_type in ('CO_TICKER_COUNT_DATA','CO_SUBSIDIARY_COUNT_DATA') then mtx.ticker else '' end,
   $state_county_fips:=state_county_fips,
   $description_1:=description_1, $description_2:=description_2, $description_3:=description_3, $description_4:=description_4,
   $g1:=g1, $g2:=g2, $g3:=g3, $g4:=g4, $g5:=g5, $g6:=g6, $g7:=g7, $g8:=g8, $g9:=g9, $g10:=g10,
@@ -348,7 +350,7 @@ order by mtx.ticker, mtx.subsidiary;]]></attr>
 from ${TABLE_SCORE_QUALITY_BY_COMPANY}
 order by ticker, company, subsidiary, joc;]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="25" id="WRITE_REPORT" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS}" guiName="Write Report" guiX="419" guiY="25" id="WRITE_REPORT" outputFieldNames="false" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCORES}" guiName="Write Report" guiX="419" guiY="136" id="WRITE_REPORT1" outputFieldNames="true" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SCOREQUALITY}" guiName="Write Report" guiX="419" guiY="248" id="WRITE_REPORT2" outputFieldNames="true" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_LWAVG}" guiName="Write Report" guiX="419" guiY="351" id="WRITE_REPORT3" outputFieldNames="true" type="DATA_WRITER"/>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Mon Jul 24 12:43:43 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.457" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Jul 25 12:47:55 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.459" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -15,8 +15,8 @@
 <Property id="GraphParameter1" name="TABLE_EMP_COUNT_TOTAL" value="${TMP_BASE}_EMP_COUNT_TOTAL"/>
 <Property id="GraphParameter2" name="TABLE_JOC_ORDER" value="${TMP_BASE}_JOC_ORDER"/>
 <Property fileURL="wage.prm" id="GraphParameter3"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter68"/>
-<Property fileURL="workspace.prm" id="GraphParameter90"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter69"/>
+<Property fileURL="workspace.prm" id="GraphParameter91"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -322,15 +322,16 @@ select
   d.ticker,
   d.subsidiary,
   d.state_county_fips,
-  cf.county_name, 
-  cf.state,
+  isnull(cf.county_name,'') county_name, 
+  isnull(sf.state,'') state,
   concat('$',cast(cast(round(fd.living_wage_hourly,2) as numeric(36,2)) as varchar(8))),
   cast(round(d.employee_count_total,2) as numeric(18,2))
 from (select state_county_fips, ticker, subsidiary, sum(employee_count_total) employee_count_total from ${TABLE_COMPANY_LOCATION_DETAIL} group by state_county_fips, ticker, subsidiary) d
 join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and ((d.subsidiary is null and c.subsidiary is null) or (d.subsidiary = c.subsidiary))
-join (select state_county_fips, state_abbreviation state, max(county_name) county_name from ${TABLE_CITY_FIPS} group by state_county_fips, state_abbreviation) cf on cf.state_county_fips = d.state_county_fips
 join (select g.ticker from ${TABLE_JOC_ORDER} g group by g.ticker ) g on g.ticker = d.ticker
-join ${TABLE_FIPS_DATA} fd on fd.state_county_fips = d.state_county_fips;]]></attr>
+join ${TABLE_FIPS_DATA} fd on fd.state_county_fips = d.state_county_fips
+left join (select state_county_fips, max(county_name) county_name from ${TABLE_CITY_FIPS} group by state_county_fips) cf on cf.state_county_fips = d.state_county_fips
+left join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state) sf on sf.state_fips = left(d.state_county_fips,2);]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Header Blank Top" guiX="4" guiY="316" id="ADD_HEADER_BLANK_TOP" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_REPORT_MATRIX_LIVING_WAGE}(
