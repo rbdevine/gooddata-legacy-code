@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Tue Jul 18 10:16:13 EDT 2017" modifiedBy="hankmobley" name="LivingWageDistByGOC" revision="1.129" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jul 26 17:12:24 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.133" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -113,7 +113,7 @@
 <Property id="GraphParameter4" name="REPORTFILEPATH_SUMMARY_TICKER" value="${REPORTS_DIR}/Summary_Ticker.csv"/>
 <Property id="GraphParameter5" name="REPORTS_DIR" value="${REPORTS_DIR_LW_LOCAL}/subsidy"/>
 <Property fileURL="wage.prm" id="GraphParameter6"/>
-<Property fileURL="workspace.prm" id="GraphParameter65"/>
+<Property fileURL="workspace.prm" id="GraphParameter72"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -258,7 +258,7 @@ from (
       gc.joc = sc.joc
     join ${TABLE_FIPS_DATA} f on f.state_county_fips = sc.state_county_fips
     join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(sc.state_county_fips,2)
-    join ${TABLE_COMPANY} c on c.ticker = sc.ticker
+    join (select ticker, subsidy_code from ${TABLE_COMPANY_LIVING_WAGE} group by ticker, subsidy_code) c on c.ticker = sc.ticker
     join ${TABLE_STATE_DETAIL} sd on sd.state = fs.state
     left join ${TABLE_SUBSIDY_EITC} eitc on eitc.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= eitc.maximum_wage
     left join ${TABLE_SUBSIDY_SNAP} snap on snap.subsidy_code = c.subsidy_code and snap.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= snap.maximum_wage
