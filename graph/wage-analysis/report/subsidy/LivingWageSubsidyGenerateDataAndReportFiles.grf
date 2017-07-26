@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Jul 26 12:26:14 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.198" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Jul 26 18:19:56 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.208" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -27,6 +27,7 @@ create table if not exists ${TABLE_SUBSIDY_ACCUMULATED_COUNT} (
   ID INTEGER NOT NULL UNIQUE,
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(32) NOT NULL,
+  SUBSIDIARY VARCHAR(64) NULL,
   JOC VARCHAR(128) NOT NULL,
   WAGE_HOURLY_RAW FLOAT NOT NULL,
   EMPLOYEE_COUNT FLOAT NOT NULL,
@@ -41,6 +42,7 @@ create table if not exists ${TABLE_SUBSIDY_ACCUMULATED_COUNT} (
 create table if not exists ${TABLE_SUBSIDY_COUNT} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(32) NOT NULL,
+  SUBSIDIARY VARCHAR(64) NULL,
   JOC VARCHAR(128) NOT NULL,
   EMP_COUNT_EITC FLOAT NULL DEFAULT 0.0,
   EMP_COUNT_SNAP FLOAT NULL DEFAULT 0.0,
@@ -55,6 +57,7 @@ create table if not exists ${TABLE_SUBSIDY_COUNT} (
 create table if not exists ${TABLE_SUBSIDY_COUNTY_JOC_RATE} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL, 
   TICKER VARCHAR(32) NOT NULL,
+  SUBSIDIARY VARCHAR(64) NULL,
   JOC VARCHAR(128) NOT NULL,
   EMPLOYEE_COUNT FLOAT NOT NULL,
   WAGE_HOURLY_RAW FLOAT NOT NULL
@@ -70,13 +73,16 @@ create table if not exists ${TABLE_SUBSIDY_TICKER_QUEUE} (
 <Phase number="1">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Rate Table" guiX="141" guiY="168" id="POPULATE_SUBSIDY_RATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_SUBSIDY_COUNTY_JOC_RATE}
+/*
 select 
   cd.state_county_fips,
   cd.ticker,
+  cd.subsidiary,
   cd.joc,
   cast(cd.employee_count_total as integer) employee_count_total,
   AVG(cd.wage_hourly_raw_min_wage_adj) wage_hourly_raw 
 from (
+*/
   select 
     cd.state_county_fips,
     cd.ticker,
@@ -116,8 +122,10 @@ from (
     from (select ticker_parent, ticker_subsidiary, employee_count_multiplier from ${TABLE_SUBSIDIARY} where ticker_subsidiary is not null) s
     join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
   ) cm on cm.ticker = cd.ticker and isnull(cm.subsidiary,'') = isnull(cd.subsidiary,'')
+  /*
   left join (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent) s on s.ticker = cd.ticker
   where s.ticker is null or cd.subsidiary is null
+  */
   group by 
     cd.state_county_fips, 
     cd.ticker, 
@@ -126,13 +134,14 @@ from (
     cd.employee_count_total,
     cd.wage_hourly_raw_min_wage_adj,
     cm.employee_count_multiplier
+/*
 ) cd
 group by 
   cd.state_county_fips, 
   cd.ticker,
   cd.joc,
   cd.employee_count_total;
-]]></attr>
+*/;]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
@@ -156,14 +165,16 @@ group by ticker;
   ID,
   STATE_COUNTY_FIPS,
   TICKER,
+  SUBSIDIARY,
   JOC,
   WAGE_HOURLY_RAW,
   EMPLOYEE_COUNT
 )
 select 
-  rank() over (order by ticker, state_county_fips, wage_hourly_raw, joc) id, 
+  rank() over (order by ticker, subsidiary, state_county_fips, wage_hourly_raw, joc) id, 
   state_county_fips,
-  ticker, 
+  ticker,
+  subsidiary,
   joc,
   wage_hourly_raw,
   employee_count
@@ -173,20 +184,24 @@ from ${TABLE_SUBSIDY_COUNTY_JOC_RATE};]]></attr>
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_SUBSIDY_COUNT} (
   state_county_fips, 
   ticker,
+  subsidiary,
   joc
 )
 select 
   gc.state_county_fips,
   gc.ticker,
+  gc.subsidiary,
   gc.joc
 from ${TABLE_SUBSIDY_COUNTY_JOC_RATE} gc
 group by 
   gc.state_county_fips, 
-  gc.ticker, 
+  gc.ticker,
+  gc.subsidiary, 
   gc.joc
 order by 
   gc.state_county_fips, 
-  gc.ticker, 
+  gc.ticker,
+  gc.subsidiary,
   gc.joc;]]></attr>
 </Node>
 </Phase>
@@ -456,7 +471,7 @@ function integer transform() {
 <Edge fromNode="REFORMAT:0" guiBendpoints="" guiRouter="Manhattan" id="Edge6" inPort="Port 0 (in regular mode: names of the graphs to be executed, otherwise nothing)" metadata="Metadata2" outPort="Port 0 (out)" toNode="UPDATE_ACCUMULATION:0"/>
 </Phase>
 <Phase number="13">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Accumulation Table" guiX="104" guiY="1188" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Accumulation Table" guiX="170" guiY="1189" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_SUBSIDY_ACCUMULATED_COUNT};]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="disabled" guiName="Drop Ticker Queue" guiX="653" guiY="1181" id="DROP_TICKER_QUEUE" type="DB_EXECUTE">

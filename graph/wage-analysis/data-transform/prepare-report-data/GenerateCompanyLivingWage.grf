@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed Jul 26 17:09:15 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.288" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Wed Jul 26 19:32:15 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.290" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="wage.prm" id="GraphParameter0"/>
@@ -51,7 +51,6 @@ from (
   from ${TABLE_COMPANY} c
   join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker and s.ticker_subsidiary is null
   group by c.ticker, c.company_name, c.industry, c.subsidy_code
-  order by ticker
 ) c
 join (
   select ec.ticker, ec.subsidiary
@@ -61,12 +60,12 @@ join (
     left join (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker having count(subsidiary_name) > 1) s on s.ticker = ec.ticker
     group by ec.ticker, ec.subsidiary, s.ticker 
   ) ec
-  join (
+  left join (
     select ticker, subsidiary 
     from ${TABLE_JOC_DISTRIBUTION} 
     group by ticker, subsidiary 
   ) d on d.ticker = ec.ticker and ((ec.subsidiary is null and (not ec.has_subsidiaries or d.subsidiary is null)) or (d.subsidiary = ec.subsidiary))
-) c2 on c2.ticker = c.ticker and ((c.subsidiary is null and c2.subsidiary is null) or (c2.subsidiary = c.subsidiary))
+) c2 on c2.ticker = c.ticker and isnull(c.subsidiary,'') = isnull(c2.subsidiary,'')
 order by ticker, subsidiary;
 
 ]]></attr>

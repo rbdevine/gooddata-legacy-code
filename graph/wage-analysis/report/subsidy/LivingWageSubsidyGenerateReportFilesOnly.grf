@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jul 26 17:12:24 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.133" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jul 26 19:19:43 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.141" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -43,6 +43,7 @@
 <Record fieldDelimiter="," name="Report_Details_County_Ticker" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="STATE_COUNTY_FIPS" type="string"/>
 <Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
 <Field name="JOC" type="string"/>
 <Field name="HOURLY_WAGE_RAW" type="string"/>
 <Field name="MINIMUM_WAGE" type="string"/>
@@ -78,6 +79,7 @@
 <Metadata id="Metadata2" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Report_Summary_Ticker" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
 <Field name="TICKER" type="string"/>
+<Field name="SUBSIDIARY" type="string"/>
 <Field name="EMP_COUNT_TOTAL" type="string"/>
 <Field name="EMP_COUNT_SUBSIDY_TOTAL" type="string"/>
 <Field name="SUBSIDY_TOTAL" type="string"/>
@@ -122,6 +124,7 @@
 CREATE TABLE ${TABLE_SUBSIDY_DETAIL} (
   STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
   TICKER VARCHAR(32) NOT NULL,
+  SUBSIDIARY VARCHAR(64) NULL,
   JOC VARCHAR(128) NOT NULL,
   HOURLY_WAGE_RAW FLOAT NOT NULL,
   LIVING_WAGE_HOURLY FLOAT NOT NULL,
@@ -149,6 +152,7 @@ CREATE TABLE ${TABLE_SUBSIDY_DETAIL} (
 select
   state_county_fips,
   ticker,
+  subsidiary,
   joc,
   wage_hourly_raw,
   living_wage_hourly,
@@ -170,6 +174,7 @@ from (
   select
     state_county_fips,
     ticker,
+    subsidiary,
     joc,
     isnull(wage_hourly_raw,0.0) wage_hourly_raw,
     isnull(living_wage_hourly,0.0) living_wage_hourly,
@@ -190,6 +195,7 @@ from (
     select 
       sc.state_county_fips,
       sc.ticker,
+      sc.subsidiary,
       sc.joc,
       gc.wage_hourly_raw,
       f.living_wage_hourly,
@@ -255,10 +261,11 @@ from (
     join ${TABLE_SUBSIDY_COUNTY_JOC_RATE} gc on 
       gc.state_county_fips = sc.state_county_fips and 
       gc.ticker = sc.ticker and 
+      isnull(gc.subsidiary,'') = isnull(sc.subsidiary,'') and
       gc.joc = sc.joc
     join ${TABLE_FIPS_DATA} f on f.state_county_fips = sc.state_county_fips
     join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(sc.state_county_fips,2)
-    join (select ticker, subsidy_code from ${TABLE_COMPANY_LIVING_WAGE} group by ticker, subsidy_code) c on c.ticker = sc.ticker
+    join (select ticker, subsidiary, subsidy_code from ${TABLE_COMPANY_LIVING_WAGE} group by ticker, subsidiary, subsidy_code) c on c.ticker = sc.ticker and isnull(c.subsidiary,'') = isnull(sc.subsidiary,'')
     join ${TABLE_STATE_DETAIL} sd on sd.state = fs.state
     left join ${TABLE_SUBSIDY_EITC} eitc on eitc.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= eitc.maximum_wage
     left join ${TABLE_SUBSIDY_SNAP} snap on snap.subsidy_code = c.subsidy_code and snap.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= snap.maximum_wage
@@ -269,6 +276,7 @@ from (
 group by
   state_county_fips,
   ticker,
+  subsidiary,
   joc,
   wage_hourly_raw,
   living_wage_hourly,
@@ -485,6 +493,7 @@ order by state_county_fips;]]></attr>
 <attr name="sqlQuery"><![CDATA[select
   $STATE_COUNTY_FIPS:=STATE_COUNTY_FIPS,
   $TICKER:=TICKER,
+  $SUBSIDIARY:=SUBSIDIARY,
   $JOC:=JOC,
   $HOURLY_WAGE_RAW:=concat('$',cast(round(HOURLY_WAGE_RAW,2) as numeric(16,2))),
   $MINIMUM_WAGE:=concat('$',cast(round(MINIMUM_WAGE,2) as numeric(16,2))),
@@ -527,6 +536,7 @@ from (
   select
     STATE_COUNTY_FIPS,
     TICKER,
+    SUBSIDIARY,
     JOC,
     HOURLY_WAGE_RAW,
     STATE_MINIMUM_WAGE MINIMUM_WAGE,
@@ -590,11 +600,12 @@ from (
     end SUBSIDY_ABS_BY_EMP_ACA
   from ${TABLE_SUBSIDY_DETAIL}
 ) t
-order by state_county_fips, ticker, hourly_wage_raw;]]></attr>
+order by state_county_fips, ticker, subsidiary, hourly_wage_raw;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Select Summary by Ticker" guiX="27" guiY="201" id="SELECT_SUMMARY_BY_TICKER" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select
   $TICKER:=TICKER,
+  $SUBSIDIARY:=SUBSIDIARY,
   $EMP_COUNT_TOTAL:=cast(round(EMP_COUNT_TOTAL,3) as numeric(16,3)),
   $EMP_COUNT_SUBSIDY_TOTAL:=cast(round(EMP_COUNT_SUBSIDY_TOTAL,3) as numeric(16,3)),
   $SUBSIDY_TOTAL:=concat('$',cast(round(SUBSIDY_TOTAL,2) as numeric(16,2))),
@@ -632,6 +643,7 @@ order by state_county_fips, ticker, hourly_wage_raw;]]></attr>
 from (
   select
     TICKER,
+    SUBSIDIARY,
     sum(EMP_COUNT_TOTAL) EMP_COUNT_TOTAL,
     sum(EMP_COUNT_SUBSIDY_TOTAL) EMP_COUNT_SUBSIDY_TOTAL,
     sum(SUBSIDY_TOTAL) SUBSIDY_TOTAL,
@@ -690,9 +702,9 @@ from (
       else 0.0
     end SUBSIDY_ABS_BY_EMP_ACA
   from ${TABLE_SUBSIDY_DETAIL}
-  group by ticker
+  group by ticker, subsidiary
 ) t
-order by ticker;]]></attr>
+order by ticker, subsidiary;]]></attr>
 </Node>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_SUMMARY_TICKER}" guiName="Write Report" guiX="420" guiY="201" id="WRITE_REPORT" outputFieldNames="true" type="DATA_WRITER"/>
 <Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS_COUNTY}" guiName="Write Report" guiX="420" guiY="312" id="WRITE_REPORT1" outputFieldNames="true" type="DATA_WRITER"/>
