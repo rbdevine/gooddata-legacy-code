@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 27 10:48:51 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.145" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 27 11:45:03 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.147" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="," name="Details_County" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -118,189 +118,8 @@
 <Property fileURL="workspace.prm" id="GraphParameter72"/>
 <Dictionary/>
 </Global>
-<Phase number="0">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Table: Subsidy Detail" guiX="233" guiY="10" id="TABLE_SUBSIDY_DETAIL" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[DROP TABLE IF EXISTS ${TABLE_SUBSIDY_DETAIL};
-CREATE TABLE ${TABLE_SUBSIDY_DETAIL} (
-  STATE_COUNTY_FIPS VARCHAR(5) NOT NULL,
-  TICKER VARCHAR(32) NOT NULL,
-  SUBSIDIARY VARCHAR(64) NULL,
-  JOC VARCHAR(128) NOT NULL,
-  HOURLY_WAGE_RAW FLOAT NOT NULL,
-  LIVING_WAGE_HOURLY FLOAT NOT NULL,
-  STATE_MINIMUM_WAGE FLOAT NOT NULL,
-  EMP_COUNT_TOTAL FLOAT NOT NULL,
-  EMP_COUNT_SUBSIDY_TOTAL FLOAT NOT NULL,
-  SUBSIDY_TOTAL FLOAT NOT NULL,
-  EMP_COUNT_EITC FLOAT NOT NULL,
-  SUBSIDY_TOTAL_EITC FLOAT NOT NULL,
-  EMP_COUNT_SNAP FLOAT NOT NULL,
-  SUBSIDY_TOTAL_SNAP FLOAT NOT NULL,
-  EMP_COUNT_ADULT_MEDICAID FLOAT NOT NULL,
-  SUBSIDY_TOTAL_ADULT_MEDICAID FLOAT NOT NULL,
-  EMP_COUNT_CHILD_MEDICAID FLOAT NOT NULL,
-  SUBSIDY_TOTAL_CHILD_MEDICAID FLOAT NOT NULL,
-  EMP_COUNT_ACA FLOAT NOT NULL,
-  SUBSIDY_TOTAL_ACA FLOAT NOT NULL
-);
-]]></attr>
-</Node>
-</Phase>
-<Phase number="1">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Detail" guiX="225" guiY="103" id="POPULATE_SUBSIDY_DETAIL" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[INSERT INTO ${TABLE_SUBSIDY_DETAIL}
-select
-  state_county_fips,
-  ticker,
-  subsidiary,
-  joc,
-  wage_hourly_raw,
-  living_wage_hourly,
-  minimum_wage,
-  emp_count_total,
-  emp_count_subsidy_total,
-  eitc_subsidy_total + snap_subsidy_total + adult_medicaid_subsidy_total + child_medicaid_subsidy_total + aca_subsidy_total subsidy_total,
-  emp_count_eitc,
-  eitc_subsidy_total, 
-  emp_count_snap,
-  snap_subsidy_total,
-  emp_count_adult_medicaid,
-  adult_medicaid_subsidy_total,
-  emp_count_child_medicaid,
-  child_medicaid_subsidy_total,
-  emp_count_aca,
-  aca_subsidy_total
-from (
-  select
-    state_county_fips,
-    ticker,
-    subsidiary,
-    joc,
-    isnull(wage_hourly_raw,0.0) wage_hourly_raw,
-    isnull(living_wage_hourly,0.0) living_wage_hourly,
-    isnull(minimum_wage,0.0) minimum_wage,
-    isnull(emp_count_total,0.0) emp_count_total, 
-    isnull(emp_count_subsidy_total,0.0) emp_count_subsidy_total,
-    isnull(emp_count_eitc,0.0) emp_count_eitc,
-    isnull(eitc_subsidy_total/2.0,0.0) eitc_subsidy_total, 
-    isnull(emp_count_snap,0.0) emp_count_snap,
-    isnull(snap_subsidy_total/2.0,0.0) snap_subsidy_total,
-    isnull(emp_count_adult_medicaid,0.0) emp_count_adult_medicaid,
-    isnull(adult_medicaid_subsidy_total,0.0) adult_medicaid_subsidy_total,
-    isnull(emp_count_child_medicaid,0.0) emp_count_child_medicaid,
-    isnull(child_medicaid_subsidy_total/2.0,0.0) child_medicaid_subsidy_total,
-    isnull(emp_count_aca,0.0) emp_count_aca,
-    isnull(aca_subsidy_total/2.0,0.0) aca_subsidy_total
-  from (
-    select 
-      sc.state_county_fips,
-      sc.ticker,
-      sc.subsidiary,
-      sc.joc,
-      gc.wage_hourly_raw,
-      f.living_wage_hourly,
-      sd.minimum_wage,
-      gc.employee_count emp_count_total,
-      case 
-        when gc.wage_hourly_raw < f.living_wage_hourly then gc.employee_count
-        else 0.0
-      end emp_count_below_lw,
-      case
-        when 
-          sc.emp_count_eitc > sc.emp_count_snap and
-          sc.emp_count_eitc > sc.emp_count_adult_medicaid and
-          sc.emp_count_eitc > sc.emp_count_child_medicaid and
-          sc.emp_count_eitc > sc.emp_count_aca
-        then sc.emp_count_eitc
-        when
-          sc.emp_count_snap > sc.emp_count_eitc and
-          sc.emp_count_snap > sc.emp_count_adult_medicaid and
-          sc.emp_count_snap > sc.emp_count_child_medicaid and
-          sc.emp_count_snap > sc.emp_count_aca
-        then sc.emp_count_snap
-        when
-          sc.emp_count_adult_medicaid > sc.emp_count_eitc and
-          sc.emp_count_adult_medicaid > sc.emp_count_snap and
-          sc.emp_count_adult_medicaid > sc.emp_count_child_medicaid and
-          sc.emp_count_adult_medicaid > sc.emp_count_aca
-        then sc.emp_count_adult_medicaid
-        when
-          sc.emp_count_child_medicaid > sc.emp_count_eitc and
-          sc.emp_count_child_medicaid > sc.emp_count_snap and
-          sc.emp_count_child_medicaid > sc.emp_count_adult_medicaid and
-          sc.emp_count_child_medicaid > sc.emp_count_aca
-        then emp_count_child_medicaid
-        when 
-          sc.emp_count_aca > sc.emp_count_eitc and
-          sc.emp_count_aca > sc.emp_count_snap and
-          sc.emp_count_aca > sc.emp_count_adult_medicaid and
-          sc.emp_count_aca > sc.emp_count_child_medicaid
-        then sc.emp_count_aca
-        else
-          emp_count_eitc
-      end emp_count_subsidy_total,
-      sc.emp_count_eitc,
-      sc.emp_count_eitc * isnull(eitc.subsidy_annual,0.0) eitc_subsidy_total,
-      sc.emp_count_snap,
-      snap.subsidy_annual,
-      sc.emp_count_snap * isnull(snap.subsidy_annual,0.0) snap_subsidy_total,
-      sc.emp_count_adult_medicaid,
-      sc.emp_count_adult_medicaid * isnull(sd.adult_medicaid_annual,0.0) adult_medicaid_subsidy_total,
-      sc.emp_count_child_medicaid,
-      sc.emp_count_child_medicaid * isnull(sd.child_medicaid_annual,0.0) child_medicaid_subsidy_total,
-      case
-        when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
-        else sc.emp_count_aca
-      end emp_count_aca,
-      (case
-        when aca_lw.subsidy_annual is null then isnull(aca_base.subsidy_annual,0.0)
-        when isnull(aca_base.subsidy_annual,0.0) >= isnull(aca_lw.subsidy_annual,0.0) then 0.0
-        else aca_lw.subsidy_annual - isnull(aca_base.subsidy_annual,0.0)
-      end) * sc.emp_count_aca aca_subsidy_total
-    from ${TABLE_SUBSIDY_COUNT} sc
-    join ${TABLE_SUBSIDY_COUNTY_JOC_RATE} gc on 
-      gc.state_county_fips = sc.state_county_fips and 
-      gc.ticker = sc.ticker and 
-      isnull(gc.subsidiary,'') = isnull(sc.subsidiary,'') and
-      gc.joc = sc.joc
-    join ${TABLE_FIPS_DATA} f on f.state_county_fips = sc.state_county_fips
-    join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(sc.state_county_fips,2)
-    join (select ticker, subsidiary, subsidy_code from ${TABLE_COMPANY_LIVING_WAGE} group by ticker, subsidiary, subsidy_code) c on c.ticker = sc.ticker and isnull(c.subsidiary,'') = isnull(sc.subsidiary,'')
-    join ${TABLE_STATE_DETAIL} sd on sd.state = fs.state
-    left join ${TABLE_SUBSIDY_EITC} eitc on eitc.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= eitc.maximum_wage
-    left join ${TABLE_SUBSIDY_SNAP} snap on snap.subsidy_code = c.subsidy_code and snap.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= snap.maximum_wage
-    left join ${TABLE_SUBSIDY_ACA} aca_base on aca_base.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= aca_base.maximum_wage
-    left join ${TABLE_SUBSIDY_ACA} aca_lw on aca_lw.minimum_wage <= f.living_wage_hourly and f.living_wage_hourly <= aca_lw.maximum_wage
-  ) t
-) t
-group by
-  state_county_fips,
-  ticker,
-  subsidiary,
-  joc,
-  wage_hourly_raw,
-  living_wage_hourly,
-  minimum_wage,
-  emp_count_total,
-  emp_count_subsidy_total,
-  emp_count_eitc,
-  eitc_subsidy_total, 
-  emp_count_snap,
-  snap_subsidy_total,
-  emp_count_adult_medicaid,
-  adult_medicaid_subsidy_total,
-  emp_count_child_medicaid,
-  child_medicaid_subsidy_total,
-  emp_count_aca,
-  aca_subsidy_total
-order by 
-  state_county_fips, 
-  wage_hourly_raw;
-]]></attr>
-</Node>
-</Phase>
 <Phase number="2">
-<Node enabled="enabled" guiName="Reformat" guiX="242" guiY="201" id="REFORMAT1" type="REFORMAT">
+<Node enabled="enabled" guiName="Reformat" guiX="246" guiY="29" id="REFORMAT1" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -329,7 +148,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" guiName="Reformat" guiX="242" guiY="424" id="REFORMAT2" type="REFORMAT">
+<Node enabled="enabled" guiName="Reformat" guiX="246" guiY="252" id="REFORMAT2" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -358,7 +177,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node enabled="enabled" guiName="Reformat" guiX="242" guiY="312" id="REFORMAT3" type="REFORMAT">
+<Node enabled="enabled" guiName="Reformat" guiX="246" guiY="140" id="REFORMAT3" type="REFORMAT">
 <attr name="transform"><![CDATA[//#CTL2
 
 // Transforms input record into output record.
@@ -387,7 +206,7 @@ function integer transform() {
 // function string getMessage() {}
 ]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details by County" guiX="27" guiY="312" id="SELECT_DETAILS_BY_COUNTY" type="DB_INPUT_TABLE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details by County" guiX="31" guiY="140" id="SELECT_DETAILS_BY_COUNTY" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select
   $STATE_COUNTY_FIPS:=STATE_COUNTY_FIPS,
   $EMP_COUNT_TOTAL:=cast(round(EMP_COUNT_TOTAL,3) as numeric(16,3)),
@@ -491,7 +310,7 @@ from (
 ) t
 order by state_county_fips;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details by County, Ticker" guiX="2" guiY="424" id="SELECT_DETAILS_BY_COUNTY_TICKER" type="DB_INPUT_TABLE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Details by County, Ticker" guiX="6" guiY="252" id="SELECT_DETAILS_BY_COUNTY_TICKER" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select
   $STATE_COUNTY_FIPS:=STATE_COUNTY_FIPS,
   $TICKER:=TICKER,
@@ -604,7 +423,7 @@ from (
 ) t
 order by state_county_fips, ticker, subsidiary, hourly_wage_raw;]]></attr>
 </Node>
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Summary by Ticker" guiX="27" guiY="201" id="SELECT_SUMMARY_BY_TICKER" type="DB_INPUT_TABLE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Select Summary by Ticker" guiX="31" guiY="29" id="SELECT_SUMMARY_BY_TICKER" type="DB_INPUT_TABLE">
 <attr name="sqlQuery"><![CDATA[select
   $TICKER:=TICKER,
   $SUBSIDIARY:=SUBSIDIARY,
@@ -708,9 +527,9 @@ from (
 ) t
 order by ticker, subsidiary;]]></attr>
 </Node>
-<Node enabled="enabled" fileURL="${REPORTFILEPATH_SUMMARY_TICKER}" guiName="Write Report" guiX="420" guiY="201" id="WRITE_REPORT" outputFieldNames="true" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS_COUNTY}" guiName="Write Report" guiX="420" guiY="312" id="WRITE_REPORT1" outputFieldNames="true" type="DATA_WRITER"/>
-<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS_COUNTY_TICKER}" guiName="Write Report" guiX="420" guiY="424" id="WRITE_REPORT2" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_SUMMARY_TICKER}" guiName="Write Report" guiX="424" guiY="29" id="WRITE_REPORT" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS_COUNTY}" guiName="Write Report" guiX="424" guiY="140" id="WRITE_REPORT1" outputFieldNames="true" type="DATA_WRITER"/>
+<Node enabled="enabled" fileURL="${REPORTFILEPATH_DETAILS_COUNTY_TICKER}" guiName="Write Report" guiX="424" guiY="252" id="WRITE_REPORT2" outputFieldNames="true" type="DATA_WRITER"/>
 <Edge fromNode="REFORMAT1:0" guiBendpoints="" guiRouter="Manhattan" id="Edge15" inPort="Port 0 (in)" metadata="Metadata2" outPort="Port 0 (out)" toNode="WRITE_REPORT:0"/>
 <Edge fromNode="REFORMAT2:0" guiBendpoints="" guiRouter="Manhattan" id="Edge19" inPort="Port 0 (in)" metadata="Metadata1" outPort="Port 0 (out)" toNode="WRITE_REPORT2:0"/>
 <Edge fromNode="REFORMAT3:0" guiBendpoints="" guiRouter="Manhattan" id="Edge17" inPort="Port 0 (in)" metadata="Metadata0" outPort="Port 0 (out)" toNode="WRITE_REPORT1:0"/>
