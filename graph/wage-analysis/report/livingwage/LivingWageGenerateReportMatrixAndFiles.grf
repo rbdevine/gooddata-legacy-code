@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Tue Jul 25 12:47:55 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.459" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed Jul 26 23:37:55 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.460" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -327,7 +327,7 @@ select
   concat('$',cast(cast(round(fd.living_wage_hourly,2) as numeric(36,2)) as varchar(8))),
   cast(round(d.employee_count_total,2) as numeric(18,2))
 from (select state_county_fips, ticker, subsidiary, sum(employee_count_total) employee_count_total from ${TABLE_COMPANY_LOCATION_DETAIL} group by state_county_fips, ticker, subsidiary) d
-join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and ((d.subsidiary is null and c.subsidiary is null) or (d.subsidiary = c.subsidiary))
+join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and isnull(d.subsidiary,'') = isnull(c.subsidiary,'')
 join (select g.ticker from ${TABLE_JOC_ORDER} g group by g.ticker ) g on g.ticker = d.ticker
 join ${TABLE_FIPS_DATA} fd on fd.state_county_fips = d.state_county_fips
 left join (select state_county_fips, max(county_name) county_name from ${TABLE_CITY_FIPS} group by state_county_fips) cf on cf.state_county_fips = d.state_county_fips
@@ -345,7 +345,7 @@ join (
   select ticker, subsidiary 
   from ${TABLE_COMPANY_LOCATION_DETAIL} 
   group by ticker, subsidiary
-) d on d.ticker = c.ticker and ((d.subsidiary is null and c.subsidiary is null) or (d.subsidiary = c.subsidiary))
+) d on d.ticker = c.ticker and isnull(d.subsidiary,'') = isnull(c.subsidiary,'')
 group by c.industry, row_type, c.ticker, c.subsidiary;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Ind Header Blank Bottom 1" guiX="173" guiY="316" id="ADD_IND_HEADER_BLANK_BOTTOM_1" type="DB_EXECUTE">
@@ -415,14 +415,7 @@ select
   cast(round(sum(employee_count_living_wage_total),2) as numeric(18,2))
 from (select ticker from ${TABLE_JOC_ORDER} group by ticker) g
 join ${TABLE_COMPANY_LOCATION_DETAIL} d on d.ticker = g.ticker
-join (
-  select industry, ticker, subsidiary
-  from ${TABLE_COMPANY_LIVING_WAGE}
-  union all
-  select industry, s.ticker, null
-  from (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent) s
-  join ${TABLE_COMPANY} c on c.ticker = s.ticker
-) c on c.ticker = d.ticker and isnull(c.subsidiary,'') = isnull(d.subsidiary,'')
+join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and isnull(c.subsidiary,'') = isnull(d.subsidiary,'')
 group by c.ticker, d.subsidiary, c.industry;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Add Totals No Data" guiX="260" guiY="391" id="ADD_TOTALS_NO_DATA" type="DB_EXECUTE">
@@ -440,7 +433,7 @@ left join (
   select ticker, subsidiary 
   from ${TABLE_COMPANY_LOCATION_DETAIL} d 
   group by ticker, subsidiary
-) d on d.ticker = c.ticker and ((d.subsidiary is null and c.subsidiary is null) or (d.subsidiary = c.subsidiary))
+) d on d.ticker = c.ticker and isnull(d.subsidiary,'') = isnull(c.subsidiary,'')
 where d.ticker is null;]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Living Wage Avgs By Company" guiX="-107" guiY="708" id="POPULATE_LIVING_WAGE_AVGS_BY_COMPANY" type="DB_EXECUTE">
@@ -470,7 +463,7 @@ from (
   ) cc 
   join ${TABLE_EMPLOYEE_COUNT_TOTAL} tc on tc.ticker = cc.ticker and ((tc.subsidiary is null and cc.subsidiary is null) or (tc.subsidiary = cc.subsidiary))
   join ${TABLE_FIPS_DATA} f on f.state_county_fips = cc.state_county_fips
-  join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = cc.ticker and ((c.subsidiary is null and cc.subsidiary is null) or (c.subsidiary = cc.subsidiary))
+  join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = cc.ticker and isnull(c.subsidiary,'') = isnull(cc.subsidiary,'')
 ) t
 group by ticker, company, subsidiary;
 ]]></attr>
