@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Wed Jul 26 18:19:56 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.208" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 27 10:53:01 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.215" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -210,11 +210,11 @@ order by
 <attr name="sqlQuery"><![CDATA[update ${TABLE_SUBSIDY_COUNT} sc
 set EMP_COUNT_EITC = gc.employee_count
 from (
-  select gc.state_county_fips, gc.ticker, gc.joc, gc.employee_count
+  select gc.state_county_fips, gc.ticker, gc.subsidiary, gc.joc, gc.employee_count
   from ${TABLE_SUBSIDY_COUNTY_JOC_RATE} gc
   left join ${TABLE_SUBSIDY_EITC} eitc on eitc.minimum_wage <= gc.wage_hourly_raw and gc.wage_hourly_raw <= eitc.maximum_wage
   where eitc.subsidy_annual is not null
-) gc where sc.state_county_fips = gc.state_county_fips and sc.ticker = gc.ticker and sc.joc = gc.joc;]]></attr>
+) gc where sc.state_county_fips = gc.state_county_fips and sc.ticker = gc.ticker and isnull(sc.subsidiary,'') = isnull(gc.subsidiary,'') and sc.joc = gc.joc;]]></attr>
 </Node>
 </Phase>
 <Phase number="6">
@@ -226,19 +226,20 @@ from (
     a1.id,
     a1.state_county_fips,
     a1.ticker,
+    a1.subsidiary,
     a1.employee_count,
     sum(a2.employee_count)-a1.employee_count employee_count_max_prev,
     sum(a2.employee_count) employee_count_max
   from (
-    select a.id, a.state_county_fips, a.ticker, a.employee_count 
+    select a.id, a.state_county_fips, a.ticker, a.subsidiary, a.employee_count 
     from ${TABLE_SUBSIDY_ACCUMULATED_COUNT} a 
   ) a1
   join (
-    select a.id, a.state_county_fips, a.ticker, a.employee_count 
+    select a.id, a.state_county_fips, a.ticker, a.subsidiary, a.employee_count 
     from ${TABLE_SUBSIDY_ACCUMULATED_COUNT} a 
-  ) a2 on a1.state_county_fips = a2.state_county_fips and a1.ticker = a2.ticker and a1.id >= a2.id
-  group by a1.id, a1.state_county_fips, a1.ticker, a1.employee_count
-  order by state_county_fips, a1.ticker, a1.id
+  ) a2 on a1.state_county_fips = a2.state_county_fips and a1.ticker = a2.ticker and isnull(a1.subsidiary,'') = isnull(a2.subsidiary,'') and a1.id >= a2.id
+  group by a1.id, a1.state_county_fips, a1.ticker, a1.subsidiary, a1.employee_count
+  order by state_county_fips, a1.ticker, a1.subsidiary, a1.id
 ) ac
 where ac.id = a.id;]]></attr>
 </Node>
@@ -274,19 +275,21 @@ from (
       select 
         state_county_fips,
         ticker,
+        subsidiary,
         sum(employee_count) employee_count
       from ${TABLE_SUBSIDY_COUNTY_JOC_RATE}
       group by 
         state_county_fips,
-        ticker
-    ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker
+        ticker,
+        subsidiary
+    ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker and isnull(gc.subsidiary,'') = isnull(a.subsidiary,'')
     join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
-    join ${TABLE_COMPANY} c on c.ticker = a.ticker
+    join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = a.ticker and isnull(c.subsidiary,'') = isnull(a.subsidiary,'')
     left join ${TABLE_SUBSIDY_MEDICAID_PARTICIPATION_BY_CODE} mc on mc.subsidy_code = c.subsidy_code
     left join ${TABLE_STATE_DETAIL} sd on sd.state = fs.state
   ) a
 ) ac
-where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.joc = a.joc;]]></attr>
+where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and isnull(ac.subsidiary,'') = isnull(a.subsidiary,'') and ac.joc = a.joc;]]></attr>
 </Node>
 </Phase>
 <Phase number="8">
@@ -314,19 +317,21 @@ from (
       select 
         state_county_fips,
         ticker,
+        subsidiary,
         sum(employee_count) employee_count
       from ${TABLE_SUBSIDY_COUNTY_JOC_RATE}
       group by 
         state_county_fips,
-        ticker
-    ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker
+        ticker,
+        subsidiary
+    ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker and isnull(gc.subsidiary,'') = isnull(a.subsidiary,'')
     join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
-    join ${TABLE_COMPANY} c on c.ticker = a.ticker
+    join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = a.ticker and isnull(c.subsidiary,'') = isnull(a.subsidiary,'')
     left join ${TABLE_SUBSIDY_MEDICAID_PARTICIPATION_BY_CODE} mc on mc.subsidy_code = c.subsidy_code
     left join ${TABLE_STATE_DETAIL} ms on ms.state = fs.state
   ) a
 ) ac
-where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.joc = a.joc;]]></attr>
+where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and isnull(ac.subsidiary,'') = isnull(a.subsidiary,'') and ac.joc = a.joc;]]></attr>
 </Node>
 </Phase>
 <Phase number="9">
@@ -352,19 +357,21 @@ from (
       select 
         state_county_fips,
         ticker,
+        subsidiary,
         sum(employee_count) employee_count
       from ${TABLE_SUBSIDY_COUNTY_JOC_RATE}
       group by 
         state_county_fips,
-        ticker
-    ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker
+        ticker,
+        subsidiary
+    ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker and isnull(gc.subsidiary,'') = isnull(a.subsidiary,'')
     join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
-    join ${TABLE_COMPANY} c on c.ticker = a.ticker
+    join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = a.ticker and isnull(c.subsidiary,'') = isnull(a.subsidiary,'')
     left join ${TABLE_SUBSIDY_SNAP_PARTICIPATION_BY_CODE} sc on sc.subsidy_code = c.subsidy_code
     left join ${TABLE_STATE_DETAIL} sd on sd.state = fs.state
   ) a
 ) ac
-where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.joc = a.joc;]]></attr>
+where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and isnull(ac.subsidiary,'') = isnull(a.subsidiary,'') and ac.joc = a.joc;]]></attr>
 </Node>
 </Phase>
 <Phase number="10">
@@ -397,24 +404,26 @@ from (
       select 
         state_county_fips,
         ticker,
+        subsidiary,
         sum(employee_count) employee_count
       from ${TABLE_SUBSIDY_COUNTY_JOC_RATE}
       group by 
         state_county_fips,
-        ticker
-    ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker
+        ticker,
+        subsidiary
+    ) gc on gc.state_county_fips = a.state_county_fips and gc.ticker = a.ticker and isnull(gc.subsidiary,'') = isnull(a.subsidiary,'')
     join (select state_fips, state_abbreviation state from ${TABLE_CITY_FIPS} group by state_fips, state_abbreviation) fs on fs.state_fips = left(a.state_county_fips,2)
-    join ${TABLE_COMPANY} c on c.ticker = a.ticker
+    join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = a.ticker and isnull(c.subsidiary,'') = isnull(a.subsidiary,'')
     join (
-      select state_county_fips, ticker, sum(emp_count_adult_medicaid) emp_count_adult_medicaid
+      select state_county_fips, ticker, subsidiary, sum(emp_count_adult_medicaid) emp_count_adult_medicaid
       from ${TABLE_SUBSIDY_COUNT}
-      group by state_county_fips, ticker
-    ) sc on sc.state_county_fips = gc.state_county_fips and sc.ticker = a.ticker
+      group by state_county_fips, ticker, subsidiary
+    ) sc on sc.state_county_fips = gc.state_county_fips and sc.ticker = a.ticker and isnull(sc.subsidiary,'') = isnull(a.subsidiary,'')
     left join ${TABLE_SUBSIDY_ACA_MULTIPLIER} am on am.subsidy_code = c.subsidy_code
     left join ${TABLE_SUBSIDY_MEDICAID_PARTICIPATION_BY_CODE} mc on mc.subsidy_code = c.subsidy_code 
   ) a
 ) ac
-where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and ac.joc = a.joc;]]></attr>
+where ac.state_county_fips = a.state_county_fips and ac.ticker = a.ticker and isnull(ac.subsidiary,'') = isnull(a.subsidiary,'') and ac.joc = a.joc;]]></attr>
 </Node>
 </Phase>
 <Phase number="11">
@@ -426,7 +435,7 @@ set
   emp_count_snap = 0.0
 from ${TABLE_SUBSIDY_COUNTY_JOC_RATE} gr
 join ${TABLE_FIPS_DATA} f on f.state_county_fips = gr.state_county_fips and gr.wage_hourly_raw >= f.living_wage_hourly
-where gr.state_county_fips = a.state_county_fips and gr.ticker = a.ticker and gr.joc = a.joc;]]></attr>
+where gr.state_county_fips = a.state_county_fips and gr.ticker = a.ticker and isnull(gr.subsidiary,'') = isnull(a.subsidiary,'') and gr.joc = a.joc;]]></attr>
 </Node>
 </Phase>
 <Phase number="12">
