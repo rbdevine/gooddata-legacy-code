@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Wed Jul 26 23:37:55 EDT 2017" modifiedBy="hankmobley" name="LivingWageGenerateReportMatrix" revision="1.460" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Fri Sep 23 09:41:37 EDT 2016" description="This graph will create all the data necessary for generating living wage reports." guiVersion="3.4.4.P" id="1474644206703" licenseType="Commercial" modified="Thu Jul 27 17:19:05 EDT 2017" modifiedBy="richdevine" name="LivingWageGenerateReportMatrix" revision="1.461" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0">
 <Record fieldDelimiter="|" name="Columns" recordDelimiter="\n" type="delimited">
@@ -410,7 +410,7 @@ select
   d.subsidiary,
   'Score',
   cast(round(((sum(employee_count_living_wage_total)/sum(employee_count_total))*100.0),1) as numeric(18,1)),
-  concat(concat(cast(round(sum(employee_count_living_wage_total),2) as numeric(36,2)),' / '),sum(employee_count_total)),
+  concat(concat(cast(sum(employee_count_living_wage_total) as integer),' / '),cast(sum(employee_count_total) as integer)),
   cast(round(sum(employee_count_total),2) as numeric(18,2)),
   cast(round(sum(employee_count_living_wage_total),2) as numeric(18,2))
 from (select ticker from ${TABLE_JOC_ORDER} group by ticker) g

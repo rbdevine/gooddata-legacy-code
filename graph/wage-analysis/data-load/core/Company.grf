@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Wed Jul 19 12:44:19 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.82" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 15 14:53:16 EDT 2016" description="Load up the living wage distributions." guiVersion="3.4.4.P" id="1473965616523" licenseType="Commercial" modified="Thu Jul 27 13:10:40 EDT 2017" modifiedBy="richdevine" name="LivingWageDistByGOC" revision="1.88" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="COMPANY" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -8,6 +8,7 @@
 <Field name="ALT_COMPANY_NAME" type="string"/>
 <Field name="SUBSIDY_CODE" type="integer"/>
 <Field name="EMPLOYEE_COUNT_MULTIPLIER" type="number"/>
+<Field name="RAW_WAGE_MINIMUM" type="number"/>
 </Record>
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
@@ -16,8 +17,8 @@
 <Property id="GraphParameter2" name="READFILEPATH" value="${DATA_TMP_DIR}/Company.xlsx"/>
 <Property id="GraphParameter3" name="TMP_TABLENAME" value="TMP_COMPANY"/>
 <Property fileURL="wage.prm" id="GraphParameter4"/>
-<Property fileURL="workspace.prm" id="GraphParameter66"/>
-<Property id="GraphParameter84" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
+<Property fileURL="workspace.prm" id="GraphParameter70"/>
+<Property id="GraphParameter88" name="WRITEFILEPATH" value="${DATA_TRANSFORM_DIR}/Company.txt"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -29,7 +30,8 @@ CREATE TABLE IF NOT EXISTS ${TABLE_COMPANY} (
   INDUSTRY VARCHAR(128) NOT NULL,
   ALT_COMPANY_NAME VARCHAR(64) UNIQUE NULL,
   SUBSIDY_CODE INTEGER NULL,
-  EMPLOYEE_COUNT_MULTIPLIER FLOAT NULL
+  EMPLOYEE_COUNT_MULTIPLIER FLOAT NULL,
+  RAW_WAGE_MINIMUM FLOAT NULL
 );]]></attr>
 </Node>
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Create Temp Table" guiX="268" guiY="16" id="CREATE_TEMP_TABLE" type="DB_EXECUTE">
@@ -40,7 +42,8 @@ CREATE TABLE IF NOT EXISTS ${TMP_TABLENAME} (
   INDUSTRY VARCHAR(128),
   ALT_COMPANY_NAME VARCHAR(64),
   SUBSIDY_CODE INTEGER,
-  EMPLOYEE_COUNT_MULTIPLIER FLOAT
+  EMPLOYEE_COUNT_MULTIPLIER FLOAT,
+  RAW_WAGE_MINIMUM FLOAT
 );]]></attr>
 </Node>
 <Node baseURL="${DOWNLOADFILEPATH}" destination="${DATA_TMP_DIR}" enabled="enabled" guiName="File Download" guiX="12" guiY="16" id="FILE_DOWNLOAD" type="FILE_DOWNLOAD"/>
@@ -89,7 +92,8 @@ function integer transform() {
     INDUSTRY,
     ALT_COMPANY_NAME,
     SUBSIDY_CODE,
-    EMPLOYEE_COUNT_MULTIPLIER
+    EMPLOYEE_COUNT_MULTIPLIER,
+    RAW_WAGE_MINIMUM
 )
 FROM LOCAL '${WRITEFILEPATH}'
 EXCEPTIONS '${POPULATEERRORFILEPATH}';
@@ -106,6 +110,7 @@ UPDATE ${TMP_TABLENAME} SET ALT_COMPANY_NAME = TRIM(ALT_COMPANY_NAME);
 UPDATE ${TMP_TABLENAME} SET ALT_COMPANY_NAME = NULL WHERE ALT_COMPANY_NAME = '';
 UPDATE ${TMP_TABLENAME} SET SUBSIDY_CODE = NULL WHERE SUBSIDY_CODE <= 0;
 UPDATE ${TMP_TABLENAME} SET EMPLOYEE_COUNT_MULTIPLIER = NULL WHERE EMPLOYEE_COUNT_MULTIPLIER <= 0.0;
+UPDATE ${TMP_TABLENAME} SET RAW_WAGE_MINIMUM = NULL WHERE RAW_WAGE_MINIMUM <= 0.0;
 ]]></attr>
 </Node>
 <Node baseURL="${WRITEFILEPATH}" enabled="enabled" guiName="Clean Write" guiX="141" guiY="273" id="CLEAN_WRITE" type="FILE_DELETE"/>
@@ -119,7 +124,8 @@ SELECT
   MAX(INDUSTRY),
   MAX(ALT_COMPANY_NAME),
   MAX(SUBSIDY_CODE),
-  MAX(EMPLOYEE_COUNT_MULTIPLIER)
+  MAX(EMPLOYEE_COUNT_MULTIPLIER),
+  MAX(RAW_WAGE_MINIMUM)
 FROM (
   SELECT
     TICKER,
@@ -130,7 +136,8 @@ FROM (
       WHEN SUBSIDY_CODE IS NOT NULL THEN CAST(SUBSIDY_CODE AS INTEGER)
       ELSE NULL
     END SUBSIDY_CODE,
-    EMPLOYEE_COUNT_MULTIPLIER
+    EMPLOYEE_COUNT_MULTIPLIER,
+    RAW_WAGE_MINIMUM
   FROM ${TMP_TABLENAME}
 ) t
 GROUP BY TICKER;]]></attr>

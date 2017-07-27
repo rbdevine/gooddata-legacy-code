@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon Jul 24 15:20:02 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.203" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 27 17:07:23 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.204" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="ProcessTypeId" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -17,8 +17,8 @@
 </Metadata>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property fileURL="wage.prm" id="GraphParameter0"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter65"/>
-<Property fileURL="workspace.prm" id="GraphParameter87"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter66"/>
+<Property fileURL="workspace.prm" id="GraphParameter88"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -90,42 +90,36 @@ and subsidiary is null;
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_COMPANY_LOCATION_DETAIL}
 (state_county_fips, ticker, subsidiary, joc, employee_count_total, wage_hourly_raw, wage_hourly_cola, employee_count_living_wage_total)
 select 
-  cc.state_county_fips,
-  d.ticker,
-  cc.subsidiary,
-  ws.joc,
-  /*cast(*/cc.employee_count*d.distribution /*as int)*/ emp_count,
-  cast(round((ws.wage_hourly_cola/100.0)*f.cost_of_living_index,2) as numeric (16,2)) reverse_adj, 
-  ws.wage_hourly_cola,
+  w.state_county_fips,
+  w.ticker,
+  w.subsidiary,
+  w.joc,
+  w.emp_count,
+  case when w.reverse_adj < isnull(c.raw_wage_minimum,0.0) then c.raw_wage_minimum else w.reverse_adj end wage_hourly_raw,
+  w.wage_hourly_cola,
   -1.0
-  /*
-  cast(
-   (
-    case
-      when ((ws.wage_hourly_cola/100.0)*f.cost_of_living_index) >= f.living_wage_hourly then 1
-      else 0
-    end
-  )*cc.employee_count*d.distribution as int) pays_living_wage 
-  */
-from ${TABLE_COUNTY_EMPLOYEE_COUNT} cc
-join ${TABLE_FIPS_DATA} f on f.state_county_fips = cc.state_county_fips
-join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = cc.ticker and isnull(cc.subsidiary,d.subsidiary) = d.subsidiary
-join (
-  select c.ticker, s.subsidiary_name 
-  from ${TABLE_COMPANY_SUBSIDIARY_TICKER} c
-  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
-  where s.ticker_subsidiary is null
-) c on c.ticker = d.ticker and isnull(c.subsidiary_name,d.subsidiary) = d.subsidiary
-join ${TABLE_WAGE_SUMMARY} ws on ws.ticker = cc.ticker and ws.joc = d.joc
-where 
-  cc.employee_count is not null and 
-  d.distribution is not null and
-  ws.wage_hourly_cola is not null and
-  f.cost_of_living_index is not null
-  and (
-    d.ticker not in (select ticker_parent from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent)
-    or cc.subsidiary is not null
-  );]]></attr>
+from (
+  select 
+    cc.state_county_fips,
+    d.ticker,
+    cc.subsidiary,
+    ws.joc,
+    cc.employee_count*d.distribution emp_count,
+    cast(round((ws.wage_hourly_cola/100.0)*f.cost_of_living_index,2) as numeric (16,2)) reverse_adj, 
+    ws.wage_hourly_cola
+  from ${TABLE_COUNTY_EMPLOYEE_COUNT} cc
+  join ${TABLE_FIPS_DATA} f on f.state_county_fips = cc.state_county_fips
+  join ${TABLE_JOC_DISTRIBUTION} d on d.ticker = cc.ticker and isnull(cc.subsidiary,d.subsidiary) = d.subsidiary
+  join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = d.ticker and not c.has_subsidiaries and isnull(c.subsidiary,'') = isnull(cc.subsidiary,'')
+  join ${TABLE_WAGE_SUMMARY} ws on ws.ticker = cc.ticker and ws.joc = d.joc
+  where 
+    cc.employee_count is not null and 
+    d.distribution is not null and
+    ws.wage_hourly_cola is not null and
+    f.cost_of_living_index is not null
+) w
+join ${TABLE_COMPANY_LIVING_WAGE} c on c.ticker = w.ticker and isnull(c.subsidiary,'') = isnull(w.subsidiary,'')
+where not c.has_subsidiaries;]]></attr>
 </Node>
 </Phase>
 <Phase number="3">
