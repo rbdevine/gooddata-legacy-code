@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Tue Jul 25 18:18:52 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.83" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Mon Sep 19 09:45:33 EDT 2016" description="Load up a list of cities and states and try to match " guiVersion="3.4.4.P" id="1474293575901" licenseType="Commercial" modified="Fri Jul 28 11:28:32 EDT 2017" modifiedBy="richdevine" name="LivingWageCitiesThatNeedFips" revision="1.84" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata0" previewAttachmentCharset="ISO-8859-1">
 <Record fieldDelimiter="|" name="CityCountyState" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\n" type="delimited">
@@ -130,7 +130,7 @@ where length(state_county_fips) = 4;]]></attr>
 </Node>
 </Phase>
 <Phase number="9">
-<Node dbConnection="JDBC0" enabled="disabled" guiName="Apply County Count Multiplier" guiX="70" guiY="793" id="APPLY_COUNTY_COUNT_MULTIPLIER1" type="DB_EXECUTE">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Apply County Count Multiplier" guiX="70" guiY="793" id="APPLY_COUNTY_COUNT_MULTIPLIER1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[/* rough adjustment for companies with distribution/branches we did not capture due to missing job distribution information */
 update ${TABLE_COUNTY_EMPLOYEE_COUNT} ec
 set employee_count = employee_count_multiplier * employee_count
