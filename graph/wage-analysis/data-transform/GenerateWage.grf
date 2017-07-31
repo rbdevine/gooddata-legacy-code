@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Jul 24 17:58:22 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.355" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Thu Sep 22 10:24:29 EDT 2016" description="This massages the original fair pay data sources into a smaller, more managable table to&#10;act as the data source for later, more coplex queries to generate reports.&#10;&#10;At the time of this writing, only glassdoor data is being used, but we could add other &#10;sources later.&#10;&#10;In additoin to creating the lookup table, it also cleans up a few issues with fips matching&#10;and adds some titles (e..g., software engineer 3 - 5 years)" guiVersion="3.4.4.P" id="1474554360353" licenseType="Commercial" modified="Mon Jul 31 13:14:20 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupTables" revision="1.356" showComponentDetails="true">
 <Global>
 <Connection database="DSS" dbURL="jdbc:dss://secure.gooddata.com/gdc/dss/instances/d68eb234fff8f2750cbf7dd02b20fd0e" id="JDBC0" jdbcSpecific="DSS" name="GOODDATA_DEV" password="justcapital1!" type="JDBC" user="ps-etl+justcapital_research@gooddata.com"/>
 <Property id="GraphParameter0" name="TMP_TABLE_COMPANY_NAME_TICKER" value="${TMP_BASE}_COMPANY_NAME_TICKER"/>
-<Property fileURL="wage-staging.prm" id="GraphParameter66"/>
-<Property fileURL="workspace.prm" id="GraphParameter88"/>
-<Property fileURL="wage.prm" id="GraphParameter1"/>
+<Property fileURL="wage.prm" id="GraphParameter41"/>
+<Property fileURL="wage-staging.prm" id="GraphParameter1"/>
+<Property fileURL="workspace.prm" id="GraphParameter23"/>
 <Dictionary/>
 </Global>
 <Phase number="0">
@@ -484,7 +484,36 @@ select w.* from ${TABLE_WAGE} w join ${TABLE_DATA_SOURCE} ds on ds.data_source_i
 </Phase>
 <Phase number="10">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Low Wages" guiX="93" guiY="909" id="DROP_LOW_WAGES" type="DB_EXECUTE">
-<attr name="sqlQuery"><![CDATA[delete from ${TABLE_WAGE} where hourly_wage_cola < ${CONST_MINIMUM_ALLOWED_WAGE};]]></attr>
+<attr name="sqlQuery"><![CDATA[CREATE TABLE ${TMP_BASE}_${TABLE_WAGE} (
+  DATA_SOURCE_ID INT NOT NULL,
+  RECORD_ID VARCHAR(255) NULL,
+  CITY VARCHAR(255) NOT NULL,
+  STATE VARCHAR(2) NOT NULL,
+  TICKER VARCHAR(16) NOT NULL,
+  JOC VARCHAR(128) NOT NULL,
+  JOB_TITLE VARCHAR(128) NOT NULL,
+  HOURLY_WAGE_RAW FLOAT NOT NULL,
+  HOURLY_WAGE_COLA FLOAT NOT NULL,
+  WAGE_YEAR INT NULL,
+  YEARS_OF_EXPERIENCE INT NULL
+);
+
+INSERT INTO ${TMP_BASE}_${TABLE_WAGE}
+select w.*
+from ${TABLE_WAGE} w
+where hourly_wage_cola >= ${CONST_MINIMUM_ALLOWED_WAGE}
+union all
+select w.*
+from ${TABLE_WAGE} w
+join ${TABLE_JOC_WAGE_MULTIPLIER} m on m.ticker = w.ticker and m.joc = w.joc
+where hourly_wage_cola < ${CONST_MINIMUM_ALLOWED_WAGE};
+
+TRUNCATE TABLE ${TABLE_WAGE};
+
+INSERT INTO ${TABLE_WAGE}
+SELECT * FROM ${TMP_BASE}_${TABLE_WAGE};
+
+DROP TABLE ${TMP_BASE}_${TABLE_WAGE};]]></attr>
 </Node>
 </Phase>
 <Phase number="11">

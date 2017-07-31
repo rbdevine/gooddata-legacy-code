@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Thu Jul 27 11:44:34 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.217" showComponentDetails="true">
+<?xml version="1.0" encoding="UTF-8"?><Graph author="hankmobley" created="Sun Sep 04 11:29:08 EDT 2016" description="This step generates all the data required for all industry and company summary reports.&#10;It does not generate the reports themselves, but rather makes data available for reports&#10;to be created separately.&#10;&#10;This graph only needs to be run if cut-criteria for what's included changes or if the underlying&#10;salary data is updated or added to (which is done in a separate step.)&#10;&#10;This graph assumes the main salaray data table has been generated. (As of this writing, the &#10;table is called, JUST_WAGE, but since we may be incorporating&#10;non-glassdoor data, may change it to LKP_FAIRPAY_SALARY_DW)." guiVersion="3.4.4.P" id="1473004233680" licenseType="Commercial" modified="Mon Jul 31 12:33:31 EDT 2017" modifiedBy="richdevine" name="FairPayGenerateLookupMatrix" revision="1.225" showComponentDetails="true">
 <Global>
 <Metadata id="Metadata2">
 <Record fieldDelimiter="|" name="RunGraph_Name" recordDelimiter="\n" type="delimited">
@@ -93,75 +93,47 @@ create table if not exists ${TABLE_SUBSIDY_COUNTY_JOC_RATE} (
 <Phase number="1">
 <Node dbConnection="JDBC0" enabled="enabled" guiName="Populate Subsidy Rate Table" guiX="160" guiY="93" id="POPULATE_SUBSIDY_RATE_TABLE" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[insert into ${TABLE_SUBSIDY_COUNTY_JOC_RATE}
-/*
 select 
   cd.state_county_fips,
   cd.ticker,
   cd.subsidiary,
   cd.joc,
-  cast(cd.employee_count_total as integer) employee_count_total,
-  AVG(cd.wage_hourly_raw_min_wage_adj) wage_hourly_raw 
-from (
-*/
-  select 
-    cd.state_county_fips,
-    cd.ticker,
-    cd.subsidiary,
-    cd.joc,
-    cd.employee_count_total*isnull(cm.employee_count_multiplier,1.0) employee_count_total,
-    cd.wage_hourly_raw_min_wage_adj
-  from ${TABLE_COMPANY_LOCATION_DETAIL} cd
-  join (
-    select
-      c.ticker,
-      null subsidiary,
-      c.employee_count_multiplier
-    from ${TABLE_COMPANY} c
-    left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
-    where s.ticker_parent is null
-    union all
-    select
-      c.ticker,
-      s.subsidiary_name subsidiary,
-      isnull(s.employee_count_multiplier,c.employee_count_multiplier) employee_count_multiplier
-    from ${TABLE_SUBSIDIARY} s
-    join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
-    where s.ticker_subsidiary is null
-    union all
-    select
-      c.ticker,
-      null subsidiary,
-      c.employee_count_multiplier
-    from (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent) s
-    join ${TABLE_COMPANY} c on c.ticker = s.ticker
-    union all
-    select
-      s.ticker_subsidiary ticker,
-      null subsidiary,
-      isnull(s.employee_count_multiplier,c.employee_count_multiplier) employee_count_multiplier
-    from (select ticker_parent, ticker_subsidiary, employee_count_multiplier from ${TABLE_SUBSIDIARY} where ticker_subsidiary is not null) s
-    join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
-  ) cm on cm.ticker = cd.ticker and isnull(cm.subsidiary,'') = isnull(cd.subsidiary,'')
-  /*
-  left join (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent) s on s.ticker = cd.ticker
-  where s.ticker is null or cd.subsidiary is null
-  */
-  group by 
-    cd.state_county_fips, 
-    cd.ticker, 
-    cd.subsidiary, 
-    cd.joc, 
-    cd.employee_count_total,
-    cd.wage_hourly_raw_min_wage_adj,
-    cm.employee_count_multiplier
-/*
-) cd
+  cd.employee_count_total*isnull(cm.employee_count_multiplier,1.0) employee_count_total,
+  cd.wage_hourly_raw_min_wage_adj
+from ${TABLE_COMPANY_LOCATION_DETAIL} cd
+join (
+  select
+    c.ticker,
+    null subsidiary,
+    c.employee_count_multiplier
+  from ${TABLE_COMPANY} c
+  left join ${TABLE_SUBSIDIARY} s on s.ticker_parent = c.ticker
+  where s.ticker_parent is null
+  union all
+  select
+    c.ticker,
+    s.subsidiary_name subsidiary,
+    isnull(s.employee_count_multiplier,c.employee_count_multiplier) employee_count_multiplier
+  from ${TABLE_SUBSIDIARY} s
+  join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+  where s.ticker_subsidiary is null
+  union all
+  select
+    s.ticker_subsidiary ticker,
+    null subsidiary,
+    isnull(s.employee_count_multiplier,c.employee_count_multiplier) employee_count_multiplier
+  from (select ticker_parent, ticker_subsidiary, employee_count_multiplier from ${TABLE_SUBSIDIARY} where ticker_subsidiary is not null) s
+  join ${TABLE_COMPANY} c on c.ticker = s.ticker_parent
+) cm on cm.ticker = cd.ticker and isnull(cm.subsidiary,'') = isnull(cd.subsidiary,'')
 group by 
   cd.state_county_fips, 
-  cd.ticker,
-  cd.joc,
-  cd.employee_count_total;
-*/;]]></attr>
+  cd.ticker, 
+  cd.subsidiary, 
+  cd.joc, 
+  cd.employee_count_total,
+  cd.wage_hourly_raw_min_wage_adj,
+  cm.employee_count_multiplier;
+]]></attr>
 </Node>
 </Phase>
 <Phase number="2">
@@ -597,10 +569,49 @@ order by
 </Node>
 </Phase>
 <Phase number="11">
-<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/report/subsidy/LivingWageSubsidyGenerateReportFilesOnly.grf" guiName="Run Reports" guiX="194" guiY="867" id="RUN_REPORTS" type="RUN_GRAPH"/>
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Add Subsidiary Parents" guiX="177" guiY="863" id="ADD_SUBSIDIARY_PARENTS" type="DB_EXECUTE">
+<attr name="sqlQuery"><![CDATA[SET LOCALE to LEN_S1;
+
+INSERT INTO ${TABLE_SUBSIDY_DETAIL}
+select 
+  d.state_county_fips, 
+  d.ticker, 
+  null subsidiary, 
+  d.joc, 
+  d.hourly_wage_raw,
+  d.living_wage_hourly,
+  d.state_minimum_wage,
+  sum(d.emp_count_total) emp_count_total,
+  sum(d.emp_count_subsidy_total) emp_count_subsidy_total,
+  sum(d.subsidy_total) subsidy_total,
+  sum(d.emp_count_eitc) emp_count_eitc,
+  sum(d.subsidy_total_eitc) subsidy_total_eitc,
+  sum(d.emp_count_snap) emp_count_snap,
+  sum(d.subsidy_total_snap) emp_total_snap,
+  sum(d.emp_count_adult_medicaid) emp_count_adult_medicaid,
+  sum(d.subsidy_total_adult_medicaid) emp_total_adult_medicaid,
+  sum(d.emp_count_child_medicaid) emp_count_child_medicaid,
+  sum(d.subsidy_total_child_medicaid) emp_total_child_medicaid,
+  sum(d.emp_count_aca) emp_count_aca,
+  sum(d.subsidy_total_aca) subsidy_total_aca
+from ${TABLE_SUBSIDY_DETAIL} d
+join (
+    select
+      c.ticker,
+      null subsidiary,
+      c.employee_count_multiplier
+    from (select ticker_parent ticker from ${TABLE_SUBSIDIARY} where ticker_subsidiary is null group by ticker_parent) s
+    join ${TABLE_COMPANY} c on c.ticker = s.ticker
+) t on t.ticker = d.ticker
+group by d.state_county_fips, d.ticker, d.joc, d.hourly_wage_raw, d.living_wage_hourly, d.state_minimum_wage;
+]]></attr>
+</Node>
 </Phase>
 <Phase number="12">
-<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Accumulation Table" guiX="174" guiY="970" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
+<Node enabled="enabled" graphName="${GRAPH_DIR}/wage-analysis/report/subsidy/LivingWageSubsidyGenerateReportFilesOnly.grf" guiName="Run Reports" guiX="194" guiY="942" id="RUN_REPORTS" type="RUN_GRAPH"/>
+</Phase>
+<Phase number="13">
+<Node dbConnection="JDBC0" enabled="enabled" guiName="Drop Accumulation Table" guiX="173" guiY="1044" id="DROP_ACCUMULATION_TABLE1" type="DB_EXECUTE">
 <attr name="sqlQuery"><![CDATA[drop table if exists ${TABLE_SUBSIDY_ACCUMULATED_COUNT};]]></attr>
 </Node>
 </Phase>
